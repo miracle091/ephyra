@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Ephyra-only strings, in English (the default).
+    Keep upstream's strings.xml untouched so merges from jellyfin-androidtv stay clean.
+    Every string here needs its Italian version in values-it/strings_ephyra.xml.
+    Other languages fall back to English.
+-->
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+</resources>
