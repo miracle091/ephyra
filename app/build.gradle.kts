@@ -5,6 +5,9 @@ plugins {
 	alias(libs.plugins.kotlin.serialization)
 }
 
+// Ephyra: own application id, so it installs next to the official app. The namespace stays unchanged.
+val ephyraAppId = "com.ephyra.app"
+
 android {
 	namespace = "org.jellyfin.androidtv"
 	compileSdk = libs.versions.android.compileSdk.get().toInt()
@@ -14,9 +17,18 @@ android {
 		targetSdk = libs.versions.android.targetSdk.get().toInt()
 
 		// Release version
-		applicationId = namespace
+		applicationId = ephyraAppId
 		versionName = project.getVersionName()
 		versionCode = getVersionCode(versionName!!)
+	}
+
+	// Ephyra: drop files the app never reads at runtime
+	packaging {
+		resources.excludes += listOf(
+			"DebugProbesKt.bin",
+			"kotlin-tooling-metadata.json",
+			"META-INF/*.version",
+		)
 	}
 
 	buildFeatures {
@@ -57,13 +69,17 @@ android {
 			isShrinkResources = true
 			proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
 
+			// Ephyra: the Shield's Tegra X1+ runs a 64-bit userspace; other ABIs only add native weight (FFmpeg, libass).
+			// Debug builds keep every ABI so they still install on x86 emulators.
+			ndk { abiFilters += "arm64-v8a" }
+
 			// Set package names used in various XML files
-			resValue("string", "app_id", namespace!!)
-			resValue("string", "app_search_suggest_authority", "${namespace}.content")
-			resValue("string", "app_search_suggest_intent_data", "content://${namespace}.content/intent")
+			resValue("string", "app_id", ephyraAppId)
+			resValue("string", "app_search_suggest_authority", "${ephyraAppId}.content")
+			resValue("string", "app_search_suggest_intent_data", "content://${ephyraAppId}.content/intent")
 
 			// Set flavored application name
-			resValue("string", "app_name", "@string/app_name_release")
+			resValue("string", "app_name", "@string/ephyra_app_name")
 
 			buildConfigField("boolean", "DEVELOPMENT", "false")
 
@@ -75,12 +91,12 @@ android {
 			applicationIdSuffix = ".debug"
 
 			// Set package names used in various XML files
-			resValue("string", "app_id", namespace + applicationIdSuffix)
-			resValue("string", "app_search_suggest_authority", "${namespace + applicationIdSuffix}.content")
-			resValue("string", "app_search_suggest_intent_data", "content://${namespace + applicationIdSuffix}.content/intent")
+			resValue("string", "app_id", ephyraAppId + applicationIdSuffix)
+			resValue("string", "app_search_suggest_authority", "${ephyraAppId + applicationIdSuffix}.content")
+			resValue("string", "app_search_suggest_intent_data", "content://${ephyraAppId + applicationIdSuffix}.content/intent")
 
 			// Set flavored application name
-			resValue("string", "app_name", "@string/app_name_debug")
+			resValue("string", "app_name", "@string/ephyra_app_name_debug")
 
 			buildConfigField("boolean", "DEVELOPMENT", (defaultConfig.versionCode!! < 100).toString())
 		}
@@ -97,7 +113,7 @@ android {
 	}
 }
 
-base.archivesName.set("jellyfin-androidtv-v${project.getVersionName()}")
+base.archivesName.set("ephyra-v${project.getVersionName()}")
 
 tasks.register("versionTxt") {
 	val path = layout.buildDirectory.asFile.get().resolve("version.txt")

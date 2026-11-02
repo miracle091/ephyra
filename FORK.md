@@ -52,7 +52,8 @@ The status column shows how far each change has gone. A change becomes "done" wh
 |---|---|---|
 | Dependencies | A build check fails if Google Play Services, Firebase, Play Core or the Cast SDK appear in the dependency graph | done |
 | Dependencies | Accompanist permissions are replaced with AndroidX Activity Result APIs | done |
-| Build | minSdk 30 (Android 11), arm64-v8a only, R8 strips debug logging | planned |
+| Identity | Name Ephyra, application id `com.ephyra.app` (namespace unchanged); backup rules cover the new id | done |
+| Build | minSdk 30 (Android 11), arm64-v8a only, R8 strips debug logging | done |
 | Build | Baseline profile for faster startup and smoother scrolling | planned |
 | Playback | Hardware decoders come first for H.264, HEVC, VP9 and Dolby Vision; buffer size scales with the device's memory | planned |
 | Playback | Software decoders are off by default; AV1 (no hardware decoder on Tegra X1+) is left to server transcoding | planned |

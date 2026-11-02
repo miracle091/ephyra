@@ -4,6 +4,10 @@
     Keep upstream's strings.xml untouched so merges from jellyfin-androidtv stay clean.
     Every string here needs its Italian version in values-it/strings_ephyra.xml.
     Other languages fall back to English.
+    Strings marked translatable="false" (names) live only here.
 -->
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+    <!-- Used from app/build.gradle.kts (resValue app_name), which lint can't see -->
+    <string name="ephyra_app_name" translatable="false" tools:ignore="UnusedResources">Ephyra</string>
+    <string name="ephyra_app_name_debug" translatable="false" tools:ignore="UnusedResources">Ephyra Debug</string>
 </resources>
