@@ -10,6 +10,7 @@ import androidx.core.content.ContextCompat
 import androidx.media3.common.MimeTypes
 import kotlinx.serialization.json.Json
 import org.jellyfin.androidtv.BuildConfig
+import org.jellyfin.androidtv.EphyraInfo
 import org.jellyfin.androidtv.constant.Codec
 import org.jellyfin.androidtv.preference.UserPreferences
 import org.jellyfin.androidtv.util.AndroidVersion
@@ -65,9 +66,9 @@ fun createDeviceProfileReport(
 ) = buildMarkdown {
 	// Header
 	appendLine("---")
-	appendLine("client: Jellyfin for Android TV")
+	appendLine("client: ${EphyraInfo.CLIENT_NAME}")
 	appendLine("client_version: ${BuildConfig.VERSION_NAME}")
-	appendLine("client_repository: https://github.com/jellyfin/jellyfin-androidtv")
+	appendLine("client_repository: ${EphyraInfo.REPOSITORY_URL}")
 	appendLine("type: media_capabilities_report")
 	appendLine("format: markdown")
 	appendLine("---")

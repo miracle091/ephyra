@@ -68,7 +68,7 @@ private fun ConnectHelpAlert(
 					)
 					Text(
 						modifier = Modifier.padding(top = 16.dp),
-						text = stringResource(R.string.login_help_description),
+						text = stringResource(R.string.ephyra_login_help_description),
 						style = LocalTextStyle.current.copy(fontSize = 16.sp),
 					)
 					Button(

@@ -30,6 +30,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import org.jellyfin.androidtv.BuildConfig
+import org.jellyfin.androidtv.EphyraInfo
 import org.jellyfin.androidtv.R
 import org.jellyfin.androidtv.auth.model.ConnectedState
 import org.jellyfin.androidtv.auth.model.ConnectingState
@@ -200,7 +201,7 @@ class SelectServerFragment : Fragment() {
 
 		// App info
 		@Suppress("SetTextI18n")
-		binding.appVersion.text = "jellyfin-androidtv ${BuildConfig.VERSION_NAME} ${BuildConfig.BUILD_TYPE}"
+		binding.appVersion.text = "${EphyraInfo.VERSION_PREFIX} ${BuildConfig.VERSION_NAME} ${BuildConfig.BUILD_TYPE}"
 
 		// Set focus to fragment
 		binding.root.requestFocus()

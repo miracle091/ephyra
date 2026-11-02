@@ -16,6 +16,7 @@ import org.acra.sender.ReportSender
 import org.acra.sender.ReportSenderException
 import org.acra.sender.ReportSenderFactory
 import org.jellyfin.androidtv.BuildConfig
+import org.jellyfin.androidtv.EphyraInfo
 import org.jellyfin.androidtv.R
 import org.jellyfin.androidtv.preference.TelemetryPreferences
 import org.jellyfin.androidtv.util.appendCodeBlock
@@ -69,7 +70,7 @@ object TelemetryService {
 			val connection = URL(url).openConnection() as HttpURLConnection
 			// Add authorization
 			val clientName = buildString {
-				append("Jellyfin for Android TV")
+				append(EphyraInfo.CLIENT_NAME)
 				if (BuildConfig.DEBUG) append(" (debug)")
 			}
 			val authorization = AuthorizationHeaderBuilder.buildHeader(
@@ -97,9 +98,9 @@ object TelemetryService {
 		private fun CrashReportData.toReport(): String = buildMarkdown {
 			// Header
 			appendLine("---")
-			appendLine("client: Jellyfin for Android TV")
+			appendLine("client: ${EphyraInfo.CLIENT_NAME}")
 			appendLine("client_version: ${BuildConfig.VERSION_NAME}")
-			appendLine("client_repository: https://github.com/jellyfin/jellyfin-androidtv")
+			appendLine("client_repository: ${EphyraInfo.REPOSITORY_URL}")
 			appendLine("type: crash_report")
 			appendLine("format: markdown")
 			appendLine("---")

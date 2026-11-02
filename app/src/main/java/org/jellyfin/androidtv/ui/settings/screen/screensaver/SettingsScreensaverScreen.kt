@@ -37,7 +37,7 @@ fun SettingsScreensaverScreen() {
 			ListButton(
 				headingContent = { Text(stringResource(R.string.pref_screensaver_inapp_enabled)) },
 				trailingContent = { Checkbox(checked = screensaverInAppEnabled) },
-				captionContent = { Text(stringResource(R.string.pref_screensaver_inapp_enabled_description)) },
+				captionContent = { Text(stringResource(R.string.ephyra_screensaver_inapp_enabled_description)) },
 				onClick = { screensaverInAppEnabled = !screensaverInAppEnabled },
 				modifier = Modifier.focusKey("screensaver_in_app_enabled")
 			)

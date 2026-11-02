@@ -102,7 +102,7 @@ fun SettingsCustomizationScreen() {
 
 			ListButton(
 				headingContent = { Text(stringResource(R.string.tv_provider_enabled)) },
-				captionContent = { Text(stringResource(R.string.tv_provider_enabled_description)) },
+				captionContent = { Text(stringResource(R.string.ephyra_tv_provider_enabled_description)) },
 				trailingContent = { Checkbox(checked = tvProviderEnabled) },
 				onClick = {
 					tvProviderEnabled = !tvProviderEnabled

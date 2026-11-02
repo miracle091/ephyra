@@ -4,4 +4,12 @@
     Not managed by Weblate: keep the same names and order as the English file.
 -->
 <resources>
+    <string name="ephyra_welcome_title">Benvenuto in Ephyra!</string>
+    <string name="ephyra_login_help_description">Ephyra ha bisogno di un server Jellyfin a cui connettersi. Visita la documentazione di Jellyfin su docs.jellyfin.org o scansiona il codice QR per installare un server.</string>
+    <string name="ephyra_no_network_permissions">Ephyra richiede i permessi di rete per funzionare</string>
+    <string name="ephyra_searchable_hint">Cerca in Ephyra</string>
+    <string name="ephyra_tv_provider_enabled_description">Mostra i canali e i suggerimenti di Ephyra nella schermata home di Android TV</string>
+    <string name="ephyra_screensaver_inapp_enabled_description">Mostra il salvaschermo di Ephyra mentre l\'app è aperta</string>
+    <string name="ephyra_video_player_external_empty">Non hai installato sul tuo dispositivo nessun lettore video che possa aprire questi video.</string>
+    <string name="ephyra_app_version">Versione di Ephyra</string>
 </resources>

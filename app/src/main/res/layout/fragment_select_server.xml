@@ -38,7 +38,7 @@
             style="@style/Widget.Jellyfin.Row.Header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/welcome_title" />
+            android:text="@string/ephyra_welcome_title" />
 
         <TextView
             android:id="@+id/welcome_content"

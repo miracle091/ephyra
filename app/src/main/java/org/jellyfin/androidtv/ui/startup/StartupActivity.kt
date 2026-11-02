@@ -79,7 +79,7 @@ class StartupActivity : FragmentActivity() {
 
 		if (anyRejected) {
 			// Permission denied, exit the app.
-			Toast.makeText(this, R.string.no_network_permissions, Toast.LENGTH_LONG).show()
+			Toast.makeText(this, R.string.ephyra_no_network_permissions, Toast.LENGTH_LONG).show()
 			finish()
 		} else {
 			onPermissionsGranted()

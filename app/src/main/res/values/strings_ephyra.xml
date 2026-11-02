@@ -10,4 +10,14 @@
     <!-- Used from app/build.gradle.kts (resValue app_name), which lint can't see -->
     <string name="ephyra_app_name" translatable="false" tools:ignore="UnusedResources">Ephyra</string>
     <string name="ephyra_app_name_debug" translatable="false" tools:ignore="UnusedResources">Ephyra Debug</string>
+
+    <!-- Replace upstream strings that name the app; the ones about the Jellyfin server stay upstream's -->
+    <string name="ephyra_welcome_title">Welcome to Ephyra!</string>
+    <string name="ephyra_login_help_description">Ephyra needs a Jellyfin server to connect to. Visit the Jellyfin documentation at docs.jellyfin.org or scan the QR code to set up a server.</string>
+    <string name="ephyra_no_network_permissions">Ephyra requires network permissions to function</string>
+    <string name="ephyra_searchable_hint">Search Ephyra</string>
+    <string name="ephyra_tv_provider_enabled_description">Show Ephyra channels and recommendations on the Android TV home screen</string>
+    <string name="ephyra_screensaver_inapp_enabled_description">Show the Ephyra screensaver while the app is open</string>
+    <string name="ephyra_video_player_external_empty">You don\'t have any video player apps installed on your device that can open these videos.</string>
+    <string name="ephyra_app_version">Ephyra version</string>
 </resources>
