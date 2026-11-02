@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Ephyra: vector TV banner, replaces upstream's per-density PNGs -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/app_banner_background" />
+    <item android:drawable="@drawable/app_banner_foreground" />
+</layer-list>

@@ -54,6 +54,7 @@ The status column shows how far each change has gone. A change becomes "done" wh
 | Dependencies | Accompanist permissions are replaced with AndroidX Activity Result APIs | done |
 | Identity | Name Ephyra, application id `com.ephyra.app` (namespace unchanged); backup rules cover the new id | done |
 | Build | minSdk 30 (Android 11), arm64-v8a only, R8 strips debug logging | done |
+| Identity | Own vector logo: launcher icon (with monochrome layer), TV banner and in-app logo; upstream's PNG icons removed | done |
 | Build | Baseline profile for faster startup and smoother scrolling | planned |
 | Playback | Hardware decoders come first for H.264, HEVC, VP9 and Dolby Vision; buffer size scales with the device's memory | planned |
 | Playback | Software decoders are off by default; AV1 (no hardware decoder on Tegra X1+) is left to server transcoding | planned |
