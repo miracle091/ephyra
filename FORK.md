@@ -50,8 +50,8 @@ The status column shows how far each change has gone. A change becomes "done" wh
 
 | Area | Change | Status |
 |---|---|---|
-| Dependencies | A build check fails if Google Play Services, Firebase, Play Core or the Cast SDK appear in the dependency graph | planned |
-| Dependencies | Accompanist permissions are replaced with AndroidX Activity Result APIs | planned |
+| Dependencies | A build check fails if Google Play Services, Firebase, Play Core or the Cast SDK appear in the dependency graph | done |
+| Dependencies | Accompanist permissions are replaced with AndroidX Activity Result APIs | done |
 | Build | minSdk 30 (Android 11), arm64-v8a only, R8 strips debug logging | planned |
 | Build | Baseline profile for faster startup and smoother scrolling | planned |
 | Playback | Hardware decoders come first for H.264, HEVC, VP9 and Dolby Vision; buffer size scales with the device's memory | planned |

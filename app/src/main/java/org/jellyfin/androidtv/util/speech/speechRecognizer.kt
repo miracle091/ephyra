@@ -15,10 +15,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
-import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.PermissionStatus
-import com.google.accompanist.permissions.rememberPermissionState
 import org.jellyfin.androidtv.util.locale
+import org.jellyfin.androidtv.util.permission.PermissionRequestAction
+import org.jellyfin.androidtv.util.permission.decidePermissionRequest
+import org.jellyfin.androidtv.util.permission.rememberRuntimePermission
 import timber.log.Timber
 
 @Composable
@@ -27,7 +27,6 @@ fun rememberSpeechRecognizerAvailability(context: Context = LocalContext.current
 	return remember(context) { SpeechRecognizer.isRecognitionAvailable(context) }
 }
 
-@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun rememberSpeechRecognizer(
 	/**
@@ -130,9 +129,9 @@ fun rememberSpeechRecognizer(
 		speechRecognizer.stopListening()
 	}
 
-	val recordAudioPermission = rememberPermissionState(
+	val recordAudioPermission = rememberRuntimePermission(
 		permission = android.Manifest.permission.RECORD_AUDIO,
-		onPermissionResult = { granted ->
+		onResult = { granted ->
 			// Start recording as we've just been granted recording permission as result of our request
 			if (granted) startListening()
 			else status = SpeechRecognizerStatus.PermissionDenied(true)
@@ -144,18 +143,21 @@ fun rememberSpeechRecognizer(
 		// Dont attempt to start when unavailable
 		if (!available) return
 
-		when (val permissionStatus = recordAudioPermission.status) {
-			is PermissionStatus.Granted -> startListening()
+		val action = decidePermissionRequest(
+			granted = recordAudioPermission.isGranted,
+			shouldShowRationale = recordAudioPermission.shouldShowRationale,
+			alreadyRequested = hasRequestedPermission,
+		)
+		when (action) {
+			PermissionRequestAction.PROCEED -> startListening()
 
-			is PermissionStatus.Denied -> {
-				if (permissionStatus.shouldShowRationale || !hasRequestedPermission) {
-					status = SpeechRecognizerStatus.RequestingPermission
-					hasRequestedPermission = true
-					recordAudioPermission.launchPermissionRequest()
-				} else {
-					emitError(SpeechRecognizerStatus.PermissionDenied(false))
-				}
+			PermissionRequestAction.REQUEST -> {
+				status = SpeechRecognizerStatus.RequestingPermission
+				hasRequestedPermission = true
+				recordAudioPermission.launchRequest()
 			}
+
+			PermissionRequestAction.DENIED -> emitError(SpeechRecognizerStatus.PermissionDenied(false))
 		}
 	}
 

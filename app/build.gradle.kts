@@ -151,7 +151,6 @@ dependencies {
 	implementation(libs.androidx.cardview)
 	implementation(libs.androidx.startup)
 	implementation(libs.bundles.androidx.compose)
-	implementation(libs.accompanist.permissions)
 
 	// Dependency Injection
 	implementation(libs.bundles.koin)
@@ -188,3 +187,6 @@ dependencies {
 	testImplementation(libs.kotest.assertions)
 	testImplementation(libs.mockk)
 }
+
+// Ephyra: fail the build if a Google service SDK reaches the app (buildSrc/src/main/kotlin/GoogleServicesGuard.kt)
+verifyNoGoogleServices()
