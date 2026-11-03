@@ -73,6 +73,7 @@ The status column shows how far each change has gone. A change becomes "done" wh
 | Code | Android lint errors fixed: Media3 opt-ins declared per file, no restricted Leanback class in the player controls, configuration-aware string lookup in voice search, correct lint id on the media notification | done |
 | Memory | The live TV guides (screen and in-player) and the item details build their content in a task tied to the screen's view (`LifecycleTask`) instead of an AsyncTask, so the work stops when the screen closes and no longer holds it in memory | done |
 | CI | The lint workflow runs only detekt; Android lint runs in local checks and in the release workflow, and no longer uploads to code scanning | done |
+| Playback | The request that opens a stream (PlaybackInfo) waits up to 2 minutes instead of 30 seconds, so a live TV channel the server is still tuning opens on the first try; every other request keeps the 30-second timeout | done |
 
 ## What changes for users
 

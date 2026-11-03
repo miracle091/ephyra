@@ -9,6 +9,7 @@ import org.jellyfin.androidtv.data.compat.PlaybackException
 import org.jellyfin.androidtv.data.compat.StreamInfo
 import org.jellyfin.androidtv.data.compat.VideoOptions
 import org.jellyfin.androidtv.util.apiclient.Response
+import org.jellyfin.sdk.Jellyfin
 import org.jellyfin.sdk.api.client.ApiClient
 import org.jellyfin.sdk.api.client.extensions.hlsSegmentApi
 import org.jellyfin.sdk.api.client.extensions.mediaInfoApi
@@ -59,7 +60,8 @@ private fun createStreamInfo(
 }
 
 class PlaybackManager(
-	private val api: ApiClient
+	private val api: ApiClient,
+	private val jellyfin: Jellyfin,
 ) {
 	fun getVideoStreamInfo(
 		lifecycleOwner: LifecycleOwner,
@@ -97,7 +99,7 @@ class PlaybackManager(
 		startTimeTicks: Long
 	) = runCatching {
 		val response = withContext(Dispatchers.IO) {
-			api.mediaInfoApi.getPostedPlaybackInfo(
+			api.withResponseTimeout(jellyfin, PLAYBACK_INFO_TIMEOUT).mediaInfoApi.getPostedPlaybackInfo(
 				itemId = requireNotNull(options.itemId) { "Item id cannot be null" },
 				data = PlaybackInfoDto(
 					mediaSourceId = options.mediaSourceId,
