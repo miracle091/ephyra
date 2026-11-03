@@ -13,6 +13,9 @@ include(":playback:media3:exoplayer")
 include(":playback:media3:session")
 include(":preference")
 
+// Ephyra: generates the baseline profile on a device (./gradlew :app:generateBaselineProfile)
+include(":baselineprofile")
+
 pluginManagement {
 	repositories {
 		gradlePluginPortal()
