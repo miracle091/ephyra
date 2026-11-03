@@ -65,7 +65,7 @@ The status column shows how far each change has gone. A change becomes "done" wh
 | Memory | Backdrops (home, details and screensaver) are requested from the server at screen width and decoded at screen size instead of their original size; the image memory cache is sized at 15% of the app's memory class instead of Coil's 20% | done |
 | UI | Home-screen channels and Watch Next off by default (the existing setting in Customization, upstream default on), so the background worker makes no server calls for them | done |
 | UI | Lighter home defaults and a shared view pool for rows | planned |
-| Updates | Built-in updater that installs releases from GitHub; no Google Play | planned |
+| Updates | Built-in updater (Settings → About → Check for updates, release builds only): reads the latest GitHub release's `version.txt` and installs `ephyra-v<version>.apk` through PackageInstaller after the system's confirmation; no Google Play, no background checks | done |
 | CI | Release workflow that publishes signed APKs with checksums to GitHub Releases; upstream's publish jobs removed | planned |
 
 ## What changes for users

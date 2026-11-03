@@ -20,4 +20,14 @@
     <string name="ephyra_screensaver_inapp_enabled_description">Show the Ephyra screensaver while the app is open</string>
     <string name="ephyra_video_player_external_empty">You don\'t have any video player apps installed on your device that can open these videos.</string>
     <string name="ephyra_app_version">Ephyra version</string>
+
+    <!-- Updates from GitHub Releases (Settings, About) -->
+    <string name="ephyra_update_check">Check for updates</string>
+    <string name="ephyra_update_check_description">Looks for a new Ephyra release on GitHub</string>
+    <string name="ephyra_update_checking">Checking…</string>
+    <string name="ephyra_update_up_to_date">Ephyra is up to date</string>
+    <string name="ephyra_update_available">Install version %1$s</string>
+    <string name="ephyra_update_available_description">Downloads the update; Android asks you to confirm the installation</string>
+    <string name="ephyra_update_installing">Downloading version %1$s…</string>
+    <string name="ephyra_update_failed">The update failed. Select to try again</string>
 </resources>

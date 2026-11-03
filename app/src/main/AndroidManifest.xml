@@ -14,6 +14,9 @@
         tools:ignore="LeanbackUsesWifi" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
+    <!-- Ephyra: install updates from GitHub Releases (update/AppUpdater.kt) -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+
     <!-- Search permissions (voice to text) -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
@@ -130,5 +133,10 @@
             android:windowSoftInputMode="adjustNothing" />
 
         <activity android:name=".ui.playback.ExternalPlayerActivity" />
+
+        <!-- Ephyra: result of an update installation -->
+        <receiver
+            android:name=".update.AppUpdateStatusReceiver"
+            android:exported="false" />
     </application>
 </manifest>

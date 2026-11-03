@@ -2,6 +2,7 @@ package org.jellyfin.androidtv.di
 
 import android.content.Context
 import androidx.lifecycle.ProcessLifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import coil3.ImageLoader
 import coil3.annotation.ExperimentalCoilApi
 import coil3.gif.AnimatedImageDecoder
@@ -62,6 +63,7 @@ import org.jellyfin.androidtv.util.PlaybackHelper
 import org.jellyfin.androidtv.util.apiclient.ReportingHelper
 import org.jellyfin.androidtv.util.coil.CoilTimberLogger
 import org.jellyfin.androidtv.util.coil.createCoilConnectivityChecker
+import org.jellyfin.androidtv.update.AppUpdater
 import org.jellyfin.androidtv.util.sdk.SdkPlaybackHelper
 import org.jellyfin.sdk.android.androidDevice
 import org.jellyfin.sdk.api.client.HttpClientOptions
@@ -180,4 +182,10 @@ val appModule = module {
 	single<PlaybackHelper> { SdkPlaybackHelper(get(), get(), get(), get()) }
 
 	factory { (context: Context) -> SearchFragmentDelegate(context, get(), get()) }
+
+	// Ephyra: updates from GitHub Releases
+	single {
+		val httpClient = AppUpdater.httpClient(get<OkHttpFactory>().createClient(get<HttpClientOptions>()))
+		AppUpdater(androidContext(), httpClient, ProcessLifecycleOwner.get().lifecycleScope)
+	}
 }
