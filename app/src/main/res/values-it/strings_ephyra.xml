@@ -21,4 +21,8 @@
     <string name="ephyra_update_available_description">Scarica l\'aggiornamento; Android ti chiede di confermare l\'installazione</string>
     <string name="ephyra_update_installing">Download della versione %1$s…</string>
     <string name="ephyra_update_failed">Aggiornamento non riuscito. Seleziona per riprovare</string>
+    <string name="ephyra_update_daily_check">Cerca aggiornamenti in automatico</string>
+    <string name="ephyra_update_daily_check_enabled">Ephyra controlla GitHub una volta al giorno e mostra un avviso nella schermata home</string>
+    <string name="ephyra_update_daily_check_disabled">Ephyra controlla solo quando selezioni Cerca aggiornamenti</string>
+    <string name="ephyra_update_notification">Ephyra %1$s è disponibile. Installala da Impostazioni, Info</string>
 </resources>

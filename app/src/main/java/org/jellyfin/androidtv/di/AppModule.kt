@@ -64,6 +64,7 @@ import org.jellyfin.androidtv.util.apiclient.ReportingHelper
 import org.jellyfin.androidtv.util.coil.CoilTimberLogger
 import org.jellyfin.androidtv.util.coil.createCoilConnectivityChecker
 import org.jellyfin.androidtv.update.AppUpdater
+import org.jellyfin.androidtv.update.DailyUpdateCheck
 import org.jellyfin.androidtv.util.sdk.SdkPlaybackHelper
 import org.jellyfin.sdk.android.androidDevice
 import org.jellyfin.sdk.api.client.HttpClientOptions
@@ -188,4 +189,5 @@ val appModule = module {
 		val httpClient = AppUpdater.httpClient(get<OkHttpFactory>().createClient(get<HttpClientOptions>()))
 		AppUpdater(androidContext(), httpClient, ProcessLifecycleOwner.get().lifecycleScope)
 	}
+	single { DailyUpdateCheck(androidContext(), get(), get(), get()) }
 }

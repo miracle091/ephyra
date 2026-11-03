@@ -30,4 +30,8 @@
     <string name="ephyra_update_available_description">Downloads the update; Android asks you to confirm the installation</string>
     <string name="ephyra_update_installing">Downloading version %1$s…</string>
     <string name="ephyra_update_failed">The update failed. Select to try again</string>
+    <string name="ephyra_update_daily_check">Check for updates automatically</string>
+    <string name="ephyra_update_daily_check_enabled">Ephyra checks GitHub once a day and shows a notice on the home screen</string>
+    <string name="ephyra_update_daily_check_disabled">Ephyra checks only when you select Check for updates</string>
+    <string name="ephyra_update_notification">Ephyra %1$s is available. Install it from Settings, About</string>
 </resources>

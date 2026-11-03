@@ -87,6 +87,10 @@
             <meta-data
                 android:name="org.jellyfin.androidtv.SessionInitializer"
                 android:value="androidx.startup" />
+            <!-- Ephyra: daily update check -->
+            <meta-data
+                android:name="org.jellyfin.androidtv.update.UpdateCheckInitializer"
+                android:value="androidx.startup" />
         </provider>
 
         <provider

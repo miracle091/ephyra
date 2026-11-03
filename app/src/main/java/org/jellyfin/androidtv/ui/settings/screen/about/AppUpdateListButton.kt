@@ -3,14 +3,18 @@ package org.jellyfin.androidtv.ui.settings.screen.about
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import org.jellyfin.androidtv.R
 import org.jellyfin.androidtv.ui.base.Icon
+import org.jellyfin.androidtv.preference.UpdatePreferences
 import org.jellyfin.androidtv.ui.base.Text
+import org.jellyfin.androidtv.ui.base.form.Checkbox
 import org.jellyfin.androidtv.ui.base.list.ListButton
 import org.jellyfin.androidtv.ui.navigation.focus.focusKey
+import org.jellyfin.androidtv.ui.settings.compat.rememberPreference
 import org.jellyfin.androidtv.update.AppUpdateState
 import org.jellyfin.androidtv.update.AppUpdater
 import org.koin.compose.koinInject
@@ -46,5 +50,23 @@ fun AppUpdateListButton() {
 			}
 		},
 		modifier = Modifier.focusKey("app_update"),
+	)
+}
+
+/** Ephyra: turns the daily update check (update/DailyUpdateCheck.kt) on or off. */
+@Composable
+fun DailyUpdateCheckListButton() {
+	val updatePreferences = koinInject<UpdatePreferences>()
+	var enabled by rememberPreference(updatePreferences, UpdatePreferences.dailyCheckEnabled)
+
+	ListButton(
+		headingContent = { Text(stringResource(R.string.ephyra_update_daily_check)) },
+		trailingContent = { Checkbox(checked = enabled) },
+		captionContent = {
+			if (enabled) Text(stringResource(R.string.ephyra_update_daily_check_enabled))
+			else Text(stringResource(R.string.ephyra_update_daily_check_disabled))
+		},
+		onClick = { enabled = !enabled },
+		modifier = Modifier.focusKey("daily_update_check"),
 	)
 }

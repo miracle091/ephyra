@@ -54,6 +54,12 @@ class AppUpdaterTest : FunSpec({
 		eventually(5.seconds) { updater.state.value shouldBe AppUpdateState.UpToDate }
 	}
 
+	test("A failed background check leaves the visible state unchanged") {
+		val updater = updater { throw IOException("offline") }
+		updater.check(background = true) shouldBe AppUpdateState.Failed
+		updater.state.value shouldBe AppUpdateState.Idle
+	}
+
 	test("The updater's client has no call timeout and stays on HTTPS") {
 		val client = AppUpdater.httpClient(OkHttpClient.Builder().callTimeout(30, TimeUnit.SECONDS).build())
 		client.callTimeoutMillis shouldBe 0

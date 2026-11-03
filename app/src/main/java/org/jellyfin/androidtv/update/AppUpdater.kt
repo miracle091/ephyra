@@ -42,24 +42,34 @@ class AppUpdater(
 	val state: StateFlow<AppUpdateState> = _state.asStateFlow()
 
 	fun checkForUpdate() {
-		if (_state.value == AppUpdateState.Checking || _state.value is AppUpdateState.Installing) return
+		scope.launch { check() }
+	}
+
+	/**
+	 * Checks GitHub and returns the new state. While a check or an installation runs, returns the current state.
+	 * A failed [background] check returns Failed but leaves the visible state as it was: the user did not ask for it.
+	 */
+	suspend fun check(background: Boolean = false): AppUpdateState {
+		val current = _state.value
+		if (current == AppUpdateState.Checking || current is AppUpdateState.Installing) return current
 		_state.value = AppUpdateState.Checking
 
-		scope.launch {
-			_state.value = try {
-				val latest = withContext(Dispatchers.IO) { fetchLatest() }
-				when {
-					latest == null -> AppUpdateState.Failed
-					latest.versionCode > BuildConfig.VERSION_CODE -> AppUpdateState.Available(latest)
-					else -> AppUpdateState.UpToDate
-				}
-			} catch (err: CancellationException) {
-				throw err
-			} catch (@Suppress("TooGenericExceptionCaught") err: Exception) {
-				Timber.w(err, "Update check failed")
-				AppUpdateState.Failed
+		val result = try {
+			val latest = withContext(Dispatchers.IO) { fetchLatest() }
+			when {
+				latest == null -> AppUpdateState.Failed
+				latest.versionCode > BuildConfig.VERSION_CODE -> AppUpdateState.Available(latest)
+				else -> AppUpdateState.UpToDate
 			}
+		} catch (err: CancellationException) {
+			_state.value = current
+			throw err
+		} catch (@Suppress("TooGenericExceptionCaught") err: Exception) {
+			Timber.w(err, "Update check failed")
+			AppUpdateState.Failed
 		}
+		_state.value = if (background && result == AppUpdateState.Failed) current else result
+		return result
 	}
 
 	fun install(update: AppUpdate) {

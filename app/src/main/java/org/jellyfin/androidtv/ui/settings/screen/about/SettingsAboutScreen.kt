@@ -50,6 +50,7 @@ fun SettingsAboutScreen(launchedFromLogin: Boolean = false) {
 
 		// Ephyra: debug builds have their own application id, so a release could not update them
 		if (!BuildConfig.DEBUG) item { AppUpdateListButton() }
+		if (!BuildConfig.DEBUG) item { DailyUpdateCheckListButton() }
 
 		item {
 			val heading = stringResource(R.string.pref_device_model)

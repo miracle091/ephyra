@@ -18,6 +18,9 @@ interface NotificationsRepository {
 	fun dismissNotification(item: AppNotification)
 	fun addDefaultNotifications()
 	fun updateServerNotifications(server: Server?)
+
+	// Ephyra: lets the update check (update/DailyUpdateCheck.kt) add its notice
+	fun addNotification(message: String, public: Boolean = false, dismiss: () -> Unit = {}): AppNotification
 }
 
 class NotificationsRepositoryImpl(
@@ -40,10 +43,10 @@ class NotificationsRepositoryImpl(
 		addBetaNotification()
 	}
 
-	private fun addNotification(
+	override fun addNotification(
 		message: String,
-		public: Boolean = false,
-		dismiss: () -> Unit = {}
+		public: Boolean,
+		dismiss: () -> Unit
 	): AppNotification {
 		val notification = AppNotification(message, dismiss, public)
 		notifications.value += notification
