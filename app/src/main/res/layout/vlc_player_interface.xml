@@ -108,6 +108,22 @@
             app:layout_constraintTop_toBottomOf="@id/item_title"
             tools:text="Subtitle" />
 
+        <!-- Ephyra: play method and the server's transcode reasons (ui/playback/PlayInfo.kt) -->
+        <TextView
+            android:id="@+id/ephyra_play_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textColor="@color/white"
+            android:alpha="0.7"
+            android:textSize="16sp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toStartOf="@id/textClock"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/item_subtitle"
+            tools:text="Transcoding: video codec not supported" />
+
         <org.jellyfin.androidtv.ui.ClockUserView
             android:id="@+id/textClock"
             android:layout_width="wrap_content"

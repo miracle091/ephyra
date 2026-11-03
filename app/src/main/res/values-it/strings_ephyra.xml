@@ -25,4 +25,37 @@
     <string name="ephyra_update_daily_check_enabled">Ephyra controlla GitHub una volta al giorno e mostra un avviso nella schermata home</string>
     <string name="ephyra_update_daily_check_disabled">Ephyra controlla solo quando selezioni Cerca aggiornamenti</string>
     <string name="ephyra_update_notification">Ephyra %1$s è disponibile. Installala da Impostazioni, Info</string>
+
+    <!-- How the server delivers the stream, under the title in the player (ui/playback/PlayInfo.kt) -->
+    <string name="ephyra_play_info_direct_play">Riproduzione diretta</string>
+    <string name="ephyra_play_info_direct_stream">Streaming diretto (remux)</string>
+    <string name="ephyra_play_info_transcode">Transcodifica</string>
+    <string name="ephyra_play_info_with_reasons">%1$s: %2$s</string>
+    <string name="ephyra_transcode_reason_container">contenitore non supportato</string>
+    <string name="ephyra_transcode_reason_video_codec">codec video non supportato</string>
+    <string name="ephyra_transcode_reason_audio_codec">codec audio non supportato</string>
+    <string name="ephyra_transcode_reason_subtitle_codec">formato dei sottotitoli non supportato</string>
+    <string name="ephyra_transcode_reason_audio_external">traccia audio esterna</string>
+    <string name="ephyra_transcode_reason_secondary_audio">traccia audio secondaria non supportata</string>
+    <string name="ephyra_transcode_reason_video_profile">profilo video non supportato</string>
+    <string name="ephyra_transcode_reason_video_level">livello video non supportato</string>
+    <string name="ephyra_transcode_reason_video_resolution">risoluzione video non supportata</string>
+    <string name="ephyra_transcode_reason_video_bit_depth">profondità di bit video non supportata</string>
+    <string name="ephyra_transcode_reason_video_framerate">frequenza fotogrammi non supportata</string>
+    <string name="ephyra_transcode_reason_ref_frames">troppi fotogrammi di riferimento</string>
+    <string name="ephyra_transcode_reason_anamorphic">video anamorfico non supportato</string>
+    <string name="ephyra_transcode_reason_interlaced">video interlacciato non supportato</string>
+    <string name="ephyra_transcode_reason_audio_channels">canali audio non supportati</string>
+    <string name="ephyra_transcode_reason_audio_profile">profilo audio non supportato</string>
+    <string name="ephyra_transcode_reason_audio_sample_rate">frequenza di campionamento non supportata</string>
+    <string name="ephyra_transcode_reason_audio_bit_depth">profondità di bit audio non supportata</string>
+    <string name="ephyra_transcode_reason_container_bitrate">bitrate oltre il limite</string>
+    <string name="ephyra_transcode_reason_video_bitrate">bitrate video non supportato</string>
+    <string name="ephyra_transcode_reason_audio_bitrate">bitrate audio non supportato</string>
+    <string name="ephyra_transcode_reason_unknown_video">flusso video sconosciuto</string>
+    <string name="ephyra_transcode_reason_unknown_audio">flusso audio sconosciuto</string>
+    <string name="ephyra_transcode_reason_direct_play_error">riproduzione diretta non riuscita</string>
+    <string name="ephyra_transcode_reason_video_range">tipo di HDR non supportato</string>
+    <string name="ephyra_transcode_reason_video_codec_tag">tag del codec video non supportato</string>
+    <string name="ephyra_transcode_reason_stream_count">troppi flussi</string>
 </resources>

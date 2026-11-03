@@ -1253,6 +1253,8 @@ public class CustomPlaybackOverlayFragment extends Fragment implements LiveTvGui
             } else {
                 binding.itemTitle.setText(current.getName());
             }
+            // Ephyra: how the server delivers this stream and why
+            PlayInfo.bind(binding.ephyraPlayInfo, playbackControllerContainer.getValue().getPlaybackController().getCurrentStreamInfo());
             // Update the logo
             String imageUrl = imageHelper.getValue().getLogoImageUrl(current, 440);
             if (imageUrl != null) {
