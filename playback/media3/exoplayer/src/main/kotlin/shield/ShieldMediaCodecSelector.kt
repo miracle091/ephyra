@@ -35,7 +35,7 @@ class ShieldMediaCodecSelector(
 
 		val (software, hardware) = all.partition { it.softwareOnly }
 		return when {
-			// No hardware decoder (AV1 on the Tegra X1+, emulators): software is the only option
+			// No hardware decoder (AV1 on every Shield TV, emulators): software is the only option
 			hardware.isEmpty() -> all
 			mimeType in HARDWARE_ONLY_MIME_TYPES -> hardware
 			else -> hardware + software

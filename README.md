@@ -15,8 +15,8 @@
 </p>
 
 Ephyra is a client for [Jellyfin](https://jellyfin.org) media servers, made for Android TV. It is a fork of the official
-[Jellyfin for Android TV](https://github.com/jellyfin/jellyfin-androidtv) app, trimmed and tuned for one device: the
-**NVIDIA Shield TV Pro (2019)**. It needs no Google services, so it runs both on the stock Shield software and on
+[Jellyfin for Android TV](https://github.com/jellyfin/jellyfin-androidtv) app, trimmed and tuned for the
+**NVIDIA Shield TV**: every model from 2015 to the 2019 Pro. It needs no Google services, so it runs both on the stock Shield software and on
 GMS-free AOSP or LineageOS builds.
 
 The name comes from the ephyra, the small, light, young stage of a jellyfish.
@@ -25,7 +25,8 @@ The name comes from the ephyra, the small, light, young stage of a jellyfish.
 
 - **No Google services:** no Play Services, Firebase, Play Core or Cast SDK. A build check fails if one ever slips in
   through a dependency.
-- **Built for the Shield:** Android 11 or later, 64-bit ARM only, so the APK carries only the code the Shield runs.
+- **Built for the Shield:** Android 11 or later, ARM only (64-bit, and 32-bit for the 2019 non-Pro), so the APK
+  carries only the code a Shield runs.
 - **Tuned for its hardware (in progress):** hardware decoders first, sensible memory limits, refresh-rate switching on
   by default.
 - **Its own identity:** the app is called Ephyra and installs next to the official Jellyfin app instead of replacing

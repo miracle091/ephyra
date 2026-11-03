@@ -78,6 +78,11 @@ jobs:
           # Without the signing secrets the build is named *-release-unsigned.apk, so this file is missing
           apk="app/build/outputs/apk/release/ephyra-v${JELLYFIN_VERSION}-release.apk"
           test -f "$apk" || { echo "::error::Signed release APK not found"; exit 1; }
+          # The Shield TV 2019 tube runs a 32-bit userspace: without armeabi-v7a the APK does not install on it
+          libs="$(unzip -l "$apk")"
+          for abi in arm64-v8a armeabi-v7a; do
+            grep -q " lib/$abi/" <<< "$libs" || { echo "::error::No $abi native libraries in the APK"; exit 1; }
+          done
           sdk="${ANDROID_HOME:-$ANDROID_SDK_ROOT}"
           apksigner="$(printf '%s\n' "$sdk"/build-tools/*/apksigner | sort -V | tail -n 1)"
           certs="$("$apksigner" verify --print-certs "$apk")"

@@ -71,9 +71,9 @@ android {
 			isShrinkResources = true
 			proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
 
-			// Ephyra: the Shield's Tegra X1+ runs a 64-bit userspace; other ABIs only add native weight (FFmpeg, libass).
-			// Debug builds keep every ABI so they still install on x86 emulators.
-			ndk { abiFilters += "arm64-v8a" }
+			// Ephyra: Shield TV 2015, 2017 and 2019 Pro run a 64-bit userspace, the 2019 tube a 32-bit one; x86 ABIs only add
+			// native weight (FFmpeg, libass). Debug builds keep every ABI so they still install on x86 emulators.
+			ndk { abiFilters += listOf("arm64-v8a", "armeabi-v7a") }
 
 			// Set package names used in various XML files
 			resValue("string", "app_id", ephyraAppId)

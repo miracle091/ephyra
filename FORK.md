@@ -1,8 +1,8 @@
 # About Ephyra
 
 Ephyra is a Jellyfin client for Android TV, forked from the official Jellyfin Android TV client. The name comes from
-the ephyra, the small, light, young stage of a jellyfish. It is trimmed and tuned for one device, the
-**NVIDIA Shield TV Pro (2019, Tegra X1+)**, and it runs without Google Mobile Services, so it also works on GMS-free
+the ephyra, the small, light, young stage of a jellyfish. It is trimmed and tuned for the
+**NVIDIA Shield TV** (2015, 2017 and 2019, Pro and non-Pro; Tegra X1 and X1+), and it runs without Google Mobile Services, so it also works on GMS-free
 AOSP and LineageOS builds.
 
 This file explains where the fork comes from and what it changes. It is also the change notice required by the
@@ -54,14 +54,14 @@ The status column shows how far each change has gone. A change becomes "done" wh
 | Dependencies | A build check fails if Google Play Services, Firebase, Play Core or the Cast SDK appear in the dependency graph | done |
 | Dependencies | Accompanist permissions are replaced with AndroidX Activity Result APIs | done |
 | Identity | Name Ephyra, application id `com.ephyra.app` (namespace unchanged); backup rules cover the new id | done |
-| Build | minSdk 30 (Android 11), arm64-v8a only, R8 strips debug logging | done |
+| Build | minSdk 30 (Android 11), ARM only (arm64-v8a, plus armeabi-v7a for the 32-bit Shield TV 2019 tube), R8 strips debug logging | done |
 | Identity | Own vector logo: launcher icon (with monochrome layer), TV banner and in-app logo; upstream's PNG icons removed | done |
 | Identity | The app names itself Ephyra: welcome and help texts, search hint, settings, version line, About icon, the client name the server sees and the header of crash and playback reports. Texts about the Jellyfin server keep its name | done |
 | Identity | Per-library view settings are saved on the server under the client id `ephyra`, apart from the official app's (settings shared with the web client stay shared) | done |
 | Docs | README describes Ephyra (install, build, translations, support), with its own banner | done |
 | Build | Baseline profile (`:baselineprofile` module, profileinstaller) so ART compiles startup code ahead of time, sideloaded APKs included; generated on a TV emulator, so it covers startup and the screens before sign-in | done |
 | Playback | Hardware video decoders come first; for H.264, HEVC, VP9 and Dolby Vision the software decoders are skipped when a hardware one exists, so a failing decoder ends in an error instead of a stuttering software decode. The playback buffer is capped at a quarter of the app's heap (48-192 MB) | done |
-| Playback | Software decoders are off by default, so AV1 (no hardware decoder on Tegra X1+) is left to server transcoding. With them on, software AV1 is capped at 1080p. For H.264, HEVC, VP9 and Dolby Vision the limits sent to the server come from the hardware decoders whatever the setting, as the player uses | done |
+| Playback | Software decoders are off by default, so AV1 (no hardware decoder on any Shield TV) is left to server transcoding. With them on, software AV1 is capped at 1080p. For H.264, HEVC, VP9 and Dolby Vision the limits sent to the server come from the hardware decoders whatever the setting, as the player uses | done |
 | Playback | Refresh-rate switching on by default ("Scale on device": the display keeps its resolution, so the Shield can still upscale); while the app switches the display mode, Media3's own frame-rate requests are off | done |
 | Memory | Backdrops (home, details and screensaver) are requested from the server at screen width and decoded at screen size instead of their original size; the image memory cache is sized at 15% of the app's memory class instead of Coil's 20% | done |
 | UI | Home-screen channels and Watch Next off by default (the existing setting in Customization, upstream default on), so the background worker makes no server calls for them | done |
@@ -82,8 +82,9 @@ The status column shows how far each change has gone. A change becomes "done" wh
   the other way round.
 - **Distribution:** sideload only. APKs are published on GitHub Releases, which also works with Obtainium. Ephyra is
   not on Google Play, F-Droid or any other store.
-- **Devices:** built for the Shield TV Pro 2019. It may run on other arm64 Android TV devices with Android 11 or
-  later, but those devices are not tested.
+- **Devices:** built for every NVIDIA Shield TV with Android 11 (Shield Experience 9): 2015, 2017, 2019 and 2019 Pro.
+  Dolby Vision and AI upscaling are features of the 2019 models only. It may run on other ARM Android TV devices with
+  Android 11 or later, but those devices are not tested.
 
 ## Viewing the changes
 
