@@ -79,7 +79,7 @@ jobs:
           apk="app/build/outputs/apk/release/ephyra-v${JELLYFIN_VERSION}-release.apk"
           test -f "$apk" || { echo "::error::Signed release APK not found"; exit 1; }
           sdk="${ANDROID_HOME:-$ANDROID_SDK_ROOT}"
-          apksigner="$(ls -d "$sdk"/build-tools/*/ | sort -V | tail -n 1)apksigner"
+          apksigner="$(printf '%s\n' "$sdk"/build-tools/*/apksigner | sort -V | tail -n 1)"
           certs="$("$apksigner" verify --print-certs "$apk")"
           echo "$certs"
           if [ -n "$RELEASE_CERT_SHA256" ]; then
