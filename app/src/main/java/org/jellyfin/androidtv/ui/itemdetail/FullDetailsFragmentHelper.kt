@@ -12,8 +12,6 @@ import org.jellyfin.androidtv.R
 import org.jellyfin.androidtv.data.model.DataRefreshService
 import org.jellyfin.androidtv.data.repository.ItemMutationRepository
 import org.jellyfin.androidtv.data.repository.ItemRepository
-import org.jellyfin.androidtv.ui.navigation.Destinations
-import org.jellyfin.androidtv.ui.navigation.NavigationRepository
 import org.jellyfin.androidtv.util.TimeUtils
 import org.jellyfin.androidtv.util.apiclient.getSeriesOverview
 import org.jellyfin.androidtv.util.popupMenu
@@ -23,7 +21,6 @@ import org.jellyfin.androidtv.util.sdk.compat.copyWithUserData
 import org.jellyfin.androidtv.util.showIfNotEmpty
 import org.jellyfin.sdk.api.client.ApiClient
 import org.jellyfin.sdk.api.client.exception.ApiClientException
-import org.jellyfin.sdk.api.client.extensions.libraryApi
 import org.jellyfin.sdk.api.client.extensions.liveTvApi
 import org.jellyfin.sdk.api.client.extensions.tvShowsApi
 import org.jellyfin.sdk.api.client.extensions.userLibraryApi
@@ -39,36 +36,6 @@ import java.time.Instant
 import java.util.UUID
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
-
-fun FullDetailsFragment.deleteItem(
-	api: ApiClient,
-	item: BaseItemDto,
-	dataRefreshService: DataRefreshService,
-	navigationRepository: NavigationRepository,
-) = lifecycleScope.launch {
-	Timber.i("Deleting item ${item.name} (id=${item.id})")
-
-	try {
-		withContext(Dispatchers.IO) {
-			api.libraryApi.deleteItem(item.id)
-		}
-	} catch (error: ApiClientException) {
-		Timber.e(error, "Failed to delete item ${item.name} (id=${item.id})")
-		Toast.makeText(
-			context,
-			getString(R.string.item_deletion_failed, item.name),
-			Toast.LENGTH_LONG
-		).show()
-		return@launch
-	}
-
-	dataRefreshService.lastDeletedItemId = item.id
-
-	if (navigationRepository.canGoBack) navigationRepository.goBack()
-	else navigationRepository.navigate(Destinations.home)
-
-	Toast.makeText(context, getString(R.string.item_deleted, item.name), Toast.LENGTH_LONG).show()
-}
 
 fun FullDetailsFragment.showDetailsMenu(
 	view: View,
