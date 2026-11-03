@@ -26,17 +26,12 @@ jobs:
           java-version-file: .tools-versions
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@3f5f9adaf7d9fecd50b5935e54106014257a94e6 # v6.4.0
-      - name: Run detekt and lint tasks
-        run: ./gradlew detekt lint
+      # Ephyra: Android lint runs only locally and in the release workflow; its code-scanning alerts were mostly upstream's
+      - name: Run detekt task
+        run: ./gradlew detekt
       - name: Upload Detekt SARIF
         uses: github/codeql-action/upload-sarif@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # v4.39.1
         if: ${{ always() }}
         with:
           sarif_file: build/reports/detekt/detekt.sarif
           category: detekt
-      - name: Upload Android SARIF
-        uses: github/codeql-action/upload-sarif@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # v4.39.1
-        if: ${{ always() }}
-        with:
-          sarif_file: app/build/reports/lint-results-debug.sarif
-          category: android
