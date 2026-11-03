@@ -125,6 +125,7 @@ val appModule = module {
 	single {
 		ImageLoader.Builder(androidContext()).apply {
 			serviceLoaderEnabled(false)
+			memoryCache { imageMemoryCache(androidContext()) }
 			logger(CoilTimberLogger(if (BuildConfig.DEBUG) Logger.Level.Warn else Logger.Level.Error))
 
 			components {

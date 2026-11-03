@@ -62,7 +62,7 @@ The status column shows how far each change has gone. A change becomes "done" wh
 | Playback | Hardware video decoders come first; for H.264, HEVC, VP9 and Dolby Vision the software decoders are skipped when a hardware one exists, so a failing decoder ends in an error instead of a stuttering software decode. The playback buffer is capped at a quarter of the app's heap (48-192 MB) | done |
 | Playback | Software decoders are off by default, so AV1 (no hardware decoder on Tegra X1+) is left to server transcoding. With them on, software AV1 is capped at 1080p. For H.264, HEVC, VP9 and Dolby Vision the limits sent to the server come from the hardware decoders whatever the setting, as the player uses | done |
 | Playback | Refresh-rate switching on by default ("Scale on device": the display keeps its resolution, so the Shield can still upscale); while the app switches the display mode, Media3's own frame-rate requests are off | done |
-| Memory | Image caches have size limits; images are requested at display size | planned |
+| Memory | Backdrops (home, details and screensaver) are requested from the server at screen width and decoded at screen size instead of their original size; the image memory cache is sized at 15% of the app's memory class instead of Coil's 20% | done |
 | UI | Home-screen channels and Watch Next off by default (the existing setting, upstream default on) | planned |
 | UI | Lighter home defaults and a shared view pool for rows | planned |
 | Updates | Built-in updater that installs releases from GitHub; no Google Play | planned |

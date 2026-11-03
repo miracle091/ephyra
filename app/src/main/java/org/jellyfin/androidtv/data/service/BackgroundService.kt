@@ -71,7 +71,7 @@ class BackgroundService(
 
 		// Get all backdrop urls
 		val backdropUrls = (baseItem.itemBackdropImages + baseItem.parentBackdropImages)
-			.map { it.getUrl(api) }
+			.map { it.getUrl(api, maxWidth = context.resources.displayMetrics.widthPixels) }
 			.toSet()
 
 		loadBackgrounds(backdropUrls)
@@ -110,7 +110,7 @@ class BackgroundService(
 		loadBackgroundsJob = scope.launch(Dispatchers.IO) {
 			_backgrounds = backdropUrls.mapNotNull { url ->
 				imageLoader.execute(
-					request = ImageRequest.Builder(context).data(url).build()
+					request = ImageRequest.Builder(context).data(url).backdropSize(context).build()
 				).image?.toBitmap()?.asImageBitmap()
 			}
 

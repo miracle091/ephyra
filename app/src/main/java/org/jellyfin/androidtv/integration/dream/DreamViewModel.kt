@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.withContext
+import org.jellyfin.androidtv.data.service.backdropSize
 import org.jellyfin.androidtv.integration.dream.model.DreamContent
 import org.jellyfin.androidtv.preference.UserPreferences
 import org.jellyfin.androidtv.util.apiclient.getUrl
@@ -136,7 +137,7 @@ class DreamViewModel(
 
 	private suspend fun BaseItemDto.asLibraryShowcase(): DreamContent.LibraryShowcase? = withContext(Dispatchers.IO) {
 		val logoUrl = itemImages[ImageType.LOGO]?.getUrl(api)
-		val backdropUrl = itemBackdropImages.randomOrNull()?.getUrl(api)
+		val backdropUrl = itemBackdropImages.randomOrNull()?.getUrl(api, maxWidth = context.resources.displayMetrics.widthPixels)
 
 		// Require a backdrop
 		if (backdropUrl == null) return@withContext null
@@ -151,7 +152,7 @@ class DreamViewModel(
 		}
 
 		val backdrop = imageLoader.execute(
-			request = ImageRequest.Builder(context).data(backdropUrl).build()
+			request = ImageRequest.Builder(context).data(backdropUrl).backdropSize(context).build()
 		).image?.toBitmap()
 
 		if (backdrop == null) null
