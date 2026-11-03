@@ -51,6 +51,8 @@ import org.jellyfin.androidtv.data.compat.StreamInfo;
 import org.jellyfin.androidtv.preference.UserPreferences;
 import org.jellyfin.androidtv.preference.constant.BufferLength;
 import org.jellyfin.androidtv.preference.constant.ZoomMode;
+import org.jellyfin.playback.media3.exoplayer.shield.ShieldLoadControl;
+import org.jellyfin.playback.media3.exoplayer.shield.ShieldMediaCodecSelector;
 import org.jellyfin.sdk.api.client.ApiClient;
 import org.jellyfin.sdk.model.api.MediaStream;
 import org.jellyfin.sdk.model.api.MediaStreamType;
@@ -219,6 +221,7 @@ public class VideoManager {
     private ExoPlayer.Builder configureExoplayerBuilder(Context context, AssHandler assHandler) {
         ExoPlayer.Builder exoPlayerBuilder = new ExoPlayer.Builder(context);
         DefaultRenderersFactory defaultRendererFactory = new DefaultRenderersFactory(context);
+        defaultRendererFactory.setMediaCodecSelector(new ShieldMediaCodecSelector());
         defaultRendererFactory.setEnableDecoderFallback(true);
         defaultRendererFactory.setExtensionRendererMode(determineExoPlayerExtensionRendererMode());
 
@@ -252,15 +255,11 @@ public class VideoManager {
         BufferLength bufferLength = userPreferences.get(UserPreferences.Companion.getBufferLength());
         DefaultLoadControl loadControl;
         if (bufferLength == BufferLength.LARGE) {
-            loadControl = new DefaultLoadControl.Builder()
-                    .setBufferDurationsMs(50_000, 120_000, 2_500, 5_000)
-                    .build();
+            loadControl = ShieldLoadControl.build(context, 50_000, 120_000, 2_500, 5_000);
         } else if (bufferLength == BufferLength.EXTRA_LARGE) {
-            loadControl = new DefaultLoadControl.Builder()
-                    .setBufferDurationsMs(80_000, 240_000, 5_000, 10_000)
-                    .build();
+            loadControl = ShieldLoadControl.build(context, 80_000, 240_000, 5_000, 10_000);
         } else {
-            loadControl = new DefaultLoadControl();
+            loadControl = ShieldLoadControl.build(context);
         }
         exoPlayerBuilder.setLoadControl(loadControl);
 

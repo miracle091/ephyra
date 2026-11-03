@@ -59,7 +59,7 @@ The status column shows how far each change has gone. A change becomes "done" wh
 | Identity | Per-library view settings are saved on the server under the client id `ephyra`, apart from the official app's (settings shared with the web client stay shared) | done |
 | Docs | README describes Ephyra (install, build, translations, support), with its own banner | done |
 | Build | Baseline profile for faster startup and smoother scrolling | planned |
-| Playback | Hardware decoders come first for H.264, HEVC, VP9 and Dolby Vision; buffer size scales with the device's memory | planned |
+| Playback | Hardware video decoders come first; for H.264, HEVC, VP9 and Dolby Vision the software decoders are skipped when a hardware one exists, so a failing decoder ends in an error instead of a stuttering software decode. The playback buffer is capped at a quarter of the app's heap (48-192 MB) | done |
 | Playback | Software decoders are off by default; AV1 (no hardware decoder on Tegra X1+) is left to server transcoding | planned |
 | Playback | Refresh-rate switching on by default | planned |
 | Memory | Image caches have size limits; images are requested at display size | planned |
