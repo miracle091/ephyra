@@ -104,6 +104,8 @@ public class VideoManager {
         AssHandler assHandler = assDirectPlay ? new AssHandler(AssRenderType.OVERLAY_OPEN_GL, new AssHandlerConfig()) : null;
 
         mExoPlayer = configureExoplayerBuilder(activity, assHandler).build();
+        mExoPlayer.setVideoChangeFrameRateStrategy(FrameRateStrategyKt.videoChangeFrameRateStrategy(
+                userPreferences.get(UserPreferences.Companion.getRefreshRateSwitchingBehavior())));
 
         if (userPreferences.get(UserPreferences.Companion.getDebuggingEnabled())) {
             mExoPlayer.addAnalyticsListener(new EventLogger());
