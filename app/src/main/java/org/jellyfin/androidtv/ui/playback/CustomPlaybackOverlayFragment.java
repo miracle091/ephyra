@@ -6,7 +6,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.media.AudioManager;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.KeyEvent;
@@ -36,6 +35,7 @@ import androidx.leanback.widget.Presenter;
 import androidx.leanback.widget.Row;
 import androidx.leanback.widget.RowPresenter;
 import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleOwnerKt;
 
 import org.jellyfin.androidtv.R;
 import org.jellyfin.androidtv.constant.CustomMessage;
@@ -68,6 +68,7 @@ import org.jellyfin.androidtv.util.CoroutineUtils;
 import org.jellyfin.androidtv.util.DateTimeExtensionsKt;
 import org.jellyfin.androidtv.util.ImageHelper;
 import org.jellyfin.androidtv.util.InfoLayoutHelper;
+import org.jellyfin.androidtv.util.LifecycleTask;
 import org.jellyfin.androidtv.util.TextUtilsKt;
 import org.jellyfin.androidtv.util.TimeUtils;
 import org.jellyfin.androidtv.util.Utils;
@@ -812,7 +813,7 @@ public class CustomPlaybackOverlayFragment extends Fragment implements LiveTvGui
             public void onResponse() {
                 if (!isActive()) return;
                 Timber.d("*** Programs response");
-                if (mDisplayProgramsTask != null) mDisplayProgramsTask.cancel(true);
+                if (mDisplayProgramsTask != null) mDisplayProgramsTask.cancel();
                 mDisplayProgramsTask = new DisplayProgramsTask(self);
                 mDisplayProgramsTask.execute(mCurrentDisplayChannelStartNdx, mCurrentDisplayChannelEndNdx);
             }
@@ -822,13 +823,13 @@ public class CustomPlaybackOverlayFragment extends Fragment implements LiveTvGui
 
     DisplayProgramsTask mDisplayProgramsTask;
 
-    class DisplayProgramsTask extends AsyncTask<Integer, Integer, Void> {
+    class DisplayProgramsTask extends LifecycleTask<Integer, Void> {
         private View firstRow;
         private int displayedChannels = 0;
         private final LiveTvGuide guide;
 
         DisplayProgramsTask(LiveTvGuide guide) {
-            super();
+            super(LifecycleOwnerKt.getLifecycleScope(getViewLifecycleOwner()));
             this.guide = guide;
         }
 
@@ -855,7 +856,7 @@ public class CustomPlaybackOverlayFragment extends Fragment implements LiveTvGui
         }
 
         @Override
-        protected Void doInBackground(Integer... params) {
+        protected Void doInBackground(Integer[] params) {
             int start = params[0];
             int end = params[1];
 

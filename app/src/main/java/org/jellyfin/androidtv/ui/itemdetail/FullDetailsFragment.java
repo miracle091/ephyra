@@ -5,7 +5,6 @@ import static org.koin.java.KoinJavaComponent.inject;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.graphics.Point;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.DisplayMetrics;
@@ -33,6 +32,7 @@ import androidx.leanback.widget.Presenter;
 import androidx.leanback.widget.Row;
 import androidx.leanback.widget.RowPresenter;
 import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleOwnerKt;
 
 import org.jellyfin.androidtv.R;
 import org.jellyfin.androidtv.auth.repository.UserRepository;
@@ -71,6 +71,7 @@ import org.jellyfin.androidtv.util.CoroutineUtils;
 import org.jellyfin.androidtv.util.DateTimeExtensionsKt;
 import org.jellyfin.androidtv.util.ImageHelper;
 import org.jellyfin.androidtv.util.KeyProcessor;
+import org.jellyfin.androidtv.util.LifecycleTask;
 import org.jellyfin.androidtv.util.MarkdownRenderer;
 import org.jellyfin.androidtv.util.PlaybackHelper;
 import org.jellyfin.androidtv.util.TimeUtils;
@@ -406,10 +407,14 @@ public class FullDetailsFragment extends Fragment implements RecordingIndicatorV
 
     }
 
-    private class BuildDorTask extends AsyncTask<BaseItemDto, Integer, MyDetailsOverviewRow> {
+    private class BuildDorTask extends LifecycleTask<BaseItemDto, MyDetailsOverviewRow> {
+
+        BuildDorTask() {
+            super(LifecycleOwnerKt.getLifecycleScope(getViewLifecycleOwner()));
+        }
 
         @Override
-        protected MyDetailsOverviewRow doInBackground(BaseItemDto... params) {
+        protected MyDetailsOverviewRow doInBackground(BaseItemDto[] params) {
             BaseItemDto item = params[0];
 
             // Figure image size

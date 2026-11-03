@@ -71,6 +71,7 @@ The status column shows how far each change has gone. A change becomes "done" wh
 | Updates | Daily update check (on by default, can be turned off in Settings → About): when the app comes to the foreground and the last check is a day old, it checks GitHub and shows a notice on the home screen; installing stays a choice in Settings | done |
 | CI | Release workflow (`ephyra-release.yaml`, on `v*` tags) that checks, signs and publishes the APK, `version.txt`, the R8 mapping and SHA-256 checksums to GitHub Releases; the signing secrets live in a protected `release` environment. Upstream's publish job (repo.jellyfin.org) removed; build, lint and test also run on `ephyra/main` | done |
 | Code | Android lint errors fixed: Media3 opt-ins declared per file, no restricted Leanback class in the player controls, configuration-aware string lookup in voice search, correct lint id on the media notification | done |
+| Memory | The live TV guides (screen and in-player) and the item details build their content in a task tied to the screen's view (`LifecycleTask`) instead of an AsyncTask, so the work stops when the screen closes and no longer holds it in memory | done |
 | CI | The lint workflow runs only detekt; Android lint runs in local checks and in the release workflow, and no longer uploads to code scanning | done |
 
 ## What changes for users

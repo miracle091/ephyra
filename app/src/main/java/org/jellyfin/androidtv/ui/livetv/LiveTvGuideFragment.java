@@ -6,7 +6,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.KeyEvent;
@@ -24,6 +23,7 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleOwnerKt;
 
 import org.jellyfin.androidtv.R;
 import org.jellyfin.androidtv.constant.CustomMessage;
@@ -44,6 +44,7 @@ import org.jellyfin.androidtv.util.CoroutineUtils;
 import org.jellyfin.androidtv.util.DateTimeExtensionsKt;
 import org.jellyfin.androidtv.util.ImageHelper;
 import org.jellyfin.androidtv.util.InfoLayoutHelper;
+import org.jellyfin.androidtv.util.LifecycleTask;
 import org.jellyfin.androidtv.util.PlaybackHelper;
 import org.jellyfin.androidtv.util.TextUtilsKt;
 import org.jellyfin.androidtv.util.TimeUtils;
@@ -270,7 +271,7 @@ public class LiveTvGuideFragment extends Fragment implements LiveTvGuide, View.O
         super.onPause();
 
         if (mDisplayProgramsTask != null) {
-            mDisplayProgramsTask.cancel(true);
+            mDisplayProgramsTask.cancel();
         }
         if (mDetailPopup != null) {
             mDetailPopup.dismiss();
@@ -485,7 +486,7 @@ public class LiveTvGuideFragment extends Fragment implements LiveTvGuide, View.O
             public void onResponse() {
                 if (!isActive()) return;
                 Timber.d("*** Programs response");
-                if (mDisplayProgramsTask != null) mDisplayProgramsTask.cancel(true);
+                if (mDisplayProgramsTask != null) mDisplayProgramsTask.cancel();
                 mDisplayProgramsTask = new DisplayProgramsTask();
                 mDisplayProgramsTask.execute(mCurrentDisplayChannelStartNdx, mCurrentDisplayChannelEndNdx);
             }
@@ -493,10 +494,14 @@ public class LiveTvGuideFragment extends Fragment implements LiveTvGuide, View.O
     }
 
     DisplayProgramsTask mDisplayProgramsTask;
-    class DisplayProgramsTask extends AsyncTask<Integer, Integer, Void> {
+    class DisplayProgramsTask extends LifecycleTask<Integer, Void> {
 
         View firstFocusView;
         int displayedChannels = 0;
+
+        DisplayProgramsTask() {
+            super(LifecycleOwnerKt.getLifecycleScope(getViewLifecycleOwner()));
+        }
 
         @Override
         protected void onPreExecute() {
@@ -522,7 +527,7 @@ public class LiveTvGuideFragment extends Fragment implements LiveTvGuide, View.O
         }
 
         @Override
-        protected Void doInBackground(Integer... params) {
+        protected Void doInBackground(Integer[] params) {
             int start = params[0];
             int end = params[1];
             boolean first = true;
