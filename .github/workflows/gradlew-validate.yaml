@@ -4,9 +4,10 @@ on:
   push:
     branches:
       - master
+      - ephyra/main # Ephyra: the fork's default branch
   pull_request:
     paths:
-      - '**/gradlе-wrapper.jar'
+      - '**/gradle-wrapper.jar'
 
 permissions:
   contents: read

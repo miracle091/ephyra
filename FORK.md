@@ -35,7 +35,8 @@ Upstream's full history and authorship are kept. Copyright stays with the Jellyf
 
 ## Keeping up with upstream
 
-- Upstream is merged into `ephyra/main` with `git merge upstream/master`. The fork does not rebase.
+- Upstream is not merged wholesale: single upstream changes are cherry-picked into `ephyra/main` when they help the
+  fork. The fork does not rebase.
 - Fork-only commits are prefixed with `ephyra:`, so they stand apart from upstream history.
 - The fork keeps the `org.jellyfin.androidtv` namespace and leaves upstream files where they are. Fork-specific
   code goes into new files, so each upstream merge touches as few lines as possible.
@@ -66,7 +67,7 @@ The status column shows how far each change has gone. A change becomes "done" wh
 | UI | Home-screen channels and Watch Next off by default (the existing setting in Customization, upstream default on), so the background worker makes no server calls for them | done |
 | UI | Lighter home defaults and a shared view pool for rows | planned |
 | Updates | Built-in updater (Settings → About → Check for updates, release builds only): reads the latest GitHub release's `version.txt` and installs `ephyra-v<version>.apk` through PackageInstaller after the system's confirmation; no Google Play, no background checks | done |
-| CI | Release workflow that publishes signed APKs with checksums to GitHub Releases; upstream's publish jobs removed | planned |
+| CI | Release workflow (`ephyra-release.yaml`, on `v*` tags) that checks, signs and publishes the APK, `version.txt`, the R8 mapping and SHA-256 checksums to GitHub Releases; the signing secrets live in a protected `release` environment. Upstream's publish job (repo.jellyfin.org) removed; build, lint and test also run on `ephyra/main` | done |
 
 ## What changes for users
 

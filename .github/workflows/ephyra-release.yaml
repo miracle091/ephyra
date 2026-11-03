@@ -1,0 +1,114 @@
+# Ephyra: builds, signs and publishes a release on GitHub Releases when a v* tag is pushed.
+# The signing secrets (KEYSTORE as base64, KEYSTORE_PASSWORD, KEY_ALIAS, KEY_PASSWORD) live in the "release"
+# environment, which waits for the owner's approval before this job can read them.
+# The assets match what the in-app updater reads (app/src/main/java/org/jellyfin/androidtv/update/AppUpdate.kt):
+# version.txt and ephyra-v<version>.apk under the tag v<version>.
+name: Ephyra / Release
+
+on:
+  push:
+    tags:
+      - v*
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-26.04
+    timeout-minutes: 60
+    environment: release
+    permissions:
+      contents: write
+    steps:
+      - name: Check the tag
+        run: |
+          # Pre-releases need a number (v1.2.3-rc.1): without one the version code would equal the final release's
+          if ! [[ "$GITHUB_REF_NAME" =~ ^v[0-9]{1,2}\.[0-9]{1,2}\.[0-9]{1,2}(-(alpha|beta|rc)\.[0-9]{1,2})?$ ]]; then
+            echo "::error::Tag $GITHUB_REF_NAME is not v<major>.<minor>.<patch>[-alpha|beta|rc.<n>] with parts up to 99"
+            exit 1
+          fi
+          echo "JELLYFIN_VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
+
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup Java
+        uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
+        with:
+          distribution: temurin
+          java-version-file: .tools-versions
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@3f5f9adaf7d9fecd50b5935e54106014257a94e6 # v6.4.0
+        with:
+          cache-read-only: true
+
+      - name: Run checks
+        run: ./gradlew detekt lint test
+
+      - name: Decode keystore
+        env:
+          KEYSTORE: ${{ secrets.KEYSTORE }}
+        run: printf '%s' "$KEYSTORE" | base64 --decode > "$RUNNER_TEMP/keystore.jks"
+
+      - name: Assemble release
+        env:
+          KEYSTORE_FILE: ${{ runner.temp }}/keystore.jks
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          SIGNING_KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          SIGNING_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: ./gradlew :app:assembleRelease :app:versionTxt
+
+      - name: Remove keystore
+        if: always()
+        run: rm -f "$RUNNER_TEMP/keystore.jks"
+
+      - name: Verify signature and version
+        env:
+          # SHA-256 of the release certificate, as apksigner prints it; set it as a variable after the first release
+          RELEASE_CERT_SHA256: ${{ vars.RELEASE_CERT_SHA256 }}
+        run: |
+          # Without the signing secrets the build is named *-release-unsigned.apk, so this file is missing
+          apk="app/build/outputs/apk/release/ephyra-v${JELLYFIN_VERSION}-release.apk"
+          test -f "$apk" || { echo "::error::Signed release APK not found"; exit 1; }
+          sdk="${ANDROID_HOME:-$ANDROID_SDK_ROOT}"
+          apksigner="$(ls -d "$sdk"/build-tools/*/ | sort -V | tail -n 1)apksigner"
+          certs="$("$apksigner" verify --print-certs "$apk")"
+          echo "$certs"
+          if [ -n "$RELEASE_CERT_SHA256" ]; then
+            grep -qi "certificate SHA-256 digest: ${RELEASE_CERT_SHA256}$" <<< "$certs" || { echo "::error::APK not signed with the release key"; exit 1; }
+          else
+            echo "::warning::RELEASE_CERT_SHA256 is not set, the signing key is not checked"
+          fi
+          version_txt="$(cat app/build/version.txt)"
+          [[ "${version_txt%%=*}" == "v${JELLYFIN_VERSION}" && "${version_txt#*=}" =~ ^[0-9]+$ ]] || { echo "::error::version.txt ($version_txt) does not match the tag"; exit 1; }
+
+      - name: Stage release assets
+        run: |
+          mkdir -p out
+          cp "app/build/outputs/apk/release/ephyra-v${JELLYFIN_VERSION}-release.apk" "out/ephyra-v${JELLYFIN_VERSION}.apk"
+          cp app/build/version.txt out/version.txt
+          # R8 mapping for deobfuscating crash reports, compressed (about 90 MB as text)
+          gzip -9 -c app/build/outputs/mapping/release/mapping.txt > "out/mapping-v${JELLYFIN_VERSION}.txt.gz"
+          (cd out && sha256sum -- * > SHA256SUMS)
+
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Pre-releases (v1.2.3-rc.1) are not "latest", so the in-app updater skips them
+          prerelease=()
+          [[ "$GITHUB_REF_NAME" == *-* ]] && prerelease=(--prerelease)
+          # A re-run after a partial failure finds the release already there: replace its files instead
+          if gh release view "$GITHUB_REF_NAME" > /dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" out/* --clobber
+          else
+            gh release create "$GITHUB_REF_NAME" out/* --verify-tag --title "$GITHUB_REF_NAME" --generate-notes "${prerelease[@]}"
+          fi
