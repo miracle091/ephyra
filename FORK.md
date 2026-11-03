@@ -60,7 +60,7 @@ The status column shows how far each change has gone. A change becomes "done" wh
 | Docs | README describes Ephyra (install, build, translations, support), with its own banner | done |
 | Build | Baseline profile for faster startup and smoother scrolling | planned |
 | Playback | Hardware video decoders come first; for H.264, HEVC, VP9 and Dolby Vision the software decoders are skipped when a hardware one exists, so a failing decoder ends in an error instead of a stuttering software decode. The playback buffer is capped at a quarter of the app's heap (48-192 MB) | done |
-| Playback | Software decoders are off by default; AV1 (no hardware decoder on Tegra X1+) is left to server transcoding | planned |
+| Playback | Software decoders are off by default, so AV1 (no hardware decoder on Tegra X1+) is left to server transcoding. With them on, software AV1 is capped at 1080p. For H.264, HEVC, VP9 and Dolby Vision the limits sent to the server come from the hardware decoders whatever the setting, as the player uses | done |
 | Playback | Refresh-rate switching on by default | planned |
 | Memory | Image caches have size limits; images are requested at display size | planned |
 | UI | Home-screen channels and Watch Next off by default (the existing setting, upstream default on) | planned |

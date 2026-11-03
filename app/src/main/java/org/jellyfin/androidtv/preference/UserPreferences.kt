@@ -306,7 +306,7 @@ class UserPreferences(context: Context) : SharedPreferenceStore(
 		/**
 		 * Enable the use of software-based codecs.
 		 */
-		var softwareCodecsEnabled = booleanPreference("software_codecs_enabled", true)
+		var softwareCodecsEnabled = booleanPreference("software_codecs_enabled", false)
 
 		/**
 		 * Stores the interval for the photo player.

@@ -152,6 +152,7 @@ fun createDeviceProfile(
 	val maxResolutionAVC = mediaTest.getMaxResolution(MimeTypes.VIDEO_H264)
 	val maxResolutionHevc = mediaTest.getMaxResolution(MimeTypes.VIDEO_H265)
 	val maxResolutionAV1 = mediaTest.getMaxResolution(MimeTypes.VIDEO_AV1)
+	val av1SoftwareOnly = !mediaTest.supportsHardwareAV1()
 	val maxResolutionVC1 = mediaTest.getMaxResolution(MimeTypes.VIDEO_VC1)
 
 	/// HDR capabilities
@@ -443,8 +444,8 @@ fun createDeviceProfile(
 		codec = Codec.Video.AV1
 
 		conditions {
-			ProfileConditionValue.WIDTH lowerThanOrEquals maxResolutionAV1.width
-			ProfileConditionValue.HEIGHT lowerThanOrEquals maxResolutionAV1.height
+			ProfileConditionValue.WIDTH lowerThanOrEquals SoftwareAv1Limit.width(maxResolutionAV1.width, av1SoftwareOnly)
+			ProfileConditionValue.HEIGHT lowerThanOrEquals SoftwareAv1Limit.height(maxResolutionAV1.height, av1SoftwareOnly)
 		}
 	}
 

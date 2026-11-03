@@ -6,6 +6,7 @@ import android.media.MediaCodecList
 import android.media.MediaFormat
 import android.util.Size
 import org.jellyfin.androidtv.util.AndroidVersion
+import org.jellyfin.playback.media3.exoplayer.shield.ShieldMediaCodecSelector.Companion.HARDWARE_ONLY_MIME_TYPES
 import timber.log.Timber
 
 /**
@@ -18,13 +19,18 @@ class MediaCodecQuery(
 	private val MediaCodecInfo.isSoftwareCodec: Boolean
 		get() = AndroidVersion.isAtLeastQ && isSoftwareOnly
 
-	private fun decoderInfos(): Sequence<MediaCodecInfo> =
-		mediaCodecList.codecInfos.asSequence()
+	private fun decoderInfos(mime: String): Sequence<MediaCodecInfo> {
+		val decoders = mediaCodecList.codecInfos.asSequence()
 			.filter { !it.isEncoder }
-			.filter { softwareCodecsEnabled || !it.isSoftwareCodec }
+			.filter { info -> info.supportedTypes.any { it.equals(mime, ignoreCase = true) } }
+		// Ephyra: the player skips software decoders for these formats when a hardware one exists (ShieldMediaCodecSelector),
+		// so the limits sent to the server must come from the hardware decoders too
+		val hardwareFirst = HARDWARE_ONLY_MIME_TYPES.any { it.equals(mime, ignoreCase = true) } && decoders.any { !it.isSoftwareCodec }
+		return if (softwareCodecsEnabled && !hardwareFirst) decoders else decoders.filter { !it.isSoftwareCodec }
+	}
 
 	fun hasCodecForMime(mime: String): Boolean {
-		val info = decoderInfos().firstOrNull { info ->
+		val info = decoderInfos(mime).firstOrNull { info ->
 			info.supportedTypes.any { it.equals(mime, ignoreCase = true) }
 		} ?: return false
 
@@ -33,12 +39,12 @@ class MediaCodecQuery(
 	}
 
 	fun hasDecoder(mime: String, profile: Int, level: Int): Boolean =
-		decoderInfos().any { info -> supportsProfileLevel(info, mime, profile, level) }
+		decoderInfos(mime).any { info -> supportsProfileLevel(info, mime, profile, level) }
 
 	fun getDecoderLevel(mime: String, profile: Int): Int {
 		var maxLevel = 0
 
-		for (info in decoderInfos()) {
+		for (info in decoderInfos(mime)) {
 			val capabilities = getCapabilitiesOrNull(info, mime) ?: continue
 			for (profileLevel in capabilities.profileLevels) {
 				if (profileLevel.profile == profile) {
@@ -51,7 +57,7 @@ class MediaCodecQuery(
 	}
 
 	fun getMaxResolution(mime: String): Size {
-		val resolutions = decoderInfos()
+		val resolutions = decoderInfos(mime)
 			.mapNotNull { info -> getCapabilitiesOrNull(info, mime)?.videoCapabilities }
 			.mapNotNull { vc ->
 				val w = vc.supportedWidths?.upper ?: return@mapNotNull null
@@ -67,7 +73,7 @@ class MediaCodecQuery(
 	}
 
 	fun supportsMultiInstance(mime: String): Boolean =
-		decoderInfos().any { info -> hasMultipleInstances(info, mime) }
+		decoderInfos(mime).any { info -> hasMultipleInstances(info, mime) }
 
 	private fun supportsProfileLevel(info: MediaCodecInfo, mime: String, profile: Int, level: Int): Boolean {
 		val capabilities = getCapabilitiesOrNull(info, mime) ?: return false

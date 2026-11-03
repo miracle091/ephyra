@@ -19,6 +19,9 @@ class MediaCodecCapabilitiesTest(
 
 	fun supportsAV1(): Boolean = av1.supportsAv1()
 
+	// Ephyra: true only with an AV1 decoder that is not software-only (none on the Tegra X1+)
+	fun supportsHardwareAV1(): Boolean = Av1CodecCapabilities(MediaCodecQuery(mediaCodecList, softwareCodecsEnabled = false)).supportsAv1()
+
 	fun supportsAV1Main10(): Boolean = av1.supportsAv1Main10()
 
 	fun supportsAV1DolbyVision(): Boolean = av1.supportsAv1DolbyVision()

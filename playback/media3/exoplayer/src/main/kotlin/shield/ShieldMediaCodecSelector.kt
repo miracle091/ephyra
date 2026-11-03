@@ -15,12 +15,15 @@ import androidx.media3.exoplayer.mediacodec.MediaCodecSelector
 class ShieldMediaCodecSelector(
 	private val delegate: MediaCodecSelector = MediaCodecSelector.DEFAULT,
 ) : MediaCodecSelector {
-	private val hardwareOnlyMimeTypes = setOf(
-		MimeTypes.VIDEO_H264,
-		MimeTypes.VIDEO_H265,
-		MimeTypes.VIDEO_DOLBY_VISION,
-		MimeTypes.VIDEO_VP9,
-	)
+	companion object {
+		/** Formats whose software decoders are skipped when a hardware one exists. The device profile follows the same list. */
+		val HARDWARE_ONLY_MIME_TYPES = setOf(
+			MimeTypes.VIDEO_H264,
+			MimeTypes.VIDEO_H265,
+			MimeTypes.VIDEO_DOLBY_VISION,
+			MimeTypes.VIDEO_VP9,
+		)
+	}
 
 	override fun getDecoderInfos(
 		mimeType: String,
@@ -34,7 +37,7 @@ class ShieldMediaCodecSelector(
 		return when {
 			// No hardware decoder (AV1 on the Tegra X1+, emulators): software is the only option
 			hardware.isEmpty() -> all
-			mimeType in hardwareOnlyMimeTypes -> hardware
+			mimeType in HARDWARE_ONLY_MIME_TYPES -> hardware
 			else -> hardware + software
 		}
 	}
