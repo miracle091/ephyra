@@ -79,7 +79,7 @@ class MediaSessionService(
 		if (notifiedNotificationId == null) notifiedNotificationId = options.notificationId
 
 		// POST_NOTIFICATIONS permission is not required for media notifications
-		@Suppress("MissingPermission")
+		@Suppress("MissingPermission", "NotificationPermission")
 		notificationManager.notify(notifiedNotificationId!!, notification)
 	}
 }

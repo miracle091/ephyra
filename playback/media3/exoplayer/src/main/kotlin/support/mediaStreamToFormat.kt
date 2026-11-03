@@ -1,3 +1,5 @@
+@file:OptIn(UnstableApi::class)
+
 package org.jellyfin.playback.media3.exoplayer.support
 
 import androidx.annotation.OptIn

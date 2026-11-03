@@ -19,7 +19,8 @@ object PlayInfo {
 
 	fun transcodeReasons(transcodingUrl: String?): List<TranscodeReason> {
 		val value = transcodingUrl?.let { transcodeReasonsParameter.find(it) }?.groupValues?.get(1) ?: return emptyList()
-		return URLDecoder.decode(value, Charsets.UTF_8)
+		// The Charset overload needs API 33; the String one works on every Shield (Android 11).
+		return URLDecoder.decode(value, Charsets.UTF_8.name())
 			.split(',')
 			.mapNotNull { TranscodeReason.fromNameOrNull(it.trim()) }
 	}

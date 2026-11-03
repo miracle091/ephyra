@@ -19,7 +19,6 @@ import androidx.leanback.widget.ArrayObjectAdapter;
 import androidx.leanback.widget.PlaybackControlsRow;
 import androidx.leanback.widget.PlaybackRowPresenter;
 import androidx.leanback.widget.PlaybackTransportRowPresenter;
-import androidx.leanback.widget.PlaybackTransportRowView;
 import androidx.leanback.widget.RowPresenter;
 
 import org.jellyfin.androidtv.R;
@@ -141,7 +140,7 @@ public class CustomPlaybackTransportControlGlue extends PlaybackTransportControl
 
                     LinearLayout view = (LinearLayout) vh.view;
 
-                    PlaybackTransportRowView bar = (PlaybackTransportRowView) view.getChildAt(1);
+                    ViewGroup bar = (ViewGroup) view.getChildAt(1);
                     FrameLayout v = (FrameLayout) bar.getChildAt(0);
                     mButtonRef = (LinearLayout) v.getChildAt(0);
 

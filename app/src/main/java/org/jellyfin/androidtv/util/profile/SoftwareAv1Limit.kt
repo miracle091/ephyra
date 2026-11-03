@@ -1,8 +1,8 @@
 package org.jellyfin.androidtv.util.profile
 
 /**
- * Resolution cap for AV1 when only a software decoder exists, as on every Shield TV (Tegra X1 and X1+): their CPU cores keep up with 1080p at most,
- * so the server transcodes anything larger. Hardware AV1 decoders keep their own limits.
+ * Resolution cap for AV1 when only a software decoder exists, as on every Shield TV (Tegra X1 and X1+):
+ * their CPU cores keep up with 1080p at most, so the server transcodes anything larger. Hardware AV1 decoders keep their own limits.
  */
 object SoftwareAv1Limit {
 	const val MAX_WIDTH = 1920

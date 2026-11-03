@@ -19,6 +19,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import org.jellyfin.androidtv.R
@@ -36,6 +37,7 @@ fun SearchVoiceInput(
 	modifier: Modifier = Modifier,
 ) {
 	val context = LocalContext.current
+	val resources = LocalResources.current
 	val recognizer = rememberSpeechRecognizer(
 		onResult = { query ->
 			onQueryChange(query)
@@ -60,7 +62,7 @@ fun SearchVoiceInput(
 			}
 
 			if (string != null) {
-				Toast.makeText(context, context.getString(string), Toast.LENGTH_LONG).show()
+				Toast.makeText(context, resources.getString(string), Toast.LENGTH_LONG).show()
 			}
 		}
 	)
