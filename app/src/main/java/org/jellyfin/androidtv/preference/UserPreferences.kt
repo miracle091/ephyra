@@ -316,7 +316,7 @@ class UserPreferences(context: Context) : SharedPreferenceStore(
 		/**
 		 * Integrate with androidx.tvprovider for the Android TV home screen.
 		 */
-		var tvProviderEnabled = booleanPreference("tv_provider_enabled", true)
+		var tvProviderEnabled = booleanPreference("tv_provider_enabled", false)
 	}
 
 	init {
