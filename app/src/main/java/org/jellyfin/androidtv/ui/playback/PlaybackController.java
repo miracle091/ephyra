@@ -539,6 +539,8 @@ public class PlaybackController implements PlaybackControllerNotifiable {
                 }
             }
         }
+        // Ephyra: tracks picked on the details screen
+        TrackPreselectionKt.applyTrackPreselection(internalOptions, item, currentMediaSource);
         if (!isLiveTv && currentMediaSource != null) {
             internalOptions.setMediaSourceId(currentMediaSource.getId());
         }

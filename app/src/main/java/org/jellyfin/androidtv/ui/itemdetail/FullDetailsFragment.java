@@ -838,6 +838,10 @@ public class FullDetailsFragment extends Fragment implements RecordingIndicatorV
             });
             mDetailsOverviewRow.addAction(mVersionsButton);
         }
+        // Ephyra: pick audio and subtitles before playback
+        for (TextUnderButton button : DetailsTrackButtons.create(requireContext(), () -> mBaseItem, buttonSize)) {
+            mDetailsOverviewRow.addAction(button);
+        }
 
         if (TrailerUtils.hasPlayableTrailers(requireContext(), mBaseItem)) {
             trailerButton = TextUnderButton.create(requireContext(), R.drawable.ic_trailer, buttonSize, 0, getString(R.string.lbl_play_trailers), new View.OnClickListener() {
