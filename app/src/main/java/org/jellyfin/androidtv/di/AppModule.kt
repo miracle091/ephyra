@@ -29,6 +29,7 @@ import org.jellyfin.androidtv.data.repository.NotificationsRepositoryImpl
 import org.jellyfin.androidtv.data.repository.UserViewsRepository
 import org.jellyfin.androidtv.data.repository.UserViewsRepositoryImpl
 import org.jellyfin.androidtv.data.service.BackgroundService
+import org.jellyfin.androidtv.integration.ShieldDisplayHint
 import org.jellyfin.androidtv.integration.dream.DreamViewModel
 import org.jellyfin.androidtv.ui.InteractionTrackerViewModel
 import org.jellyfin.androidtv.ui.itemhandling.ItemLauncher
@@ -190,4 +191,5 @@ val appModule = module {
 		AppUpdater(androidContext(), httpClient, ProcessLifecycleOwner.get().lifecycleScope)
 	}
 	single { DailyUpdateCheck(androidContext(), get(), get(), get()) }
+	single { ShieldDisplayHint(androidContext(), get(), get()) }
 }

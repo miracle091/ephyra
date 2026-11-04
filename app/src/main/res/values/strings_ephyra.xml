@@ -68,6 +68,9 @@
     <string name="ephyra_transcode_reason_video_codec_tag">video codec tag not supported</string>
     <string name="ephyra_transcode_reason_stream_count">too many streams</string>
 
+    <!-- One-time hint on a Shield TV with an HDR display (integration/ShieldDisplayHint.kt); menu names as on Shield Experience 9 -->
+    <string name="ephyra_shield_display_hint">For HDR videos, turn on Match content color space in the Shield settings: Device Preferences, Display &amp; Sound, Advanced display settings</string>
+
     <!-- Codec benchmark in the developer settings, debug builds only (ui/settings/screen/CodecBenchmarkListButton.kt) -->
     <string name="ephyra_benchmark_title">Codec benchmark</string>
     <string name="ephyra_benchmark_description">Plays Jellyfin test clips from repo.jellyfin.org and reports decoders and dropped frames (about 10 minutes, streams up to 100 Mbit/s)</string>

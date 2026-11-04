@@ -91,6 +91,10 @@
             <meta-data
                 android:name="org.jellyfin.androidtv.update.UpdateCheckInitializer"
                 android:value="androidx.startup" />
+            <!-- Ephyra: one-time hint about the Shield's display settings -->
+            <meta-data
+                android:name="org.jellyfin.androidtv.integration.ShieldDisplayHintInitializer"
+                android:value="androidx.startup" />
         </provider>
 
         <provider
