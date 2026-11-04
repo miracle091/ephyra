@@ -32,8 +32,9 @@ class SelectAudioAction(
 		dismissPopup()
 		popup = PopupMenu(context, view, Gravity.END).apply {
 			with(menu) {
-				for (track in audioTracks) {
-					add(0, track.index, track.index, track.displayTitle).apply {
+				// Ephyra: preferred languages first; the order argument follows the list, not the stream index
+				audioTracks.preferredLanguagesFirst { it.audioLanguagePreference }.forEachIndexed { order, track ->
+					add(0, track.index, order, track.displayTitle).apply {
 						isChecked = currentAudioIndex == track.index
 					}
 				}
