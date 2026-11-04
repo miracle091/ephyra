@@ -14,6 +14,21 @@ import org.jellyfin.androidtv.ui.navigation.focus.focusKey
 import org.jellyfin.androidtv.ui.settings.compat.rememberPreference
 import org.koin.compose.koinInject
 
+/** Ephyra: "Spotlight" in Customization, Home. */
+@Composable
+fun HomeSpotlightListButton() {
+	val preferences = koinInject<EphyraPreferences>()
+	var homeSpotlight by rememberPreference(preferences, EphyraPreferences.homeSpotlight)
+
+	ListButton(
+		headingContent = { Text(stringResource(R.string.ephyra_pref_home_spotlight)) },
+		captionContent = { Text(stringResource(R.string.ephyra_pref_home_spotlight_description)) },
+		trailingContent = { Checkbox(checked = homeSpotlight) },
+		onClick = { homeSpotlight = !homeSpotlight },
+		modifier = Modifier.focusKey("ephyra_home_spotlight"),
+	)
+}
+
 /** Ephyra: "Blur unwatched episodes" in Customization. */
 @Composable
 fun SpoilerBlurListButton() {

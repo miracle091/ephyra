@@ -86,4 +86,12 @@
     <string name="ephyra_pref_spoiler_blur_description">Episode cards show a blurred picture until you start the episode</string>
     <string name="ephyra_pref_stop_at_season_end">Stop at the end of the season</string>
     <string name="ephyra_pref_stop_at_season_end_description">Episodes play one after another only within the same season</string>
+
+    <!-- Home spotlight (ui/home/spotlight/HomeSpotlight.kt) -->
+    <string name="ephyra_spotlight">Spotlight</string>
+    <string name="ephyra_spotlight_details">Details</string>
+    <string name="ephyra_pref_home_spotlight">Spotlight</string>
+    <string name="ephyra_pref_home_spotlight_description">Recent films and series you have not watched, in turn at the top of the home screen</string>
+    <string name="ephyra_runtime_hours_minutes">%1$d h %2$d min</string>
+    <string name="ephyra_runtime_minutes">%1$d min</string>
 </resources>

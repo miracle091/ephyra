@@ -16,6 +16,7 @@ import org.jellyfin.androidtv.ui.navigation.focus.focusKey
 import org.jellyfin.androidtv.ui.settings.Routes
 import org.jellyfin.androidtv.ui.settings.compat.rememberPreference
 import org.jellyfin.androidtv.ui.settings.composable.SettingsColumn
+import org.jellyfin.androidtv.ui.settings.screen.HomeSpotlightListButton
 import org.koin.compose.koinInject
 
 @Composable
@@ -31,6 +32,8 @@ fun SettingsHomeScreen() {
 				headingContent = { Text(stringResource(R.string.home_prefs)) },
 			)
 		}
+
+		item { HomeSpotlightListButton() } // Ephyra
 
 		itemsIndexed(userSettingPreferences.homesections) { index, section ->
 			ListButton(

@@ -29,6 +29,7 @@ import kotlinx.coroutines.flow.onEach
 import org.jellyfin.androidtv.auth.repository.ServerRepository
 import org.jellyfin.androidtv.auth.repository.SessionRepository
 import org.jellyfin.androidtv.data.repository.NotificationsRepository
+import org.jellyfin.androidtv.ui.home.spotlight.HomeSpotlight
 import org.jellyfin.androidtv.ui.shared.toolbar.MainToolbar
 import org.jellyfin.androidtv.ui.shared.toolbar.MainToolbarActiveButton
 import org.koin.android.ext.android.inject
@@ -53,6 +54,7 @@ class HomeFragment : Fragment() {
 			// issue we add custom behavior that only allows focus exit when the current selected row is the first one. Additionally when
 			// we do switch the focus, we reset the leanback state so it won't cause weird behavior when focus is regained
 			var rowsSupportFragment by remember { mutableStateOf<HomeRowsFragment?>(null) }
+			HomeSpotlight(rowsSupportFragment) // Ephyra: spotlight above the rows
 			AndroidFragment<HomeRowsFragment>(
 				modifier = Modifier
 					.focusGroup()

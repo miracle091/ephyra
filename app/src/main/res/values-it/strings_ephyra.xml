@@ -77,4 +77,12 @@
     <string name="ephyra_pref_spoiler_blur_description">Le schede degli episodi mostrano un\'immagine sfocata finché non inizi l\'episodio</string>
     <string name="ephyra_pref_stop_at_season_end">Fermati a fine stagione</string>
     <string name="ephyra_pref_stop_at_season_end_description">Gli episodi si susseguono solo all\'interno della stessa stagione</string>
+
+    <!-- Home spotlight (ui/home/spotlight/HomeSpotlight.kt) -->
+    <string name="ephyra_spotlight">In evidenza</string>
+    <string name="ephyra_spotlight_details">Dettagli</string>
+    <string name="ephyra_pref_home_spotlight">In evidenza</string>
+    <string name="ephyra_pref_home_spotlight_description">Film e serie recenti non ancora visti, a turno in cima alla home</string>
+    <string name="ephyra_runtime_hours_minutes">%1$d h %2$d min</string>
+    <string name="ephyra_runtime_minutes">%1$d min</string>
 </resources>

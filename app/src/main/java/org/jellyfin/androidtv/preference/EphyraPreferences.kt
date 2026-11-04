@@ -9,6 +9,9 @@ class EphyraPreferences(context: Context) : SharedPreferenceStore(
 	sharedPreferences = context.getSharedPreferences("ephyra_settings", Context.MODE_PRIVATE)
 ) {
 	companion object {
+		/** The spotlight at the top of the home screen: recent unwatched films and series, in turn. */
+		val homeSpotlight = booleanPreference("home_spotlight", true)
+
 		/** Cards of unwatched episodes show a blurred picture instead of a scene from the episode. */
 		val spoilerBlur = booleanPreference("spoiler_blur", false)
 
