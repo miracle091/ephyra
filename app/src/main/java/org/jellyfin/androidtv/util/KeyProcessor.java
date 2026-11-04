@@ -248,6 +248,9 @@ public class KeyProcessor {
                     menu.getMenu().add(0, MENU_MARK_FAVORITE, order++, activity.getString(R.string.lbl_add_favorite));
                 }
             }
+
+            // Ephyra: reset progress, go to series
+            ItemMenuExtra.addTo(menu.getMenu(), item, order);
         }
 
         menu.setOnMenuItemClickListener(new KeyProcessorItemMenuClickListener(activity, rowItem));
@@ -343,7 +346,8 @@ public class KeyProcessor {
                     return true;
             }
 
-            return false;
+            // Ephyra: entries of ItemMenuExtra
+            return ItemMenuExtra.onClick(menuItem.getItemId(), item, activity);
         }
     };
 

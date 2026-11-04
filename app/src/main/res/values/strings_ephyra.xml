@@ -74,4 +74,7 @@
     <!-- Codec benchmark in the developer settings, debug builds only (ui/settings/screen/CodecBenchmarkListButton.kt) -->
     <string name="ephyra_benchmark_title">Codec benchmark</string>
     <string name="ephyra_benchmark_description">Plays Jellyfin test clips from repo.jellyfin.org and reports decoders and dropped frames (about 10 minutes, streams up to 100 Mbit/s)</string>
+
+    <!-- MENU key on a card (util/ItemMenuExtras.kt) -->
+    <string name="ephyra_menu_reset_progress">Reset progress</string>
 </resources>
