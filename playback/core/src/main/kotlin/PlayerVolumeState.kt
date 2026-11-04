@@ -1,9 +1,7 @@
 package org.jellyfin.playback.core
 
 import android.media.AudioManager
-import android.os.Build
 import androidx.annotation.FloatRange
-import androidx.annotation.RequiresApi
 import timber.log.Timber
 import kotlin.math.roundToInt
 
@@ -70,7 +68,6 @@ class NoOpPlayerVolumeState : PlayerVolumeState {
 	override fun setVolume(volume: Float) = Unit
 }
 
-@RequiresApi(Build.VERSION_CODES.M)
 class AndroidPlayerVolumeState(
 	private val audioManager: AudioManager,
 ) : PlayerVolumeState {

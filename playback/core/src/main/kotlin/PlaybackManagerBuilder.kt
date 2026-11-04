@@ -1,7 +1,6 @@
 package org.jellyfin.playback.core
 
 import android.content.Context
-import android.os.Build
 import androidx.core.content.getSystemService
 import org.jellyfin.playback.core.backend.PlayerBackend
 import org.jellyfin.playback.core.mediastream.MediaStreamResolver
@@ -15,8 +14,7 @@ import kotlin.time.Duration.Companion.seconds
 
 class PlaybackManagerBuilder(context: Context) {
 	private val factories = mutableListOf<PlaybackPlugin>()
-	private val volumeState = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) NoOpPlayerVolumeState()
-	else AndroidPlayerVolumeState(audioManager = requireNotNull(context.getSystemService()))
+	private val volumeState = AndroidPlayerVolumeState(audioManager = requireNotNull(context.getSystemService()))
 
 	// Options
 	var defaultRewindAmount: (() -> Duration)? = null
