@@ -1,0 +1,9 @@
+{
+  "uniqueId": "org.fribidi:fribidi",
+  "artifactVersion": "1.0.16",
+  "name": "GNU FriBidi",
+  "description": "Unicode bidirectional text algorithm built into libass.so. Source: https://github.com/fribidi/fribidi",
+  "website": "https://github.com/fribidi/fribidi",
+  "developers": [{ "name": "The FriBidi contributors" }],
+  "licenses": ["LGPL-2.1-or-later"]
+}

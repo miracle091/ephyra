@@ -1,0 +1,8 @@
+{
+  "uniqueId": "io.github.libass:libass",
+  "name": "libass",
+  "description": "Subtitle renderer built into libass.so (ass-media)",
+  "website": "https://github.com/libass/libass",
+  "developers": [{ "name": "The libass contributors" }],
+  "licenses": ["ISC"]
+}

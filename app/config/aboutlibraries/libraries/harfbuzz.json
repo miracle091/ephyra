@@ -1,0 +1,8 @@
+{
+  "uniqueId": "org.harfbuzz:harfbuzz",
+  "name": "HarfBuzz",
+  "description": "Text shaping engine built into libass.so",
+  "website": "https://harfbuzz.github.io",
+  "developers": [{ "name": "The HarfBuzz contributors" }],
+  "licenses": ["MIT-Modern-Variant"]
+}

@@ -1,0 +1,8 @@
+{
+  "uniqueId": "org.freetype:freetype",
+  "name": "FreeType",
+  "description": "Font engine built into libass.so, used under the FreeType License. Portions of this software are copyright © The FreeType Project (www.freetype.org). All rights reserved.",
+  "website": "https://freetype.org",
+  "developers": [{ "name": "The FreeType Project" }],
+  "licenses": ["FTL"]
+}

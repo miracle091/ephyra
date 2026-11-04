@@ -117,6 +117,13 @@ android {
 
 base.archivesName.set("ephyra-v${project.getVersionName()}")
 
+// Ephyra: native libraries bundled inside other packages (FFmpeg, libass and its font stack), listed in the licenses screen
+aboutLibraries {
+	collect {
+		configPath = file("config/aboutlibraries")
+	}
+}
+
 tasks.register("versionTxt") {
 	val path = layout.buildDirectory.asFile.get().resolve("version.txt")
 

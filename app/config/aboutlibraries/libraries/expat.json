@@ -1,0 +1,8 @@
+{
+  "uniqueId": "io.github.libexpat:expat",
+  "name": "Expat",
+  "description": "XML parser built into libass.so (used by Fontconfig)",
+  "website": "https://libexpat.github.io",
+  "developers": [{ "name": "The Expat maintainers" }],
+  "licenses": ["MIT"]
+}

@@ -1,0 +1,9 @@
+{
+  "uniqueId": "org.ffmpeg:ffmpeg",
+  "artifactVersion": "6.0",
+  "name": "FFmpeg (libavcodec, libavutil, libswresample)",
+  "description": "Audio decoders built into the Jellyfin Media3 FFmpeg decoder (libffmpegJNI.so), configured without GPL or version 3 parts. Source: FFmpeg release/6.0 as built by https://github.com/jellyfin/jellyfin-androidx-media",
+  "website": "https://ffmpeg.org",
+  "developers": [{ "name": "The FFmpeg developers" }],
+  "licenses": ["LGPL-2.1-or-later"]
+}

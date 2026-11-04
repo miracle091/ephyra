@@ -1,0 +1,8 @@
+{
+  "uniqueId": "org.freedesktop:fontconfig",
+  "name": "Fontconfig",
+  "description": "Font configuration library built into libass.so",
+  "website": "https://www.freedesktop.org/wiki/Software/fontconfig/",
+  "developers": [{ "name": "Keith Packard and the Fontconfig contributors" }],
+  "licenses": ["HPND"]
+}

@@ -1,0 +1,8 @@
+{
+  "uniqueId": "io.github.adah1972:libunibreak",
+  "name": "libunibreak",
+  "description": "Unicode line breaking built into libass.so",
+  "website": "https://github.com/adah1972/libunibreak",
+  "developers": [{ "name": "Wu Yongwei and the libunibreak contributors" }],
+  "licenses": ["Zlib"]
+}
