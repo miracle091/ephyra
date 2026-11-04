@@ -71,4 +71,10 @@
 
     <!-- True black theme (res/values/theme_ephyra_black.xml) -->
     <string name="ephyra_pref_theme_black">Nero (OLED)</string>
+
+    <!-- Episode settings (preference/EphyraPreferences.kt) -->
+    <string name="ephyra_pref_spoiler_blur">Sfoca gli episodi non visti</string>
+    <string name="ephyra_pref_spoiler_blur_description">Le schede degli episodi mostrano un\'immagine sfocata finché non inizi l\'episodio</string>
+    <string name="ephyra_pref_stop_at_season_end">Fermati a fine stagione</string>
+    <string name="ephyra_pref_stop_at_season_end_description">Gli episodi si susseguono solo all\'interno della stessa stagione</string>
 </resources>

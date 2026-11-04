@@ -83,7 +83,7 @@ class SdkPlaybackHelper(
 						fields = ItemRepository.itemFields
 					)
 
-					response.items
+					applySeasonEnd(response.items, mainItem) // Ephyra: optional stop at the end of the season
 				} else {
 					listOf(mainItem)
 				}

@@ -309,7 +309,9 @@ private fun CardViewHolderContent(
 	val card = @Composable {
 		ItemCard(
 			image = {
-				if (image != null) {
+				if (image != null && hidesEpisodeSpoiler(item.baseItem, image)) {
+					EpisodeSpoilerImage(image, aspectRatio, Modifier.fillMaxSize()) // Ephyra
+				} else if (image != null) {
 					val api = koinInject<ApiClient>()
 					AsyncImage(
 						url = image.getUrl(

@@ -80,4 +80,10 @@
 
     <!-- True black theme (res/values/theme_ephyra_black.xml) -->
     <string name="ephyra_pref_theme_black">Black (OLED)</string>
+
+    <!-- Episode settings (preference/EphyraPreferences.kt) -->
+    <string name="ephyra_pref_spoiler_blur">Blur unwatched episodes</string>
+    <string name="ephyra_pref_spoiler_blur_description">Episode cards show a blurred picture until you start the episode</string>
+    <string name="ephyra_pref_stop_at_season_end">Stop at the end of the season</string>
+    <string name="ephyra_pref_stop_at_season_end_description">Episodes play one after another only within the same season</string>
 </resources>

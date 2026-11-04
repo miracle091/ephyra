@@ -95,6 +95,8 @@ The status column shows how far each change has gone. A change becomes "done" wh
 | CI | The lint workflow runs only detekt; Android lint runs in local checks and in the release workflow, and no longer uploads to code scanning | done |
 | Playback | The request that opens a stream (PlaybackInfo) waits up to 2 minutes instead of 30 seconds, so a live TV channel the server is still tuning opens on the first try; every other request keeps the 30-second timeout | done |
 | UI | "Black (OLED)" theme (Settings → Customization → App theme): true black backgrounds, popup menus and tiles, so an OLED TV keeps its pixels off around the content | done |
+| UI | "Blur unwatched episodes" (Customization, off by default): cards of episodes not started yet show the blurred BlurHash of their picture instead of the scene, without downloading it; series and season posters stay as they are | done |
+| Playback | "Stop at the end of the season" (Playback → Next up, off by default): the episodes queued after the one started stay in its season, so autoplay stops when the season ends | done |
 
 ## What changes for users
 

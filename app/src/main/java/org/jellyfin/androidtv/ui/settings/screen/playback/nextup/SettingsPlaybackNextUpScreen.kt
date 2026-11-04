@@ -29,6 +29,7 @@ import org.jellyfin.androidtv.ui.navigation.focus.focusKey
 import org.jellyfin.androidtv.ui.settings.Routes
 import org.jellyfin.androidtv.ui.settings.compat.rememberPreference
 import org.jellyfin.androidtv.ui.settings.composable.SettingsColumn
+import org.jellyfin.androidtv.ui.settings.screen.StopAtSeasonEndListButton
 import org.jellyfin.design.Tokens
 import org.koin.compose.koinInject
 import kotlin.math.roundToInt
@@ -57,6 +58,8 @@ fun SettingsPlaybackNextUpScreen() {
 				modifier = Modifier.focusKey("media_queuing_enabled")
 			)
 		}
+
+		item { StopAtSeasonEndListButton() } // Ephyra
 
 		item {
 			var nextUpBehavior by rememberPreference(userPreferences, UserPreferences.nextUpBehavior)

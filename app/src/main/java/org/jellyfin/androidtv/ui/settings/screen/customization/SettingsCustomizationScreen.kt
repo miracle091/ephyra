@@ -23,6 +23,7 @@ import org.jellyfin.androidtv.ui.navigation.focus.focusKey
 import org.jellyfin.androidtv.ui.settings.Routes
 import org.jellyfin.androidtv.ui.settings.compat.rememberPreference
 import org.jellyfin.androidtv.ui.settings.composable.SettingsColumn
+import org.jellyfin.androidtv.ui.settings.screen.SpoilerBlurListButton
 import org.koin.compose.koinInject
 
 @Composable
@@ -96,6 +97,8 @@ fun SettingsCustomizationScreen() {
 				modifier = Modifier.focusKey("series_thumbnails_enabled")
 			)
 		}
+
+		item { SpoilerBlurListButton() } // Ephyra
 
 		if (leanbackChannelWorkerAvailable) item {
 			var tvProviderEnabled by rememberPreference(userPreferences, UserPreferences.tvProviderEnabled)
