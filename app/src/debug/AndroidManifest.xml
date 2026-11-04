@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Ephyra: debug-only components, merged into the debug build's manifest -->
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<!-- Ephyra: debug-only components, merged into the debug build's manifest. The TV checks below look at this file alone;
+     the merged manifest has the launcher, the leanback feature and the touchscreen flag from src/main. -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="MissingLeanbackLauncher,MissingLeanbackSupport,ImpliedTouchscreenHardware">
     <application>
         <activity
             android:name="org.jellyfin.androidtv.benchmark.CodecBenchmarkActivity"

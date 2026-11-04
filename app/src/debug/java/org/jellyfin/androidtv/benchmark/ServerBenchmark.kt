@@ -79,7 +79,8 @@ class ServerBenchmark(
 			transcodeReasons = PlayInfo.transcodeReasons(transcodingUrl),
 			transcodeVideoCodec = transcodingUrl
 				?.let { videoCodecParameter.find(it) }
-				?.let { URLDecoder.decode(it.groupValues[1], Charsets.UTF_8) }
+				// The Charset overload of decode needs API 33
+				?.let { URLDecoder.decode(it.groupValues[1], "UTF-8") }
 				?.substringBefore(','),
 		)
 	}
