@@ -20,4 +20,9 @@ enum class AppTheme(
 	 * A theme with a more muted accent color, inspired by CTalvio's Monochromic CSS theme for Jellyfin Web
 	 */
 	MUTED_PURPLE(R.string.pref_theme_muted_purple),
+
+	/**
+	 * Ephyra: true black backgrounds, for OLED TVs
+	 */
+	BLACK(R.string.ephyra_pref_theme_black),
 }

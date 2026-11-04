@@ -94,6 +94,7 @@ The status column shows how far each change has gone. A change becomes "done" wh
 | UI | No "Delete" button on the item details screen (films, episodes, recordings and other media), so the app never deletes media from the server; cancelling scheduled recordings stays | done |
 | CI | The lint workflow runs only detekt; Android lint runs in local checks and in the release workflow, and no longer uploads to code scanning | done |
 | Playback | The request that opens a stream (PlaybackInfo) waits up to 2 minutes instead of 30 seconds, so a live TV channel the server is still tuning opens on the first try; every other request keeps the 30-second timeout | done |
+| UI | "Black (OLED)" theme (Settings → Customization → App theme): true black backgrounds, popup menus and tiles, so an OLED TV keeps its pixels off around the content | done |
 
 ## What changes for users
 

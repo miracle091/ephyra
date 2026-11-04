@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Ephyra: true black theme, so an OLED TV keeps its pixels off around the content -->
+<resources>
+
+    <color name="ephyra_black">#000000</color>
+    <color name="ephyra_black_raised">#141414</color>
+    <color name="ephyra_black_card">#0A0A0A</color>
+
+    <style name="Theme.Jellyfin.Black" parent="Theme.Jellyfin">
+        <!-- Colors -->
+        <item name="android:colorPrimary">@color/ephyra_black</item>
+        <item name="android:colorPrimaryDark">@color/ephyra_black</item>
+        <item name="defaultBackground">@color/ephyra_black</item>
+        <item name="cardImageBackground">@color/ephyra_black_card</item>
+        <item name="popupMenuBackground">@color/ephyra_black_raised</item>
+
+        <!-- Tile colors -->
+        <item name="tile_port_person_bg">@color/ephyra_black_raised</item>
+        <item name="tile_port_video_bg">@color/ephyra_black_raised</item>
+        <item name="tile_land_folder_bg">@color/ephyra_black_raised</item>
+        <item name="tile_chapter_bg">@color/ephyra_black_raised</item>
+        <item name="tile_land_tv_bg">@color/ephyra_black_raised</item>
+        <item name="tile_port_tv_bg">@color/ephyra_black_raised</item>
+        <item name="tile_actors_bg">@color/ephyra_black_raised</item>
+        <item name="tile_land_photo_bg">@color/ephyra_black_raised</item>
+        <item name="tile_port_folder_bg">@color/ephyra_black_raised</item>
+        <item name="tile_land_series_timer_bg">@color/ephyra_black_raised</item>
+        <item name="tile_audio_bg">@color/ephyra_black_raised</item>
+        <item name="tile_artists_bg">@color/ephyra_black_raised</item>
+        <item name="tile_genres_bg">@color/ephyra_black_raised</item>
+        <item name="tile_search_bg">@color/ephyra_black_raised</item>
+        <item name="tile_suggestions_bg">@color/ephyra_black_raised</item>
+        <item name="tile_port_grid_bg">@color/ephyra_black_raised</item>
+        <item name="tile_letters_bg">@color/ephyra_black_raised</item>
+        <item name="tile_port_guide_bg">@color/ephyra_black_raised</item>
+        <item name="tile_port_series_timer_bg">@color/ephyra_black_raised</item>
+        <item name="tile_port_time_bg">@color/ephyra_black_raised</item>
+    </style>
+</resources>

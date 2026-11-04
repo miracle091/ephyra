@@ -77,4 +77,7 @@
 
     <!-- MENU key on a card (util/ItemMenuExtras.kt) -->
     <string name="ephyra_menu_reset_progress">Reset progress</string>
+
+    <!-- True black theme (res/values/theme_ephyra_black.xml) -->
+    <string name="ephyra_pref_theme_black">Black (OLED)</string>
 </resources>
