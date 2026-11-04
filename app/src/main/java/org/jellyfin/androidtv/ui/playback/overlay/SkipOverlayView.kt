@@ -19,6 +19,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.AbstractComposeView
@@ -48,6 +49,7 @@ fun SkipOverlayComposable(
 		AnimatedVisibility(visible, enter = fadeIn(), exit = fadeOut()) {
 			Row(
 				modifier = Modifier
+					.alpha(skipButtonAlpha(visible)) // Ephyra: dims after a few seconds
 					.clip(RoundedCornerShape(6.dp))
 					.background(colorResource(R.color.popup_menu_background).copy(alpha = 0.6f))
 					.padding(10.dp),
