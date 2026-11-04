@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import coil3.ImageLoader
+import org.jellyfin.androidtv.BuildConfig
 import org.jellyfin.androidtv.R
 import org.jellyfin.androidtv.preference.SystemPreferences
 import org.jellyfin.androidtv.preference.UserPreferences
@@ -84,5 +85,8 @@ fun SettingsDeveloperScreen() {
 				modifier = Modifier.focusKey("clear_image_cache")
 			)
 		}
+
+		// Ephyra: codec benchmark, debug builds only
+		if (BuildConfig.DEBUG) item { CodecBenchmarkListButton() }
 	}
 }

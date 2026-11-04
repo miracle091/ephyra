@@ -58,4 +58,8 @@
     <string name="ephyra_transcode_reason_video_range">tipo di HDR non supportato</string>
     <string name="ephyra_transcode_reason_video_codec_tag">tag del codec video non supportato</string>
     <string name="ephyra_transcode_reason_stream_count">troppi flussi</string>
+
+    <!-- Codec benchmark in the developer settings, debug builds only (ui/settings/screen/CodecBenchmarkListButton.kt) -->
+    <string name="ephyra_benchmark_title">Benchmark dei codec</string>
+    <string name="ephyra_benchmark_description">Riproduce i clip di prova di Jellyfin da repo.jellyfin.org e riporta decoder e fotogrammi persi (circa 10 minuti, flussi fino a 100 Mbit/s)</string>
 </resources>

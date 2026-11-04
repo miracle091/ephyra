@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Ephyra: strings of the debug-only codec benchmark (benchmark/CodecBenchmarkActivity.kt) -->
+<resources>
+    <string name="ephyra_benchmark_running">Clip %1$d di %2$d: %3$s</string>
+    <string name="ephyra_benchmark_uploaded">Report caricato sul server come %1$s</string>
+    <string name="ephyra_benchmark_server">Chiedo al server dei clip nelle tue librerie…</string>
+</resources>
