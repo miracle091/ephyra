@@ -30,8 +30,9 @@ suspend fun loadSpotlightItems(api: ApiClient): List<BaseItemDto> = withContext(
 			recursive = true,
 			isPlayed = false,
 			imageTypes = setOf(ImageType.BACKDROP),
-			sortBy = setOf(ItemSortBy.DATE_CREATED),
-			sortOrder = setOf(SortOrder.DESCENDING),
+			// The name breaks ties (items scanned together share their date), so the order stays the same between loads
+			sortBy = setOf(ItemSortBy.DATE_CREATED, ItemSortBy.SORT_NAME),
+			sortOrder = setOf(SortOrder.DESCENDING, SortOrder.ASCENDING),
 			fields = setOf(ItemFields.GENRES),
 			limit = SPOTLIGHT_SIZE,
 		).content.items

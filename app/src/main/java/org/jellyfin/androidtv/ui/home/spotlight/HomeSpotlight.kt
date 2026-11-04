@@ -96,9 +96,10 @@ fun HomeSpotlight(rowsFragment: HomeRowsFragment?, modifier: Modifier = Modifier
 	val api = koinInject<ApiClient>()
 	val items by produceState(emptyList<BaseItemDto>(), api) { value = loadSpotlightItems(api) }
 	val firstRowSelected by rememberFirstRowSelected(rowsFragment)
+	// Kept above the early return, so the rotation goes on where it was when the spotlight shows again
+	var index by remember { mutableIntStateOf(0) }
 	if (items.isEmpty() || !firstRowSelected) return
 
-	var index by remember { mutableIntStateOf(0) }
 	var focused by remember { mutableStateOf(false) }
 	LaunchedEffect(items, focused) {
 		while (!focused && items.size > 1) {
