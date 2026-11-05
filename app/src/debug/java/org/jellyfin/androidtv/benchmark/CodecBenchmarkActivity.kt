@@ -15,7 +15,9 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.jellyfin.androidtv.BuildConfig
 import org.jellyfin.androidtv.R
 import org.jellyfin.androidtv.preference.UserPreferences
@@ -135,7 +137,7 @@ class CodecBenchmarkActivity : FragmentActivity() {
 	private suspend fun upload(markdown: String) {
 		if (api.accessToken == null) return
 		try {
-			val fileName = api.clientLogApi.logFile(markdown).content.fileName
+			val fileName = withContext(Dispatchers.IO) { api.clientLogApi.logFile(markdown).content.fileName }
 			report.append("\n${getString(R.string.ephyra_benchmark_uploaded, fileName)}")
 		} catch (error: CancellationException) {
 			throw error

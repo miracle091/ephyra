@@ -1,5 +1,7 @@
 package org.jellyfin.androidtv.benchmark
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.jellyfin.androidtv.ui.playback.PlayInfo
 import org.jellyfin.sdk.api.client.ApiClient
 import org.jellyfin.sdk.api.client.extensions.itemsApi
@@ -31,7 +33,8 @@ class ServerBenchmark(
 	private val api: ApiClient,
 	private val deviceProfile: DeviceProfile,
 ) {
-	suspend fun run(clips: List<BenchmarkClip>): List<ServerResult> {
+	// The SDK's calls block, so they run on the IO dispatcher, not the activity's main thread
+	suspend fun run(clips: List<BenchmarkClip>): List<ServerResult> = withContext(Dispatchers.IO) {
 		val items = api.itemsApi.getItems(
 			searchTerm = SEARCH_TERM,
 			recursive = true,
@@ -39,7 +42,7 @@ class ServerBenchmark(
 			fields = setOf(ItemFields.PATH),
 		).content.items
 
-		return clips.map { clip ->
+		clips.map { clip ->
 			val item = items.firstOrNull { it.path?.substringAfterLast('/')?.substringAfterLast('\\') == clip.fileName }
 				?: return@map ServerResult(clip.label, error = "not in a library")
 
