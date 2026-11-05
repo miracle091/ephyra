@@ -22,7 +22,9 @@ import org.jellyfin.androidtv.auth.repository.UserRepository
 import org.jellyfin.androidtv.integration.LeanbackChannelWorker
 import org.jellyfin.androidtv.ui.InteractionTrackerViewModel
 import org.jellyfin.androidtv.ui.background.AppBackground
+import org.jellyfin.androidtv.preference.UserPreferences
 import org.jellyfin.androidtv.ui.base.JellyfinTheme
+import org.jellyfin.androidtv.ui.base.colorSchemeFor
 import org.jellyfin.androidtv.ui.base.ProvideLocalInteractionTracker
 import org.jellyfin.androidtv.ui.composable.compat.AppNavigationHost
 import org.jellyfin.androidtv.ui.navigation.NavigationRepository
@@ -40,6 +42,7 @@ class MainActivity : FragmentActivity() {
 	private val userRepository by inject<UserRepository>()
 	private val interactionTrackerViewModel by viewModel<InteractionTrackerViewModel>()
 	private val workManager by inject<WorkManager>()
+	private val userPreferences by inject<UserPreferences>() // Ephyra
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		applyTheme()
@@ -63,7 +66,7 @@ class MainActivity : FragmentActivity() {
 			}.launchIn(lifecycleScope)
 
 		setContent {
-			JellyfinTheme {
+			JellyfinTheme(colorScheme = colorSchemeFor(userPreferences[UserPreferences.appTheme])) { // Ephyra: theme colours
 				ProvideLocalInteractionTracker(
 					interactionTracker = { interactionTrackerViewModel.notifyInteraction(false, userInitiated = true) }
 				) {
