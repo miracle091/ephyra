@@ -59,8 +59,8 @@
     <string name="ephyra_transcode_reason_video_codec_tag">tag del codec video non supportato</string>
     <string name="ephyra_transcode_reason_stream_count">troppi flussi</string>
 
-    <!-- One-time hint on a Shield TV with an HDR display (integration/ShieldDisplayHint.kt); menu names as on Shield Experience 9 -->
-    <string name="ephyra_shield_display_hint">Per i video HDR, attiva Abbina spazio colore dei contenuti nelle impostazioni della Shield: Preferenze dispositivo, Display e audio, Impostazioni di visualizzazione avanzate</string>
+    <!-- One-time hint on a Shield TV with an HDR display (integration/ShieldDisplayHint.kt); menu names as on Shield Experience 9 (TvSettings it), short enough for the 280x90 dp notification card -->
+    <string name="ephyra_shield_display_hint">HDR: attiva Abbina spazio cromatico contenuto in Preferenze del dispositivo › Schermo e suono › Impostazioni display avanzate</string>
 
     <!-- Codec benchmark in the developer settings, debug builds only (ui/settings/screen/CodecBenchmarkListButton.kt) -->
     <string name="ephyra_benchmark_title">Benchmark dei codec</string>
