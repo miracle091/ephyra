@@ -98,6 +98,7 @@ The status column shows how far each change has gone. A change becomes "done" wh
 | UI | "Black (OLED)" theme (Settings → Customization → App theme): true black backgrounds, popup menus, tiles and settings panel, so an OLED TV keeps its pixels off around the content | done |
 | UI | "Blur unwatched episodes" (Customization, off by default): cards of episodes not started yet show the blurred BlurHash of their picture instead of the scene, without downloading it; series and season posters stay as they are | done |
 | Playback | "Stop at the end of the season" (Playback → Next up, off by default): the episodes queued after the one started stay in its season, so autoplay stops when the season ends | done |
+| UI | Ephyra design system, first step: in the Dark and Black themes the Compose parts (settings panel, toolbar, search, dialogs, player controls) use Ephyra's colours (night blue, one cyan accent, a solid white focus); the Emerald and Muted purple themes keep upstream's colours | in progress |
 
 ## What changes for users
 
