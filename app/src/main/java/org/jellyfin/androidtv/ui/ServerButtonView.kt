@@ -31,7 +31,9 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.jellyfin.androidtv.R
+import androidx.compose.ui.text.font.FontWeight
 import org.jellyfin.androidtv.ui.base.CircularProgressIndicator
+import org.jellyfin.androidtv.ui.base.EphyraTheme
 import org.jellyfin.androidtv.ui.base.Icon
 import org.jellyfin.androidtv.ui.base.LocalTextStyle
 import org.jellyfin.androidtv.ui.base.ProvideTextStyle
@@ -61,7 +63,7 @@ fun ServerButton(
 		shape = shape,
 	) {
 		Row(
-			horizontalArrangement = Arrangement.spacedBy(8.dp),
+			horizontalArrangement = Arrangement.spacedBy(16.dp),
 			verticalAlignment = Alignment.CenterVertically,
 			modifier = Modifier
 				.fillMaxSize()
@@ -73,7 +75,7 @@ fun ServerButton(
 				modifier = Modifier
 					.weight(1f)
 					.fillMaxHeight(),
-				verticalArrangement = Arrangement.SpaceBetween,
+				verticalArrangement = Arrangement.spacedBy(2.dp, Alignment.CenterVertically),
 			) {
 				ProvideTextStyle(LocalTextStyle.current.copy(fontSize = 14.sp)) {
 					name()
@@ -84,7 +86,7 @@ fun ServerButton(
 				}
 			}
 
-			Box(modifier = Modifier.align(Alignment.Bottom)) {
+			Box(modifier = Modifier.align(Alignment.CenterVertically)) {
 				ProvideTextStyle(LocalTextStyle.current.copy(fontSize = 12.sp)) {
 					version()
 				}
@@ -142,7 +144,8 @@ class ServerButtonView @JvmOverloads constructor(
 			else interactionSource.emit(FocusInteraction.Unfocus(focusInteraction))
 		}
 
-		ServerButton(
+		// Ephyra: the theme's colours (the startup screens have no EphyraTheme around them) and a 64dp row with radius-md
+		EphyraTheme { ServerButton(
 			icon = {
 				when (state) {
 					State.DEFAULT -> Icon(
@@ -165,17 +168,15 @@ class ServerButtonView @JvmOverloads constructor(
 					)
 				}
 			},
-			name = { Text(name) },
-			address = { Text(address) },
+			name = { Text(name, fontSize = 16.sp, fontWeight = FontWeight.Bold, maxLines = 1) },
+			address = { Text(address, fontSize = 14.sp, maxLines = 1) },
 			version = { Text(version.orEmpty()) },
 			interactionSource = interactionSource,
-			// Use the old shape as the Android View implementation is only used in legacy UI
-			shape = RoundedCornerShape(3.dp),
-			// New implementation doesn't end up at 51.dp by default so force the old size
-			modifier = Modifier.height(51.dp),
+			shape = RoundedCornerShape(12.dp),
+			modifier = Modifier.height(64.dp),
 			// We use our own click handler for the view
 			onClick = {}
-		)
+		) }
 	}
 
 	enum class State {

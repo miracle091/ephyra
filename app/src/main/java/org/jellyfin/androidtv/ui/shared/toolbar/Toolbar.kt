@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -35,7 +36,8 @@ fun Logo(modifier: Modifier = Modifier) {
 @Composable
 fun Toolbar(
 	modifier: Modifier = Modifier,
-	start: @Composable () -> Unit = { Logo() },
+	// Ephyra: the logo's drawing has an empty strip on the left, so the mark lines up with the home's user button
+	start: @Composable () -> Unit = { Logo(Modifier.offset(x = (-15).dp)) },
 	center: @Composable () -> Unit = {},
 	end: @Composable () -> Unit = { ToolbarClock() },
 ) {

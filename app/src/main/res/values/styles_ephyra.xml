@@ -16,4 +16,11 @@
         <item name="android:textStyle">bold</item>
         <item name="android:textAllCaps">false</item>
     </style>
+
+    <!-- Ephyra: a section title of the startup screens, like the home row titles (bold 20sp ink) -->
+    <style name="TextAppearance.Ephyra.SectionTitle" parent="">
+        <item name="android:textColor">?attr/headerTextColor</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
 </resources>

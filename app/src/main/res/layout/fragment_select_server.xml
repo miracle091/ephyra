@@ -1,22 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Ephyra: one centred 640dp column like user selection and sign in: saved and discovered servers as sections, a ghost button
+     to enter an address at the bottom -->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal"
-    android:paddingHorizontal="@dimen/overscan_horizontal"
+    android:paddingHorizontal="@dimen/ephyra_side_margin"
     android:paddingBottom="@dimen/overscan_vertical">
 
     <LinearLayout
+        android:id="@+id/servers_column"
         android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:orientation="vertical">
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@id/enter_server_address"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_max="640dp">
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/notifications"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:descendantFocusability="blocksDescendants"
+            android:focusable="false" />
 
         <TextView
             android:id="@+id/stored_servers_title"
-            style="@style/Widget.Jellyfin.Row.Header"
+            style="@style/TextAppearance.Ephyra.SectionTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/saved_servers"
@@ -26,16 +41,16 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/stored_servers"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:clipToPadding="false"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            tools:ignore="NestedWeights"
-            tools:itemCount="3"
+            tools:itemCount="2"
             tools:listitem="@layout/view_button_server" />
 
         <TextView
             android:id="@+id/welcome_title"
-            style="@style/Widget.Jellyfin.Row.Header"
+            style="@style/TextAppearance.Ephyra.SectionTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/ephyra_welcome_title" />
@@ -45,43 +60,19 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            android:text="@string/welcome_content" />
-
-        <Button
-            android:id="@+id/enter_server_address"
-            style="@style/Button.Default"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="@string/connect_manually_by_address" />
-    </LinearLayout>
-
-    <Space
-        android:layout_width="16dp"
-        android:layout_height="match_parent" />
-
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:orientation="vertical">
-
-        <androidx.compose.ui.platform.ComposeView
-            android:id="@+id/notifications"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:descendantFocusability="blocksDescendants"
-            android:focusable="false" />
+            android:text="@string/welcome_content"
+            android:textColor="?attr/controlIconForegroundInactive"
+            android:textSize="14sp" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
             android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/discovery_title"
-                style="@style/Widget.Jellyfin.Row.Header"
+                style="@style/TextAppearance.Ephyra.SectionTitle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -92,35 +83,49 @@
                 android:layout_width="18dp"
                 android:layout_height="18dp"
                 android:layout_gravity="end|center_vertical"
-                android:layout_marginEnd="6dp" />
+                android:indeterminateTint="?android:attr/colorAccent" />
         </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/discovery_servers"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:clipToPadding="false"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            tools:itemCount="3"
+            tools:itemCount="2"
             tools:listitem="@layout/view_button_server" />
 
         <TextView
             android:id="@+id/discovery_none_found"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_marginTop="32dp"
-            android:layout_weight="1"
-            android:gravity="top|center"
-            android:text="@string/discovered_servers_empty"
-            android:visibility="gone" />
-
-        <TextView
-            android:id="@+id/app_version"
-            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:layout_marginTop="6dp"
-            android:textColor="@color/lb_grey"
-            tools:text="App version" />
+            android:layout_marginTop="8dp"
+            android:text="@string/discovered_servers_empty"
+            android:textColor="?attr/controlIconForegroundInactive"
+            android:textSize="14sp"
+            android:visibility="gone" />
     </LinearLayout>
-</LinearLayout>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/enter_server_address"
+        style="@style/Button.Ephyra.Ghost"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:drawableStart="@drawable/ic_add"
+        android:text="@string/connect_manually_by_address"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/app_version"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:alpha="0.7"
+        android:textColor="?attr/controlIconForegroundInactive"
+        android:textSize="12sp"
+        app:layout_constraintBaseline_toBaselineOf="@id/enter_server_address"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:text="App version" />
+</androidx.constraintlayout.widget.ConstraintLayout>
