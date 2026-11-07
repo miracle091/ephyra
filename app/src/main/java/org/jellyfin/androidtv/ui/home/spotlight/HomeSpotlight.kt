@@ -57,6 +57,7 @@ import org.jellyfin.androidtv.R
 import org.jellyfin.androidtv.data.repository.ItemMutationRepository
 import org.jellyfin.androidtv.preference.EphyraPreferences
 import org.jellyfin.androidtv.ui.base.Icon
+import org.jellyfin.androidtv.ui.base.LocalEphyraPalette
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.base.button.Button
 import org.jellyfin.androidtv.ui.base.button.IconButton
@@ -66,7 +67,6 @@ import org.jellyfin.androidtv.ui.navigation.NavigationRepository
 import org.jellyfin.androidtv.util.PlaybackHelper
 import org.jellyfin.androidtv.util.apiclient.getUrl
 import org.jellyfin.androidtv.util.apiclient.itemBackdropImages
-import org.jellyfin.design.Tokens
 import org.jellyfin.sdk.api.client.ApiClient
 import org.jellyfin.sdk.model.api.BaseItemDto
 import org.koin.compose.koinInject
@@ -78,10 +78,21 @@ private val SpotlightHeight = 180.dp
 private val SpotlightInterval = 10.seconds
 private const val SPOTLIGHT_FADE_MS = 240
 
-// The backdrop covers the right two thirds and fades out towards the text and the rows, without blur (Android 11 has none)
+// The backdrop covers the right two thirds and fades out at the top, towards the text and towards the rows, without blur
+// (Android 11 has none)
 private const val BACKDROP_WIDTH = 0.66f
-private val BackdropFadeHorizontal = Brush.horizontalGradient(0f to Color.Transparent, 0.45f to Color.Black)
-private val BackdropFadeVertical = Brush.verticalGradient(0.55f to Color.Black, 1f to Color.Transparent)
+private val BackdropFadeHorizontal = Brush.horizontalGradient(
+	0f to Color.Transparent,
+	0.25f to Color.Black.copy(alpha = 0.6f),
+	0.5f to Color.Black,
+)
+private val BackdropFadeVertical = Brush.verticalGradient(
+	0f to Color.Transparent,
+	0.3f to Color.Black,
+	0.55f to Color.Black,
+	0.8f to Color.Black.copy(alpha = 0.4f),
+	1f to Color.Transparent,
+)
 
 /**
  * Ephyra: the spotlight at the top of the home screen (the `DetailHero` "feature" of the design in guide 5.1e): recent films and
@@ -180,14 +191,14 @@ private fun SpotlightInfo(item: BaseItemDto, modifier: Modifier = Modifier) {
 			fontSize = 11.sp,
 			fontWeight = FontWeight.Bold,
 			letterSpacing = 1.sp,
-			color = Tokens.Color.colorCyan300,
+			color = LocalEphyraPalette.current.accent,
 		)
 		Text(
 			text = item.name.orEmpty(),
 			fontSize = 28.sp,
 			lineHeight = 34.sp,
 			fontWeight = FontWeight.Bold,
-			color = Tokens.Color.colorWhite,
+			color = LocalEphyraPalette.current.ink,
 			maxLines = 1,
 			overflow = TextOverflow.Ellipsis,
 		)
@@ -195,7 +206,7 @@ private fun SpotlightInfo(item: BaseItemDto, modifier: Modifier = Modifier) {
 			text = spotlightMeta(item) { res, args -> resources.getString(res, *args) },
 			fontSize = 14.sp,
 			fontWeight = FontWeight.Medium,
-			color = Tokens.Color.colorGrey200,
+			color = LocalEphyraPalette.current.inkMuted,
 			maxLines = 1,
 		)
 		Spacer(Modifier.height(8.dp))
