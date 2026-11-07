@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Ephyra: the video player's controls after the design system's "Player" board. Leanback spaces its control buttons by the
+     distance between their centres, child_margin_default + control_icon_width: 32 + 24 = a 48dp button and an 8dp gap -->
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <dimen name="lb_playback_controls_child_margin_default" tools:override="true">32dp</dimen>
+    <dimen name="lb_control_icon_width" tools:override="true">24dp</dimen>
+    <!-- The controls row reaches the screen's bottom edge, so its shade does too; the row keeps the safe area as padding.
+         Leanback hides the row with 0, 1dp is the smallest that works -->
+    <dimen name="lb_playback_controls_padding_bottom" tools:override="true">1dp</dimen>
+    <dimen name="ephyra_osd_button">48dp</dimen>
+    <dimen name="ephyra_osd_icon">24dp</dimen>
+    <dimen name="ephyra_safe_y">27dp</dimen>
+    <!-- Close to the bottom edge, as the user asked: the icons sit 16dp from it, the focus circle 4dp -->
+    <dimen name="ephyra_osd_padding_bottom">4dp</dimen>
+</resources>

@@ -20,7 +20,6 @@ import androidx.fragment.app.Fragment;
 
 import org.jellyfin.androidtv.R;
 import org.jellyfin.androidtv.databinding.FragmentItemListBinding;
-import org.jellyfin.androidtv.databinding.ViewRowDetailsBinding;
 import org.jellyfin.androidtv.ui.ItemListView;
 import org.jellyfin.androidtv.ui.ItemRowView;
 import org.jellyfin.androidtv.ui.TextUnderButton;
@@ -69,11 +68,11 @@ public class MusicFavoritesListFragment extends Fragment implements View.OnKeyLi
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         FragmentItemListBinding binding = FragmentItemListBinding.inflate(getLayoutInflater(), container, false);
 
-        ViewRowDetailsBinding detailsBinding = binding.details.getBinding();
-        detailsBinding.fdTitle.setText(getString(R.string.lbl_favorites));
-        detailsBinding.mainImage.setImageResource(R.drawable.favorites);
-        detailsBinding.fdSummaryText.setText(getString(R.string.desc_automatic_fav_songs));
-        mButtonRow = detailsBinding.fdButtonRow;
+        // Ephyra: the album's own hero layout instead of the shared details row
+        binding.fdTitle.setText(getString(R.string.lbl_favorites));
+        binding.mainImage.setImageResource(R.drawable.favorites);
+        binding.fdSummaryText.setText(getString(R.string.desc_automatic_fav_songs));
+        mButtonRow = binding.fdButtonRow;
         mItemList = binding.songs;
         mScrollView = binding.scrollView;
 

@@ -17,15 +17,19 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.findViewTreeCompositionContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.leanback.widget.Presenter
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.setViewTreeLifecycleOwner
@@ -52,10 +56,12 @@ import org.jellyfin.androidtv.util.ImageHelper
 import org.jellyfin.androidtv.util.apiclient.JellyfinImage
 import org.jellyfin.androidtv.util.apiclient.getUrl
 import org.jellyfin.androidtv.util.getActivity
-import org.jellyfin.design.Tokens
 import org.jellyfin.sdk.api.client.ApiClient
 import org.jellyfin.sdk.model.api.BaseItemKind
 import org.koin.compose.koinInject
+
+// Ephyra: the design system's card overlay shade, rgba(5, 8, 20)
+private val CARD_SHADE = Color(0xFF050814)
 
 class CardPresenter(
 	val showInfo: Boolean,
@@ -342,6 +348,14 @@ private fun CardViewHolderContent(
 			},
 			overlay = {
 				val showInfo = !usePreview && item.showCardInfoOverlay
+				// Ephyra: the design system's card overlay, a bottom shade under the bold title, instead of a grey box
+				if (showInfo && title != null) {
+					Box(
+						modifier = Modifier
+							.fillMaxSize()
+							.background(Brush.verticalGradient(0.4f to CARD_SHADE.copy(alpha = 0f), 1f to CARD_SHADE.copy(alpha = 0.86f))),
+					)
+				}
 				item.baseItem?.let { baseItem ->
 					ItemCardBaseItemOverlay(
 						item = baseItem,
@@ -352,22 +366,19 @@ private fun CardViewHolderContent(
 									initialDelayMillis = 0,
 								) else Modifier
 
-								Box(
+								Text(
+									text = title,
+									maxLines = 1,
+									overflow = TextOverflow.Ellipsis,
+									color = LocalEphyraPalette.current.ink,
+									fontSize = 18.sp,
+									fontWeight = FontWeight.Bold,
+									lineHeight = 22.sp,
 									modifier = Modifier
 										.fillMaxWidth()
-										.background(Tokens.Color.colorBluegrey900.copy(alpha = 0.6f), JellyfinTheme.shapes.extraSmall),
-								) {
-									Text(
-										text = title,
-										maxLines = 1,
-										overflow = TextOverflow.Ellipsis,
-										textAlign = TextAlign.Center,
-										color = Tokens.Color.colorWhite,
-										modifier = Modifier
-											.then(focusModifier)
-											.padding(Tokens.Space.spaceXs),
-									)
-								}
+										.then(focusModifier)
+										.padding(start = 8.dp, end = 8.dp, bottom = 8.dp),
+								)
 							}
 						}
 					)

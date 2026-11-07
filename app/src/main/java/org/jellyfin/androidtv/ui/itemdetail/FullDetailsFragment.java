@@ -226,6 +226,9 @@ public class FullDetailsFragment extends Fragment implements RecordingIndicatorV
     public void onResume() {
         super.onResume();
 
+        // Ephyra: the video player disables the app background; turn it back on (plain, no backdrop) when coming back
+        backgroundService.getValue().clearBackgrounds();
+
         ClockBehavior clockBehavior = userPreferences.getValue().get(UserPreferences.Companion.getClockBehavior());
         if (clockBehavior == ClockBehavior.ALWAYS || clockBehavior == ClockBehavior.IN_MENUS) {
             startClock();
@@ -421,10 +424,8 @@ public class FullDetailsFragment extends Fragment implements RecordingIndicatorV
 
             mDetailsOverviewRow = new MyDetailsOverviewRow(item);
 
-            String primaryImageUrl = imageHelper.getValue().getLogoImageUrl(mBaseItem, 600);
-            if (primaryImageUrl == null) {
-                primaryImageUrl = imageHelper.getValue().getPrimaryImageUrl(mBaseItem, false, null, posterHeight);
-            }
+            // Ephyra: the poster, not the title logo, beside the details
+            String primaryImageUrl = imageHelper.getValue().getPrimaryImageUrl(mBaseItem, false, null, Utils.convertDpToPixel(requireContext(), 300));
 
             mDetailsOverviewRow.setSummary(item.getOverview());
             switch (item.getType()) {
@@ -491,7 +492,7 @@ public class FullDetailsFragment extends Fragment implements RecordingIndicatorV
         if (!getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) return;
 
         mBaseItem = item;
-        backgroundService.getValue().setBackground(item);
+        backgroundService.getValue().clearBackgrounds(); // Ephyra: plain background behind the details, no backdrop
         if (mBaseItem != null) {
             if (mChannelId != null) {
                 mBaseItem = JavaCompat.copyWithParentId(mBaseItem, mChannelId);
@@ -963,6 +964,8 @@ public class FullDetailsFragment extends Fragment implements RecordingIndicatorV
             });
             favButton.setActivated(userData.isFavorite());
             mDetailsOverviewRow.addAction(favButton);
+            // Ephyra: a person's page opens on its button like the other details, not on the biography
+            if (mBaseItem.getType() == BaseItemKind.PERSON) favButton.post(favButton::requestFocus);
         }
 
         if (mBaseItem.getType() == BaseItemKind.EPISODE && mBaseItem.getSeriesId() != null) {

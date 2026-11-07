@@ -97,6 +97,7 @@ public class AudioNowPlayingFragment extends Fragment {
         mScrollView = binding.mainScroller;
         mCounter = binding.counter;
 
+        AudioNowPlayingFragmentHelperKt.initializeBackdropView(binding.backdrop, playbackManager.getValue()); // Ephyra
         AudioNowPlayingFragmentHelperKt.initializePreviewView(binding.preview, playbackManager.getValue());
 
         ImageButton rewindButton = binding.rewindBtn;
@@ -345,12 +346,13 @@ public class AudioNowPlayingFragment extends Fragment {
 
     private void updateInfo(org.jellyfin.sdk.model.api.BaseItemDto item) {
         if (item != null) {
-            mArtistName.setText(getArtistName(item));
+            // Ephyra: "Now playing · Album" above the title, "Artist · Year" under it
+            mArtistName.setText(AudioNowPlayingFragmentHelperKt.nowPlayingSubtitle(item, getArtistName(item)));
             mSongTitle.setText(item.getName());
             if (item.getAlbum() != null) {
-                mAlbumTitle.setText(getString(R.string.lbl_now_playing_album, item.getAlbum()));
+                mAlbumTitle.setText(getString(R.string.ephyra_now_playing_album, item.getAlbum()));
             } else {
-                mAlbumTitle.setText(null);
+                mAlbumTitle.setText(R.string.lbl_now_playing);
             }
             mCurrentNdx.setText(getString(R.string.lbl_now_playing_track, mediaManager.getValue().getCurrentAudioQueueDisplayPosition(), mediaManager.getValue().getCurrentAudioQueueDisplaySize()));
             addGenres(mGenreRow);

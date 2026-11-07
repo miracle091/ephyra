@@ -39,13 +39,12 @@ class UserViewsRepositoryImpl(
 
 		private val disallowViewSelectionCollectionTypes = arrayOf(
 			CollectionType.LIVETV,
-			CollectionType.MUSIC,
+			// Ephyra: music opens as a grid like movies and shows, so it gets their options
 			CollectionType.PHOTOS,
 		)
 
 		private val disallowGridViewCollectionTypes = arrayOf(
 			CollectionType.LIVETV,
-			CollectionType.MUSIC
 		)
 	}
 }

@@ -1,6 +1,15 @@
 package org.jellyfin.androidtv.ui.itemdetail
 
+import android.view.ViewGroup
+import androidx.core.view.children
+import androidx.core.content.ContextCompat
+import androidx.core.view.setPadding
+import androidx.core.view.updateLayoutParams
+import androidx.core.widget.ImageViewCompat
 import androidx.lifecycle.lifecycleScope
+import org.jellyfin.androidtv.R
+import org.jellyfin.androidtv.ui.TextUnderButton
+import org.jellyfin.androidtv.util.dp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -90,5 +99,34 @@ fun ItemListFragment.toggleFavorite(item: BaseItemDto, callback: (item: BaseItem
 			favorite = !(item.userData?.isFavorite ?: false)
 		)
 		callback(item.copy(userData = userData))
+	}
+}
+
+// The home spotlight's buttons: 40dp, 8dp apart, 20dp icons
+private const val ICON_BUTTON_GAP_DP = 8
+private const val ICON_BUTTON_SIZE_DP = 40
+private const val ICON_BUTTON_PADDING_DP = 10
+
+/**
+ * Ephyra: the album and details buttons are icon buttons like the home spotlight's: no fill until focused, the icon in ink, in
+ * the accent when active; the label stays as the content description for TalkBack.
+ */
+fun showButtonIconsOnly(buttonRow: ViewGroup) {
+	buttonRow.children.filterIsInstance<TextUnderButton>().forEach { button ->
+		val context = button.context
+		button.labelVisible = false
+		button.updateLayoutParams<ViewGroup.MarginLayoutParams> { marginEnd = ICON_BUTTON_GAP_DP.dp(context) }
+		button.binding.imageButton.apply {
+			updateLayoutParams {
+				width = ICON_BUTTON_SIZE_DP.dp(context)
+				height = ICON_BUTTON_SIZE_DP.dp(context)
+			}
+			maxHeight = Int.MAX_VALUE
+			setPadding(ICON_BUTTON_PADDING_DP.dp(context))
+			setBackgroundResource(R.drawable.button_icon_back)
+			ImageViewCompat.setImageTintList(this, ContextCompat.getColorStateList(context, R.color.ephyra_icon_button_tint))
+			// The play button already has the focus before it is attached: without this its fill's fade-in never ends
+			jumpDrawablesToCurrentState()
+		}
 	}
 }

@@ -81,7 +81,7 @@ public class ItemRowView extends FrameLayout {
     protected void onFocusChanged(boolean gainFocus, int direction, Rect previouslyFocusedRect) {
         super.onFocusChanged(gainFocus, direction, previouslyFocusedRect);
         if (gainFocus) {
-            mWholeRow.setBackgroundResource(R.drawable.jellyfin_button);
+            mWholeRow.setBackgroundResource(R.drawable.ephyra_list_item_focused); // Ephyra: the design system's list focus
             if (rowSelectedListener != null) rowSelectedListener.onRowSelected(this);
         } else {
             mWholeRow.setBackground(normalBackground);

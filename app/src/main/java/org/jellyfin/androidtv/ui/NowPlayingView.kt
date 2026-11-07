@@ -13,18 +13,21 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.platform.AbstractComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
@@ -101,17 +104,22 @@ fun NowPlayingComposable(
 							aspectRatio = image?.aspectRatio ?: 1f,
 							modifier = Modifier
 								.size(35.dp)
-								.clip(CircleShape)
+								// Ephyra: the progress ring goes around the cover instead of over its edge, where the clip cut half of it
 								.drawWithContent {
-									drawContent()
-
 									val width = 3.dp.toPx()
+									val inset = width / 2
+
+									// The cover inside the ring
+									clipPath(Path().apply { addOval(Rect(Offset.Zero, size).deflate(width + 1.dp.toPx())) }) {
+										this@drawWithContent.drawContent()
+									}
 
 									// Background
 									drawCircle(
 										style = Stroke(width),
 										color = Color.Black,
 										alpha = 0.4f,
+										radius = size.minDimension / 2 - inset,
 									)
 									// Foreground
 									drawArc(
@@ -120,6 +128,8 @@ fun NowPlayingComposable(
 										useCenter = false,
 										startAngle = -90f,
 										sweepAngle = 360f * progress,
+										topLeft = Offset(inset, inset),
+										size = Size(size.width - width, size.height - width),
 									)
 								},
 							scaleType = ImageView.ScaleType.CENTER_CROP,

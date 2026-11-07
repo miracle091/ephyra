@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -15,9 +16,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import org.jellyfin.androidtv.ui.base.Icon
+import org.jellyfin.androidtv.ui.base.LocalEphyraPalette
 import org.jellyfin.androidtv.ui.base.LocalTextStyle
 import org.jellyfin.androidtv.ui.base.ProvideTextStyle
 
@@ -35,12 +39,19 @@ fun InfoRowItem(
 	// Content
 	content: @Composable RowScope.() -> Unit,
 ) {
-	val (backgroundColor, foregroundColor) = colors
+	// Ephyra: plain items in ink-muted like the home's meta line, neutral badges as the design system's badge
+	val palette = LocalEphyraPalette.current
+	val (backgroundColor, foregroundColor) = when (colors) {
+		InfoRowColors.Transparent -> Color.Transparent to palette.inkMuted
+		InfoRowColors.Default -> palette.surface2 to palette.inkMuted
+		else -> colors
+	}
 
 	val modifier = when {
 		backgroundColor.alpha > 0f -> Modifier
-			.background(backgroundColor, RoundedCornerShape(3.dp))
-			.padding(horizontal = 5.dp)
+			.height(20.dp)
+			.background(backgroundColor, RoundedCornerShape(4.dp))
+			.padding(horizontal = 6.dp)
 
 		else -> Modifier
 	}
@@ -48,8 +59,9 @@ fun InfoRowItem(
 	ProvideTextStyle(
 		value = TextStyle(
 			color = foregroundColor,
-			fontSize = if (backgroundColor.alpha > 0f) 10.sp else 16.sp,
-			fontWeight = if (backgroundColor.alpha > 0f) FontWeight.W600 else FontWeight.W500,
+			fontSize = if (backgroundColor.alpha > 0f) 11.sp else 14.sp,
+			fontWeight = if (backgroundColor.alpha > 0f) FontWeight.Bold else FontWeight.W500,
+			letterSpacing = if (backgroundColor.alpha > 0f) 0.06.em else TextUnit.Unspecified,
 		)
 	) {
 		Row(

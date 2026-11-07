@@ -27,7 +27,6 @@ import org.jellyfin.androidtv.R;
 import org.jellyfin.androidtv.data.model.DataRefreshService;
 import org.jellyfin.androidtv.data.service.BackgroundService;
 import org.jellyfin.androidtv.databinding.FragmentItemListBinding;
-import org.jellyfin.androidtv.databinding.ViewRowDetailsBinding;
 import org.jellyfin.androidtv.ui.AsyncImageView;
 import org.jellyfin.androidtv.ui.ItemListView;
 import org.jellyfin.androidtv.ui.ItemListViewHelperKt;
@@ -54,7 +53,6 @@ import org.koin.java.KoinJavaComponent;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.UUID;
 
 import kotlin.Lazy;
@@ -101,13 +99,13 @@ public class ItemListFragment extends Fragment implements View.OnKeyListener {
 
         BUTTON_SIZE = Utils.convertDpToPixel(requireContext(), 35);
 
-        ViewRowDetailsBinding detailsBinding = binding.details.getBinding();
-        mTitle = detailsBinding.fdTitle;
+        // Ephyra: the album's own hero layout instead of the shared details row
+        mTitle = binding.fdTitle;
         mTitle.setText(getString(R.string.loading));
-        mGenreRow = detailsBinding.fdGenreRow;
-        mPoster = detailsBinding.mainImage;
-        mButtonRow = detailsBinding.fdButtonRow;
-        mSummary = detailsBinding.fdSummaryText;
+        mGenreRow = binding.fdGenreRow;
+        mPoster = binding.mainImage;
+        mButtonRow = binding.fdButtonRow;
+        mSummary = binding.fdSummaryText;
         mItemList = binding.songs;
         mScrollView = binding.scrollView;
 
@@ -307,7 +305,9 @@ public class ItemListFragment extends Fragment implements View.OnKeyListener {
         InfoLayoutHelper.addInfoRow(requireContext(), item, mainInfoRow, false);
         addGenres(mGenreRow);
         addButtons(BUTTON_SIZE);
+        ItemListFragmentHelperKt.showButtonIconsOnly(mButtonRow); // Ephyra
         mSummary.setText(mBaseItem.getOverview());
+        mSummary.setVisibility(TextUtils.isEmpty(mBaseItem.getOverview()) ? View.GONE : View.VISIBLE); // Ephyra: no gap without one
 
         Double aspect = imageHelper.getValue().getImageAspectRatio(item, false);
         String primaryImageUrl = imageHelper.getValue().getPrimaryImageUrl(item, null, ImageHelper.MAX_PRIMARY_IMAGE_HEIGHT);
@@ -318,11 +318,8 @@ public class ItemListFragment extends Fragment implements View.OnKeyListener {
     }
 
     private Function1<List<BaseItemDto>, Unit> itemResponse = (List<BaseItemDto> items) -> {
+        // Ephyra: the title keeps the home's 28sp and wraps to two lines instead of scaling to 32sp
         mTitle.setText(mBaseItem.getName());
-        if (mBaseItem.getName().length() > 32) {
-            // scale down the title so more will fit
-            mTitle.setTextSize(32);
-        }
         if (!items.isEmpty()) {
             mItems = new ArrayList<>();
             int i = 0;
@@ -335,7 +332,7 @@ public class ItemListFragment extends Fragment implements View.OnKeyListener {
                 mAudioEventListener.onPlaybackStateChange(PlaybackController.PlaybackState.PLAYING, mediaManager.getValue().getCurrentAudioItem());
             }
 
-            updateBackdrop();
+            backgroundService.getValue().clearBackgrounds(); // Ephyra: plain background behind the album, no artist backdrop
         }
         return null;
     };
@@ -469,12 +466,4 @@ public class ItemListFragment extends Fragment implements View.OnKeyListener {
 
     }
 
-    private void updateBackdrop() {
-        BaseItemDto item = mBaseItem;
-
-        if (item.getBackdropImageTags() == null || item.getBackdropImageTags().isEmpty() && mItems != null && !mItems.isEmpty())
-            item = mItems.get(new Random().nextInt(mItems.size()));
-
-        backgroundService.getValue().setBackground(item);
-    }
 }

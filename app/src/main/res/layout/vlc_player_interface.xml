@@ -57,71 +57,62 @@
             android:orientation="horizontal" />
     </FrameLayout>
 
+    <!-- Ephyra: the header of the design system's "Player" board over a top shade: the overline (series and episode, or
+         genres), the bold title and the play method in ink-muted (OsdHeader.kt, PlayInfo.kt), the clock on the right -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/topPanel"
-        android:layout_width="fill_parent"
-        android:layout_height="155dp"
-        android:layout_gravity="center_horizontal|top"
-        android:layout_marginHorizontal="40dp"
-        android:layout_marginTop="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:background="@drawable/ephyra_osd_scrim_top"
         android:clickable="false"
+        android:paddingHorizontal="@dimen/ephyra_side_margin"
+        android:paddingTop="@dimen/ephyra_safe_y"
+        android:paddingBottom="96dp"
         android:visibility="gone">
 
-        <org.jellyfin.androidtv.ui.AsyncImageView
-            android:id="@+id/item_logo"
-            android:layout_width="wrap_content"
-            android:layout_height="60dp"
-            android:layout_centerInParent="true"
-            android:layout_centerVertical="true"
-            android:layout_marginBottom="2dp"
-            android:contentDescription="@null"
-            android:foregroundGravity="fill_horizontal"
-            android:scaleType="fitCenter"
+        <TextView
+            android:id="@+id/item_overline"
+            style="@style/TextAppearance.Ephyra.OsdOverline"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="24dp"
+            android:ellipsize="end"
+            android:maxLines="1"
             app:layout_constraintEnd_toStartOf="@id/textClock"
-            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintWidth_max="450dp" />
+            tools:text="Series · S2:E4" />
 
         <TextView
             android:id="@+id/item_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:textColor="@color/white"
-            android:textSize="32sp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="24dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="?attr/headerTextColor"
+            android:textSize="28sp"
+            android:textStyle="bold"
             app:layout_constraintEnd_toStartOf="@id/textClock"
-            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/item_logo"
+            app:layout_constraintTop_toBottomOf="@id/item_overline"
             tools:text="Title" />
-
-        <TextView
-            android:id="@+id/item_subtitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            android:textSize="20sp"
-            app:layout_constraintEnd_toStartOf="@id/textClock"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/item_title"
-            tools:text="Subtitle" />
 
         <!-- Ephyra: play method and the server's transcode reasons (ui/playback/PlayInfo.kt) -->
         <TextView
             android:id="@+id/ephyra_play_info"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:textColor="@color/white"
-            android:alpha="0.7"
-            android:textSize="16sp"
+            android:layout_marginEnd="24dp"
+            android:textColor="?attr/controlIconForegroundInactive"
+            android:textSize="14sp"
             android:visibility="gone"
             app:layout_constraintEnd_toStartOf="@id/textClock"
-            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/item_subtitle"
+            app:layout_constraintTop_toBottomOf="@id/item_title"
             tools:text="Transcoding: video codec not supported" />
 
         <org.jellyfin.androidtv.ui.ClockUserView

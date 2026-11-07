@@ -17,10 +17,58 @@
         <item name="android:textAllCaps">false</item>
     </style>
 
+    <!-- Ephyra: the icon button of the design system's player (48dp, 24dp icon; the large one 64dp with a 32dp icon) -->
+    <style name="Button.Ephyra.PlayerIcon" parent="Button.Icon">
+        <item name="android:layout_width">48dp</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:padding">12dp</item>
+        <item name="android:scaleType">fitCenter</item>
+    </style>
+
+    <style name="Button.Ephyra.PlayerIcon.Large">
+        <item name="android:layout_width">64dp</item>
+        <item name="android:layout_height">64dp</item>
+        <item name="android:padding">16dp</item>
+    </style>
+
+    <!-- Ephyra: a small label/value pair of the details screen (director, runtime, end time) -->
+    <style name="TextAppearance.Ephyra.InfoLabel" parent="">
+        <item name="android:textColor">?attr/controlIconForegroundInactive</item>
+        <item name="android:alpha">0.8</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">0.08</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
+
+    <style name="TextAppearance.Ephyra.InfoValue" parent="">
+        <item name="android:textColor">?attr/headerTextColor</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:layout_marginTop">2dp</item>
+    </style>
+
     <!-- Ephyra: a section title of the startup screens, like the home row titles (bold 20sp ink) -->
     <style name="TextAppearance.Ephyra.SectionTitle" parent="">
         <item name="android:textColor">?attr/headerTextColor</item>
         <item name="android:textSize">20sp</item>
         <item name="android:textStyle">bold</item>
+    </style>
+
+    <!-- Ephyra: the video player's times and end time under the seek bar, 14sp medium ink-muted with even-width digits -->
+    <style name="TextAppearance.Ephyra.OsdTime" parent="">
+        <item name="android:textColor">?attr/controlIconForegroundInactive</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:fontFeatureSettings">tnum</item>
+        <item name="android:layout_marginTop">8dp</item>
+    </style>
+
+    <!-- Ephyra: the video player's overline over the title, like the details' genres but in ink-muted -->
+    <style name="TextAppearance.Ephyra.OsdOverline" parent="">
+        <item name="android:textColor">?attr/controlIconForegroundInactive</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">0.08</item>
+        <item name="android:textAllCaps">true</item>
     </style>
 </resources>

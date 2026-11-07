@@ -18,6 +18,9 @@ import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.DefaultRenderersFactory
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.audio.AudioSink
+import androidx.media3.exoplayer.audio.DefaultAudioSink
+import androidx.media3.exoplayer.audio.TeeAudioProcessor
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.media3.exoplayer.util.EventLogger
@@ -99,7 +102,18 @@ class ExoPlayerBackend(
 			}
 		} else DefaultMediaSourceFactory(dataSourceFactory, extractorsFactory)
 
-		val renderersFactory = DefaultRenderersFactory(context).apply {
+		// Ephyra: the default audio sink plus a tee that measures the loudness for the music player's backdrop (AudioLevel)
+		val renderersFactory = object : DefaultRenderersFactory(context) {
+			override fun buildAudioSink(
+				context: Context,
+				enableFloatOutput: Boolean,
+				enableAudioOutputPlaybackParameters: Boolean,
+			): AudioSink = DefaultAudioSink.Builder(context)
+				.setEnableFloatOutput(enableFloatOutput)
+				.setEnableAudioOutputPlaybackParameters(enableAudioOutputPlaybackParameters)
+				.setAudioProcessors(arrayOf(TeeAudioProcessor(AudioLevelSink())))
+				.build()
+		}.apply {
 			setMediaCodecSelector(ShieldMediaCodecSelector())
 			setEnableDecoderFallback(true)
 			setExtensionRendererMode(

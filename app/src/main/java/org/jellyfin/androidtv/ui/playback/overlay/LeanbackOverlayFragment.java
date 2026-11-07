@@ -34,7 +34,8 @@ public class LeanbackOverlayFragment extends PlaybackSupportFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setBackgroundType(BG_LIGHT);
+        // Ephyra: no shade over the whole picture, the controls' own top and bottom shades (ephyra_osd_scrim_*) keep them legible
+        setBackgroundType(BG_NONE);
 
         PlaybackController playbackController = playbackControllerContainer.getValue().getPlaybackController();
         if (playbackController == null) {

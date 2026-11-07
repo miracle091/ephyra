@@ -5,7 +5,11 @@ import androidx.leanback.widget.HeaderItem
 import androidx.leanback.widget.ListRow
 import androidx.leanback.widget.Row
 import androidx.lifecycle.LifecycleCoroutineScope
+import androidx.compose.ui.unit.dp
 import org.jellyfin.androidtv.R
+import org.jellyfin.androidtv.ui.composable.item.ROW_CARDS_WIDE
+import org.jellyfin.androidtv.ui.composable.item.WIDE_ASPECT_RATIO
+import org.jellyfin.androidtv.ui.composable.item.rowCardHeight
 import org.jellyfin.androidtv.ui.playback.AudioQueueBaseRowAdapter
 import org.jellyfin.androidtv.ui.playback.MediaManager
 import org.jellyfin.androidtv.ui.presentation.CardPresenter
@@ -32,7 +36,12 @@ class HomeFragmentNowPlayingRow(
 			// Ensure row exists
 			if (row == null) row = ListRow(
 				HeaderItem(context.getString(R.string.lbl_now_playing)),
-				AudioQueueBaseRowAdapter(playbackManager, lifecycleScope)
+				// Ephyra: as tall as the library tiles, so the square cover fits under the spotlight (upstream 140dp)
+				AudioQueueBaseRowAdapter(
+					playbackManager,
+					lifecycleScope,
+					rowCardHeight(context.resources.configuration.screenWidthDp.dp, ROW_CARDS_WIDE, WIDE_ASPECT_RATIO).value.toInt(),
+				)
 			)
 			// Add row if it wasn't added already
 			if (!rowsAdapter.contains(row!!)) rowsAdapter.add(0, row!!)

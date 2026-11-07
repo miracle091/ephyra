@@ -1,69 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Ephyra: a list item of the design system: number, bold title with the artist under it and the duration, lined up with the
+     screen's side margin; the focused row gets a surface-3 fill (ItemRowView) and keeps its text colours -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/wholeRow"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginStart="100dp"
-    android:layout_marginEnd="100dp"
+    android:layout_marginStart="20dp"
+    android:layout_marginEnd="20dp"
     android:duplicateParentState="true"
-    android:foreground="@drawable/button_default_ripple"
-    android:padding="10dp"
+    android:minHeight="52dp"
+    android:paddingStart="12dp"
+    android:paddingTop="6dp"
+    android:paddingEnd="12dp"
+    android:paddingBottom="6dp"
     tools:ignore="UnusedAttribute">
 
     <TextView
         android:id="@+id/watchedMark"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:duplicateParentState="true"
-        android:textColor="@drawable/button_default_text"
-        android:textSize="18sp" />
+        android:layout_alignParentEnd="false"
+        android:layout_centerVertical="true"
+        android:layout_toStartOf="@+id/runTime"
+        android:layout_marginEnd="12dp"
+        android:textColor="?android:attr/colorAccent"
+        android:textSize="16sp" />
 
     <TextView
         android:id="@+id/indexNo"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
         android:layout_alignParentStart="true"
         android:layout_centerVertical="true"
-        android:layout_marginStart="10dp"
-        android:duplicateParentState="true"
+        android:backgroundTint="?attr/headerTextColor"
         android:gravity="center"
-        android:minWidth="20dp"
-        android:textColor="@drawable/button_default_text"
-        android:textSize="16sp"
-        tools:text="Track" />
+        android:textColor="?attr/controlIconForegroundInactive"
+        android:textSize="14sp"
+        tools:text="1" />
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_toStartOf="@+id/runTime"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_toStartOf="@+id/watchedMark"
         android:layout_toEndOf="@+id/indexNo"
-        android:duplicateParentState="true"
         android:orientation="vertical">
 
         <TextView
             android:id="@+id/songName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:duplicateParentState="true"
             android:ellipsize="end"
             android:singleLine="true"
-            android:textColor="@drawable/button_default_text"
+            android:textColor="?attr/headerTextColor"
             android:textSize="16sp"
+            android:textStyle="bold"
             tools:text="Title" />
 
         <TextView
             android:id="@+id/artistName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:duplicateParentState="true"
             android:ellipsize="end"
             android:singleLine="true"
-            android:textColor="@drawable/button_default_text"
+            android:textColor="?attr/controlIconForegroundInactive"
             android:textSize="12sp"
             tools:text="Artist" />
-
     </LinearLayout>
 
     <TextView
@@ -72,9 +77,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
-        android:duplicateParentState="true"
-        android:textColor="@drawable/button_default_text"
-        android:textSize="16sp"
-        tools:text="Time" />
-
+        android:textColor="?attr/controlIconForegroundInactive"
+        android:textSize="14sp"
+        tools:text="3:03" />
 </RelativeLayout>

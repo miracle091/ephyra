@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.leanback.media.PlaybackTransportControlGlue;
@@ -135,29 +134,15 @@ public class CustomPlaybackTransportControlGlue extends PlaybackTransportControl
                 if (showClock == ClockBehavior.ALWAYS || showClock == ClockBehavior.IN_VIDEO) {
                     Context context = parent.getContext();
                     mEndsText = new TextView(context);
-                    mEndsText.setTextAppearance(context, androidx.leanback.R.style.Widget_Leanback_PlaybackControlsTimeStyle);
+                    // Ephyra: the end time sits in the times row of lb_playback_transport_controls_row, found by id
+                    mEndsText.setTextAppearance(R.style.TextAppearance_Ephyra_OsdTime);
                     setEndTime();
 
-                    LinearLayout view = (LinearLayout) vh.view;
+                    FrameLayout controlsDock = vh.view.findViewById(androidx.leanback.R.id.controls_dock);
+                    mButtonRef = (LinearLayout) controlsDock.getChildAt(0);
 
-                    ViewGroup bar = (ViewGroup) view.getChildAt(1);
-                    FrameLayout v = (FrameLayout) bar.getChildAt(0);
-                    mButtonRef = (LinearLayout) v.getChildAt(0);
-
-                    bar.removeViewAt(0);
-                    RelativeLayout rl = new RelativeLayout(context);
-                    RelativeLayout.LayoutParams rlp = new RelativeLayout.LayoutParams(
-                            RelativeLayout.LayoutParams.WRAP_CONTENT,
-                            RelativeLayout.LayoutParams.WRAP_CONTENT);
-                    rl.addView(v);
-
-                    RelativeLayout.LayoutParams rlp2 = new RelativeLayout.LayoutParams(
-                            RelativeLayout.LayoutParams.WRAP_CONTENT,
-                            RelativeLayout.LayoutParams.WRAP_CONTENT);
-                    rlp2.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-                    rlp2.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-                    rl.addView(mEndsText, rlp2);
-                    bar.addView(rl, 0, rlp);
+                    ViewGroup endsDock = vh.view.findViewById(R.id.ephyra_ends_dock);
+                    endsDock.addView(mEndsText);
                 }
 
                 return vh;
@@ -233,21 +218,27 @@ public class CustomPlaybackTransportControlGlue extends PlaybackTransportControl
         if (secondaryActionsAdapter.size() > 0)
             secondaryActionsAdapter.clear();
 
-        // Primary Items
-        primaryActionsAdapter.add(playPauseAction);
+        // Ephyra: the design system's order, transport on the left (previous, rewind, play, forward, next) and the
+        // track, chapter, speed, quality and zoom choices on the right
         VideoPlayerAdapter playerAdapter = getPlayerAdapter();
+
+        // Primary Items
+        if (playerAdapter.hasPreviousItem()) {
+            primaryActionsAdapter.add(skipPreviousAction);
+        }
 
         if (playerAdapter.canSeek()) {
             primaryActionsAdapter.add(rewindAction);
+        }
+
+        primaryActionsAdapter.add(playPauseAction);
+
+        if (playerAdapter.canSeek()) {
             primaryActionsAdapter.add(fastForwardAction);
         }
 
-        if (playerAdapter.hasSubs()) {
-            primaryActionsAdapter.add(closedCaptionsAction);
-        }
-
-        if (playerAdapter.hasMultiAudio()) {
-            primaryActionsAdapter.add(selectAudioAction);
+        if (playerAdapter.hasNextItem()) {
+            primaryActionsAdapter.add(skipNextAction);
         }
 
         if (playerAdapter.isLiveTv()) {
@@ -264,12 +255,12 @@ public class CustomPlaybackTransportControlGlue extends PlaybackTransportControl
             }
         }
 
-        if (playerAdapter.hasPreviousItem()) {
-            secondaryActionsAdapter.add(skipPreviousAction);
+        if (playerAdapter.hasSubs()) {
+            secondaryActionsAdapter.add(closedCaptionsAction);
         }
 
-        if (playerAdapter.hasNextItem()) {
-            secondaryActionsAdapter.add(skipNextAction);
+        if (playerAdapter.hasMultiAudio()) {
+            secondaryActionsAdapter.add(selectAudioAction);
         }
 
         if (playerAdapter.hasChapters()) {

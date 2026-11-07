@@ -233,6 +233,10 @@ public class BrowseGridFragment extends Fragment implements View.OnKeyListener {
         }
         mGridView.setHorizontalSpacing(mGridItemSpacingHorizontal);
         mGridView.setVerticalSpacing(mGridItemSpacingVertical);
+        // Ephyra: the focused card's zoom and ring may draw past the grid's top edge instead of being cut
+        mGridView.setClipChildren(false);
+        mGridView.setClipToPadding(false);
+        binding.rowsFragment.setClipChildren(false);
         mGridView.setFocusable(true);
         binding.rowsFragment.removeAllViews();
         binding.rowsFragment.addView(mGridViewHolder.view);

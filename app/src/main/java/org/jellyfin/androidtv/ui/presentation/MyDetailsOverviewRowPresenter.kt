@@ -1,10 +1,12 @@
 package org.jellyfin.androidtv.ui.presentation
 
+import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.leanback.widget.RowPresenter
 import org.jellyfin.androidtv.ui.DetailRowView
 import org.jellyfin.androidtv.ui.itemdetail.MyDetailsOverviewRow
+import org.jellyfin.androidtv.ui.itemdetail.showButtonIconsOnly
 import org.jellyfin.androidtv.util.InfoLayoutHelper
 import org.jellyfin.androidtv.util.MarkdownRenderer
 import org.jellyfin.sdk.model.api.BaseItemKind
@@ -22,7 +24,7 @@ class MyDetailsOverviewRowPresenter(
 			setTitle(row.item.name)
 
 			InfoLayoutHelper.addInfoRow(view.context, row.item, row.item.mediaSources?.getOrNull(row.selectedMediaSourceIndex), binding.fdMainInfoRow, false)
-			binding.fdGenreRow.text = row.item.genres?.joinToString(" / ")
+			binding.fdGenreRow.text = row.item.genres?.joinToString(" · ") // Ephyra: the spotlight's separator
 
 			binding.infoTitle1.text = row.infoItem1?.label
 			binding.infoValue1.text = row.infoItem1?.value
@@ -37,8 +39,8 @@ class MyDetailsOverviewRowPresenter(
 
 			setSummary(row.summary)
 
+			// Ephyra: a person's biography keeps the same three lines as the other details, the popup shows all of it
 			if (row.item.type == BaseItemKind.PERSON) {
-				binding.fdSummaryText.maxLines = 9
 				binding.fdGenreRow.isVisible = false
 			}
 
@@ -48,6 +50,11 @@ class MyDetailsOverviewRowPresenter(
 				if (parent is ViewGroup) parent.removeView(button)
 
 				binding.fdButtonRow.addView(button)
+			}
+			// Ephyra: icon buttons like the album's, and no empty label/value pairs
+			showButtonIconsOnly(binding.fdButtonRow)
+			listOf(binding.infoTitle1, binding.infoTitle2, binding.infoTitle3).forEach { title ->
+				(title.parent as? View)?.isVisible = !title.text.isNullOrBlank()
 			}
 		}
 

@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Ephyra: the full overview in the design system's dialog: a centred surface-2 card with radius-lg over the scrim, the text in
+     the muted colour, the hint under the card -->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -11,33 +13,47 @@
 
     <ScrollView
         android:id="@+id/scroll_container"
-        android:layout_width="600dp"
-        android:layout_height="400dp"
+        android:layout_width="640dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/ephyra_dialog_back"
         android:clickable="true"
         android:focusable="true"
         android:focusedByDefault="true"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:padding="24dp"
+        android:scrollbars="none"
+        app:layout_constrainedHeight="true"
+        app:layout_constraintBottom_toTopOf="@id/hint"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_max="400dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
         tools:ignore="UnusedAttribute">
 
         <TextView
             android:id="@+id/content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:duplicateParentState="true"
+            android:lineSpacingExtra="4sp"
+            android:textColor="?attr/controlIconForegroundInactive"
             android:textSize="16sp"
             tools:text="This is the expanded text!" />
     </ScrollView>
 
     <TextView
+        android:id="@+id/hint"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         android:drawableStart="@drawable/ic_control_select"
         android:drawablePadding="8dp"
+        android:gravity="center_vertical"
         android:text="@string/press_to_close"
+        android:textColor="?attr/controlIconForegroundInactive"
+        android:textSize="14sp"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/scroll_container"
         tools:ignore="UseCompatTextViewDrawableXml" />
 </androidx.constraintlayout.widget.ConstraintLayout>

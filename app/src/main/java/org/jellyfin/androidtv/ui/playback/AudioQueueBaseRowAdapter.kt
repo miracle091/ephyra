@@ -13,10 +13,12 @@ import org.jellyfin.playback.core.PlaybackManager
 import org.jellyfin.playback.core.queue.queue
 import org.jellyfin.playback.jellyfin.queue.baseItem
 
-class AudioQueueBaseRowAdapter(
+class AudioQueueBaseRowAdapter @JvmOverloads constructor(
 	private val playbackManager: PlaybackManager,
 	lifecycleScope: LifecycleCoroutineScope,
-) : MutableObjectAdapter<AudioQueueBaseRowItem>(CardPresenter(true, @Suppress("MagicNumber") 140)) {
+	// Ephyra: the home passes its own row height, so the card fits under the spotlight
+	@Suppress("MagicNumber") cardHeight: Int = 140,
+) : MutableObjectAdapter<AudioQueueBaseRowItem>(CardPresenter(true, cardHeight)) {
 	init {
 		lifecycleScope.launch {
 			updateAdapter()

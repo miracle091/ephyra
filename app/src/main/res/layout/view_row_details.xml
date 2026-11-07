@@ -1,218 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Ephyra: the details of a film, series, episode or person after the design system's detail hero, without the backdrop: the
+     poster on the left with radius-md, the genres as an accent overline, a bold title, the info row, the overview, the director,
+     runtime and end time as small label/value pairs and the icon buttons on the right -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:clipChildren="false">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:clipChildren="false"
+        android:gravity="top"
+        android:orientation="horizontal"
+        android:paddingStart="@dimen/ephyra_side_margin"
+        android:paddingTop="95dp"
+        android:paddingEnd="@dimen/ephyra_side_margin"
+        android:paddingBottom="16dp">
 
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guide_top"
+        <androidx.cardview.widget.CardView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            app:layout_constraintGuide_begin="180dp"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guide_left_end"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintGuide_begin="150dp" />
-
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guide_main_start"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintGuide_begin="170dp" />
-
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guide_main_end"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintGuide_end="240dp" />
-
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guide_right_start"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintGuide_end="220dp" />
-
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guide_right_end"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintGuide_end="50dp" />
-
-        <!-- Top -->
-        <TextView
-            android:id="@+id/fdTitle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:fontFamily="sans-serif-light"
-            android:maxLines="2"
-            android:textSize="30sp"
-            app:layout_constraintBottom_toTopOf="@id/fdMainInfoRow"
-            app:layout_constraintEnd_toEndOf="@id/guide_right_end"
-            app:layout_constraintStart_toStartOf="@id/guide_main_start"
-            tools:text="fdTitle" />
-
-        <LinearLayout
-            android:id="@+id/fdMainInfoRow"
-            android:layout_width="0dp"
-            android:layout_height="20sp"
-            android:dividerPadding="4sp"
-            android:orientation="horizontal"
-            app:layout_constraintBottom_toTopOf="@id/fdGenreRow"
-            app:layout_constraintEnd_toEndOf="@id/guide_right_end"
-            app:layout_constraintStart_toStartOf="@id/guide_main_start" />
-
-        <TextView
-            android:id="@+id/fdGenreRow"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toTopOf="@id/guide_top"
-            app:layout_constraintEnd_toEndOf="@id/guide_right_end"
-            app:layout_constraintStart_toStartOf="@id/guide_main_start"
-            tools:text="fdGenreRow" />
-
-        <!-- Left -->
-
-        <TextView
-            android:id="@+id/infoTitle1"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:textAlignment="viewEnd"
-            android:textAllCaps="true"
-            android:textSize="14sp"
-            app:layout_constraintEnd_toEndOf="@id/guide_left_end"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/guide_top"
-            tools:text="infoTitle1" />
-
-        <TextView
-            android:id="@+id/infoValue1"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:alpha=".6"
-            android:textAlignment="viewEnd"
-            android:textSize="14sp"
-            app:layout_constraintEnd_toStartOf="@id/guide_left_end"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/infoTitle1"
-            tools:text="infoValue1" />
-
-        <TextView
-            android:id="@+id/infoTitle2"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:textAlignment="viewEnd"
-            android:textAllCaps="true"
-            android:textSize="14sp"
-            app:layout_constraintEnd_toStartOf="@id/guide_left_end"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/infoValue1"
-            tools:text="infoTitle2" />
-
-        <TextView
-            android:id="@+id/infoValue2"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:alpha=".6"
-            android:textAlignment="viewEnd"
-            android:textSize="14sp"
-            app:layout_constraintEnd_toStartOf="@id/guide_left_end"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/infoTitle2"
-            tools:text="infoValue2" />
-
-        <TextView
-            android:id="@+id/infoTitle3"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:textAlignment="viewEnd"
-            android:textAllCaps="true"
-            android:textSize="14sp"
-            app:layout_constraintEnd_toStartOf="@id/guide_left_end"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/infoValue2"
-            tools:text="infoTitle3" />
-
-        <TextView
-            android:id="@+id/infoValue3"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:alpha=".6"
-            android:textAlignment="viewEnd"
-            android:textSize="14sp"
-            app:layout_constraintEnd_toStartOf="@id/guide_left_end"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/infoTitle3"
-            tools:text="infoValue3" />
-
-        <!-- Main -->
-
-        <org.jellyfin.androidtv.ui.ExpandableTextView
-            android:id="@+id/fdSummaryText"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:fontFamily="sans-serif-light"
-            android:maxLines="6"
-            android:textSize="16sp"
-            app:layout_constraintEnd_toEndOf="@id/guide_main_end"
-            app:layout_constraintStart_toStartOf="@id/guide_main_start"
-            app:layout_constraintTop_toBottomOf="@id/fdGenreRow"
-            tools:text="fdSummaryText" />
-
-        <androidx.constraintlayout.widget.Barrier
-            android:id="@+id/details_content_bottom"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:barrierDirection="bottom"
-            app:constraint_referenced_ids="fdSummaryText,infoValue3" />
-
-        <LinearLayout
-            android:id="@+id/fdButtonRow"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:divider="@drawable/blank10x10"
-            android:orientation="horizontal"
-            android:showDividers="none"
-            app:layout_constraintEnd_toEndOf="@id/guide_main_end"
-            app:layout_constraintStart_toStartOf="@id/guide_main_start"
-            app:layout_constraintTop_toBottomOf="@id/details_content_bottom" />
-
-        <!-- Right -->
-
-        <FrameLayout
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toBottomOf="@id/fdButtonRow"
-            app:layout_constraintEnd_toEndOf="@id/guide_right_end"
-            app:layout_constraintStart_toStartOf="@id/guide_right_start"
-            app:layout_constraintTop_toTopOf="@id/guide_top"
-            app:layout_constraintVertical_bias="0">
+            app:cardBackgroundColor="?attr/cardImageBackground"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="0dp">
 
             <org.jellyfin.androidtv.ui.AsyncImageView
                 android:id="@+id/mainImage"
-                android:layout_width="wrap_content"
+                android:layout_width="200dp"
                 android:layout_height="wrap_content"
                 android:adjustViewBounds="true"
-                android:background="@drawable/shape_card"
-                android:scaleType="centerInside"
+                android:maxHeight="300dp"
+                android:scaleType="fitCenter"
                 tools:srcCompat="@drawable/app_banner" />
-        </FrameLayout>
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.cardview.widget.CardView>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="40dp"
+            android:clipChildren="false"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/fdGenreRow"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:letterSpacing="0.08"
+                android:maxLines="1"
+                android:textAllCaps="true"
+                android:textColor="?android:attr/colorAccent"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                tools:text="Animation / Comedy" />
+
+            <TextView
+                android:id="@+id/fdTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:textColor="?attr/headerTextColor"
+                android:textSize="28sp"
+                android:textStyle="bold"
+                tools:text="Title" />
+
+            <LinearLayout
+                android:id="@+id/fdMainInfoRow"
+                android:layout_width="match_parent"
+                android:layout_height="24dp"
+                android:layout_marginTop="4dp"
+                android:dividerPadding="4sp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" />
+
+            <org.jellyfin.androidtv.ui.ExpandableTextView
+                android:id="@+id/fdSummaryText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="-12dp"
+                android:layout_marginTop="0dp"
+                android:layout_marginEnd="-12dp"
+                android:layout_marginBottom="-8dp"
+                android:ellipsize="end"
+                android:lineSpacingExtra="3sp"
+                android:maxLines="3"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="8dp"
+                android:textColor="?attr/controlIconForegroundInactive"
+                android:textSize="14sp"
+                tools:text="Overview" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="32dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/infoTitle1"
+                        style="@style/TextAppearance.Ephyra.InfoLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        tools:text="Directed by" />
+
+                    <TextView
+                        android:id="@+id/infoValue1"
+                        style="@style/TextAppearance.Ephyra.InfoValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        tools:text="Name" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="32dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/infoTitle2"
+                        style="@style/TextAppearance.Ephyra.InfoLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        tools:text="Runs" />
+
+                    <TextView
+                        android:id="@+id/infoValue2"
+                        style="@style/TextAppearance.Ephyra.InfoValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        tools:text="3m" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/infoTitle3"
+                        style="@style/TextAppearance.Ephyra.InfoLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        tools:text="Ends" />
+
+                    <TextView
+                        android:id="@+id/infoValue3"
+                        style="@style/TextAppearance.Ephyra.InfoValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        tools:text="9:18 PM" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/fdButtonRow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:orientation="horizontal" />
+        </LinearLayout>
+    </LinearLayout>
 </RelativeLayout>

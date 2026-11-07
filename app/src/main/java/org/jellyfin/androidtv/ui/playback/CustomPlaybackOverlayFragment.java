@@ -66,7 +66,6 @@ import org.jellyfin.androidtv.ui.presentation.MutableObjectAdapter;
 import org.jellyfin.androidtv.ui.presentation.PositionableListRowPresenter;
 import org.jellyfin.androidtv.util.CoroutineUtils;
 import org.jellyfin.androidtv.util.DateTimeExtensionsKt;
-import org.jellyfin.androidtv.util.ImageHelper;
 import org.jellyfin.androidtv.util.InfoLayoutHelper;
 import org.jellyfin.androidtv.util.LifecycleTask;
 import org.jellyfin.androidtv.util.TextUtilsKt;
@@ -75,7 +74,6 @@ import org.jellyfin.androidtv.util.Utils;
 import org.jellyfin.androidtv.util.apiclient.EmptyResponse;
 import org.jellyfin.androidtv.util.sdk.BaseItemExtensionsKt;
 import org.jellyfin.sdk.model.api.BaseItemDto;
-import org.jellyfin.sdk.model.api.BaseItemKind;
 import org.jellyfin.sdk.model.api.ChapterInfo;
 
 import java.time.LocalDateTime;
@@ -135,7 +133,6 @@ public class CustomPlaybackOverlayFragment extends Fragment implements LiveTvGui
     private final Lazy<CustomMessageRepository> customMessageRepository = inject(CustomMessageRepository.class);
     private final Lazy<NavigationRepository> navigationRepository = inject(NavigationRepository.class);
     private final Lazy<BackgroundService> backgroundService = inject(BackgroundService.class);
-    private final Lazy<ImageHelper> imageHelper = inject(ImageHelper.class);
 
     private final PlaybackOverlayFragmentHelper helper = new PlaybackOverlayFragmentHelper(this);
 
@@ -1247,29 +1244,13 @@ public class CustomPlaybackOverlayFragment extends Fragment implements LiveTvGui
             // set other information
             tvGuideBinding.guideCurrentTitle.setText(current.getName());
 
-            // Update the title and subtitle
-            if (current.getType() == BaseItemKind.EPISODE) {
-                binding.itemTitle.setText(current.getSeriesName());
-                binding.itemSubtitle.setText(BaseItemExtensionsKt.getDisplayName(current, requireContext()));
-            } else {
-                binding.itemTitle.setText(current.getName());
-            }
+            // Ephyra: the overline and title in text, after the design system's board, instead of the title logo
+            OsdHeader.bind(current, binding.itemOverline, binding.itemTitle);
             // Ephyra: how the server delivers this stream and why
             PlayInfo.bind(binding.ephyraPlayInfo, playbackControllerContainer.getValue().getPlaybackController().getCurrentStreamInfo());
             // Ephyra: dimmer controls during HDR playback
             HdrControlsDim.apply(playbackControllerContainer.getValue().getPlaybackController().getCurrentStreamInfo(),
                     binding.topPanel, binding.leanbackFragment);
-            // Update the logo
-            String imageUrl = imageHelper.getValue().getLogoImageUrl(current, 440);
-            if (imageUrl != null) {
-                binding.itemLogo.setVisibility(View.VISIBLE);
-                binding.itemTitle.setVisibility(View.GONE);
-                binding.itemLogo.setContentDescription(current.getName());
-                binding.itemLogo.load(imageUrl, null, null, 1.0, 0);
-            } else {
-                binding.itemLogo.setVisibility(View.GONE);
-                binding.itemTitle.setVisibility(View.VISIBLE);
-            }
 
             if (playbackControllerContainer.getValue().getPlaybackController().isLiveTv()) {
                 prepareChannelAdapter();

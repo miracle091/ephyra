@@ -1,0 +1,33 @@
+package org.jellyfin.androidtv.ui.playback
+
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.shouldBe
+import org.jellyfin.sdk.model.api.BaseItemDto
+import org.jellyfin.sdk.model.api.BaseItemKind
+import java.util.UUID
+
+class OsdHeaderTest : FunSpec({
+	test("An episode's overline is the series and the episode number") {
+		val item = BaseItemDto(id = UUID.randomUUID(), type = BaseItemKind.EPISODE, seriesName = "The Seasons")
+
+		OsdHeader.overlineOf(item, "S2:E4") shouldBe "The Seasons · S2:E4"
+	}
+
+	test("An episode without a number keeps the series alone") {
+		val item = BaseItemDto(id = UUID.randomUUID(), type = BaseItemKind.EPISODE, seriesName = "The Seasons")
+
+		OsdHeader.overlineOf(item, "") shouldBe "The Seasons"
+	}
+
+	test("A film's overline is its genres") {
+		val item = BaseItemDto(id = UUID.randomUUID(), type = BaseItemKind.MOVIE, genres = listOf("Drama", "TV Movie"))
+
+		OsdHeader.overlineOf(item, "") shouldBe "Drama · TV Movie"
+	}
+
+	test("A film without genres has no overline") {
+		val item = BaseItemDto(id = UUID.randomUUID(), type = BaseItemKind.MOVIE)
+
+		OsdHeader.overlineOf(item, "") shouldBe ""
+	}
+})

@@ -26,8 +26,15 @@ class TextUnderButton @JvmOverloads constructor(
 		if (AndroidVersion.isAtLeastO) defaultFocusHighlightEnabled = false
 	}
 
+	// Ephyra: icon-only buttons keep their label only as the content description, also when it changes later
+	var labelVisible = true
+		set(value) {
+			field = value
+			binding.label.isVisible = value && binding.label.text != null
+		}
+
 	fun setLabel(text: String?) {
-		binding.label.isVisible = text != null
+		binding.label.isVisible = labelVisible && text != null
 		binding.label.text = text
 		binding.imageButton.contentDescription = text
 	}

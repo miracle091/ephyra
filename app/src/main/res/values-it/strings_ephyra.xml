@@ -90,4 +90,5 @@
     <string name="ephyra_runtime_hours_minutes">%1$d h %2$d min</string>
     <string name="ephyra_runtime_minutes">%1$d min</string>
     <string name="ephyra_change_server">Cambia server</string>
+    <string name="ephyra_now_playing_album">In riproduzione · %1$s</string>
 </resources>
