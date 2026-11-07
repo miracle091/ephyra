@@ -104,6 +104,7 @@ The status column shows how far each change has gone. A change becomes "done" wh
 | UI | Three coloured themes on the Ephyra design system (Settings → Customization → App theme): Abyss (deep teal, mint accent), Coral (warm dark red, coral accent) and Medusa (deep violet, lilac accent) | done |
 | UI | Home layout: 32dp side margins (upstream 48 to 56dp) in the toolbar, the spotlight and the browse rows; the home rows size their cards so that four wide cards or eight posters fill a row edge to edge; the home rows and the library screens no longer show the selected item's backdrop behind them | done |
 | UI | Library screens: the same 32dp side margins as the home; the library grid keeps an 8dp gap between cards and sits right below the title, and drops the item counter and the "Showing ... sorted by ..." line at the bottom; the startup and sign-in screens show the plain theme background instead of the server's splashscreen | done |
+| UI | Home icons: Home and Search in the toolbar and Play, Details and Favorite in the spotlight are icons without labels; the favorite mark of a cover is a round badge like the watched one, next to it in the top right corner, instead of a red heart in the top left; the spotlight's favorite button uses the theme's accent instead of red | done |
 
 ## What changes for users
 

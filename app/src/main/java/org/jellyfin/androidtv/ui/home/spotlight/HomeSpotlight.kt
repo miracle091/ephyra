@@ -58,8 +58,8 @@ import org.jellyfin.androidtv.data.repository.ItemMutationRepository
 import org.jellyfin.androidtv.preference.EphyraPreferences
 import org.jellyfin.androidtv.ui.base.Icon
 import org.jellyfin.androidtv.ui.base.LocalEphyraPalette
+import org.jellyfin.androidtv.ui.base.LocalTextStyle
 import org.jellyfin.androidtv.ui.base.Text
-import org.jellyfin.androidtv.ui.base.button.Button
 import org.jellyfin.androidtv.ui.base.button.IconButton
 import org.jellyfin.androidtv.ui.home.HomeRowsFragment
 import org.jellyfin.androidtv.ui.navigation.Destinations
@@ -232,19 +232,23 @@ private fun SpotlightInfo(item: BaseItemDto, modifier: Modifier = Modifier) {
 		)
 		Spacer(Modifier.height(8.dp))
 		Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-			Button(
+			IconButton(
 				// A series starts from its next up episode
 				onClick = { scope.launch { playbackHelper.retrieveAndPlay(loadSpotlightPlayTarget(api, item), false, context) } },
 				modifier = Modifier.focusRequester(playFocusRequester),
 			) {
-				Icon(painterResource(R.drawable.ic_play), contentDescription = null, modifier = Modifier.size(20.dp))
-				Spacer(Modifier.width(6.dp))
-				Text(stringResource(R.string.lbl_play))
+				Icon(
+					painterResource(R.drawable.ic_play),
+					contentDescription = stringResource(R.string.lbl_play),
+					modifier = Modifier.size(20.dp),
+				)
 			}
-			Button(onClick = { navigationRepository.navigate(Destinations.itemDetails(item.id)) }) {
-				Icon(painterResource(R.drawable.ic_info), contentDescription = null, modifier = Modifier.size(20.dp))
-				Spacer(Modifier.width(6.dp))
-				Text(stringResource(R.string.ephyra_spotlight_details))
+			IconButton(onClick = { navigationRepository.navigate(Destinations.itemDetails(item.id)) }) {
+				Icon(
+					painterResource(R.drawable.ic_info),
+					contentDescription = stringResource(R.string.ephyra_spotlight_details),
+					modifier = Modifier.size(20.dp),
+				)
 			}
 			IconButton(onClick = {
 				scope.launch {
@@ -258,9 +262,11 @@ private fun SpotlightInfo(item: BaseItemDto, modifier: Modifier = Modifier) {
 				}
 			}) {
 				Icon(
-					painterResource(if (favorite) R.drawable.ic_heart_red else R.drawable.ic_heart),
+					painterResource(R.drawable.ic_heart),
 					contentDescription = stringResource(R.string.lbl_favorite),
 					modifier = Modifier.size(20.dp),
+					// A favorite shows in the theme's accent instead of red
+					tint = if (favorite) LocalEphyraPalette.current.accent else LocalTextStyle.current.color,
 				)
 			}
 		}

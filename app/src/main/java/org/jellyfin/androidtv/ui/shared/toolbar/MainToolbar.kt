@@ -29,8 +29,6 @@ import org.jellyfin.androidtv.ui.base.Icon
 import org.jellyfin.androidtv.ui.base.JellyfinTheme
 import org.jellyfin.androidtv.ui.base.ProfilePicture
 import org.jellyfin.androidtv.ui.base.ProvideTextStyle
-import org.jellyfin.androidtv.ui.base.Text
-import org.jellyfin.androidtv.ui.base.button.Button
 import org.jellyfin.androidtv.ui.base.button.ButtonDefaults
 import org.jellyfin.androidtv.ui.base.button.IconButton
 import org.jellyfin.androidtv.ui.base.button.IconButtonDefaults
@@ -130,7 +128,8 @@ private fun MainToolbar(
 					.focusRequester(focusRequester)
 			) {
 				ProvideTextStyle(JellyfinTheme.typography.default.copy(fontWeight = FontWeight.Bold)) {
-					Button(
+					// Ephyra: icons instead of the Home and Search labels
+					IconButton(
 						onClick = {
 							if (activeButton != MainToolbarActiveButton.Home) {
 								navigationRepository.navigate(
@@ -140,17 +139,25 @@ private fun MainToolbar(
 							}
 						},
 						colors = if (activeButton == MainToolbarActiveButton.Home) activeButtonColors else ButtonDefaults.colors(),
-						content = { Text(stringResource(R.string.lbl_home)) }
-					)
-					Button(
+					) {
+						Icon(
+							imageVector = ImageVector.vectorResource(R.drawable.ic_house),
+							contentDescription = stringResource(R.string.lbl_home),
+						)
+					}
+					IconButton(
 						onClick = {
 							if (activeButton != MainToolbarActiveButton.Search) {
 								navigationRepository.navigate(Destinations.search())
 							}
 						},
 						colors = if (activeButton == MainToolbarActiveButton.Search) activeButtonColors else ButtonDefaults.colors(),
-						content = { Text(stringResource(R.string.lbl_search)) }
-					)
+					) {
+						Icon(
+							imageVector = ImageVector.vectorResource(R.drawable.ic_search),
+							contentDescription = stringResource(R.string.lbl_search),
+						)
+					}
 				}
 			}
 		},

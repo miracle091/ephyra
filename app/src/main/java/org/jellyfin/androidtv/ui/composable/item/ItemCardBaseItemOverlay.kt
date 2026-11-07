@@ -3,6 +3,7 @@ package org.jellyfin.androidtv.ui.composable.item
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -46,15 +47,15 @@ fun ItemCardBaseItemOverlay(
 		.fillMaxSize()
 		.padding(Tokens.Space.spaceXs)
 ) {
-	StateIndicator(
-		item = item,
-		modifier = Modifier.align(Alignment.TopStart),
-	)
-
-	WatchIndicator(
-		item = item,
-		modifier = Modifier.align(Alignment.TopEnd)
-	)
+	// Ephyra: the favorite and recording marks sit in the top right corner, next to the watched badge
+	Row(
+		modifier = Modifier.align(Alignment.TopEnd),
+		horizontalArrangement = Arrangement.spacedBy(Tokens.Space.spaceXs),
+		verticalAlignment = Alignment.CenterVertically,
+	) {
+		StateIndicator(item = item)
+		WatchIndicator(item = item)
+	}
 
 	Column(
 		modifier = Modifier.align(Alignment.BottomCenter),
@@ -93,13 +94,17 @@ private fun StateIndicator(
 		}
 
 		if (isFavorited) {
-			Icon(
-				imageVector = ImageVector.vectorResource(R.drawable.ic_heart),
-				contentDescription = null,
-				tint = Tokens.Color.colorRed500,
+			// Ephyra: a badge like the watched one, in the theme's colours instead of a red heart
+			Badge(
 				modifier = modifier
-					.size(24.dp)
-			)
+					.size(24.dp),
+			) {
+				Icon(
+					imageVector = ImageVector.vectorResource(R.drawable.ic_heart),
+					contentDescription = null,
+					modifier = Modifier.size(16.dp)
+				)
+			}
 		}
 	}
 }
