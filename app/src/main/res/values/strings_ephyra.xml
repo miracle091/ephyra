@@ -98,4 +98,6 @@
     <string name="ephyra_pref_home_spotlight_description">Recent films and series you have not watched, in turn at the top of the home screen</string>
     <string name="ephyra_runtime_hours_minutes">%1$d h %2$d min</string>
     <string name="ephyra_runtime_minutes">%1$d min</string>
+    <string name="ephyra_change_server">Change server</string>
+    <string name="ephyra_server_subtitle" translatable="false">%1$s · %2$s</string>
 </resources>

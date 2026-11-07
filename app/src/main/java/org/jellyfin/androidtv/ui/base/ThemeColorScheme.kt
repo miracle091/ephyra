@@ -4,9 +4,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
+import org.jellyfin.androidtv.preference.UserPreferences
 import org.jellyfin.androidtv.preference.constant.AppTheme
 import org.jellyfin.design.token.EphyraColorTokens
 import org.jellyfin.design.token.EphyraPalette
+import org.koin.compose.koinInject
 
 /** Ephyra: the design system tokens of the current theme, for colours [ColorScheme] has no field for. */
 val LocalEphyraPalette = staticCompositionLocalOf { EphyraColorTokens.dark }
@@ -32,6 +34,13 @@ fun EphyraTheme(theme: AppTheme, content: @Composable () -> Unit) {
 	CompositionLocalProvider(LocalEphyraPalette provides palette) {
 		JellyfinTheme(colorScheme = ephyraColorScheme(palette), content = content)
 	}
+}
+
+/** Ephyra: [EphyraTheme] with the user's theme setting, for Compose views outside [org.jellyfin.androidtv.ui.browsing.MainActivity]. */
+@Composable
+fun EphyraTheme(content: @Composable () -> Unit) {
+	val userPreferences = koinInject<UserPreferences>()
+	EphyraTheme(userPreferences[UserPreferences.appTheme], content)
 }
 
 /**

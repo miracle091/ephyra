@@ -1,7 +1,10 @@
 package org.jellyfin.androidtv.ui.shared.toolbar
 
 import androidx.activity.compose.LocalActivity
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.focusGroup
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.runtime.Composable
@@ -10,6 +13,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.focusRestorer
@@ -27,11 +31,13 @@ import org.jellyfin.androidtv.auth.repository.UserRepository
 import org.jellyfin.androidtv.ui.NowPlayingComposable
 import org.jellyfin.androidtv.ui.base.Icon
 import org.jellyfin.androidtv.ui.base.JellyfinTheme
+import org.jellyfin.androidtv.ui.base.LocalEphyraPalette
 import org.jellyfin.androidtv.ui.base.ProfilePicture
 import org.jellyfin.androidtv.ui.base.ProvideTextStyle
 import org.jellyfin.androidtv.ui.base.button.ButtonDefaults
 import org.jellyfin.androidtv.ui.base.button.IconButton
 import org.jellyfin.androidtv.ui.base.button.IconButtonDefaults
+import org.jellyfin.androidtv.ui.composable.item.cardFocusRing
 import org.jellyfin.androidtv.ui.navigation.ActivityDestinations
 import org.jellyfin.androidtv.ui.navigation.Destinations
 import org.jellyfin.androidtv.ui.navigation.NavigationRepository
@@ -42,6 +48,9 @@ import org.jellyfin.androidtv.util.apiclient.primaryImage
 import org.jellyfin.sdk.api.client.ApiClient
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinActivityViewModel
+
+// Ephyra: the zoom of a focused cover (scale-focus)
+private const val USER_FOCUS_SCALE = 1.06f
 
 enum class MainToolbarActiveButton {
 	User,
@@ -93,8 +102,17 @@ private fun MainToolbar(
 				val userImagePainter = rememberAsyncImagePainter(userImage)
 				val userImageState by userImagePainter.state.collectAsState()
 				val userImageVisible = userImageState is AsyncImagePainter.State.Success
+				// Ephyra: focus shows like on the covers, the accent ring and zoom over the picture, not a solid fill hiding it
+				val userInteractionSource = remember { MutableInteractionSource() }
+				val userFocused by userInteractionSource.collectIsFocusedAsState()
+				val userScale by animateFloatAsState(if (userFocused) USER_FOCUS_SCALE else 1f, label = "UserButtonFocusScale")
+				val userColors = if (activeButton == MainToolbarActiveButton.User) activeButtonColors else ButtonDefaults.colors()
 
 				IconButton(
+					modifier = Modifier
+						.scale(userScale)
+						.cardFocusRing(userFocused, LocalEphyraPalette.current.accent, IconButtonDefaults.Shape),
+					interactionSource = userInteractionSource,
 					onClick = {
 						if (activeButton != MainToolbarActiveButton.User) {
 							mediaManager.clearAudioQueue()
@@ -105,7 +123,10 @@ private fun MainToolbar(
 							activity?.finishAfterTransition()
 						}
 					},
-					colors = if (activeButton == MainToolbarActiveButton.User) activeButtonColors else ButtonDefaults.colors(),
+					colors = userColors.copy(
+						focusedContainerColor = userColors.containerColor,
+						focusedContentColor = userColors.contentColor,
+					),
 					contentPadding = if (userImageVisible) PaddingValues(3.dp) else IconButtonDefaults.ContentPadding,
 				) {
 					ProfilePicture(

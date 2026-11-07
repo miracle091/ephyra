@@ -5,8 +5,8 @@ import android.graphics.Rect
 import android.util.AttributeSet
 import android.view.KeyEvent
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.interaction.FocusInteraction
@@ -35,16 +35,23 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.AbstractComposeView
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import org.jellyfin.androidtv.ui.base.JellyfinTheme
+import androidx.compose.ui.unit.sp
+import org.jellyfin.androidtv.ui.base.EphyraTheme
+import org.jellyfin.androidtv.ui.base.LocalEphyraPalette
 import org.jellyfin.androidtv.ui.base.LocalTextStyle
 import org.jellyfin.androidtv.ui.base.ProfilePicture
 import org.jellyfin.androidtv.ui.base.ProvideTextStyle
 import org.jellyfin.androidtv.ui.base.Text
+import org.jellyfin.androidtv.ui.composable.item.cardFocusRing
 import org.jellyfin.androidtv.util.MenuBuilder
 import org.jellyfin.androidtv.util.popupMenu
 import org.jellyfin.androidtv.util.AndroidVersion
 import org.jellyfin.androidtv.util.showIfNotEmpty
+
+// Ephyra: the zoom of a focused cover (scale-focus)
+private const val CARD_FOCUS_SCALE = 1.06f
 
 @Composable
 fun UserCard(
@@ -57,13 +64,9 @@ fun UserCard(
 ) {
 	val focused by interactionSource.collectIsFocusedAsState()
 
-	// Mix button background with input foreground because we display text beneath the profile picture on a transparent background similar
-	// to the input text
-	val color = when {
-		focused -> JellyfinTheme.colorScheme.buttonFocused to JellyfinTheme.colorScheme.onInputFocused
-		else -> JellyfinTheme.colorScheme.button to JellyfinTheme.colorScheme.onInput
-	}
-	val scale by animateFloatAsState(if (focused) 1.1f else 1f, label = "UserCardFocusScale")
+	// Ephyra: the avatar of the design system, on surface-3 with the covers' focus ring and zoom, the name muted until focused
+	val palette = LocalEphyraPalette.current
+	val scale by animateFloatAsState(if (focused) CARD_FOCUS_SCALE else 1f, label = "UserCardFocusScale")
 
 	Column(
 		modifier = modifier
@@ -75,7 +78,8 @@ fun UserCard(
 			modifier = Modifier
 				.aspectRatio(1f)
 				.clip(shape)
-				.border(2.dp, color.first, shape)
+				.background(palette.surface3)
+				.cardFocusRing(focused, palette.accent, shape)
 		) {
 			image()
 		}
@@ -93,7 +97,9 @@ fun UserCard(
 		) {
 			ProvideTextStyle(
 				LocalTextStyle.current.copy(
-					color = color.second,
+					color = if (focused) palette.ink else palette.inkMuted,
+					fontSize = 14.sp,
+					fontWeight = FontWeight.Bold,
 				)
 			) {
 				name()
@@ -149,11 +155,12 @@ class UserCardView @JvmOverloads constructor(
 			else interactionSource.emit(FocusInteraction.Unfocus(focusInteraction))
 		}
 
-		UserCard(
+		// Ephyra: the theme's colours, the startup screens have no EphyraTheme around them
+		EphyraTheme { UserCard(
 			image = {
 				ProfilePicture(
 					url = image,
-					iconPadding = PaddingValues(24.dp),
+					iconPadding = PaddingValues(32.dp),
 					modifier = Modifier.fillMaxSize()
 				)
 			},
@@ -163,12 +170,13 @@ class UserCardView @JvmOverloads constructor(
 					maxLines = 1
 				)
 			},
+			// Ephyra: 128dp avatars, 32dp apart
 			modifier = Modifier
-				.padding(horizontal = 6.dp, vertical = 8.dp)
-				.width(110.dp),
+				.padding(horizontal = 16.dp, vertical = 8.dp)
+				.width(128.dp),
 			interactionSource = interactionSource,
 			// We use our own click handler for views used in presenters
 			onClick = {}
-		)
+		) }
 	}
 }
