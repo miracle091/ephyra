@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Ephyra: the Dark theme of the Ephyra design system (same colours as design/.../EphyraColorTokens.kt) -->
+<resources>
+
+    <color name="ephyra_bg">#0A0F24</color>
+    <color name="ephyra_surface_1">#121A36</color>
+    <color name="ephyra_surface_2">#1B2547</color>
+    <color name="ephyra_surface_3">#26315A</color>
+    <color name="ephyra_line_strong">#6B78A8</color>
+    <color name="ephyra_ink">#F2F4FA</color>
+    <color name="ephyra_ink_muted">#B4BCD6</color>
+    <color name="ephyra_ink_faint">#8C96B8</color>
+    <color name="ephyra_accent">#2BB5E8</color>
+
+    <style name="Theme.Jellyfin.Ephyra" parent="Theme.Jellyfin">
+        <!-- Colors -->
+        <item name="android:colorPrimary">@color/ephyra_bg</item>
+        <item name="android:colorPrimaryDark">@color/ephyra_bg</item>
+        <item name="android:colorAccent">@color/ephyra_accent</item>
+        <item name="defaultBackground">@color/ephyra_bg</item>
+        <item name="cardImageBackground">@color/ephyra_surface_1</item>
+        <item name="defaultSearchColor">@color/ephyra_accent</item>
+        <item name="headerTextColor">@color/ephyra_ink</item>
+
+        <!-- Buttons: a solid ink fill on focus -->
+        <item name="android:colorButtonNormal">@color/ephyra_surface_2</item>
+        <item name="buttonDefaultNormalBackground">@color/ephyra_surface_2</item>
+        <item name="buttonDefaultHighlightBackground">@color/ephyra_ink</item>
+
+        <!-- Inputs -->
+        <item name="inputDefaultStrokeColor">@color/ephyra_line_strong</item>
+        <item name="inputDefaultHighlightBackground">@color/ephyra_ink</item>
+
+        <item name="popupMenuBackground">@color/ephyra_surface_2</item>
+
+        <!-- Progress Bar -->
+        <item name="progressBackground">@color/ephyra_surface_3</item>
+        <item name="progressPrimary">@color/ephyra_accent</item>
+        <item name="progressSecondary">@color/ephyra_ink_faint</item>
+
+        <!-- Rounding: covers, inputs and menus radius-md, everything pressable a pill -->
+        <item name="cardRounding">12dp</item>
+        <item name="buttonRounding">999dp</item>
+        <item name="inputRounding">12dp</item>
+        <item name="popupMenuRounding">12dp</item>
+
+        <!-- Control icons -->
+        <item name="controlIconBackground">@color/ephyra_surface_2</item>
+        <item name="controlIconForegroundActive">@color/ephyra_accent</item>
+        <item name="controlIconForegroundInactive">@color/ephyra_ink_muted</item>
+    </style>
+</resources>

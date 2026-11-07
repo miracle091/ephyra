@@ -5,14 +5,20 @@
     <color name="ephyra_black">#000000</color>
     <color name="ephyra_black_raised">#141414</color>
     <color name="ephyra_black_card">#0A0A0A</color>
+    <color name="ephyra_black_focused">#2E2E2E</color>
 
-    <style name="Theme.Jellyfin.Black" parent="Theme.Jellyfin">
+    <!-- The Ephyra Dark theme with black backgrounds and near-black surfaces -->
+    <style name="Theme.Jellyfin.Black" parent="Theme.Jellyfin.Ephyra">
         <!-- Colors -->
         <item name="android:colorPrimary">@color/ephyra_black</item>
         <item name="android:colorPrimaryDark">@color/ephyra_black</item>
         <item name="defaultBackground">@color/ephyra_black</item>
         <item name="cardImageBackground">@color/ephyra_black_card</item>
         <item name="popupMenuBackground">@color/ephyra_black_raised</item>
+        <item name="android:colorButtonNormal">@color/ephyra_black_raised</item>
+        <item name="buttonDefaultNormalBackground">@color/ephyra_black_raised</item>
+        <item name="controlIconBackground">@color/ephyra_black_raised</item>
+        <item name="progressBackground">@color/ephyra_black_focused</item>
 
         <!-- Tile colors -->
         <item name="tile_port_person_bg">@color/ephyra_black_raised</item>
