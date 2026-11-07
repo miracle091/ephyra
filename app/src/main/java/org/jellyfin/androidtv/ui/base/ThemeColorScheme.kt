@@ -1,18 +1,37 @@
 package org.jellyfin.androidtv.ui.base
 
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import org.jellyfin.androidtv.preference.constant.AppTheme
 import org.jellyfin.design.token.EphyraColorTokens
 import org.jellyfin.design.token.EphyraPalette
 
+/** Ephyra: the design system tokens of the current theme, for colours [ColorScheme] has no field for. */
+val LocalEphyraPalette = staticCompositionLocalOf { EphyraColorTokens.dark }
+
+/** Ephyra: the design system tokens of the user's [AppTheme]. */
+fun paletteFor(theme: AppTheme): EphyraPalette = when (theme) {
+	AppTheme.DARK -> EphyraColorTokens.dark
+	AppTheme.BLACK -> EphyraColorTokens.black
+	AppTheme.ABYSS -> EphyraColorTokens.abyss
+	AppTheme.CORAL -> EphyraColorTokens.coral
+	AppTheme.MEDUSA -> EphyraColorTokens.medusa
+}
+
 /**
- * Ephyra: the Compose colours for the user's [AppTheme]. Dark and Black use the Ephyra design system; the other upstream themes
- * keep upstream's single scheme.
+ * Ephyra: the Compose colours of the Ephyra design system for the user's [AppTheme].
  */
-fun colorSchemeFor(theme: AppTheme): ColorScheme = when (theme) {
-	AppTheme.DARK -> ephyraColorScheme(EphyraColorTokens.dark)
-	AppTheme.BLACK -> ephyraColorScheme(EphyraColorTokens.black)
-	AppTheme.EMERALD, AppTheme.MUTED_PURPLE -> colorScheme()
+fun colorSchemeFor(theme: AppTheme): ColorScheme = ephyraColorScheme(paletteFor(theme))
+
+/** Ephyra: [JellyfinTheme] with the colours of [theme], which also provides its tokens as [LocalEphyraPalette]. */
+@Composable
+fun EphyraTheme(theme: AppTheme, content: @Composable () -> Unit) {
+	val palette = paletteFor(theme)
+	CompositionLocalProvider(LocalEphyraPalette provides palette) {
+		JellyfinTheme(colorScheme = ephyraColorScheme(palette), content = content)
+	}
 }
 
 /**

@@ -23,6 +23,16 @@ data class EphyraPalette(
 )
 
 object EphyraColorTokens {
+	/** `art-1` to `art-6`: the tones of covers without a picture, the same in every theme, always with `ink` text. */
+	val art = listOf(
+		Color(0xff155e63),
+		Color(0xff8a3b2b),
+		Color(0xff5b2c6f),
+		Color(0xff2d3a8c),
+		Color(0xff23573f),
+		Color(0xff6e2440),
+	)
+
 	/** Night blue, the default theme. */
 	val dark = EphyraPalette(
 		bg = Color(0xff0a0f24),
@@ -46,5 +56,47 @@ object EphyraColorTokens {
 		surface1 = Color(0xff0a0a0a),
 		surface2 = Color(0xff141414),
 		surface3 = Color(0xff2e2e2e),
+	)
+
+	/** Deep teal with a mint accent (same colours as theme_ephyra_abyss.xml). */
+	val abyss = dark.copy(
+		bg = Color(0xff06171a),
+		surface1 = Color(0xff0d2428),
+		surface2 = Color(0xff15333a),
+		surface3 = Color(0xff1f444c),
+		inkMuted = Color(0xffb0cccc),
+		inkFaint = Color(0xff86a6a8),
+		accent = Color(0xff3ddcb4),
+		onAccent = Color(0xff032019),
+		accentSoft = Color(0xff0e3d38),
+		scrim = Color(0xb8020a0c),
+	)
+
+	/** Warm dark red with a coral accent (same colours as theme_ephyra_coral.xml). */
+	val coral = dark.copy(
+		bg = Color(0xff1a0e10),
+		surface1 = Color(0xff261518),
+		surface2 = Color(0xff341e22),
+		surface3 = Color(0xff45292e),
+		inkMuted = Color(0xffd6bcba),
+		inkFaint = Color(0xffb0928f),
+		accent = Color(0xffff8a65),
+		onAccent = Color(0xff2a0e06),
+		accentSoft = Color(0xff4a2219),
+		scrim = Color(0xb80c0607),
+	)
+
+	/** Deep violet with a lilac accent (same colours as theme_ephyra_medusa.xml). */
+	val medusa = dark.copy(
+		bg = Color(0xff120c24),
+		surface1 = Color(0xff1c1436),
+		surface2 = Color(0xff271d47),
+		surface3 = Color(0xff33285a),
+		inkMuted = Color(0xffc4b8de),
+		inkFaint = Color(0xff9c8fc0),
+		accent = Color(0xffb794ff),
+		onAccent = Color(0xff1a0b33),
+		accentSoft = Color(0xff33215c),
+		scrim = Color(0xb8080512),
 	)
 }

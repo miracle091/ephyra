@@ -80,6 +80,10 @@
 
     <!-- True black theme (res/values/theme_ephyra_black.xml) -->
     <string name="ephyra_pref_theme_black">Black (OLED)</string>
+    <!-- Coloured themes (res/values/theme_ephyra_abyss.xml, _coral.xml, _medusa.xml) -->
+    <string name="ephyra_pref_theme_abyss">Abyss</string>
+    <string name="ephyra_pref_theme_coral">Coral</string>
+    <string name="ephyra_pref_theme_medusa">Medusa</string>
 
     <!-- Episode settings (preference/EphyraPreferences.kt) -->
     <string name="ephyra_pref_spoiler_blur">Blur unwatched episodes</string>

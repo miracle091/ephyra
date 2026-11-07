@@ -26,9 +26,8 @@ class ThemeColorSchemeTests : FunSpec({
 		scheme.rangeControlFill shouldBe colorSchemeFor(AppTheme.DARK).rangeControlFill
 	}
 
-	test("the other upstream themes keep upstream's colour scheme") {
-		listOf(AppTheme.EMERALD, AppTheme.MUTED_PURPLE).forEach { theme ->
-			colorSchemeFor(theme) shouldBe colorScheme()
-		}
+	test("cover placeholders use each theme's surface-1") {
+		paletteFor(AppTheme.DARK).surface1 shouldBe Color(0xFF121A36)
+		paletteFor(AppTheme.BLACK).surface1 shouldBe Color(0xFF0A0A0A)
 	}
 })

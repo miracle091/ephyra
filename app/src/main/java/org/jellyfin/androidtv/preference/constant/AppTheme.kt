@@ -11,18 +11,25 @@ enum class AppTheme(
 	 */
 	DARK(R.string.pref_theme_dark),
 
-	/**
-	 * The "classic" emerald theme
-	 */
-	EMERALD(R.string.pref_theme_emerald),
-
-	/**
-	 * A theme with a more muted accent color, inspired by CTalvio's Monochromic CSS theme for Jellyfin Web
-	 */
-	MUTED_PURPLE(R.string.pref_theme_muted_purple),
+	// Ephyra: no Emerald and Muted purple themes; a saved value of either reads as the default, DARK
 
 	/**
 	 * Ephyra: true black backgrounds, for OLED TVs
 	 */
 	BLACK(R.string.ephyra_pref_theme_black),
+
+	/**
+	 * Ephyra: deep teal with a mint accent
+	 */
+	ABYSS(R.string.ephyra_pref_theme_abyss),
+
+	/**
+	 * Ephyra: warm dark red with a coral accent
+	 */
+	CORAL(R.string.ephyra_pref_theme_coral),
+
+	/**
+	 * Ephyra: deep violet with a lilac accent
+	 */
+	MEDUSA(R.string.ephyra_pref_theme_medusa),
 }
