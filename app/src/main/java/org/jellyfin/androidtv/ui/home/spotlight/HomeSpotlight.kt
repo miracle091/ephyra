@@ -67,16 +67,20 @@ import org.jellyfin.androidtv.ui.navigation.NavigationRepository
 import org.jellyfin.androidtv.util.PlaybackHelper
 import org.jellyfin.androidtv.util.apiclient.getUrl
 import org.jellyfin.androidtv.util.apiclient.itemBackdropImages
+import org.jellyfin.androidtv.util.apiclient.itemImages
 import org.jellyfin.sdk.api.client.ApiClient
 import org.jellyfin.sdk.model.api.BaseItemDto
+import org.jellyfin.sdk.model.api.ImageType
 import org.koin.compose.koinInject
 import timber.log.Timber
 import java.util.UUID
 import kotlin.time.Duration.Companion.seconds
 
-private val SpotlightHeight = 180.dp
+private val SpotlightHeight = 250.dp
 private val SpotlightInterval = 10.seconds
 private const val SPOTLIGHT_FADE_MS = 240
+private val LogoMaxWidth = 220.dp
+private val LogoMaxHeight = 72.dp
 
 // The backdrop covers the right two thirds and fades out at the top, towards the text and towards the rows, without blur
 // (Android 11 has none)
@@ -149,19 +153,36 @@ fun HomeSpotlight(rowsFragment: HomeRowsFragment?, modifier: Modifier = Modifier
 private fun SpotlightBackdrop(item: BaseItemDto, api: ApiClient) {
 	val image = item.itemBackdropImages.firstOrNull() ?: return
 	val maxWidth = with(LocalDensity.current) { 640.dp.roundToPx() }
-	AsyncImage(
-		model = image.getUrl(api, maxWidth = maxWidth),
-		contentDescription = null,
-		contentScale = ContentScale.Crop,
-		modifier = Modifier
-			.fillMaxSize()
-			.graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
-			.drawWithContent {
-				drawContent()
-				drawRect(BackdropFadeHorizontal, blendMode = BlendMode.DstIn)
-				drawRect(BackdropFadeVertical, blendMode = BlendMode.DstIn)
-			},
-	)
+	val logoMaxWidth = with(LocalDensity.current) { LogoMaxWidth.roundToPx() }
+	Box(Modifier.fillMaxSize()) {
+		AsyncImage(
+			model = image.getUrl(api, maxWidth = maxWidth),
+			contentDescription = null,
+			contentScale = ContentScale.Crop,
+			modifier = Modifier
+				.fillMaxSize()
+				.graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
+				.drawWithContent {
+					drawContent()
+					drawRect(BackdropFadeHorizontal, blendMode = BlendMode.DstIn)
+					drawRect(BackdropFadeVertical, blendMode = BlendMode.DstIn)
+				},
+		)
+
+		// The title's logo, in the bottom right corner of the backdrop, when the server has one
+		item.itemImages[ImageType.LOGO]?.let { logo ->
+			AsyncImage(
+				model = logo.getUrl(api, maxWidth = logoMaxWidth),
+				contentDescription = null,
+				contentScale = ContentScale.Fit,
+				alignment = Alignment.BottomEnd,
+				modifier = Modifier
+					.align(Alignment.BottomEnd)
+					.padding(end = 48.dp, bottom = 24.dp)
+					.size(width = LogoMaxWidth, height = LogoMaxHeight),
+			)
+		}
+	}
 }
 
 @Composable

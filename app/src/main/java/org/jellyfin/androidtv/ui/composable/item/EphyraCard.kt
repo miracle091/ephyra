@@ -17,14 +17,12 @@ import org.jellyfin.androidtv.ui.base.LocalEphyraPalette
 import org.jellyfin.design.token.EphyraColorTokens
 
 /**
- * Ephyra: the focus ring of a cover in the Ephyra design system, a solid [ring] line of 3dp with a 2dp [gap] inside it. It is
- * drawn inside the card, so the card keeps its size.
+ * Ephyra: the focus ring of a cover, a solid [ring] line of 1.5dp along its edge. It is drawn inside the card, so the card keeps
+ * its size.
  */
-fun Modifier.cardFocusRing(focused: Boolean, ring: Color, gap: Color, shape: Shape): Modifier =
+fun Modifier.cardFocusRing(focused: Boolean, ring: Color, shape: Shape): Modifier =
 	if (!focused) this
-	else this
-		.border(3.dp, ring, shape)
-		.border(5.dp, gap, shape)
+	else this.border(1.5.dp, ring, shape)
 
 /** Ephyra: the `surface-1` fill a cover shows while its picture loads. */
 @Composable

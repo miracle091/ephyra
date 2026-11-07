@@ -35,6 +35,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import org.jellyfin.androidtv.R
 import org.jellyfin.androidtv.constant.ImageType
 import org.jellyfin.androidtv.ui.base.JellyfinTheme
+import org.jellyfin.androidtv.ui.base.LocalEphyraPalette
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.composable.AsyncImage
 import org.jellyfin.androidtv.ui.composable.item.ArtToneCover
@@ -376,8 +377,7 @@ private fun CardViewHolderContent(
 				.size(size)
 				.cardFocusRing( // Ephyra
 					focused = focused,
-					ring = JellyfinTheme.colorScheme.buttonFocused,
-					gap = JellyfinTheme.colorScheme.background,
+					ring = LocalEphyraPalette.current.accent,
 					shape = JellyfinTheme.shapes.medium,
 				)
 		)
