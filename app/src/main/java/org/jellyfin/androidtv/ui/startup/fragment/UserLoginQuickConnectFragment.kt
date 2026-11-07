@@ -25,7 +25,9 @@ import org.jellyfin.androidtv.auth.model.UnavailableQuickConnectState
 import org.jellyfin.androidtv.auth.model.UnknownQuickConnectState
 import org.jellyfin.androidtv.auth.repository.ServerRepository
 import org.jellyfin.androidtv.databinding.FragmentUserLoginQuickConnectBinding
+import org.jellyfin.androidtv.ui.base.EphyraTheme
 import org.jellyfin.androidtv.ui.startup.UserLoginViewModel
+import org.jellyfin.androidtv.ui.startup.composable.QuickConnectCode
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 
 class UserLoginQuickConnectFragment : Fragment() {
@@ -55,7 +57,8 @@ class UserLoginQuickConnectFragment : Fragment() {
 				userLoginViewModel.quickConnectState.onEach { state ->
 					when (state) {
 						is PendingQuickConnectState -> {
-							binding.quickConnectCode.text = state.code.formatCode()
+							// Ephyra: one tile per character, in groups of three
+							binding.quickConnectCode.setContent { EphyraTheme { QuickConnectCode(state.code) } }
 							binding.loading.isVisible = false
 						}
 
@@ -94,17 +97,5 @@ class UserLoginQuickConnectFragment : Fragment() {
 		super.onDestroyView()
 
 		_binding = null
-	}
-
-	/**
-	 * Add space after every 3 characters so "420420" becomes "420 420".
-	 */
-	private fun String.formatCode() = buildString {
-		@Suppress("MagicNumber")
-		val interval = 3
-		this@formatCode.forEachIndexed { index, character ->
-			if (index != 0 && index % interval == 0) append(" ")
-			append(character)
-		}
 	}
 }

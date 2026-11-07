@@ -5,6 +5,8 @@
         <item name="android:background">@drawable/ephyra_button_ghost_back</item>
         <item name="android:textColor">@color/ephyra_button_ghost_text</item>
         <item name="drawableTint">@color/ephyra_button_ghost_text</item>
+        <!-- Plain Buttons (not AppCompat) read only the platform attribute -->
+        <item name="android:drawableTint">@color/ephyra_button_ghost_text</item>
         <item name="android:minHeight">40dp</item>
         <item name="android:paddingTop">0dp</item>
         <item name="android:paddingBottom">0dp</item>

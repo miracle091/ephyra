@@ -1,41 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Ephyra: sign in like the "Users" board of the design system: centred title and server, the login method in a 640dp column,
+     ghost buttons at the bottom -->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:paddingHorizontal="@dimen/ephyra_side_margin"
+    android:paddingTop="48dp"
+    android:paddingBottom="@dimen/overscan_vertical"
     tools:context=".ui.startup.StartupActivity">
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/center"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintGuide_percent="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <ImageView
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:src="@color/black_transparent_light"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/center"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/title"
-        style="@style/TextAppearance.Leanback.Title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="48dp"
-        android:layout_marginTop="27dp"
-        android:layout_marginEnd="48dp"
+        android:gravity="center"
         android:text="@string/lbl_sign_in"
-        app:layout_constraintEnd_toStartOf="@id/center"
+        android:textColor="?attr/headerTextColor"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -43,10 +28,11 @@
         android:id="@+id/subtitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="48dp"
-        android:layout_marginTop="4dp"
-        android:layout_marginEnd="48dp"
-        app:layout_constraintEnd_toStartOf="@id/center"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:textColor="?attr/controlIconForegroundInactive"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/title"
         tools:text="@string/login_connect_to" />
@@ -55,54 +41,48 @@
         android:id="@+id/login_method"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginStart="48dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="48dp"
+        android:layout_marginTop="32dp"
         android:layout_marginBottom="16dp"
         app:layout_constraintBottom_toTopOf="@id/actions"
-        app:layout_constraintEnd_toStartOf="@id/center"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/subtitle"
+        app:layout_constraintWidth_max="640dp"
         tools:name="org.jellyfin.androidtv.ui.startup.fragment.UserLoginCredentialsFragment" />
 
     <LinearLayout
         android:id="@+id/actions"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="48dp"
-        android:layout_marginEnd="48dp"
-        android:layout_marginBottom="27dp"
+        android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/center"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/login_other_options" />
 
         <Button
             android:id="@+id/use_credentials"
-            style="@style/Button.Default"
+            style="@style/Button.Ephyra.Ghost"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="8dp"
+            android:drawableStart="@drawable/ic_ephyra_lock"
             android:text="@string/action_use_password" />
 
         <Button
             android:id="@+id/use_quickconnect"
-            style="@style/Button.Default"
+            style="@style/Button.Ephyra.Ghost"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="8dp"
+            android:drawableStart="@drawable/ic_ephyra_qr_code"
             android:text="@string/action_use_quickconnect" />
 
         <Button
             android:id="@+id/cancel"
-            style="@style/Button.Default"
+            style="@style/Button.Ephyra.Ghost"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
+            android:layout_height="40dp"
+            android:drawableStart="@drawable/ic_ephyra_close"
             android:text="@string/btn_cancel"
             tools:ignore="ButtonOrder" />
     </LinearLayout>

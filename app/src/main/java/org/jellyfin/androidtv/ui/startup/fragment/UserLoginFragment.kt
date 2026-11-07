@@ -109,5 +109,8 @@ class UserLoginFragment : Fragment() {
 		// Hide button for active fragment
 		binding.useCredentials.isVisible = T::class != UserLoginCredentialsFragment::class
 		binding.useQuickconnect.isVisible = T::class != UserLoginQuickConnectFragment::class
+
+		// Ephyra: Quick Connect has nothing to focus, so the focus starts on "Use a password"
+		if (T::class == UserLoginQuickConnectFragment::class) binding.useCredentials.requestFocus()
 	}
 }
