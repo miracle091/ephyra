@@ -3,6 +3,7 @@ package org.jellyfin.androidtv.ui.home
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.View
+import androidx.compose.ui.unit.dp
 import androidx.leanback.app.RowsSupportFragment
 import androidx.leanback.widget.ListRow
 import androidx.leanback.widget.OnItemViewClickedListener
@@ -39,6 +40,9 @@ import org.jellyfin.androidtv.preference.UserSettingPreferences
 import org.jellyfin.androidtv.ui.GridButton
 import org.jellyfin.androidtv.ui.browsing.CompositeClickedListener
 import org.jellyfin.androidtv.ui.browsing.CompositeSelectedListener
+import org.jellyfin.androidtv.ui.composable.item.POSTER_ASPECT_RATIO
+import org.jellyfin.androidtv.ui.composable.item.ROW_CARDS_POSTER
+import org.jellyfin.androidtv.ui.composable.item.rowCardHeight
 import org.jellyfin.androidtv.ui.itemhandling.BaseRowItem
 import org.jellyfin.androidtv.ui.itemhandling.ItemLauncher
 import org.jellyfin.androidtv.ui.itemhandling.ItemRowAdapter
@@ -126,7 +130,9 @@ class HomeRowsFragment : RowsSupportFragment(), AudioEventListener, View.OnKeyLi
 
 			// Add sections to layout
 			withContext(Dispatchers.Main) {
-				val cardPresenter = CardPresenter()
+				// Ephyra: a whole number of posters fills the row (upstream 150dp)
+				val screenWidth = resources.configuration.screenWidthDp.dp
+				val cardPresenter = CardPresenter(true, rowCardHeight(screenWidth, ROW_CARDS_POSTER, POSTER_ASPECT_RATIO).value.toInt())
 
 				// Add rows in order
 				notificationsRow.addToRowsAdapter(requireContext(), cardPresenter, adapter as MutableObjectAdapter<Row>)
@@ -283,7 +289,7 @@ class HomeRowsFragment : RowsSupportFragment(), AudioEventListener, View.OnKeyLi
 				val itemRowAdapter = row.adapter as? ItemRowAdapter
 				itemRowAdapter?.loadMoreItemsIfNeeded(itemRowAdapter.indexOf(item))
 
-				backgroundService.setBackground(item.baseItem)
+				backgroundService.clearBackgrounds() // Ephyra: no backdrop behind the home rows, the spotlight has its own
 			}
 		}
 	}

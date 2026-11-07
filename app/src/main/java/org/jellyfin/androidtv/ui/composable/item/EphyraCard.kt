@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.jellyfin.androidtv.ui.base.LocalEphyraPalette
 import org.jellyfin.design.token.EphyraColorTokens
@@ -23,6 +24,29 @@ import org.jellyfin.design.token.EphyraColorTokens
 fun Modifier.cardFocusRing(focused: Boolean, ring: Color, shape: Shape): Modifier =
 	if (!focused) this
 	else this.border(1.5.dp, ring, shape)
+
+/** Ephyra: wide cards (16:9) shown in a home row at once. */
+const val ROW_CARDS_WIDE = 4
+
+/** Ephyra: posters (2:3) shown in a home row at once. */
+const val ROW_CARDS_POSTER = 8
+
+/** Ephyra: wide cards shown at once in the small "My media" row. */
+const val ROW_CARDS_WIDE_SMALL = 6
+
+const val WIDE_ASPECT_RATIO = 16f / 9f
+const val POSTER_ASPECT_RATIO = 2f / 3f
+
+// The browsePaddingStart/End of the Ephyra themes and Leanback's item spacing
+private val RowSideMargin = 32.dp
+private val RowItemGap = 8.dp
+
+/**
+ * Ephyra: the height of the cards of a row, so that [count] cards of [aspectRatio] fill a screen [screenWidth] wide edge to edge,
+ * without an empty strip or half a card at the end.
+ */
+fun rowCardHeight(screenWidth: Dp, count: Int, aspectRatio: Float): Dp =
+	(screenWidth - RowSideMargin * 2 - RowItemGap * (count - 1)) / count / aspectRatio
 
 /** Ephyra: the `surface-1` fill a cover shows while its picture loads. */
 @Composable

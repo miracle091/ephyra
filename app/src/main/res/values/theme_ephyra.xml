@@ -48,5 +48,9 @@
         <item name="controlIconBackground">@color/ephyra_surface_2</item>
         <item name="controlIconForegroundActive">@color/ephyra_accent</item>
         <item name="controlIconForegroundInactive">@color/ephyra_ink_muted</item>
+
+        <!-- Side margin of the browse rows (Leanback 56dp) -->
+        <item name="browsePaddingStart">32dp</item>
+        <item name="browsePaddingEnd">32dp</item>
     </style>
 </resources>

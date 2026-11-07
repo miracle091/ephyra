@@ -489,7 +489,7 @@ public class EnhancedBrowseFragment extends Fragment implements RowLoader, View.
             ItemRowAdapter adapter = (ItemRowAdapter) ((ListRow) row).getAdapter();
             adapter.loadMoreItemsIfNeeded(adapter.indexOf(rowItem));
 
-            backgroundService.getValue().setBackground(rowItem.getBaseItem());
+            backgroundService.getValue().clearBackgrounds(); // Ephyra: no backdrop behind the library rows
         }
     }
 }

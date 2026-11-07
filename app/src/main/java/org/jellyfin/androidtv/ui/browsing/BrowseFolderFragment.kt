@@ -62,7 +62,7 @@ abstract class BrowseFolderFragment : BrowseSupportFragment(), RowLoader {
 				val adapter = (row as? ListRow)?.adapter
 				if (adapter is ItemRowAdapter) adapter.loadMoreItemsIfNeeded(adapter.indexOf(item))
 
-				backgroundService.setBackground(item.baseItem)
+				backgroundService.clearBackgrounds() // Ephyra: no backdrop behind the library rows
 			}
 		}
 

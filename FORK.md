@@ -102,6 +102,7 @@ The status column shows how far each change has gone. A change becomes "done" wh
 | UI | Covers follow the Ephyra design system: the focused cover grows by 6% (upstream 15%) and gets a thin ring in the theme's accent colour, a cover without a picture is filled with one of six colour tones, picked from its title, instead of a grey icon, and a cover still loading shows the theme's darkest surface | done |
 | UI | The Emerald and Muted purple themes are removed, as they don't follow the Ephyra design system. A device set to a removed theme opens in Dark | done |
 | UI | Three coloured themes on the Ephyra design system (Settings → Customization → App theme): Abyss (deep teal, mint accent), Coral (warm dark red, coral accent) and Medusa (deep violet, lilac accent) | done |
+| UI | Home layout: 32dp side margins (upstream 48 to 56dp) in the toolbar, the spotlight and the browse rows; the home rows size their cards so that four wide cards or eight posters fill a row edge to edge; the home rows and the library screens no longer show the selected item's backdrop behind them | done |
 
 ## What changes for users
 

@@ -143,7 +143,7 @@ fun HomeSpotlight(rowsFragment: HomeRowsFragment?, modifier: Modifier = Modifier
 			item = item,
 			modifier = Modifier
 				.align(Alignment.BottomStart)
-				.padding(start = 56.dp, bottom = 8.dp)
+				.padding(start = 32.dp, bottom = 8.dp)
 				.onFocusChanged { focused = it.hasFocus },
 		)
 	}
@@ -178,7 +178,7 @@ private fun SpotlightBackdrop(item: BaseItemDto, api: ApiClient) {
 				alignment = Alignment.BottomEnd,
 				modifier = Modifier
 					.align(Alignment.BottomEnd)
-					.padding(end = 48.dp, bottom = 24.dp)
+					.padding(end = 32.dp, bottom = 24.dp)
 					.size(width = LogoMaxWidth, height = LogoMaxHeight),
 			)
 		}

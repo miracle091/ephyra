@@ -915,7 +915,7 @@ public class BrowseGridFragment extends Fragment implements View.OnKeyListener {
         public void run() {
             if (!getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) return;
 
-            backgroundService.getValue().setBackground(mCurrentItem.getBaseItem());
+            backgroundService.getValue().clearBackgrounds(); // Ephyra: no backdrop behind the library grids
             setItem(mCurrentItem);
         }
     };
