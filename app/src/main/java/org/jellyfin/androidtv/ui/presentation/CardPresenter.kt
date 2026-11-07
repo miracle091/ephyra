@@ -16,7 +16,6 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
@@ -38,9 +37,12 @@ import org.jellyfin.androidtv.constant.ImageType
 import org.jellyfin.androidtv.ui.base.JellyfinTheme
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.composable.AsyncImage
+import org.jellyfin.androidtv.ui.composable.item.ArtToneCover
+import org.jellyfin.androidtv.ui.composable.item.CardPlaceholder
 import org.jellyfin.androidtv.ui.composable.item.ItemCard
 import org.jellyfin.androidtv.ui.composable.item.ItemCardBaseItemOverlay
 import org.jellyfin.androidtv.ui.composable.item.ItemPreview
+import org.jellyfin.androidtv.ui.composable.item.cardFocusRing
 import org.jellyfin.androidtv.ui.itemhandling.BaseItemDtoBaseRowItem
 import org.jellyfin.androidtv.ui.itemhandling.BaseRowItem
 import org.jellyfin.androidtv.ui.itemhandling.BaseRowType
@@ -309,6 +311,7 @@ private fun CardViewHolderContent(
 	val card = @Composable {
 		ItemCard(
 			image = {
+				CardPlaceholder() // Ephyra
 				if (image != null && hidesEpisodeSpoiler(item.baseItem, image)) {
 					EpisodeSpoilerImage(image, aspectRatio, Modifier.fillMaxSize()) // Ephyra
 				} else if (image != null) {
@@ -333,13 +336,7 @@ private fun CardViewHolderContent(
 							.fillMaxSize()
 					)
 				} else {
-					Image(
-						painter = painterResource(displayConfig.iconRes),
-						contentDescription = null,
-						modifier = Modifier
-							.fillMaxSize(0.4f)
-							.align(Alignment.Center)
-					)
+					ArtToneCover(title, displayConfig.iconRes) // Ephyra
 				}
 			},
 			overlay = {
@@ -377,6 +374,12 @@ private fun CardViewHolderContent(
 			},
 			modifier = Modifier
 				.size(size)
+				.cardFocusRing( // Ephyra
+					focused = focused,
+					ring = JellyfinTheme.colorScheme.buttonFocused,
+					gap = JellyfinTheme.colorScheme.background,
+					shape = JellyfinTheme.shapes.medium,
+				)
 		)
 	}
 

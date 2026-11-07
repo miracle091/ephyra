@@ -99,6 +99,7 @@ The status column shows how far each change has gone. A change becomes "done" wh
 | UI | "Blur unwatched episodes" (Customization, off by default): cards of episodes not started yet show the blurred BlurHash of their picture instead of the scene, without downloading it; series and season posters stay as they are | done |
 | Playback | "Stop at the end of the season" (Playback → Next up, off by default): the episodes queued after the one started stay in its season, so autoplay stops when the season ends | done |
 | UI | Ephyra design system, first steps: in the Dark and Black themes the Compose parts (settings panel, toolbar, search, dialogs, player controls) and the Leanback screens (backgrounds, buttons, inputs, menus, progress bars) use Ephyra's colours (night blue, one cyan accent, a solid white focus), pill-shaped buttons and rounder cards | in progress |
+| UI | Covers follow the Ephyra design system: the focused cover grows by 6% (upstream 15%) and gets a solid 3dp ring, a cover without a picture is filled with one of six colour tones, picked from its title, instead of a grey icon, and a cover still loading shows the theme's darkest surface | done |
 | UI | The Emerald and Muted purple themes are removed, as they don't follow the Ephyra design system. A device set to a removed theme opens in Dark | done |
 | UI | Three coloured themes on the Ephyra design system (Settings → Customization → App theme): Abyss (deep teal, mint accent), Coral (warm dark red, coral accent) and Medusa (deep violet, lilac accent) | done |
 
