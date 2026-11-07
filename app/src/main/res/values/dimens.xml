@@ -1,6 +1,8 @@
 <resources>
     <dimen name="overscan_horizontal">27dp</dimen>
     <dimen name="overscan_vertical">48dp</dimen>
+    <dimen name="ephyra_side_margin">32dp</dimen><!-- Ephyra: side margin of the home and library screens -->
+    <dimen name="ephyra_card_gap">8dp</dimen><!-- Ephyra: gap between cards, as in the home rows -->
 
     <fraction name="card_scale_default">100%</fraction>
     <fraction name="card_scale_focus">106%</fraction><!-- Ephyra: scale-focus of the design system (upstream 115%) -->

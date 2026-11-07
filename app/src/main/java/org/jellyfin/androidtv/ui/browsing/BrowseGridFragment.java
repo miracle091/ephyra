@@ -222,7 +222,7 @@ public class BrowseGridFragment extends Fragment implements View.OnKeyListener {
         mGridViewHolder = mGridPresenter.onCreateViewHolder(binding.rowsFragment);
         if (mGridViewHolder instanceof HorizontalGridPresenter.ViewHolder) {
             mGridView = ((HorizontalGridPresenter.ViewHolder) mGridViewHolder).getGridView();
-            mGridView.setGravity(Gravity.CENTER_VERTICAL);
+            mGridView.setGravity(Gravity.TOP); // Ephyra: right below the title, not centred
             ViewGroup.MarginLayoutParams titleMargin = (ViewGroup.MarginLayoutParams) binding.title.getLayoutParams();
             ViewGroup.MarginLayoutParams clockMargin = (ViewGroup.MarginLayoutParams) binding.clock.getLayoutParams();
             mGridView.setPadding(titleMargin.getMarginStart(), mGridPaddingTop, clockMargin.getMarginEnd(), mGridPaddingTop); // prevent initial card cutoffs
@@ -541,8 +541,9 @@ public class BrowseGridFragment extends Fragment implements View.OnKeyListener {
             mDirty = true;
         }
         mCardHeight = cardHeightInt;
-        mGridItemSpacingHorizontal = spacingHorizontalInt;
-        mGridItemSpacingVertical = spacingVerticalInt;
+        // Ephyra: at least the home's gap between cards, the 6% focus scale alone leaves 1 to 3dp
+        mGridItemSpacingHorizontal = Math.max(spacingHorizontalInt, getResources().getDimensionPixelSize(R.dimen.ephyra_card_gap));
+        mGridItemSpacingVertical = Math.max(spacingVerticalInt, getResources().getDimensionPixelSize(R.dimen.ephyra_card_gap));
         mGridPaddingLeft = paddingLeftInt;
         mGridPaddingTop = paddingTopInt;
     }

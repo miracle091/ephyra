@@ -78,8 +78,8 @@ class UserLoginFragment : Fragment() {
 					val name = server?.name ?: "Jellyfin"
 					binding.subtitle.text = getString(R.string.login_connect_to, name)
 
-					if (server != null) backgroundService.setBackground(server)
-					else backgroundService.clearBackgrounds()
+					// Ephyra: the plain theme background, without the server's splashscreen
+					backgroundService.clearBackgrounds()
 				}.launchIn(this)
 
 				// Disable QuickConnect when unavailable

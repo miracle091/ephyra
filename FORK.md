@@ -103,6 +103,7 @@ The status column shows how far each change has gone. A change becomes "done" wh
 | UI | The Emerald and Muted purple themes are removed, as they don't follow the Ephyra design system. A device set to a removed theme opens in Dark | done |
 | UI | Three coloured themes on the Ephyra design system (Settings → Customization → App theme): Abyss (deep teal, mint accent), Coral (warm dark red, coral accent) and Medusa (deep violet, lilac accent) | done |
 | UI | Home layout: 32dp side margins (upstream 48 to 56dp) in the toolbar, the spotlight and the browse rows; the home rows size their cards so that four wide cards or eight posters fill a row edge to edge; the home rows and the library screens no longer show the selected item's backdrop behind them | done |
+| UI | Library screens: the same 32dp side margins as the home; the library grid keeps an 8dp gap between cards and sits right below the title, and drops the item counter and the "Showing ... sorted by ..." line at the bottom; the startup and sign-in screens show the plain theme background instead of the server's splashscreen | done |
 
 ## What changes for users
 

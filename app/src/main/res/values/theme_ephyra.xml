@@ -50,7 +50,7 @@
         <item name="controlIconForegroundInactive">@color/ephyra_ink_muted</item>
 
         <!-- Side margin of the browse rows (Leanback 56dp) -->
-        <item name="browsePaddingStart">32dp</item>
-        <item name="browsePaddingEnd">32dp</item>
+        <item name="browsePaddingStart">@dimen/ephyra_side_margin</item>
+        <item name="browsePaddingEnd">@dimen/ephyra_side_margin</item>
     </style>
 </resources>
