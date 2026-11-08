@@ -740,7 +740,17 @@ public class FullDetailsFragment extends Fragment implements RecordingIndicatorV
         navigationRepository.getValue().navigate(Destinations.INSTANCE.itemDetails(mBaseItem.getSeriesId()));
     }
 
+    private void confirmDeleteRecording() {
+        new AlertDialog.Builder(requireContext())
+                .setTitle(getString(R.string.item_delete_confirm_title))
+                .setMessage(getString(R.string.item_delete_confirm_message))
+                .setNegativeButton(R.string.lbl_no, null)
+                .setPositiveButton(R.string.lbl_delete, (dialog, which) -> FullDetailsFragmentHelperKt.deleteRecording(this))
+                .show();
+    }
+
     TextUnderButton favButton = null;
+    TextUnderButton deleteButton = null;
     TextUnderButton shuffleButton = null;
     TextUnderButton goToSeriesButton = null;
     TextUnderButton queueButton = null;
@@ -993,7 +1003,16 @@ public class FullDetailsFragment extends Fragment implements RecordingIndicatorV
             mDetailsOverviewRow.addAction(goToSeriesButton);
         }
 
-        // Ephyra: no delete button; media files are never deleted from the TV.
+        // Ephyra: delete only live TV recordings, never library media; the button shows once the server confirms it is a recording
+        deleteButton = TextUnderButton.create(requireContext(), R.drawable.ic_delete, buttonSize, 0, getString(R.string.lbl_delete), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                confirmDeleteRecording();
+            }
+        });
+        deleteButton.setVisibility(View.GONE);
+        mDetailsOverviewRow.addAction(deleteButton);
+        FullDetailsFragmentHelperKt.showDeleteButtonForRecording(this);
 
         if (mSeriesTimerInfo != null) {
             //Settings

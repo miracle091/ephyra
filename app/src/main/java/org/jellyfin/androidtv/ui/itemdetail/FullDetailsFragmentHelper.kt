@@ -9,9 +9,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jellyfin.androidtv.R
+import org.jellyfin.androidtv.auth.repository.UserRepository
 import org.jellyfin.androidtv.data.model.DataRefreshService
 import org.jellyfin.androidtv.data.repository.ItemMutationRepository
 import org.jellyfin.androidtv.data.repository.ItemRepository
+import org.jellyfin.androidtv.ui.navigation.Destinations
+import org.jellyfin.androidtv.ui.navigation.NavigationRepository
 import org.jellyfin.androidtv.util.TimeUtils
 import org.jellyfin.androidtv.util.apiclient.getSeriesOverview
 import org.jellyfin.androidtv.util.popupMenu
@@ -21,6 +24,7 @@ import org.jellyfin.androidtv.util.sdk.compat.copyWithUserData
 import org.jellyfin.androidtv.util.showIfNotEmpty
 import org.jellyfin.sdk.api.client.ApiClient
 import org.jellyfin.sdk.api.client.exception.ApiClientException
+import org.jellyfin.sdk.api.client.extensions.libraryApi
 import org.jellyfin.sdk.api.client.extensions.liveTvApi
 import org.jellyfin.sdk.api.client.extensions.tvShowsApi
 import org.jellyfin.sdk.api.client.extensions.userLibraryApi
@@ -361,5 +365,53 @@ fun FullDetailsFragment.getLiveTvChannel(
 		}.onSuccess { channel ->
 			callback(channel)
 		}
+	}
+}
+
+/** Ephyra: shows the delete button only for a live TV recording the server lets this user delete (see [canDeleteFromTv]). */
+fun FullDetailsFragment.showDeleteButtonForRecording() {
+	val item = mBaseItem
+	if (item.canDelete != true) return
+
+	val api by inject<ApiClient>()
+	val userRepository by inject<UserRepository>()
+
+	lifecycleScope.launch {
+		val allowed = try {
+			withContext(Dispatchers.IO) {
+				val userId = userRepository.currentUser.value?.id
+				val recordingFolderIds = api.liveTvApi.getRecordingFolders(userId).content.items.map { it.id }
+				val ancestorIds = api.libraryApi.getAncestors(item.id, userId).content.map { it.id }
+				canDeleteFromTv(item, ancestorIds, recordingFolderIds)
+			}
+		} catch (error: ApiClientException) {
+			Timber.w(error, "Unable to tell whether ${item.id} is a recording")
+			false
+		}
+
+		deleteButton?.isVisible = allowed
+		showMoreButtonIfNeeded()
+	}
+}
+
+fun FullDetailsFragment.deleteRecording() {
+	val item = mBaseItem
+	val api by inject<ApiClient>()
+	val dataRefreshService by inject<DataRefreshService>()
+	val navigationRepository by inject<NavigationRepository>()
+
+	lifecycleScope.launch {
+		Timber.i("Deleting recording ${item.id}")
+		try {
+			withContext(Dispatchers.IO) { api.libraryApi.deleteItem(item.id) }
+		} catch (error: ApiClientException) {
+			Timber.e(error, "Failed to delete recording ${item.id}")
+			Toast.makeText(context, getString(R.string.item_deletion_failed, item.name), Toast.LENGTH_LONG).show()
+			return@launch
+		}
+
+		dataRefreshService.lastDeletedItemId = item.id
+		if (navigationRepository.canGoBack) navigationRepository.goBack() else navigationRepository.navigate(Destinations.home)
+		Toast.makeText(context, getString(R.string.item_deleted, item.name), Toast.LENGTH_LONG).show()
 	}
 }
