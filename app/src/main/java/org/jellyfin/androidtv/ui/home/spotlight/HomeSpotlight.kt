@@ -7,6 +7,7 @@ import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -61,6 +62,8 @@ import org.jellyfin.androidtv.ui.base.LocalEphyraPalette
 import org.jellyfin.androidtv.ui.base.LocalTextStyle
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.base.button.IconButton
+import org.jellyfin.androidtv.ui.browsing.composable.inforow.InfoRowCommunityRating
+import org.jellyfin.androidtv.ui.browsing.composable.inforow.InfoRowCriticRating
 import org.jellyfin.androidtv.ui.home.HomeRowsFragment
 import org.jellyfin.androidtv.ui.navigation.Destinations
 import org.jellyfin.androidtv.ui.navigation.NavigationRepository
@@ -224,13 +227,22 @@ private fun SpotlightInfo(item: BaseItemDto, modifier: Modifier = Modifier) {
 			maxLines = 1,
 			overflow = TextOverflow.Ellipsis,
 		)
-		Text(
-			text = spotlightMeta(item) { res, args -> resources.getString(res, *args) },
-			fontSize = 14.sp,
-			fontWeight = FontWeight.Medium,
-			color = LocalEphyraPalette.current.inkMuted,
-			maxLines = 1,
-		)
+		// Ratings first, with the gold star and the Rotten Tomatoes logo, as in the details' info row
+		Row(
+			horizontalArrangement = Arrangement.spacedBy(8.dp),
+			verticalAlignment = Alignment.CenterVertically,
+			modifier = Modifier.height(IntrinsicSize.Min),
+		) {
+			item.communityRating?.let { InfoRowCommunityRating(it / 10f) }
+			item.criticRating?.let { InfoRowCriticRating(it / 100f) }
+			Text(
+				text = spotlightMeta(item) { res, args -> resources.getString(res, *args) },
+				fontSize = 14.sp,
+				fontWeight = FontWeight.Medium,
+				color = LocalEphyraPalette.current.inkMuted,
+				maxLines = 1,
+			)
+		}
 		Spacer(Modifier.height(8.dp))
 		Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
 			IconButton(

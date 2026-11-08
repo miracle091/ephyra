@@ -120,6 +120,7 @@ The status column shows how far each change has gone. A change becomes "done" wh
 | UI | The startup window shows the Dark theme's background from the first frame instead of black, until the chosen theme takes over; the home spotlight's title, details and buttons sit centred on the backdrop's height instead of at its bottom | done |
 | UI | Icons for an active state follow the theme's accent instead of red or the button grey: active shuffle, repeat and grid filters, the live TV guide's favourite heart, checked checkboxes and radio buttons | done |
 | UI | A video left paused for 2 minutes shows a long pause screen instead of the screensaver: the title's backdrop dimmed, the player's header and progress (position, end time, duration) and a hint to return; after 10 minutes the picture dims further and the text shifts against burn-in. The screensaver opens on its content at once instead of fading from the clock, and its clock sits where the home toolbar's does | done |
+| UI | The home spotlight shows the community rating with the gold star and the critics' rating with the Rotten Tomatoes logo before the year and runtime, as in the details' info row | done |
 
 ## What changes for users
 
