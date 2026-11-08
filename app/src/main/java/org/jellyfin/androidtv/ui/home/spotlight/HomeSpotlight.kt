@@ -142,8 +142,9 @@ fun HomeSpotlight(rowsFragment: HomeRowsFragment?, modifier: Modifier = Modifier
 		SpotlightInfo(
 			item = item,
 			modifier = Modifier
-				.align(Alignment.BottomStart)
-				.padding(start = 32.dp, bottom = 8.dp)
+				// Left aligned, centred on the backdrop's height
+				.align(Alignment.CenterStart)
+				.padding(start = 32.dp)
 				.onFocusChanged { focused = it.hasFocus },
 		)
 	}

@@ -53,4 +53,10 @@
         <item name="browsePaddingStart">@dimen/ephyra_side_margin</item>
         <item name="browsePaddingEnd">@dimen/ephyra_side_margin</item>
     </style>
+
+    <!-- Launch window of the startup screen: the theme's background from the first frame instead of black, until the user's
+         theme is applied in onCreate -->
+    <style name="Theme.Jellyfin.Launch" parent="Theme.Jellyfin">
+        <item name="android:windowBackground">@color/ephyra_bg</item>
+    </style>
 </resources>
