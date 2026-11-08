@@ -394,7 +394,10 @@ public class FullDetailsFragment extends Fragment implements RecordingIndicatorV
     @Override
     public void setRecTimer(String id) {
         mProgramInfo = JavaCompat.copyWithTimerId(mProgramInfo, id);
-        if (mRecordButton != null) mRecordButton.setActivated(id != null);
+        if (mRecordButton != null) {
+            mRecordButton.setActivated(id != null);
+            RecordButtonIconKt.setRecordingSet(mRecordButton, id != null, R.drawable.ic_record, R.drawable.ic_record_red);
+        }
     }
 
     private int posterHeight;
@@ -402,7 +405,10 @@ public class FullDetailsFragment extends Fragment implements RecordingIndicatorV
     @Override
     public void setRecSeriesTimer(String id) {
         if (mProgramInfo != null) mProgramInfo = JavaCompat.copyWithTimerId(mProgramInfo, id);
-        if (mRecSeriesButton != null) mRecSeriesButton.setActivated(id != null);
+        if (mRecSeriesButton != null) {
+            mRecSeriesButton.setActivated(id != null);
+            RecordButtonIconKt.setRecordingSet(mRecSeriesButton, id != null, R.drawable.ic_record_series, R.drawable.ic_record_series_red);
+        }
         if (mSeriesSettingsButton != null)
             mSeriesSettingsButton.setVisibility(id == null ? View.GONE : View.VISIBLE);
 
@@ -441,10 +447,11 @@ public class FullDetailsFragment extends Fragment implements RecordingIndicatorV
                         firstRow = new InfoItem(
                                 getString(R.string.lbl_seasons),
                                 String.format("%d", Utils.getSafeValue(item.getChildCount(), 0)));
+                    } else if (director != null) {
+                        firstRow = new InfoItem(getString(R.string.lbl_directed_by), director.getName());
                     } else {
-                        firstRow = new InfoItem(
-                                getString(R.string.lbl_directed_by),
-                                director != null ? director.getName() : getString(R.string.lbl_bracket_unknown));
+                        // Ephyra: no director (programmes, recordings): hide the column instead of "Unknown"
+                        firstRow = new InfoItem();
                     }
                     mDetailsOverviewRow.setInfoItem1(firstRow);
 
@@ -897,6 +904,7 @@ public class FullDetailsFragment extends Fragment implements RecordingIndicatorV
                     }
                 });
                 mRecordButton.setActivated(mProgramInfo.getTimerId() != null);
+                RecordButtonIconKt.setRecordingSet(mRecordButton, mProgramInfo.getTimerId() != null, R.drawable.ic_record, R.drawable.ic_record_red);
 
                 mDetailsOverviewRow.addAction(mRecordButton);
             }
@@ -941,6 +949,7 @@ public class FullDetailsFragment extends Fragment implements RecordingIndicatorV
                     }
                 });
                 mRecSeriesButton.setActivated(mProgramInfo.getSeriesTimerId() != null);
+                RecordButtonIconKt.setRecordingSet(mRecSeriesButton, mProgramInfo.getSeriesTimerId() != null, R.drawable.ic_record_series, R.drawable.ic_record_series_red);
 
                 mDetailsOverviewRow.addAction(mRecSeriesButton);
 

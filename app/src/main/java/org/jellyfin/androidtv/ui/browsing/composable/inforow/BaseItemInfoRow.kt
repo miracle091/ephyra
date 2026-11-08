@@ -2,12 +2,17 @@ package org.jellyfin.androidtv.ui.browsing.composable.inforow
 
 import android.content.Context
 import android.util.AttributeSet
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.AbstractComposeView
 import androidx.compose.ui.platform.LocalContext
@@ -19,6 +24,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import org.jellyfin.androidtv.R
 import org.jellyfin.androidtv.preference.UserPreferences
 import org.jellyfin.androidtv.ui.base.EphyraTheme
+import org.jellyfin.androidtv.ui.base.LocalEphyraPalette
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.composable.getResolutionName
 import org.jellyfin.androidtv.util.TimeUtils
@@ -336,11 +342,18 @@ fun BaseItemInfoRow(
 				}
 
 				if (item.isLive == true) {
+					// Ephyra: the design system's danger badge, like the player's LIVE badge
+					val palette = LocalEphyraPalette.current
 					InfoRowItem(
 						contentDescription = null,
-						colors = InfoRowColors.Default,
+						colors = palette.danger to palette.onDanger,
 					) {
-						Text(stringResource(R.string.lbl_live))
+						Box(
+							Modifier
+								.size(5.dp)
+								.background(palette.onDanger, CircleShape)
+						)
+						Text(stringResource(R.string.lbl_live).uppercase())
 					}
 				}
 

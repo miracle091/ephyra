@@ -1,10 +1,15 @@
-<vector android:height="24dp"
-    android:tint="@color/red"
-    android:viewportHeight="24"
-    android:viewportWidth="24"
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Ephyra: ic_record in the design system's danger colour, for a recording that is set. Not meant to be tinted. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="24dp"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
     <path
-        android:fillColor="@android:color/white"
-        android:pathData="M12,12m-8,0a8,8 0,1 1,16 0a8,8 0,1 1,-16 0" />
+        android:fillColor="#FF7A7A"
+        android:fillType="evenOdd"
+        android:pathData="M12,12m-9.5,0a9.5,9.5 0,1 1,19 0a9.5,9.5 0,1 1,-19 0M12,12m-7.8,0a7.8,7.8 0,1 0,15.6 0a7.8,7.8 0,1 0,-15.6 0" />
+    <path
+        android:fillColor="#FF7A7A"
+        android:pathData="M12,12m-4.8,0a4.8,4.8 0,1 1,9.6 0a4.8,4.8 0,1 1,-9.6 0" />
 </vector>
