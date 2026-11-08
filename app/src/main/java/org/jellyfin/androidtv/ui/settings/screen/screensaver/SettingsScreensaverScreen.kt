@@ -56,31 +56,6 @@ fun SettingsScreensaverScreen() {
 				modifier = Modifier.focusKey(Routes.CUSTOMIZATION_SCREENSAVER_TIMEOUT)
 			)
 		}
-
-		item {
-			var screensaverAgeRatingRequired by rememberPreference(userPreferences, UserPreferences.screensaverAgeRatingRequired)
-
-			ListButton(
-				headingContent = { Text(stringResource(R.string.pref_screensaver_ageratingrequired_title)) },
-				trailingContent = { Checkbox(checked = screensaverAgeRatingRequired) },
-				captionContent = { Text(stringResource(R.string.pref_screensaver_ageratingrequired_enabled)) },
-				onClick = { screensaverAgeRatingRequired = !screensaverAgeRatingRequired },
-				modifier = Modifier.focusKey("screensaver_age_rating_required")
-			)
-		}
-
-		item {
-			var screensaverAgeRatingMax by rememberPreference(userPreferences, UserPreferences.screensaverAgeRatingMax)
-			val caption = getScreensaverAgeRatingOptions()
-				.firstOrNull { (ageRating) -> ageRating == screensaverAgeRatingMax }
-				?.second.orEmpty()
-
-			ListButton(
-				headingContent = { Text(stringResource(R.string.pref_screensaver_ageratingmax)) },
-				captionContent = { Text(caption) },
-				onClick = { router.push(Routes.CUSTOMIZATION_SCREENSAVER_AGE_RATING) },
-				modifier = Modifier.focusKey(Routes.CUSTOMIZATION_SCREENSAVER_AGE_RATING)
-			)
-		}
+		// Ephyra: no age rating options, the screensaver is a clock and shows no titles
 	}
 }

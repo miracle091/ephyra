@@ -28,14 +28,14 @@ fun DreamView(
 		label = "DreamContentTransition"
 	) { content ->
 		when (content) {
-			DreamContent.Logo -> DreamContentLogo()
-			is DreamContent.LibraryShowcase -> DreamContentLibraryShowcase(content)
+			DreamContent.Clock -> DreamContentClock() // Ephyra
 			is DreamContent.NowPlaying -> DreamContentNowPlaying(content)
 		}
 	}
 
 	// Header overlay
 	DreamHeader(
-		showClock = showClock,
+		// Ephyra: the clock screen is the clock already
+		showClock = showClock && content !is DreamContent.Clock,
 	)
 }

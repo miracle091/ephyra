@@ -258,16 +258,6 @@ class UserPreferences(context: Context) : SharedPreferenceStore(
 		var screensaverInAppTimeout = longPreference("screensaver_inapp_timeout", 5.minutes.inWholeMilliseconds)
 
 		/**
-		 * Age rating used to filter items in the screensaver. Use -1 to disable (omits parameter from requests).
-		 */
-		var screensaverAgeRatingMax = intPreference("screensaver_agerating_max", 13)
-
-		/**
-		 * Whether items shown in the screensaver are required to have an age rating set.
-		 */
-		var screensaverAgeRatingRequired = booleanPreference("screensaver_agerating_required", true)
-
-		/**
 		 * Delay when starting video playback after loading the video player.
 		 */
 		var videoStartDelay = longPreference("video_start_delay", 0)
