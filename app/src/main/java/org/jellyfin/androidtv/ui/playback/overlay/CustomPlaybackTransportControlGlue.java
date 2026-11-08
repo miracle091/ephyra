@@ -46,6 +46,7 @@ import org.koin.java.KoinJavaComponent;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 
 public class CustomPlaybackTransportControlGlue extends PlaybackTransportControlGlue<VideoPlayerAdapter> {
 
@@ -80,6 +81,7 @@ public class CustomPlaybackTransportControlGlue extends PlaybackTransportControl
     private Runnable mRefreshViewVisibility;
 
     private LinearLayout mButtonRef;
+    private View mRowView;
 
     CustomPlaybackTransportControlGlue(Context context, VideoPlayerAdapter playerAdapter, PlaybackController playbackController) {
         super(context, playerAdapter);
@@ -128,6 +130,7 @@ public class CustomPlaybackTransportControlGlue extends PlaybackTransportControl
             @Override
             protected RowPresenter.ViewHolder createRowViewHolder(ViewGroup parent) {
                 RowPresenter.ViewHolder vh = super.createRowViewHolder(parent);
+                mRowView = vh.view;
 
                 ClockBehavior showClock = KoinJavaComponent.<UserPreferences>get(UserPreferences.class).get(UserPreferences.Companion.getClockBehavior());
 
@@ -297,7 +300,27 @@ public class CustomPlaybackTransportControlGlue extends PlaybackTransportControl
         }
     }
 
+    /**
+     * Ephyra: a live channel shows the start and the end of the programme on air under the bar, as clock times, in place of
+     * the elapsed and total time Leanback writes.
+     */
+    void showLiveProgramTimes(LocalDateTime start, LocalDateTime end) {
+        if (mRowView == null || start == null || end == null) return;
+
+        TextView current = mRowView.findViewById(androidx.leanback.R.id.current_time);
+        TextView total = mRowView.findViewById(androidx.leanback.R.id.total_time);
+        if (current == null || total == null) return;
+
+        current.setText(DateTimeExtensionsKt.getTimeFormatter(getContext()).format(start));
+        total.setText(DateTimeExtensionsKt.getTimeFormatter(getContext()).format(end));
+    }
+
     private void setEndTime() {
+        // the programme's end is already the total time of a live channel
+        if (mEndsText != null && playbackController.isLiveTv()) {
+            mEndsText.setText("");
+            return;
+        }
         if (mEndsText == null || getPlayerAdapter().getDuration() < 1)
             return;
         long msLeft = getPlayerAdapter().getDuration() - getPlayerAdapter().getCurrentPosition();
@@ -384,6 +407,34 @@ public class CustomPlaybackTransportControlGlue extends PlaybackTransportControl
         return super.onKey(v, keyCode, event);
     }
 
+    /**
+     * The button left or right of [focused] in the controls row, [focused] itself at either end, or null when [focused] is not
+     * one of the row's buttons.
+     */
+    private View neighbourButton(View focused, int direction) {
+        if (mRowView == null) return null;
+
+        ArrayList<View> buttons = new ArrayList<>();
+        collectButtons(mRowView.findViewById(androidx.leanback.R.id.controls_dock), buttons);
+        collectButtons(mRowView.findViewById(androidx.leanback.R.id.secondary_controls_dock), buttons);
+        int index = buttons.indexOf(focused);
+        if (index < 0) return null;
+
+        // the children are in order already, within each dock; the docks are in order too
+        int next = index + (direction == View.FOCUS_RIGHT ? 1 : -1);
+        return next >= 0 && next < buttons.size() ? buttons.get(next) : focused;
+    }
+
+    private void collectButtons(View view, ArrayList<View> out) {
+        if (view == null || view.getVisibility() != View.VISIBLE) return;
+        if (view.getId() == androidx.leanback.R.id.button && view.isFocusable()) {
+            out.add(view);
+        } else if (view instanceof ViewGroup) {
+            ViewGroup group = (ViewGroup) view;
+            for (int i = 0; i < group.getChildCount(); i++) collectButtons(group.getChildAt(i), out);
+        }
+    }
+
     private boolean moveFocus(View root, int keyCode) {
         final int direction;
         switch (keyCode) {
@@ -405,6 +456,16 @@ public class CustomPlaybackTransportControlGlue extends PlaybackTransportControl
 
         View focused = root.findFocus();
         if (focused == null) return false;
+
+        // Ephyra: in the buttons row, left and right step to the neighbouring button by position. The geometric focus search
+        // below skipped the last button of the live controls (the guide) on the Shield
+        if (direction == View.FOCUS_LEFT || direction == View.FOCUS_RIGHT) {
+            View neighbour = neighbourButton(focused, direction);
+            if (neighbour != null) {
+                if (neighbour != focused) neighbour.requestFocus(direction);
+                return true;
+            }
+        }
 
         View next = focused.focusSearch(direction);
         if (next != null && next != focused) next.requestFocus(direction);

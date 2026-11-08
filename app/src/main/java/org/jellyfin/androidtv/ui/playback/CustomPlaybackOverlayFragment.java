@@ -543,7 +543,8 @@ public class CustomPlaybackOverlayFragment extends Fragment implements LiveTvGui
                     }
                 }
 
-                if (playbackControllerContainer.getValue().getPlaybackController().isLiveTv() && keyCode == KeyEvent.KEYCODE_MENU || keyCode == KeyEvent.KEYCODE_BUTTON_Y) {
+                if (playbackControllerContainer.getValue().getPlaybackController().isLiveTv()
+                        && (keyCode == KeyEvent.KEYCODE_MENU || keyCode == KeyEvent.KEYCODE_BUTTON_Y)) {
                     showGuide();
                     return true;
                 }
@@ -800,8 +801,6 @@ public class CustomPlaybackOverlayFragment extends Fragment implements LiveTvGui
 
         tvGuideBinding.channels.removeAllViews();
         tvGuideBinding.programRows.removeAllViews();
-        tvGuideBinding.channelsStatus.setText("");
-        tvGuideBinding.filterStatus.setText("");
         final CustomPlaybackOverlayFragment self = this;
         TvManager.getProgramsAsync(this, mCurrentDisplayChannelStartNdx, mCurrentDisplayChannelEndNdx, mCurrentGuideStart, mCurrentGuideEnd, new EmptyResponse(getLifecycle()) {
             @Override
@@ -912,8 +911,6 @@ public class CustomPlaybackOverlayFragment extends Fragment implements LiveTvGui
                 tvGuideBinding.programRows.addView(new GuidePagingButton(requireContext(), guide, mCurrentDisplayChannelEndNdx + 1, label));
             }
 
-            tvGuideBinding.channelsStatus.setText(getResources().getString(R.string.lbl_tv_channel_status, displayedChannels, mAllChannels.size()));
-            tvGuideBinding.filterStatus.setText(getResources().getString(R.string.lbl_tv_filter_status, GUIDE_HOURS));
 
             tvGuideBinding.spinner.setVisibility(View.GONE);
 
@@ -1246,7 +1243,7 @@ public class CustomPlaybackOverlayFragment extends Fragment implements LiveTvGui
             tvGuideBinding.guideCurrentTitle.setText(current.getName());
 
             // Ephyra: the overline and title in text, after the design system's board, instead of the title logo
-            OsdHeader.bind(current, binding.itemOverline, binding.itemTitle);
+            OsdHeader.bind(current, binding.itemOverline, binding.itemTitle, binding.ephyraLiveBadge);
             // Ephyra: how the server delivers this stream and why
             PlayInfo.bind(binding.ephyraPlayInfo, playbackControllerContainer.getValue().getPlaybackController().getCurrentStreamInfo());
             // Ephyra: dimmer controls during HDR playback

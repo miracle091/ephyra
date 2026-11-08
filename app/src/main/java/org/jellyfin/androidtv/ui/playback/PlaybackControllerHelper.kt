@@ -225,3 +225,6 @@ private fun PlaybackController.addAskToSkipAction(mediaSegment: MediaSegmentDto)
 		.setDeleteAfterDelivery(false)
 		.send()
 }
+
+/** Ephyra: [channel] with [program] as the programme on air, for the live player's header and record button. */
+fun withCurrentProgram(channel: BaseItemDto, program: BaseItemDto): BaseItemDto = channel.copy(currentProgram = program)

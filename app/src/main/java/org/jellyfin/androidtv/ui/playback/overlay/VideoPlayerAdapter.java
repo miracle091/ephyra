@@ -5,6 +5,7 @@ import androidx.leanback.media.PlayerAdapter;
 
 import org.jellyfin.androidtv.auth.repository.UserRepository;
 import org.jellyfin.androidtv.ui.playback.CustomPlaybackOverlayFragment;
+import org.jellyfin.androidtv.ui.playback.LiveProgram;
 import org.jellyfin.androidtv.ui.playback.PlaybackController;
 import org.jellyfin.androidtv.util.Utils;
 import org.jellyfin.androidtv.util.apiclient.StreamHelper;
@@ -65,6 +66,12 @@ public class VideoPlayerAdapter extends PlayerAdapter {
 
     @Override
     public long getDuration() {
+        // Ephyra: a live channel's bar is the programme on air
+        if (playbackController.isLiveTv()) {
+            long programLength = LiveProgram.durationMs(playbackController.getCurrentProgramStart(), playbackController.getCurrentProgramEnd());
+            if (programLength > 0) return programLength;
+        }
+
         Long runTimeTicks = null;
         if (getCurrentMediaSource() != null) runTimeTicks = getCurrentMediaSource().getRunTimeTicks();
         if (runTimeTicks == null && getCurrentlyPlayingItem() != null) runTimeTicks = getCurrentlyPlayingItem().getRunTimeTicks();
@@ -74,7 +81,13 @@ public class VideoPlayerAdapter extends PlayerAdapter {
 
     @Override
     public long getCurrentPosition() {
-        return playbackController.getCurrentPosition();
+        long position = playbackController.getCurrentPosition();
+        if (playbackController.isLiveTv()) {
+            long programLength = LiveProgram.durationMs(playbackController.getCurrentProgramStart(), playbackController.getCurrentProgramEnd());
+            // never past the end of the programme, whatever the stream says
+            if (programLength > 0) return Math.max(0, Math.min(position, programLength));
+        }
+        return position;
     }
 
     @Override
@@ -90,6 +103,7 @@ public class VideoPlayerAdapter extends PlayerAdapter {
     void updateCurrentPosition() {
         getCallback().onCurrentPositionChanged(this);
         getCallback().onBufferedPositionChanged(this);
+        showLiveProgramTimes();
     }
 
     void updatePlayState() {
@@ -98,6 +112,14 @@ public class VideoPlayerAdapter extends PlayerAdapter {
 
     void updateDuration() {
         getCallback().onDurationChanged(this);
+        showLiveProgramTimes();
+    }
+
+    // Ephyra: Leanback writes mm:ss into the two times under the bar; a live channel shows the programme's clock times
+    private void showLiveProgramTimes() {
+        if (playbackController.isLiveTv() && leanbackOverlayFragment != null && leanbackOverlayFragment.getPlayerGlue() != null) {
+            leanbackOverlayFragment.getPlayerGlue().showLiveProgramTimes(playbackController.getCurrentProgramStart(), playbackController.getCurrentProgramEnd());
+        }
     }
 
     public boolean hasSubs() {

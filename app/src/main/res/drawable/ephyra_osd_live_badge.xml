@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Ephyra: the danger badge's background -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="@color/ephyra_osd_danger" />
+    <corners android:radius="4dp" />
+</shape>

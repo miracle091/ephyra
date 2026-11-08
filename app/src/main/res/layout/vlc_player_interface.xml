@@ -71,16 +71,35 @@
         android:paddingBottom="96dp"
         android:visibility="gone">
 
+        <!-- Ephyra: the live player's danger badge (OsdHeader.kt), gone for everything else -->
+        <TextView
+            android:id="@+id/ephyra_live_badge"
+            style="@style/TextAppearance.Ephyra.OsdBadge"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/ephyra_osd_badge_height"
+            android:background="@drawable/ephyra_osd_live_badge"
+            android:drawableStart="@drawable/ephyra_osd_live_dot"
+            android:drawablePadding="4dp"
+            android:gravity="center"
+            android:paddingHorizontal="6dp"
+            android:text="@string/lbl_live"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <TextView
             android:id="@+id/item_overline"
             style="@style/TextAppearance.Ephyra.OsdOverline"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
             android:layout_marginEnd="24dp"
             android:ellipsize="end"
+            android:gravity="center_vertical"
             android:maxLines="1"
             app:layout_constraintEnd_toStartOf="@id/textClock"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toEndOf="@id/ephyra_live_badge"
+            app:layout_goneMarginStart="0dp"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Series · S2:E4" />
 

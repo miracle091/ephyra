@@ -49,6 +49,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.List;
 
 import kotlin.Lazy;
@@ -122,6 +123,15 @@ public class PlaybackController implements PlaybackControllerNotifiable {
     private int playbackRetries = 0;
     private long lastPlaybackError = 0;
 
+    // Ephyra: live streams are retried with a pause before an error counts (LiveStreamRetry)
+    private int liveStreamRetries = 0;
+    private final Runnable liveRetryRunnable = () -> {
+        if (mFragment == null || !hasInitializedVideoManager()) return;
+        play(mCurrentPosition);
+    };
+    // Ephyra: when the programme on air was last looked up, to refresh it once its end time has passed
+    private long lastProgramRefresh = 0;
+
     private Display.Mode[] mDisplayModes;
     private RefreshRateSwitchingBehavior refreshRateSwitchingBehavior = RefreshRateSwitchingBehavior.DISABLED;
 
@@ -165,6 +175,9 @@ public class PlaybackController implements PlaybackControllerNotifiable {
     public void setItems(List<BaseItemDto> items) {
         mItems = items;
         mCurrentIndex = 0;
+        // a new channel starts with fresh live stream attempts
+        liveStreamRetries = 0;
+        if (mHandler != null) mHandler.removeCallbacks(liveRetryRunnable);
     }
 
     public float getPlaybackSpeed() {
@@ -253,7 +266,25 @@ public class PlaybackController implements PlaybackControllerNotifiable {
         return mPlaybackState == PlaybackState.PLAYING && hasInitializedVideoManager() && mVideoManager.isPlaying();
     }
 
+    /**
+     * Ephyra: tears the failed live stream down and opens it again after a short pause, a few times, before the failure
+     * counts as a playback error. Returns false when this is not a live stream or the attempts are used up.
+     */
+    private boolean scheduleLiveStreamRetry() {
+        if (mHandler == null || mFragment == null || !LiveStreamRetry.shouldRetry(isLiveTv, liveStreamRetries)) return false;
+
+        liveStreamRetries++;
+        long delay = LiveStreamRetry.delayMs(liveStreamRetries);
+        Timber.i("Live stream failed - retry %d of %d in %d ms", liveStreamRetries, LiveStreamRetry.MAX_ATTEMPTS, delay);
+        stop();
+        mHandler.removeCallbacks(liveRetryRunnable);
+        mHandler.postDelayed(liveRetryRunnable, delay);
+        return true;
+    }
+
     public void playerErrorEncountered() {
+        if (scheduleLiveStreamRetry()) return;
+
         // reset the retry count if it's been more than 30s since previous error
         if (playbackRetries > 0 && Instant.now().toEpochMilli() - lastPlaybackError > 30000) {
             Timber.i("playback stabilized - retry count reset to 0 from %s", playbackRetries);
@@ -376,6 +407,7 @@ public class PlaybackController implements PlaybackControllerNotifiable {
 
         if (isLiveTv && mCurrentProgramStart != null) {
             newPos = getRealTimeProgress();
+            refreshProgramWhenEnded();
             // live tv
         } else if (hasInitializedVideoManager()) {
             if (currentSkipPos != 0 || (!isPlaying() && mSeekPosition != -1)) {
@@ -572,6 +604,9 @@ public class PlaybackController implements PlaybackControllerNotifiable {
                 @Override
                 public void onError(Exception exception) {
                     if (!isActive()) return;
+                    // Ephyra: the server can fail for a moment right after a channel switch
+                    Timber.e(exception, "Unable to get the live stream info");
+                    if (scheduleLiveStreamRetry()) return;
                     handlePlaybackInfoError(exception);
                 }
             });
@@ -917,6 +952,8 @@ public class PlaybackController implements PlaybackControllerNotifiable {
 
     private void resetPlayerErrors() {
         playbackRetries = 0;
+        liveStreamRetries = 0;
+        if (mHandler != null) mHandler.removeCallbacks(liveRetryRunnable);
     }
 
     private void clearPlaybackSessionOptions() {
@@ -1090,11 +1127,37 @@ public class PlaybackController implements PlaybackControllerNotifiable {
                 if (program != null) {
                     mCurrentProgramEnd = program.getEndDate();
                     mCurrentProgramStart = program.getStartDate();
+                    // Ephyra: the header, the record button and the times follow the programme on air
+                    BaseItemDto current = getCurrentlyPlayingItem();
+                    if (current != null && current.getId().equals(updatedChannel.getId())) {
+                        List<BaseItemDto> items = new ArrayList<>(mItems);
+                        items.set(mCurrentIndex, PlaybackControllerHelperKt.withCurrentProgram(current, program));
+                        mItems = items;
+                    }
                     if (mFragment != null) mFragment.updateDisplay();
                 }
                 return null;
             });
         }
+    }
+
+    @Nullable
+    public LocalDateTime getCurrentProgramStart() {
+        return mCurrentProgramStart;
+    }
+
+    @Nullable
+    public LocalDateTime getCurrentProgramEnd() {
+        return mCurrentProgramEnd;
+    }
+
+    /** Ephyra: looks the next programme up once the one on air has ended, at most every 15 seconds. */
+    private void refreshProgramWhenEnded() {
+        long now = Instant.now().toEpochMilli();
+        if (!LiveProgram.hasEnded(mCurrentProgramEnd, LocalDateTime.now()) || now - lastProgramRefresh < 15000) return;
+
+        lastProgramRefresh = now;
+        updateTvProgramInfo();
     }
 
     private long getRealTimeProgress() {
@@ -1236,6 +1299,7 @@ public class PlaybackController implements PlaybackControllerNotifiable {
             }
 
             mPlaybackState = PlaybackState.PLAYING;
+            liveStreamRetries = 0;
             interactionTracker.notifyStart(getCurrentlyPlayingItem());
             mCurrentTranscodeStartTime = mCurrentStreamInfo.getPlayMethod() == PlayMethod.TRANSCODE ? Instant.now().toEpochMilli() : 0;
             startReportLoop();

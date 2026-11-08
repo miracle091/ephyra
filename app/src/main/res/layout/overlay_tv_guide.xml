@@ -147,33 +147,6 @@
         android:layout_alignEnd="@+id/guideInfoRow"
         android:fontFamily="@font/atkinson_hyperlegible_next_family" />
 
-    <TextView
-        android:id="@+id/channelsStatus"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignStart="@id/guideCurrentTitle"
-        android:layout_alignParentBottom="true"
-        android:layout_marginStart="@dimen/ephyra_side_margin"
-        android:layout_marginBottom="4dp"
-        android:textColor="?attr/controlIconForegroundInactive"
-        android:textSize="12sp"
-        android:fontFamily="@font/atkinson_hyperlegible_next_family" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/filterStatus"
-        android:layout_alignEnd="@+id/programVScroller"
-        android:gravity="end"
-        android:layout_alignRight="@+id/programVScroller"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="4dp"
-        android:layout_marginEnd="@dimen/ephyra_side_margin"
-        android:textStyle="bold"
-        android:textSize="12sp"
-        android:textColor="?attr/controlIconForegroundInactive"
-        android:fontFamily="@font/atkinson_hyperlegible_next_family" />
-
     <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
