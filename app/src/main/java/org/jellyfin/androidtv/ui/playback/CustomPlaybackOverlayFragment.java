@@ -1244,6 +1244,7 @@ public class CustomPlaybackOverlayFragment extends Fragment implements LiveTvGui
 
             // Ephyra: the overline and title in text, after the design system's board, instead of the title logo
             OsdHeader.bind(current, binding.itemOverline, binding.itemTitle, binding.ephyraLiveBadge);
+            updateNextProgram();
             // Ephyra: how the server delivers this stream and why
             PlayInfo.bind(binding.ephyraPlayInfo, playbackControllerContainer.getValue().getPlaybackController().getCurrentStreamInfo());
             // Ephyra: dimmer controls during HDR playback
@@ -1256,6 +1257,13 @@ public class CustomPlaybackOverlayFragment extends Fragment implements LiveTvGui
                 prepareChapterAdapter();
             }
         }
+    }
+
+    /** Ephyra: the "Next:" line under the programme on air; hidden outside live TV and when nothing follows. */
+    public void updateNextProgram() {
+        if (binding == null) return;
+        PlaybackController controller = playbackControllerContainer.getValue().getPlaybackController();
+        NextProgram.bind(binding.ephyraNextProgram, controller.isLiveTv() ? controller.getNextProgram() : null);
     }
 
     public void clearSkipOverlay() {

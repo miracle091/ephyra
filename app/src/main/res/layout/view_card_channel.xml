@@ -1,50 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="200dp"
-    android:layout_height="wrap_content"
+<!-- Ephyra: a channel of the player's quick channel changer, styled like the Live TV guide's cells (the surface and the focus ring
+     come from ChannelCardView): the number in mono and the name over the programme on air with its red dot, the times in mono and
+     the bar that runs with the clock -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="@color/lb_basic_card_info_bg_color"
-    android:padding="14dp"
-    android:gravity="center">
+    android:layout_width="220dp"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingHorizontal="16dp"
+    android:paddingVertical="14dp">
 
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        tools:text="WBTV 3.1"
         android:id="@+id/name"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true"
-        android:maxLines="1"
-        android:ellipsize="end" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        tools:text="Bewitched"
-        android:id="@+id/program"
-        android:layout_below="@+id/name"
-        android:layout_alignParentStart="true"
-        android:ellipsize="end"
-        android:maxLines="1" />
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        tools:text="9:00am - 9:30am"
-        android:id="@+id/time"
-        android:layout_below="@+id/program"
-        android:layout_alignParentStart="true" />
-    <ProgressBar
-        style="@style/overlay_progress"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/progress"
-        android:layout_below="@+id/time"
-        android:maxHeight="5sp"
-        android:max="100"
-        android:progress="60"
-        android:layout_marginTop="2dp" />
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="?attr/headerTextColor"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        tools:text="6 · Italia 1" />
 
-</RelativeLayout>
+    <TextView
+        android:id="@+id/program"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:drawablePadding="8dp"
+        android:ellipsize="end"
+        android:gravity="center_vertical"
+        android:maxLines="1"
+        android:textColor="?attr/headerTextColor"
+        android:textSize="14sp"
+        tools:text="Bewitched" />
+
+    <TextView
+        android:id="@+id/time"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:maxLines="1"
+        android:textColor="?attr/controlIconForegroundInactive"
+        android:textSize="12sp"
+        tools:text="9:00 AM - 9:30 AM" />
+
+    <ProgressBar
+        android:id="@+id/progress"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:layout_marginTop="8dp"
+        android:max="1000"
+        android:progressDrawable="@drawable/ephyra_guide_now_bar"
+        tools:progress="600" />
+</LinearLayout>

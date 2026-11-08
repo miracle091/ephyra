@@ -15,11 +15,13 @@ import org.jellyfin.androidtv.util.sdk.start
 import org.jellyfin.sdk.api.client.ApiClient
 import org.jellyfin.sdk.api.client.extensions.liveTvApi
 import org.jellyfin.sdk.model.api.BaseItemDto
+import org.jellyfin.sdk.model.api.ItemSortBy
 import org.jellyfin.sdk.model.api.MediaSegmentDto
 import org.jellyfin.sdk.model.api.MediaStreamType
 import org.jellyfin.sdk.model.api.SubtitleDeliveryMethod
 import org.koin.android.ext.android.inject
 import timber.log.Timber
+import java.time.LocalDateTime
 import java.util.UUID
 
 fun PlaybackController.getLiveTvChannel(
@@ -228,3 +230,28 @@ private fun PlaybackController.addAskToSkipAction(mediaSegment: MediaSegmentDto)
 
 /** Ephyra: [channel] with [program] as the programme on air, for the live player's header and record button. */
 fun withCurrentProgram(channel: BaseItemDto, program: BaseItemDto): BaseItemDto = channel.copy(currentProgram = program)
+
+/** Ephyra: looks up the programme that follows the one ending at [after] on a channel, for the live player's "Next:" line. */
+fun PlaybackController.loadNextProgram(
+	channelId: UUID,
+	after: LocalDateTime,
+	callback: (next: BaseItemDto?) -> Unit,
+) {
+	val api by fragment.inject<ApiClient>()
+
+	fragment.lifecycleScope.launch {
+		val programs = runCatching {
+			withContext(Dispatchers.IO) {
+				api.liveTvApi.getLiveTvPrograms(
+					channelIds = listOf(channelId),
+					enableImages = false,
+					sortBy = setOf(ItemSortBy.START_DATE),
+					minStartDate = after,
+					limit = 3,
+				).content.items
+			}
+		}.getOrNull()
+
+		callback(NextProgram.pick(programs, after))
+	}
+}

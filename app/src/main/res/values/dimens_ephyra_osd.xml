@@ -9,6 +9,7 @@
     <dimen name="lb_playback_controls_padding_bottom" tools:override="true">1dp</dimen>
     <dimen name="ephyra_osd_button">48dp</dimen>
     <dimen name="ephyra_osd_icon">24dp</dimen>
+    <dimen name="ephyra_osd_pill_gap">8dp</dimen>
     <dimen name="ephyra_osd_badge_height">20dp</dimen>
     <dimen name="ephyra_safe_y">27dp</dimen>
     <!-- Close to the bottom edge, as the user asked: the icons sit 16dp from it, the focus circle 4dp -->

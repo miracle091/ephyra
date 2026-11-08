@@ -51,6 +51,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import kotlin.Lazy;
 import timber.log.Timber;
@@ -131,6 +132,11 @@ public class PlaybackController implements PlaybackControllerNotifiable {
     };
     // Ephyra: when the programme on air was last looked up, to refresh it once its end time has passed
     private long lastProgramRefresh = 0;
+    // Ephyra: the live stream of a failed attempt stays open on the server until the retry has its own (see stopForLiveRetry)
+    private BaseItemDto retiredLiveItem = null;
+    private StreamInfo retiredLiveStream = null;
+    // Ephyra: the programme after the one on air, for the "Next:" line of the live player's header
+    private BaseItemDto mNextProgram = null;
 
     private Display.Mode[] mDisplayModes;
     private RefreshRateSwitchingBehavior refreshRateSwitchingBehavior = RefreshRateSwitchingBehavior.DISABLED;
@@ -177,6 +183,7 @@ public class PlaybackController implements PlaybackControllerNotifiable {
         mCurrentIndex = 0;
         // a new channel starts with fresh live stream attempts
         liveStreamRetries = 0;
+        mNextProgram = null;
         if (mHandler != null) mHandler.removeCallbacks(liveRetryRunnable);
     }
 
@@ -267,8 +274,9 @@ public class PlaybackController implements PlaybackControllerNotifiable {
     }
 
     /**
-     * Ephyra: tears the failed live stream down and opens it again after a short pause, a few times, before the failure
-     * counts as a playback error. Returns false when this is not a live stream or the attempts are used up.
+     * Ephyra: stops the failed live stream locally and opens it again after a short pause, a few times, before the failure
+     * counts as a playback error. The server's live stream and transcode are not closed meanwhile. Returns false when this
+     * is not a live stream or the attempts are used up.
      */
     private boolean scheduleLiveStreamRetry() {
         if (mHandler == null || mFragment == null || !LiveStreamRetry.shouldRetry(isLiveTv, liveStreamRetries)) return false;
@@ -276,10 +284,41 @@ public class PlaybackController implements PlaybackControllerNotifiable {
         liveStreamRetries++;
         long delay = LiveStreamRetry.delayMs(liveStreamRetries);
         Timber.i("Live stream failed - retry %d of %d in %d ms", liveStreamRetries, LiveStreamRetry.MAX_ATTEMPTS, delay);
-        stop();
+        stopForLiveRetry();
         mHandler.removeCallbacks(liveRetryRunnable);
         mHandler.postDelayed(liveRetryRunnable, delay);
         return true;
+    }
+
+    /**
+     * Ephyra: like stop(), but without telling the server that playback ended. Reporting the stop closes the channel's live
+     * stream and kills its transcode, so every retry made the server start the same transcode from scratch (and it answered
+     * HTTP 500 right after a channel switch). The stream of the failed attempt is kept in retiredLiveStream and reported
+     * stopped once the retry has opened its own, so the server never counts zero viewers in between.
+     */
+    private void stopForLiveRetry() {
+        refreshCurrentPosition();
+        Timber.i("stop for live retry called at %s", mCurrentPosition);
+        stopReportLoop();
+        if (mPlaybackState != PlaybackState.IDLE && mPlaybackState != PlaybackState.UNDEFINED) {
+            mPlaybackState = PlaybackState.IDLE;
+
+            if (mVideoManager != null && mVideoManager.isPlaying()) mVideoManager.stopPlayback();
+            if (mCurrentStreamInfo != null && getCurrentlyPlayingItem() != null) {
+                reportRetiredLiveStream();
+                retiredLiveItem = getCurrentlyPlayingItem();
+                retiredLiveStream = mCurrentStreamInfo;
+            }
+            clearPlaybackSessionOptions();
+        }
+    }
+
+    private void reportRetiredLiveStream() {
+        if (retiredLiveStream != null && retiredLiveItem != null && mFragment != null) {
+            reportingHelper.getValue().reportStopped(mFragment, retiredLiveItem, retiredLiveStream, 0L);
+        }
+        retiredLiveItem = null;
+        retiredLiveStream = null;
     }
 
     public void playerErrorEncountered() {
@@ -666,6 +705,8 @@ public class PlaybackController implements PlaybackControllerNotifiable {
 
         mStartPosition = position;
         mCurrentStreamInfo = response;
+        // Ephyra: the retry has its own live stream now, the one of the failed attempt can go
+        reportRetiredLiveStream();
         mCurrentOptions.setMediaSourceId(response.getMediaSource().getId());
 
         if (response.getMediaUrl() == null) {
@@ -911,6 +952,7 @@ public class PlaybackController implements PlaybackControllerNotifiable {
     }
 
     public void stop() {
+        reportRetiredLiveStream();
         refreshCurrentPosition();
         Timber.i("stop called at %s", mCurrentPosition);
         stopReportLoop();
@@ -1135,10 +1177,31 @@ public class PlaybackController implements PlaybackControllerNotifiable {
                         mItems = items;
                     }
                     if (mFragment != null) mFragment.updateDisplay();
+                    loadNextProgramFor(updatedChannel.getId(), program.getEndDate());
                 }
                 return null;
             });
         }
+    }
+
+    /** Ephyra: fetches the programme after the one on air and shows it in the header, unless the channel changed meanwhile. */
+    private void loadNextProgramFor(UUID channelId, @Nullable LocalDateTime after) {
+        if (after == null) {
+            mNextProgram = null;
+            return;
+        }
+        PlaybackControllerHelperKt.loadNextProgram(this, channelId, after, next -> {
+            BaseItemDto current = getCurrentlyPlayingItem();
+            if (current == null || !current.getId().equals(channelId)) return null;
+            mNextProgram = next;
+            if (mFragment != null) mFragment.updateNextProgram();
+            return null;
+        });
+    }
+
+    @Nullable
+    public BaseItemDto getNextProgram() {
+        return mNextProgram;
     }
 
     @Nullable

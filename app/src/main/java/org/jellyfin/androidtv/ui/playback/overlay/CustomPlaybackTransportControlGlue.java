@@ -7,7 +7,9 @@ import android.os.Handler;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.LayoutInflater;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -83,6 +85,10 @@ public class CustomPlaybackTransportControlGlue extends PlaybackTransportControl
     private LinearLayout mButtonRef;
     private View mRowView;
 
+    // Ephyra: the live player's text buttons (Guide, Record, Channels) sit in a dock of their own next to the round ones
+    private ViewGroup mPillsDock;
+    private View mRecordPill;
+
     CustomPlaybackTransportControlGlue(Context context, VideoPlayerAdapter playerAdapter, PlaybackController playbackController) {
         super(context, playerAdapter);
         this.playbackController = playbackController;
@@ -147,6 +153,9 @@ public class CustomPlaybackTransportControlGlue extends PlaybackTransportControl
                     ViewGroup endsDock = vh.view.findViewById(R.id.ephyra_ends_dock);
                     endsDock.addView(mEndsText);
                 }
+
+                mPillsDock = vh.view.findViewById(R.id.ephyra_pills_dock);
+                updatePills();
 
                 return vh;
             }
@@ -244,18 +253,9 @@ public class CustomPlaybackTransportControlGlue extends PlaybackTransportControl
             primaryActionsAdapter.add(skipNextAction);
         }
 
-        if (playerAdapter.isLiveTv()) {
-            primaryActionsAdapter.add(channelBarChannelAction);
-            primaryActionsAdapter.add(guideAction);
-        }
-
         // Secondary Items
         if (playerAdapter.isLiveTv()) {
             secondaryActionsAdapter.add(previousLiveTvChannelAction);
-            if (playerAdapter.canRecordLiveTv()) {
-                secondaryActionsAdapter.add(recordAction);
-                recordingStateChanged();
-            }
         }
 
         if (playerAdapter.hasSubs()) {
@@ -276,6 +276,55 @@ public class CustomPlaybackTransportControlGlue extends PlaybackTransportControl
         }
 
         secondaryActionsAdapter.add(zoomAction);
+
+        updatePills();
+    }
+
+    /**
+     * Ephyra: the live player's Guide, Record and Channels actions as pill buttons with a text label, after the design system's
+     * "Live TV" board. Leanback's control bar spaces its buttons by the distance between their centres, which would overlap
+     * wide pills, so they are views of their own in the controls row. Each is a normal focusable button for the glue's focus steps.
+     */
+    private void updatePills() {
+        if (mPillsDock == null) return;
+
+        VideoPlayerAdapter playerAdapter = getPlayerAdapter();
+        boolean live = playerAdapter.isLiveTv();
+        boolean record = live && playerAdapter.canRecordLiveTv();
+        // The programme on air is refreshed now and then: keep the pills (and the focus on one) when the set is the same
+        if (mPillsDock.getChildCount() == (live ? (record ? 3 : 2) : 0) && (mRecordPill != null) == record) {
+            if (record) recordingStateChanged();
+            return;
+        }
+
+        mPillsDock.removeAllViews();
+        mRecordPill = null;
+        if (!live) return;
+
+        addPill(guideAction, getContext().getString(R.string.ephyra_osd_guide));
+        if (record) {
+            mRecordPill = addPill(recordAction, null);
+            recordingStateChanged();
+        }
+        addPill(channelBarChannelAction, getContext().getString(R.string.ephyra_osd_channels));
+    }
+
+    private View addPill(CustomAction action, String label) {
+        View pill = LayoutInflater.from(getContext()).inflate(R.layout.ephyra_osd_pill, mPillsDock, false);
+        if (mPillsDock.getChildCount() > 0) {
+            ((LinearLayout.LayoutParams) pill.getLayoutParams()).setMarginStart(
+                    getContext().getResources().getDimensionPixelSize(R.dimen.ephyra_osd_pill_gap));
+        }
+        bindPill(pill, action, label);
+        pill.setOnClickListener(view -> onCustomActionClicked(action, view));
+        mPillsDock.addView(pill);
+        return pill;
+    }
+
+    private void bindPill(View pill, CustomAction action, String label) {
+        ((ImageView) pill.findViewById(R.id.icon)).setImageDrawable(action.getDrawable(action.getIndex()));
+        if (label != null) ((TextView) pill.findViewById(R.id.label)).setText(label);
+        pill.setContentDescription(action.getLabel1());
     }
 
     @Override
@@ -356,12 +405,12 @@ public class CustomPlaybackTransportControlGlue extends PlaybackTransportControl
     }
 
     void recordingStateChanged() {
-        if (getPlayerAdapter().isRecording()) {
-            recordAction.setIndex(RecordAction.INDEX_RECORDING);
-        } else {
-            recordAction.setIndex(RecordAction.INDEX_INACTIVE);
+        boolean recording = getPlayerAdapter().isRecording();
+        recordAction.setIndex(recording ? RecordAction.INDEX_RECORDING : RecordAction.INDEX_INACTIVE);
+        // Ephyra: the Record pill follows in place, so it keeps the focus
+        if (mRecordPill != null) {
+            bindPill(mRecordPill, recordAction, getContext().getString(recording ? R.string.ephyra_osd_recording : R.string.lbl_record));
         }
-        notifyActionChanged(recordAction);
     }
 
     void updatePlayState() {
@@ -416,6 +465,7 @@ public class CustomPlaybackTransportControlGlue extends PlaybackTransportControl
 
         ArrayList<View> buttons = new ArrayList<>();
         collectButtons(mRowView.findViewById(androidx.leanback.R.id.controls_dock), buttons);
+        collectButtons(mPillsDock, buttons);
         collectButtons(mRowView.findViewById(androidx.leanback.R.id.secondary_controls_dock), buttons);
         int index = buttons.indexOf(focused);
         if (index < 0) return null;

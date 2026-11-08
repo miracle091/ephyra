@@ -94,4 +94,9 @@
     <!-- Long pause screen (integration/dream/composable/DreamContentPaused.kt) -->
     <string name="ephyra_paused">In pausa</string>
     <string name="ephyra_paused_hint">Premi un tasto per tornare al player</string>
+    <!-- Live TV player (ui/playback/NextProgram.kt, overlay/CustomPlaybackTransportControlGlue.java) -->
+    <string name="ephyra_osd_next_program">Dopo: %1$s · %2$s</string>
+    <string name="ephyra_osd_guide">Guida TV</string>
+    <string name="ephyra_osd_channels">Canali</string>
+    <string name="ephyra_osd_recording">In registrazione</string>
 </resources>
