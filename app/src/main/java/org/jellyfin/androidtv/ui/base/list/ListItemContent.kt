@@ -43,7 +43,7 @@ fun ListItemContent(
 						.sizeIn(minWidth = 24.dp),
 					contentAlignment = Alignment.Center,
 					content = {
-						ProvideTextStyle(LocalTextStyle.current.copy(color = JellyfinTheme.colorScheme.listCaption)) {
+						ProvideTextStyle(LocalTextStyle.current.copy(color = JellyfinTheme.colorScheme.listHeadline)) {
 							content()
 						}
 					}
@@ -81,7 +81,12 @@ fun ListItemContent(
 					modifier = Modifier
 						.sizeIn(minWidth = 24.dp),
 					contentAlignment = Alignment.Center,
-					content = { content() }
+					content = {
+						// Trailing values are secondary text, like the caption
+						ProvideTextStyle(LocalTextStyle.current.copy(color = JellyfinTheme.colorScheme.listCaption)) {
+							content()
+						}
+					}
 				)
 			}
 		}

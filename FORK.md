@@ -121,6 +121,7 @@ The status column shows how far each change has gone. A change becomes "done" wh
 | UI | Icons for an active state follow the theme's accent instead of red or the button grey: active shuffle, repeat and grid filters, the live TV guide's favourite heart, checked checkboxes and radio buttons | done |
 | UI | A video left paused for 2 minutes shows a long pause screen instead of the screensaver: the title's backdrop dimmed, the player's header and progress (position, end time, duration) and a hint to return; after 10 minutes the picture dims further and the text shifts against burn-in. The screensaver opens on its content at once instead of fading from the clock, and its clock sits where the home toolbar's does | done |
 | UI | The home spotlight shows the community rating with the gold star and the critics' rating with the Rotten Tomatoes logo before the year and runtime, as in the details' info row | done |
+| UI | Settings follow the home spotlight's scale: each screen's header has an accent overline, a 28sp title and a 14sp caption; the panel sits on the theme's first surface, rows have medium corners and wider padding, and trailing values read as secondary text | done |
 
 ## What changes for users
 

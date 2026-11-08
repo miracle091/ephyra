@@ -58,8 +58,8 @@ fun ListControl(
 	Box(
 		modifier = modifier
 			.fillMaxWidth()
-			.background(backgroundColor, LocalShapes.current.large)
-			.clip(LocalShapes.current.large)
+			.background(backgroundColor, LocalShapes.current.medium)
+			.clip(LocalShapes.current.medium)
 			.alpha(if (enabled) 1f else 0.4f),
 	) {
 		ListItemContent(
