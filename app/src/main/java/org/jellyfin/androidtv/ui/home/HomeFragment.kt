@@ -70,6 +70,7 @@ class HomeFragment : Fragment() {
 							}
 						}
 					}
+					.homeBottomFade() // Ephyra
 					.fillMaxSize(),
 				maxLifecycle = Lifecycle.State.RESUMED,
 				onUpdate = { fragment ->
