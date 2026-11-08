@@ -141,32 +141,6 @@
         android:maxLines="5"
         android:fontFamily="@font/atkinson_hyperlegible_next_family" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/channelsStatus"
-        android:layout_alignStart="@+id/channelScroller"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="@dimen/ephyra_safe_y"
-        android:textSize="12sp"
-        android:textColor="?attr/controlIconForegroundInactive"
-        android:fontFamily="@font/atkinson_hyperlegible_next_family" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/filterStatus"
-        android:layout_alignEnd="@+id/programVScroller"
-        android:gravity="end"
-        android:layout_alignRight="@+id/programVScroller"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="@dimen/ephyra_safe_y"
-        android:layout_marginEnd="@dimen/ephyra_side_margin"
-        android:textStyle="bold"
-        android:textSize="12sp"
-        android:textColor="?attr/controlIconForegroundInactive"
-        android:fontFamily="@font/atkinson_hyperlegible_next_family" />
-
     <!-- Ephyra: the video player's icon button (48dp, 24dp icon, solid ink circle when focused) -->
     <ImageButton
         android:id="@+id/optionsButton"

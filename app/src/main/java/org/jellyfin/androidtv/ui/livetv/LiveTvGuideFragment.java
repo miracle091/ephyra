@@ -70,8 +70,6 @@ public class LiveTvGuideFragment extends Fragment implements LiveTvGuide, View.O
 
     private TextView mDisplayDate;
     private TextView mTitle;
-    private TextView mChannelStatus;
-    private TextView mFilterStatus;
     private TextView mSummary;
     private AsyncImageView mImage;
     private LinearLayout mInfoRow;
@@ -119,8 +117,6 @@ public class LiveTvGuideFragment extends Fragment implements LiveTvGuide, View.O
         mDisplayDate = binding.displayDate;
         mTitle = binding.title;
         mSummary = binding.summary;
-        mChannelStatus = binding.channelsStatus;
-        mFilterStatus = binding.filterStatus;
         mInfoRow = binding.infoRow;
         mImage = binding.programImage;
         mChannels = binding.channels;
@@ -253,7 +249,29 @@ public class LiveTvGuideFragment extends Fragment implements LiveTvGuide, View.O
 
         mFilters.load();
         doLoad();
+
+        mHandler.removeCallbacks(nowTicker);
+        mHandler.postDelayed(nowTicker, NOW_TICK_MS);
     }
+
+    // Ephyra: moves the on-air bars with the clock while the guide is open, without reloading it
+    private static final long NOW_TICK_MS = 30_000L;
+    private final Runnable nowTicker = new Runnable() {
+        @Override
+        public void run() {
+            if (!getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED) || mProgramRows == null) return;
+            for (int i = 0; i < mProgramRows.getChildCount(); i++) {
+                View row = mProgramRows.getChildAt(i);
+                if (!(row instanceof LinearLayout)) continue;
+                LinearLayout cells = (LinearLayout) row;
+                for (int j = 0; j < cells.getChildCount(); j++) {
+                    View cell = cells.getChildAt(j);
+                    if (cell instanceof ProgramGridCell) ((ProgramGridCell) cell).refreshNow();
+                }
+            }
+            mHandler.postDelayed(this, NOW_TICK_MS);
+        }
+    };
 
     protected void doLoad() {
         if (TvManager.shouldForceReload() || mCurrentGuideStart.plusMinutes(30).isBefore(LocalDateTime.now()) || mChannels.getChildCount() == 0) {
@@ -267,6 +285,7 @@ public class LiveTvGuideFragment extends Fragment implements LiveTvGuide, View.O
     public void onPause() {
         super.onPause();
 
+        mHandler.removeCallbacks(nowTicker);
         if (mDisplayProgramsTask != null) {
             mDisplayProgramsTask.cancel();
         }
@@ -476,8 +495,6 @@ public class LiveTvGuideFragment extends Fragment implements LiveTvGuide, View.O
     private void loadProgramData() {
         mProgramRows.removeAllViews();
         mChannels.removeAllViews();
-        mChannelStatus.setText("");
-        mFilterStatus.setText("");
         TvManager.getProgramsAsync(this, mCurrentDisplayChannelStartNdx, mCurrentDisplayChannelEndNdx, mCurrentGuideStart, mCurrentGuideEnd, new EmptyResponse(getLifecycle()) {
             @Override
             public void onResponse() {
@@ -592,9 +609,6 @@ public class LiveTvGuideFragment extends Fragment implements LiveTvGuide, View.O
                 mProgramRows.addView(new GuidePagingButton(requireContext(), LiveTvGuideFragment.this, mCurrentDisplayChannelEndNdx + 1, label));
             }
 
-            mChannelStatus.setText(displayedChannels+" of "+mAllChannels.size()+" channels");
-            mFilterStatus.setText(mFilters.toString() + " for "+getGuideHours()+" hours");
-            mFilterStatus.setTextColor(Utils.getThemeColor(requireContext(), mFilters.any() ? android.R.attr.colorAccent : R.attr.controlIconForegroundInactive));
 
             mResetButton.setVisibility(mCurrentGuideStart.isAfter(LocalDateTime.now()) ? View.VISIBLE : View.GONE); // show reset button if paged ahead
 

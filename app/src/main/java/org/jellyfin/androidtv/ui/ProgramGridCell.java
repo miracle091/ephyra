@@ -61,7 +61,7 @@ public class ProgramGridCell extends RelativeLayout implements RecordingIndicato
         if (program.getStartDate() != null && program.getEndDate() != null) {
             LocalDateTime localStart = program.getStartDate();
             if (localStart.plusMinutes(1).isBefore(activity.getCurrentLocalStartDate())) {
-                mProgramName.setText("<< "+mProgramName.getText());
+                // Ephyra: no "<<" before the name; the start time under it tells the programme began earlier
                 TextView time = new TextView(context);
                 time.setTypeface(GuideStyle.monoTypeface(context));
                 time.setTextColor(Utils.getThemeColor(context, R.attr.controlIconForegroundInactive));
@@ -100,15 +100,7 @@ public class ProgramGridCell extends RelativeLayout implements RecordingIndicato
         }
 
 
-        // the programme on air gets a bar in the theme's accent
-        if (program.getStartDate() != null && program.getEndDate() != null) {
-            int now = GuideStyle.nowProgress(program.getStartDate(), program.getEndDate(), activity.getCurrentLocalStartDate(), LocalDateTime.now());
-            if (now >= 0) {
-                ProgressBar nowBar = findViewById(R.id.nowBar);
-                nowBar.setProgress(now);
-                nowBar.setVisibility(View.VISIBLE);
-            }
-        }
+        refreshNow();
 
         if (keyListen) {
             setOnClickListener(new OnClickListener() {
@@ -119,6 +111,26 @@ public class ProgramGridCell extends RelativeLayout implements RecordingIndicato
             });
         }
 
+    }
+
+    /**
+     * Ephyra: the programme on air gets a red dot before its name, like the player's LIVE badge, and a bar in the theme's accent
+     * that runs with the clock. Called again by the guide's ticker, so both move on to the next programme without reloading.
+     */
+    public void refreshNow() {
+        ProgressBar nowBar = findViewById(R.id.nowBar);
+        int now = -1;
+        if (mProgram != null && mProgram.getStartDate() != null && mProgram.getEndDate() != null) {
+            now = GuideStyle.nowProgress(mProgram.getStartDate(), mProgram.getEndDate(), LocalDateTime.now());
+        }
+        if (now >= 0) {
+            nowBar.setProgress(now);
+            nowBar.setVisibility(View.VISIBLE);
+            mProgramName.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ephyra_guide_live_dot, 0, 0, 0);
+        } else {
+            nowBar.setVisibility(View.GONE);
+            mProgramName.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, 0, 0);
+        }
     }
 
     private void addBlockText(String text) {

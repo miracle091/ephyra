@@ -42,18 +42,17 @@ object GuideStyle {
 	fun monoTypeface(context: Context): Typeface? = ResourcesCompat.getFont(context, R.font.atkinson_hyperlegible_mono)
 
 	/**
-	 * How far the programme on air has run, from 0 to [NOW_BAR_MAX], measured over the part of it that the guide shows from
-	 * [visibleStart]. Returns -1 when the programme is not on air at [now].
+	 * How far the programme on air has run, from 0 to [NOW_BAR_MAX], over its whole length, also when it began before the
+	 * guide's start. Returns -1 when the programme is not on air at [now].
 	 */
 	@JvmStatic
-	fun nowProgress(start: LocalDateTime, end: LocalDateTime, visibleStart: LocalDateTime, now: LocalDateTime): Int {
+	fun nowProgress(start: LocalDateTime, end: LocalDateTime, now: LocalDateTime): Int {
 		if (now.isBefore(start) || !now.isBefore(end)) return -1
 
-		val from = if (start.isBefore(visibleStart)) visibleStart else start
-		val total = Duration.between(from, end).toMillis()
+		val total = Duration.between(start, end).toMillis()
 		if (total <= 0L) return -1
 
-		val elapsed = Duration.between(from, now).toMillis().coerceAtLeast(0L)
+		val elapsed = Duration.between(start, now).toMillis()
 		return (elapsed * NOW_BAR_MAX / total).toInt().coerceIn(0, NOW_BAR_MAX)
 	}
 }

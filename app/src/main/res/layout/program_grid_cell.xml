@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Ephyra: a programme of the Live TV guide, name over the tags, an accent bar at the bottom for the programme on air. The cell
+<!-- Ephyra: a programme of the Live TV guide, name over the tags; the programme on air gets a red dot before its name and an accent bar at the bottom. The cell
      background and its focus state come from ProgramGridCell -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
@@ -18,6 +18,7 @@
         android:focusable="false"
         android:focusableInTouchMode="false"
         android:maxLines="1"
+        android:drawablePadding="8dp"
         android:text="@string/no_program_data"
         android:textColor="?attr/headerTextColor"
         android:textSize="16sp"

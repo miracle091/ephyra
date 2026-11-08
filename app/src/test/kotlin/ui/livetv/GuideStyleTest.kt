@@ -9,15 +9,23 @@ class GuideStyleTest : FunSpec({
 	val end = LocalDateTime.of(2026, 11, 8, 21, 0)
 
 	test("A programme on air has run by the share of its length") {
-		GuideStyle.nowProgress(start, end, start, start.plusMinutes(15)) shouldBe 250
+		GuideStyle.nowProgress(start, end, start.plusMinutes(15)) shouldBe 250
 	}
 
 	test("A programme that is not on air has no progress") {
-		GuideStyle.nowProgress(start, end, start, start.minusMinutes(1)) shouldBe -1
-		GuideStyle.nowProgress(start, end, start, end) shouldBe -1
+		GuideStyle.nowProgress(start, end, start.minusMinutes(1)) shouldBe -1
+		GuideStyle.nowProgress(start, end, end) shouldBe -1
 	}
 
-	test("A programme cropped by the guide's start is measured over the part that shows") {
-		GuideStyle.nowProgress(start, end, start.plusMinutes(30), start.plusMinutes(45)) shouldBe 500
+	test("The progress advances with the clock and the next programme takes over at the boundary") {
+		val next = end.plusHours(1)
+		GuideStyle.nowProgress(start, end, start.plusMinutes(30)) shouldBe 500
+		GuideStyle.nowProgress(start, end, start.plusMinutes(31)) shouldBe 516
+		GuideStyle.nowProgress(start, end, end) shouldBe -1
+		GuideStyle.nowProgress(end, next, end) shouldBe 0
+	}
+
+	test("A programme that began before the guide's start is measured over its whole length") {
+		GuideStyle.nowProgress(start, end, start.plusMinutes(45)) shouldBe 750
 	}
 })
