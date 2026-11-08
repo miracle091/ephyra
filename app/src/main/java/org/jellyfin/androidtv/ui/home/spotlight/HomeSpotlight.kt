@@ -79,7 +79,8 @@ import timber.log.Timber
 import java.util.UUID
 import kotlin.time.Duration.Companion.seconds
 
-private val SpotlightHeight = 250.dp
+// Leaves the first row's card labels, focused card included, above the bottom fade and the safe margin on a 540dp-high TV
+private val SpotlightHeight = 226.dp
 private val SpotlightInterval = 10.seconds
 private const val SPOTLIGHT_FADE_MS = 240
 private val LogoMaxWidth = 220.dp

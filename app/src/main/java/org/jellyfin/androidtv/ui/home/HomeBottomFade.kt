@@ -9,7 +9,8 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.unit.dp
 import org.jellyfin.androidtv.ui.base.LocalEphyraPalette
 
-private val HomeBottomFadeHeight = 48.dp
+// Only the screen's edge: a taller fade dimmed the first row's card labels
+private val HomeBottomFadeHeight = 24.dp
 
 /** Ephyra: the bottom edge of the home rows fades into the theme's background, so a row cut by the screen edge fades out. */
 @Composable

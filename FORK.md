@@ -124,6 +124,7 @@ The status column shows how far each change has gone. A change becomes "done" wh
 | UI | Settings follow the home spotlight's scale: each screen's header has an accent overline, a 28sp title and a 14sp caption; the panel sits on the theme's first surface, rows have medium corners and wider padding, and trailing values read as secondary text | done |
 | UI | Home rows leave 12dp between cards instead of 8dp, so the focused card's 6% zoom and its ring stay off the next card; the card widths are recomputed so the rows still fill the screen | done |
 | UI | The live TV guide matches the player and the home rows: rounded cells with the cards' margins and focus ring, times in the clock's figures, an accent bar on the programme on air, popups with the player's buttons; in the player a live channel's header reads "Live · number · channel" above the programme on air. Unused guide drawables and colours removed | done |
+| UI | Home: the live TV section shows only the "On now" row, without the row of Guide, Recordings and Schedule buttons (they stay in the Live TV library); card titles and subtitles under the covers are larger and in the theme's ink colours; the bottom fade is 24dp and the spotlight 226dp high, so the first row's labels stay readable | done |
 
 ## What changes for users
 

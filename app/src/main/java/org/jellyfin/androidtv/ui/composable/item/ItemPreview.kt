@@ -7,9 +7,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.SubcomposeLayout
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.sp
 import org.jellyfin.androidtv.ui.base.JellyfinTheme
+import org.jellyfin.androidtv.ui.base.LocalEphyraPalette
 import org.jellyfin.androidtv.ui.base.ProvideTextStyle
 import org.jellyfin.design.Tokens
 
@@ -47,11 +49,14 @@ private fun ItemPreviewMetadata(
 		modifier = Modifier.padding(spacing),
 		verticalArrangement = Arrangement.spacedBy(spacing),
 	) {
+		// Ephyra: captions readable from the sofa, on the spotlight's scale (14 for the title, 12 for the details) and the theme's ink
+		val palette = LocalEphyraPalette.current
 		title?.let { content ->
 			ProvideTextStyle(
 				value = JellyfinTheme.typography.default.copy(
-					color = Tokens.Color.colorGrey100,
-					fontSize = 12.sp,
+					color = palette.ink,
+					fontSize = 14.sp,
+					fontWeight = FontWeight.Medium,
 				),
 				content = content,
 			)
@@ -60,8 +65,8 @@ private fun ItemPreviewMetadata(
 		subtitle?.let { content ->
 			ProvideTextStyle(
 				value = JellyfinTheme.typography.default.copy(
-					color = Tokens.Color.colorGrey300,
-					fontSize = 10.sp,
+					color = palette.inkMuted,
+					fontSize = 12.sp,
 				),
 				content = content,
 			)
