@@ -319,7 +319,10 @@ private fun CardViewHolderContent(
 		ItemCard(
 			image = {
 				CardPlaceholder() // Ephyra
-				if (image != null && hidesEpisodeSpoiler(item.baseItem, image)) {
+				val library = item.baseItem?.takeIf(::isLibraryCard) // Ephyra
+				if (library != null) {
+					LibraryCardImage(library, title, displayConfig.iconRes, size, aspectRatio)
+				} else if (image != null && hidesEpisodeSpoiler(item.baseItem, image)) {
 					EpisodeSpoilerImage(image, aspectRatio, Modifier.fillMaxSize()) // Ephyra
 				} else if (image != null) {
 					val api = koinInject<ApiClient>()
