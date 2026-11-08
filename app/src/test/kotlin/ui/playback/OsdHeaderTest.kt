@@ -45,4 +45,22 @@ class OsdHeaderTest : FunSpec({
 		OsdHeader.titleOf(onAir) shouldBe "Match of the Day"
 		OsdHeader.titleOf(idle) shouldBe "Sport Uno"
 	}
+
+	test("The live title block's overline is the programme's genres and episode title") {
+		val program = BaseItemDto(
+			id = UUID.randomUUID(), type = BaseItemKind.PROGRAM, name = "Lazio - Torino",
+			genres = listOf("Calcio", "Sport", "Live"), episodeTitle = "12a giornata",
+		)
+		val channel = BaseItemDto(id = UUID.randomUUID(), type = BaseItemKind.TV_CHANNEL, name = "Sport Uno", currentProgram = program)
+
+		OsdHeader.programmeOverlineOf(channel) shouldBe "Calcio, Sport · 12a giornata"
+	}
+
+	test("The live title block has no overline without a programme or details") {
+		val bare = BaseItemDto(id = UUID.randomUUID(), type = BaseItemKind.PROGRAM, name = "News")
+		val channel = BaseItemDto(id = UUID.randomUUID(), type = BaseItemKind.TV_CHANNEL, name = "Sport Uno")
+
+		OsdHeader.programmeOverlineOf(channel) shouldBe ""
+		OsdHeader.programmeOverlineOf(channel.copy(currentProgram = bare)) shouldBe ""
+	}
 })

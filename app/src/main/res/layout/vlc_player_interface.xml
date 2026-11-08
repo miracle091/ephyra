@@ -119,25 +119,8 @@
             app:layout_constraintTop_toBottomOf="@id/item_overline"
             tools:text="Title" />
 
-        <!-- Ephyra: the live player's "Next: title · time" line (ui/playback/NextProgram.kt), gone without a next programme -->
-        <TextView
-            android:id="@+id/ephyra_next_program"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:layout_marginEnd="24dp"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:textColor="?attr/controlIconForegroundInactive"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:visibility="gone"
-            app:layout_constraintEnd_toStartOf="@id/textClock"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/item_title"
-            tools:text="Next: Notiziario sportivo · 22:45" />
-
-        <!-- Ephyra: play method and the server's transcode reasons (ui/playback/PlayInfo.kt) -->
+        <!-- Ephyra: play method and the server's transcode reasons (ui/playback/PlayInfo.kt); the live player shows it above the
+             controls instead, with the title block -->
         <TextView
             android:id="@+id/ephyra_play_info"
             android:layout_width="0dp"
@@ -149,7 +132,7 @@
             android:visibility="gone"
             app:layout_constraintEnd_toStartOf="@id/textClock"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/ephyra_next_program"
+            app:layout_constraintTop_toBottomOf="@id/item_title"
             tools:text="Transcoding: video codec not supported" />
 
         <org.jellyfin.androidtv.ui.ClockUserView

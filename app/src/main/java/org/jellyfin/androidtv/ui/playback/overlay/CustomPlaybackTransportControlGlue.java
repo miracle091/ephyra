@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
 import androidx.leanback.media.PlaybackTransportControlGlue;
 import androidx.leanback.widget.AbstractDetailsDescriptionPresenter;
 import androidx.leanback.widget.Action;
@@ -23,8 +24,12 @@ import androidx.leanback.widget.PlaybackTransportRowPresenter;
 import androidx.leanback.widget.RowPresenter;
 
 import org.jellyfin.androidtv.R;
+import org.jellyfin.androidtv.data.compat.StreamInfo;
 import org.jellyfin.androidtv.preference.UserPreferences;
 import org.jellyfin.androidtv.preference.constant.ClockBehavior;
+import org.jellyfin.androidtv.ui.playback.NextProgram;
+import org.jellyfin.androidtv.ui.playback.OsdHeader;
+import org.jellyfin.androidtv.ui.playback.PlayInfo;
 import org.jellyfin.androidtv.ui.playback.PlaybackController;
 import org.jellyfin.androidtv.ui.playback.overlay.action.AndroidAction;
 import org.jellyfin.androidtv.ui.playback.overlay.action.ChannelBarChannelAction;
@@ -44,6 +49,8 @@ import org.jellyfin.androidtv.ui.playback.overlay.action.SkipNextAction;
 import org.jellyfin.androidtv.ui.playback.overlay.action.SkipPreviousAction;
 import org.jellyfin.androidtv.ui.playback.overlay.action.ZoomAction;
 import org.jellyfin.androidtv.util.DateTimeExtensionsKt;
+import org.jellyfin.sdk.model.api.BaseItemDto;
+import org.jellyfin.sdk.model.api.BaseItemKind;
 import org.koin.java.KoinJavaComponent;
 
 import java.time.LocalDateTime;
@@ -88,6 +95,17 @@ public class CustomPlaybackTransportControlGlue extends PlaybackTransportControl
     // Ephyra: the live player's text buttons (Guide, Record, Channels) sit in a dock of their own next to the round ones
     private ViewGroup mPillsDock;
     private View mRecordPill;
+
+    // Ephyra: the live player's title block above the seek bar and its lines under the times (OsdHeader.bindProgramme); the
+    // state is kept here because the row is created after the first call
+    private View mLiveHead;
+    private TextView mLiveOverline;
+    private TextView mLiveTitle;
+    private TextView mLiveNext;
+    private TextView mLiveInfo;
+    private BaseItemDto mLiveChannel;
+    private BaseItemDto mLiveNextProgram;
+    private StreamInfo mLiveStreamInfo;
 
     CustomPlaybackTransportControlGlue(Context context, VideoPlayerAdapter playerAdapter, PlaybackController playbackController) {
         super(context, playerAdapter);
@@ -155,6 +173,12 @@ public class CustomPlaybackTransportControlGlue extends PlaybackTransportControl
                 }
 
                 mPillsDock = vh.view.findViewById(R.id.ephyra_pills_dock);
+                mLiveHead = vh.view.findViewById(R.id.ephyra_live_head);
+                mLiveOverline = vh.view.findViewById(R.id.ephyra_live_overline);
+                mLiveTitle = vh.view.findViewById(R.id.ephyra_live_title);
+                mLiveNext = vh.view.findViewById(R.id.ephyra_live_next);
+                mLiveInfo = vh.view.findViewById(R.id.ephyra_live_play_info);
+                applyLiveInfo();
                 updatePills();
 
                 return vh;
@@ -325,6 +349,29 @@ public class CustomPlaybackTransportControlGlue extends PlaybackTransportControl
         ((ImageView) pill.findViewById(R.id.icon)).setImageDrawable(action.getDrawable(action.getIndex()));
         if (label != null) ((TextView) pill.findViewById(R.id.label)).setText(label);
         pill.setContentDescription(action.getLabel1());
+    }
+
+    /**
+     * Ephyra: shows the live title block (programme details and name above the bar, the next programme and the play method under
+     * the times) for a live [channel], or hides it for anything else. The Live TV board has it at the bottom, with the controls.
+     */
+    public void bindLiveInfo(@Nullable BaseItemDto channel, @Nullable BaseItemDto next, @Nullable StreamInfo streamInfo) {
+        mLiveChannel = channel != null && channel.getType() == BaseItemKind.TV_CHANNEL ? channel : null;
+        mLiveNextProgram = next;
+        mLiveStreamInfo = streamInfo;
+        applyLiveInfo();
+    }
+
+    private void applyLiveInfo() {
+        if (mRowView == null || mLiveHead == null) return;
+
+        boolean live = mLiveChannel != null;
+        mLiveHead.setVisibility(live ? View.VISIBLE : View.GONE);
+        if (live) OsdHeader.bindProgramme(mLiveChannel, mLiveOverline, mLiveTitle);
+        NextProgram.bind(mLiveNext, live ? mLiveNextProgram : null);
+        PlayInfo.bind(mLiveInfo, live ? mLiveStreamInfo : null);
+        // a denser shade, as the title block reaches higher over the picture
+        mRowView.setBackgroundResource(live ? R.drawable.ephyra_osd_scrim_bottom_live : R.drawable.ephyra_osd_scrim_bottom);
     }
 
     @Override

@@ -52,6 +52,40 @@
             android:visibility="invisible" />
     </FrameLayout>
 
+    <!-- Ephyra: the live player's title block after the design system's "Live TV" board: the programme's details and name above
+         the seek bar (OsdHeader.bindProgramme), gone for everything else -->
+    <LinearLayout
+        android:id="@+id/ephyra_live_head"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:orientation="vertical"
+        android:paddingStart="@dimen/ephyra_side_margin"
+        android:paddingEnd="@dimen/ephyra_side_margin"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/ephyra_live_overline"
+            style="@style/TextAppearance.Ephyra.OsdOverline"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            tools:text="Calcio · 12ª giornata" />
+
+        <TextView
+            android:id="@+id/ephyra_live_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="?attr/headerTextColor"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            tools:text="Lazio – Torino" />
+    </LinearLayout>
+
     <androidx.leanback.widget.PlaybackTransportRowView
         android:id="@+id/transport_row"
         android:layout_width="match_parent"
@@ -104,6 +138,32 @@
                 android:layout_alignParentEnd="true"
                 tools:text="45:00" />
         </RelativeLayout>
+
+        <!-- Ephyra: the live player's "Next:" line and play method under the times, as in the board (NextProgram.kt, PlayInfo.kt) -->
+        <TextView
+            android:id="@+id/ephyra_live_next"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="?attr/controlIconForegroundInactive"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:visibility="gone"
+            tools:text="Next: Notiziario sportivo · 22:45" />
+
+        <TextView
+            android:id="@+id/ephyra_live_play_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="?attr/controlIconForegroundInactive"
+            android:textSize="14sp"
+            android:visibility="gone"
+            tools:text="Transcoding: video codec not supported" />
 
         <LinearLayout
             android:layout_width="match_parent"

@@ -130,6 +130,8 @@ public class PlaybackController implements PlaybackControllerNotifiable {
         if (mFragment == null || !hasInitializedVideoManager()) return;
         play(mCurrentPosition);
     };
+    // Ephyra: a live stream that stays in BUFFERING (the player neither plays nor reports an error) counts as failed
+    private final Runnable liveBufferTimeoutRunnable = this::onLiveBufferTimeout;
     // Ephyra: when the programme on air was last looked up, to refresh it once its end time has passed
     private long lastProgramRefresh = 0;
     // Ephyra: the live stream of a failed attempt stays open on the server until the retry has its own (see stopForLiveRetry)
@@ -185,6 +187,7 @@ public class PlaybackController implements PlaybackControllerNotifiable {
         liveStreamRetries = 0;
         mNextProgram = null;
         if (mHandler != null) mHandler.removeCallbacks(liveRetryRunnable);
+        cancelLiveBufferTimeout();
     }
 
     public float getPlaybackSpeed() {
@@ -279,6 +282,7 @@ public class PlaybackController implements PlaybackControllerNotifiable {
      * is not a live stream or the attempts are used up.
      */
     private boolean scheduleLiveStreamRetry() {
+        cancelLiveBufferTimeout();
         if (mHandler == null || mFragment == null || !LiveStreamRetry.shouldRetry(isLiveTv, liveStreamRetries)) return false;
 
         liveStreamRetries++;
@@ -301,15 +305,46 @@ public class PlaybackController implements PlaybackControllerNotifiable {
         Timber.i("stop for live retry called at %s", mCurrentPosition);
         stopReportLoop();
         if (mPlaybackState != PlaybackState.IDLE && mPlaybackState != PlaybackState.UNDEFINED) {
+            boolean wasBuffering = mPlaybackState == PlaybackState.BUFFERING;
             mPlaybackState = PlaybackState.IDLE;
 
-            if (mVideoManager != null && mVideoManager.isPlaying()) mVideoManager.stopPlayback();
+            // a stream stuck in BUFFERING is not "playing" but has to be dropped before the retry opens it again
+            if (mVideoManager != null && (wasBuffering || mVideoManager.isPlaying())) mVideoManager.stopPlayback();
             if (mCurrentStreamInfo != null && getCurrentlyPlayingItem() != null) {
                 reportRetiredLiveStream();
                 retiredLiveItem = getCurrentlyPlayingItem();
                 retiredLiveStream = mCurrentStreamInfo;
             }
             clearPlaybackSessionOptions();
+        }
+    }
+
+    /** Ephyra: starts the wait for a live stream that was just handed to the player (LiveStreamRetry.bufferTimeoutMs). */
+    private void armLiveBufferTimeout() {
+        cancelLiveBufferTimeout();
+        long timeout = LiveStreamRetry.bufferTimeoutMs(isLiveTv);
+        if (mHandler == null || timeout <= 0) return;
+        mHandler.postDelayed(liveBufferTimeoutRunnable, timeout);
+    }
+
+    private void cancelLiveBufferTimeout() {
+        if (mHandler != null) mHandler.removeCallbacks(liveBufferTimeoutRunnable);
+    }
+
+    /**
+     * Ephyra: the live stream never left BUFFERING (the server accepted it but sends nothing playable). It goes through the
+     * live retry like a failed stream, and when the attempts are used up the player closes with the error message.
+     */
+    private void onLiveBufferTimeout() {
+        if (!LiveStreamRetry.shouldFailOnBufferTimeout(isLiveTv, mPlaybackState == PlaybackState.BUFFERING)) return;
+
+        Timber.w("Live stream still buffering after %d ms", LiveStreamRetry.bufferTimeoutMs(isLiveTv));
+        if (scheduleLiveStreamRetry()) return;
+
+        mPlaybackState = PlaybackState.ERROR;
+        if (mFragment != null) {
+            Utils.showToast(mFragment.getContext(), mFragment.getString(R.string.too_many_errors));
+            mFragment.closePlayer();
         }
     }
 
@@ -766,6 +801,8 @@ public class PlaybackController implements PlaybackControllerNotifiable {
 
         if (mVideoManager != null) {
             mVideoManager.setMediaStreamInfo(api.getValue(), response);
+            // Ephyra: the video path is set, a live stream has a limited time to start playing
+            armLiveBufferTimeout();
         }
 
         PlaybackControllerHelperKt.applyMediaSegments(this, item, () -> {
@@ -952,6 +989,7 @@ public class PlaybackController implements PlaybackControllerNotifiable {
     }
 
     public void stop() {
+        cancelLiveBufferTimeout();
         reportRetiredLiveStream();
         refreshCurrentPosition();
         Timber.i("stop called at %s", mCurrentPosition);
@@ -996,6 +1034,7 @@ public class PlaybackController implements PlaybackControllerNotifiable {
         playbackRetries = 0;
         liveStreamRetries = 0;
         if (mHandler != null) mHandler.removeCallbacks(liveRetryRunnable);
+        cancelLiveBufferTimeout();
     }
 
     private void clearPlaybackSessionOptions() {
@@ -1363,6 +1402,7 @@ public class PlaybackController implements PlaybackControllerNotifiable {
 
             mPlaybackState = PlaybackState.PLAYING;
             liveStreamRetries = 0;
+            cancelLiveBufferTimeout();
             interactionTracker.notifyStart(getCurrentlyPlayingItem());
             mCurrentTranscodeStartTime = mCurrentStreamInfo.getPlayMethod() == PlayMethod.TRANSCODE ? Instant.now().toEpochMilli() : 0;
             startReportLoop();
@@ -1398,6 +1438,7 @@ public class PlaybackController implements PlaybackControllerNotifiable {
 
     @Override
     public void onError() {
+        cancelLiveBufferTimeout();
         if (mFragment == null) {
             playerErrorEncountered();
             return;

@@ -19,4 +19,15 @@ class LiveStreamRetryTest : FunSpec({
 		LiveStreamRetry.delayMs(2) shouldBe 2000
 		LiveStreamRetry.delayMs(0) shouldBe 1000
 	}
+
+	test("a live stream gets 20 seconds to leave buffering, anything else no timeout") {
+		LiveStreamRetry.bufferTimeoutMs(isLiveTv = true) shouldBe 30_000
+		LiveStreamRetry.bufferTimeoutMs(isLiveTv = false) shouldBe 0
+	}
+
+	test("the timeout fails only a live stream that is still buffering") {
+		LiveStreamRetry.shouldFailOnBufferTimeout(isLiveTv = true, isBuffering = true) shouldBe true
+		LiveStreamRetry.shouldFailOnBufferTimeout(isLiveTv = true, isBuffering = false) shouldBe false
+		LiveStreamRetry.shouldFailOnBufferTimeout(isLiveTv = false, isBuffering = true) shouldBe false
+	}
 })

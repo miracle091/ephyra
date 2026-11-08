@@ -38,6 +38,7 @@ import androidx.lifecycle.LifecycleOwnerKt;
 
 import org.jellyfin.androidtv.R;
 import org.jellyfin.androidtv.constant.CustomMessage;
+import org.jellyfin.androidtv.data.compat.StreamInfo;
 import org.jellyfin.androidtv.data.repository.CustomMessageRepository;
 import org.jellyfin.androidtv.data.service.BackgroundService;
 import org.jellyfin.androidtv.databinding.OverlayTvGuideBinding;
@@ -74,6 +75,7 @@ import org.jellyfin.androidtv.util.Utils;
 import org.jellyfin.androidtv.util.apiclient.EmptyResponse;
 import org.jellyfin.androidtv.util.sdk.BaseItemExtensionsKt;
 import org.jellyfin.sdk.model.api.BaseItemDto;
+import org.jellyfin.sdk.model.api.BaseItemKind;
 import org.jellyfin.sdk.model.api.ChapterInfo;
 
 import java.time.LocalDateTime;
@@ -1245,8 +1247,10 @@ public class CustomPlaybackOverlayFragment extends Fragment implements LiveTvGui
             // Ephyra: the overline and title in text, after the design system's board, instead of the title logo
             OsdHeader.bind(current, binding.itemOverline, binding.itemTitle, binding.ephyraLiveBadge);
             updateNextProgram();
-            // Ephyra: how the server delivers this stream and why
-            PlayInfo.bind(binding.ephyraPlayInfo, playbackControllerContainer.getValue().getPlaybackController().getCurrentStreamInfo());
+            // Ephyra: how the server delivers this stream and why; the live player shows it with its title block above the controls
+            boolean liveItem = current.getType() == BaseItemKind.TV_CHANNEL;
+            StreamInfo streamInfo = playbackControllerContainer.getValue().getPlaybackController().getCurrentStreamInfo();
+            PlayInfo.bind(binding.ephyraPlayInfo, liveItem ? null : streamInfo);
             // Ephyra: dimmer controls during HDR playback
             HdrControlsDim.apply(playbackControllerContainer.getValue().getPlaybackController().getCurrentStreamInfo(),
                     binding.topPanel, binding.leanbackFragment);
@@ -1259,11 +1263,18 @@ public class CustomPlaybackOverlayFragment extends Fragment implements LiveTvGui
         }
     }
 
-    /** Ephyra: the "Next:" line under the programme on air; hidden outside live TV and when nothing follows. */
+    /**
+     * Ephyra: the live title block, its "Next:" line and play method above the controls (the glue hides them outside live TV and
+     * the Next line when nothing follows).
+     */
     public void updateNextProgram() {
-        if (binding == null) return;
+        if (binding == null || leanbackOverlayFragment == null || leanbackOverlayFragment.getPlayerGlue() == null) return;
         PlaybackController controller = playbackControllerContainer.getValue().getPlaybackController();
-        NextProgram.bind(binding.ephyraNextProgram, controller.isLiveTv() ? controller.getNextProgram() : null);
+        boolean live = controller.isLiveTv();
+        leanbackOverlayFragment.getPlayerGlue().bindLiveInfo(
+                live ? controller.getCurrentlyPlayingItem() : null,
+                live ? controller.getNextProgram() : null,
+                controller.getCurrentStreamInfo());
     }
 
     public void clearSkipOverlay() {
