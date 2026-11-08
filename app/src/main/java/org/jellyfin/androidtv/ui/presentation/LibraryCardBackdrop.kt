@@ -4,6 +4,7 @@ import android.widget.ImageView
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.Modifier
@@ -12,6 +13,7 @@ import androidx.compose.ui.unit.DpSize
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.jellyfin.androidtv.auth.repository.UserRepository
 import org.jellyfin.androidtv.ui.composable.AsyncImage
 import org.jellyfin.androidtv.ui.composable.item.ArtToneCover
 import org.jellyfin.androidtv.util.apiclient.JellyfinImage
@@ -40,19 +42,27 @@ fun isLibraryCard(item: BaseItemDto?): Boolean = item?.type == BaseItemKind.USER
 /** Ephyra: the first backdrop among the titles the server returned for a library, or null when none has one. */
 fun libraryCardBackdrop(titles: List<BaseItemDto>): JellyfinImage? = titles.firstNotNullOfOrNull { it.itemBackdropImages.firstOrNull() }
 
-// Looked up once per library while the app runs; only read and written on the main thread
-private val libraryBackdrops = HashMap<UUID, LibraryCardBackdrop.Ready>()
+/**
+ * Ephyra: the key a library's backdrop is kept under. Users of a server share library ids but not what they may see
+ * (parental ratings, hidden folders), so the user is part of it.
+ */
+fun libraryBackdropKey(userId: UUID?, libraryId: UUID): Pair<UUID?, UUID> = userId to libraryId
+
+// Looked up once per user and library while the app runs; only read and written on the main thread
+private val libraryBackdrops = HashMap<Pair<UUID?, UUID>, LibraryCardBackdrop.Ready>()
 
 /** Ephyra: the backdrop for a library card, from the title added most recently to the library. */
 @Composable
 fun rememberLibraryCardBackdrop(library: BaseItemDto): State<LibraryCardBackdrop> {
 	val api = koinInject<ApiClient>()
-	return produceState(libraryBackdrops[library.id] ?: LibraryCardBackdrop.Loading, library.id) {
-		if (library.id in libraryBackdrops) return@produceState
+	val user by koinInject<UserRepository>().currentUser.collectAsState()
+	val key = libraryBackdropKey(user?.id, library.id)
+	return produceState(libraryBackdrops[key] ?: LibraryCardBackdrop.Loading, key) {
+		if (key in libraryBackdrops) return@produceState
 		// A failed lookup is not cached, so the next bind tries again; meanwhile the card shows its colour tone
 		val result = loadLibraryCardBackdrop(api, library.id)
 		val backdrop = LibraryCardBackdrop.Ready(result.getOrNull())
-		if (result.isSuccess) libraryBackdrops[library.id] = backdrop
+		if (result.isSuccess) libraryBackdrops[key] = backdrop
 		value = backdrop
 	}
 }

@@ -34,6 +34,15 @@ class LibraryCardBackdropTest : FunSpec({
 		backdrop?.index shouldBe 0
 	}
 
+	test("each user keeps their own backdrop for a shared library") {
+		val library = UUID.randomUUID()
+		val parent = UUID.randomUUID()
+		val child = UUID.randomUUID()
+
+		(libraryBackdropKey(parent, library) == libraryBackdropKey(child, library)) shouldBe false
+		libraryBackdropKey(parent, library) shouldBe libraryBackdropKey(parent, library)
+	}
+
 	test("a library without backdrops has none") {
 		libraryCardBackdrop(listOf(item(BaseItemKind.MUSIC_ALBUM, backdrops = emptyList()))) shouldBe null
 		libraryCardBackdrop(emptyList()) shouldBe null
