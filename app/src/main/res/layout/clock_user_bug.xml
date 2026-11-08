@@ -21,7 +21,7 @@
         android:id="@+id/clock"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fontFamily="sans-serif-light"
+        android:fontFamily="@font/atkinson_hyperlegible_next_family"
         android:format12Hour="h:mm"
         android:format24Hour="k:mm"
         android:paddingStart="24dp"

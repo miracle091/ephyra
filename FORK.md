@@ -115,6 +115,7 @@ The status column shows how far each change has gone. A change becomes "done" wh
 | UI | Cards that carry their name over the image (playlists, folders, artists, people) use the design system's card overlay: a bottom shade under the name in bold ink instead of a grey box | done |
 | UI | Library cards (Movies, Shows, Music...) show the backdrop of the title added most recently to the library, with the library's name in the card overlay, instead of the server's image with the name printed on it; a library without backdrops shows its colour tone. The backdrop is looked up per user, as users of a server may see different titles | done |
 | UI | Home rows: the bottom 48dp of the home fade into the theme's background, so a row cut by the screen edge fades out instead of ending in half a line of text; the selected row's cards start at a fixed line from the top instead of being centred, so the spotlight no longer pushes the first row's title out of sight | done |
+| UI | The whole interface uses the Atkinson Hyperlegible Next font (and Atkinson Hyperlegible Mono for Quick Connect codes), designed for easy reading from a distance, bundled as variable fonts (SIL OFL 1.1, listed in the licenses screen) | done |
 
 ## What changes for users
 

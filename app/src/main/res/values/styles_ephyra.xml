@@ -58,7 +58,7 @@
     <style name="TextAppearance.Ephyra.OsdTime" parent="">
         <item name="android:textColor">?attr/controlIconForegroundInactive</item>
         <item name="android:textSize">14sp</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">@font/atkinson_hyperlegible_next_family</item>
         <item name="android:fontFeatureSettings">tnum</item>
         <item name="android:layout_marginTop">8dp</item>
     </style>

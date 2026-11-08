@@ -1,0 +1,8 @@
+{
+  "uniqueId": "com.googlefonts:atkinson-hyperlegible-next",
+  "name": "Atkinson Hyperlegible Next",
+  "description": "The app's text font (variable font file bundled in the resources). Designed by the Braille Institute of America",
+  "website": "https://github.com/googlefonts/atkinson-hyperlegible-next",
+  "developers": [{ "name": "The Atkinson Hyperlegible Next Project Authors" }],
+  "licenses": ["OFL-1.1"]
+}

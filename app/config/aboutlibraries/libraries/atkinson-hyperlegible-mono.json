@@ -1,0 +1,8 @@
+{
+  "uniqueId": "com.googlefonts:atkinson-hyperlegible-mono",
+  "name": "Atkinson Hyperlegible Mono",
+  "description": "The app's monospaced font for codes (variable font file bundled in the resources). Designed by the Braille Institute of America",
+  "website": "https://github.com/googlefonts/atkinson-hyperlegible-next-mono",
+  "developers": [{ "name": "The Atkinson Hyperlegible Mono Project Authors" }],
+  "licenses": ["OFL-1.1"]
+}

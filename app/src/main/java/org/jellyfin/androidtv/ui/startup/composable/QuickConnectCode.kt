@@ -11,10 +11,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import org.jellyfin.androidtv.ui.base.EphyraMonoFontFamily
 import org.jellyfin.androidtv.ui.base.LocalEphyraPalette
 import org.jellyfin.androidtv.ui.base.Text
 
@@ -50,7 +50,7 @@ fun QuickConnectCode(code: String, modifier: Modifier = Modifier) {
 							color = palette.ink,
 							fontSize = 36.sp,
 							fontWeight = FontWeight.Bold,
-							fontFamily = FontFamily.Monospace,
+							fontFamily = EphyraMonoFontFamily, // Ephyra
 						)
 					}
 				}

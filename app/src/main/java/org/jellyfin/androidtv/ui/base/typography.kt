@@ -8,7 +8,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 
 object TypographyDefaults {
-	val Default: TextStyle = TextStyle.Default
+	val Default: TextStyle = TextStyle.Default.copy(fontFamily = EphyraFontFamily) // Ephyra
 
 	val ListHeader: TextStyle = Default.copy(
 		fontSize = 15.sp,
