@@ -122,6 +122,7 @@ The status column shows how far each change has gone. A change becomes "done" wh
 | UI | A video left paused for 2 minutes shows a long pause screen instead of the screensaver: the title's backdrop dimmed, the player's header and progress (position, end time, duration) and a hint to return; after 10 minutes the picture dims further and the text shifts against burn-in. The screensaver opens on its content at once instead of fading from the clock, and its clock sits where the home toolbar's does | done |
 | UI | The home spotlight shows the community rating with the gold star and the critics' rating with the Rotten Tomatoes logo before the year and runtime, as in the details' info row | done |
 | UI | Settings follow the home spotlight's scale: each screen's header has an accent overline, a 28sp title and a 14sp caption; the panel sits on the theme's first surface, rows have medium corners and wider padding, and trailing values read as secondary text | done |
+| UI | Home rows leave 12dp between cards instead of 8dp, so the focused card's 6% zoom and its ring stay off the next card; the card widths are recomputed so the rows still fill the screen | done |
 
 ## What changes for users
 

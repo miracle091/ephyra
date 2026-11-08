@@ -37,9 +37,12 @@ const val ROW_CARDS_WIDE_SMALL = 6
 const val WIDE_ASPECT_RATIO = 16f / 9f
 const val POSTER_ASPECT_RATIO = 2f / 3f
 
-// The browsePaddingStart/End of the Ephyra themes and Leanback's item spacing
+/** Ephyra: the gap between the cards of a row (CustomListRowPresenter), wider than the focused card's 6% zoom. */
+const val ROW_ITEM_GAP_DP = 12
+
+// The browsePaddingStart/End of the Ephyra themes
 private val RowSideMargin = 32.dp
-private val RowItemGap = 8.dp
+private val RowItemGap = ROW_ITEM_GAP_DP.dp
 
 /**
  * Ephyra: the height of the cards of a row, so that [count] cards of [aspectRatio] fill a screen [screenWidth] wide edge to edge,
