@@ -442,30 +442,21 @@ public class FullDetailsFragment extends Fragment implements RecordingIndicatorV
 
                     BaseItemPerson director = BaseItemExtensionsKt.getFirstPerson(item, PersonKind.DIRECTOR);
 
-                    InfoItem firstRow;
+                    // Ephyra: a column without a value is not added (programmes and recordings have no director); the row hides it
                     if (item.getType() == BaseItemKind.SERIES) {
-                        firstRow = new InfoItem(
+                        mDetailsOverviewRow.setInfoItem1(new InfoItem(
                                 getString(R.string.lbl_seasons),
-                                String.format("%d", Utils.getSafeValue(item.getChildCount(), 0)));
+                                String.format("%d", Utils.getSafeValue(item.getChildCount(), 0))));
                     } else if (director != null) {
-                        firstRow = new InfoItem(getString(R.string.lbl_directed_by), director.getName());
-                    } else {
-                        // Ephyra: no director (programmes, recordings): hide the column instead of "Unknown"
-                        firstRow = new InfoItem();
+                        mDetailsOverviewRow.setInfoItem1(new InfoItem(getString(R.string.lbl_directed_by), director.getName()));
                     }
-                    mDetailsOverviewRow.setInfoItem1(firstRow);
 
                     if ((item.getRunTimeTicks() != null && item.getRunTimeTicks() > 0) || item.getRunTimeTicks() != null) {
                         mDetailsOverviewRow.setInfoItem2(new InfoItem(getString(R.string.lbl_runs), getRunTime()));
                         ClockBehavior clockBehavior = userPreferences.getValue().get(UserPreferences.Companion.getClockBehavior());
                         if (clockBehavior == ClockBehavior.ALWAYS || clockBehavior == ClockBehavior.IN_MENUS) {
                             mDetailsOverviewRow.setInfoItem3(new InfoItem(getString(R.string.lbl_ends), getEndTime()));
-                        } else {
-                            mDetailsOverviewRow.setInfoItem3(new InfoItem());
                         }
-                    } else {
-                        mDetailsOverviewRow.setInfoItem2(new InfoItem());
-                        mDetailsOverviewRow.setInfoItem3(new InfoItem());
                     }
 
             }

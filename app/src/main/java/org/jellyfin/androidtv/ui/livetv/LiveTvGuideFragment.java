@@ -27,6 +27,7 @@ import androidx.lifecycle.LifecycleOwnerKt;
 import org.jellyfin.androidtv.R;
 import org.jellyfin.androidtv.constant.CustomMessage;
 import org.jellyfin.androidtv.data.repository.CustomMessageRepository;
+import org.jellyfin.androidtv.data.service.BackgroundService;
 import org.jellyfin.androidtv.databinding.LiveTvGuideBinding;
 import org.jellyfin.androidtv.ui.AsyncImageView;
 import org.jellyfin.androidtv.ui.FriendlyDateButton;
@@ -103,6 +104,7 @@ public class LiveTvGuideFragment extends Fragment implements LiveTvGuide, View.O
     private final Lazy<PlaybackHelper> playbackHelper = inject(PlaybackHelper.class);
     private final Lazy<ImageHelper> imageHelper = inject(ImageHelper.class);
     private final Lazy<PlaybackLauncher> playbackLauncher = inject(PlaybackLauncher.class);
+    private final Lazy<BackgroundService> backgroundService = inject(BackgroundService.class); // Ephyra
     private MutableStateFlow<Boolean> showOptions;
     private MutableStateFlow<Boolean> showFilterOptions;
 
@@ -246,6 +248,10 @@ public class LiveTvGuideFragment extends Fragment implements LiveTvGuide, View.O
     @Override
     public void onResume() {
         super.onResume();
+
+        // Ephyra: the video player switches the app background off (BackgroundService.disable) and only a call that sets or
+        // clears the backgrounds switches it back on; the guide sets none, so coming back from the player left it black
+        backgroundService.getValue().clearBackgrounds();
 
         mFilters.load();
         doLoad();

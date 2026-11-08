@@ -34,7 +34,7 @@ import org.jellyfin.sdk.model.api.TimerInfoDto;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.UUID;
@@ -246,7 +246,8 @@ public class RecordPopup {
                 .append(" @ ")
                 .append(DateTimeExtensionsKt.getTimeFormatter(mContext).format(local))
                 .append(" (")
-                .append(DateUtils.getRelativeTimeSpanString(local.toInstant(ZoneOffset.UTC).toEpochMilli(), Instant.now().toEpochMilli(), 0))
+                // Ephyra: local is wall-clock time, so it takes the device zone (UTC put it an hour off in Italy)
+                .append(DateUtils.getRelativeTimeSpanString(local.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli(), Instant.now().toEpochMilli(), 0))
                 .append(")")
         );
         datetime.setTextColor(Utils.getThemeColor(mContext, R.attr.controlIconForegroundInactive));

@@ -94,7 +94,8 @@ fun LibraryCardImage(library: BaseItemDto, title: String?, iconRes: Int, size: D
 					modifier = Modifier.fillMaxSize(),
 				)
 			} else {
-				ArtToneCover(title, iconRes)
+				// Ephyra: the icon always shows, so a library without backdrops (Recordings...) is not a bare colour
+				ArtToneCover(title, iconRes, alwaysShowIcon = true)
 			}
 		}
 	}

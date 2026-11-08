@@ -417,14 +417,16 @@ fun ItemRowAdapter.retrieveLiveTvSeriesTimers(
 						add(
 							GridButton(
 								LiveTvOption.LIVE_TV_SCHEDULE_OPTION_ID,
-								context.getString(R.string.lbl_schedule)
+								context.getString(R.string.lbl_schedule),
+								iconRes = R.drawable.ic_calendar, // Ephyra
 							)
 						)
 
 						add(
 							GridButton(
 								LiveTvOption.LIVE_TV_SERIES_OPTION_ID,
-								context.getString(R.string.lbl_series)
+								context.getString(R.string.lbl_series),
+								iconRes = R.drawable.ic_tv_timer, // Ephyra
 							)
 						)
 					}
