@@ -14,6 +14,15 @@ class LibraryCardBackdropTest : FunSpec({
 		backdropImageTags = backdrops,
 	)
 
+	test("a server recordings folder gets the recording icon, other libraries keep theirs") {
+		val recordings = UUID.randomUUID()
+		val playlists = UUID.randomUUID()
+
+		libraryCardIcon(recordings, setOf(recordings), defaultIcon = 1, recordingIcon = 2) shouldBe 2
+		libraryCardIcon(playlists, setOf(recordings), defaultIcon = 1, recordingIcon = 2) shouldBe 1
+		libraryCardIcon(recordings, emptySet(), defaultIcon = 1, recordingIcon = 2) shouldBe 1
+	}
+
 	test("only libraries get a title's backdrop") {
 		isLibraryCard(item(BaseItemKind.USER_VIEW)) shouldBe true
 		isLibraryCard(item(BaseItemKind.COLLECTION_FOLDER)) shouldBe true

@@ -10,6 +10,7 @@ import androidx.compose.runtime.produceState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.DpSize
+import org.jellyfin.androidtv.R
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -21,6 +22,7 @@ import org.jellyfin.androidtv.util.apiclient.getUrl
 import org.jellyfin.androidtv.util.apiclient.itemBackdropImages
 import org.jellyfin.sdk.api.client.ApiClient
 import org.jellyfin.sdk.api.client.extensions.itemsApi
+import org.jellyfin.sdk.api.client.extensions.liveTvApi
 import org.jellyfin.sdk.model.api.BaseItemDto
 import org.jellyfin.sdk.model.api.BaseItemKind
 import org.jellyfin.sdk.model.api.CollectionType
@@ -43,6 +45,10 @@ fun isLibraryCard(item: BaseItemDto?): Boolean = item?.type == BaseItemKind.USER
 /** Ephyra: the Live TV library holds channels, not titles with a backdrop, so its card shows the colour tone with a TV icon. */
 fun isLiveTvLibraryCard(item: BaseItemDto?): Boolean = isLibraryCard(item) && item?.collectionType == CollectionType.LIVETV
 
+/** Ephyra: the icon of a library card without a backdrop: the REC symbol for the server's recordings folders, else [defaultIcon]. */
+fun libraryCardIcon(libraryId: UUID, recordingFolderIds: Collection<UUID>, defaultIcon: Int, recordingIcon: Int): Int =
+	if (libraryId in recordingFolderIds) recordingIcon else defaultIcon
+
 /** Ephyra: the first backdrop among the titles the server returned for a library, or null when none has one. */
 fun libraryCardBackdrop(titles: List<BaseItemDto>): JellyfinImage? = titles.firstNotNullOfOrNull { it.itemBackdropImages.firstOrNull() }
 
@@ -54,6 +60,26 @@ fun libraryBackdropKey(userId: UUID?, libraryId: UUID): Pair<UUID?, UUID> = user
 
 // Looked up once per user and library while the app runs; only read and written on the main thread
 private val libraryBackdrops = HashMap<Pair<UUID?, UUID>, LibraryCardBackdrop.Ready>()
+
+// The server's recordings folders per user, looked up once while the app runs; only read and written on the main thread
+private val recordingFolders = HashMap<UUID?, Set<UUID>>()
+
+/**
+ * Ephyra: the ids of the server's live TV recordings folders. The Recordings library is a plain collection folder without a
+ * collection type, so only the server can tell it apart from other folders.
+ */
+@Composable
+private fun rememberRecordingFolderIds(): State<Set<UUID>> {
+	val api = koinInject<ApiClient>()
+	val user by koinInject<UserRepository>().currentUser.collectAsState()
+	val userId = user?.id
+	return produceState(recordingFolders[userId] ?: emptySet(), userId) {
+		if (userId == null || userId in recordingFolders) return@produceState
+		val ids = loadRecordingFolderIds(api, userId) ?: return@produceState
+		recordingFolders[userId] = ids
+		value = ids
+	}
+}
 
 /** Ephyra: the backdrop for a library card, from the title added most recently to the library. */
 @Composable
@@ -75,6 +101,7 @@ fun rememberLibraryCardBackdrop(library: BaseItemDto): State<LibraryCardBackdrop
 @Composable
 fun LibraryCardImage(library: BaseItemDto, title: String?, iconRes: Int, size: DpSize, aspectRatio: Float) {
 	val backdrop by rememberLibraryCardBackdrop(library)
+	val recordingFolderIds by rememberRecordingFolderIds()
 	when (val state = backdrop) {
 		LibraryCardBackdrop.Loading -> Unit
 		is LibraryCardBackdrop.Ready -> {
@@ -95,7 +122,7 @@ fun LibraryCardImage(library: BaseItemDto, title: String?, iconRes: Int, size: D
 				)
 			} else {
 				// Ephyra: the icon always shows, so a library without backdrops (Recordings...) is not a bare colour
-				ArtToneCover(title, iconRes, alwaysShowIcon = true)
+				ArtToneCover(title, libraryCardIcon(library.id, recordingFolderIds, iconRes, R.drawable.ic_record), alwaysShowIcon = true)
 			}
 		}
 	}
@@ -117,5 +144,16 @@ private suspend fun loadLibraryCardBackdrop(api: ApiClient, libraryId: UUID): Re
 	} catch (@Suppress("TooGenericExceptionCaught") error: Exception) {
 		Timber.w(error, "Could not load a backdrop for a library card")
 		Result.failure(error)
+	}
+}
+
+private suspend fun loadRecordingFolderIds(api: ApiClient, userId: UUID): Set<UUID>? = withContext(Dispatchers.IO) {
+	try {
+		api.liveTvApi.getRecordingFolders(userId).content.items.map { it.id }.toSet()
+	} catch (error: CancellationException) {
+		throw error
+	} catch (@Suppress("TooGenericExceptionCaught") error: Exception) {
+		Timber.w(error, "Could not load the recordings folders")
+		null
 	}
 }
