@@ -7,4 +7,7 @@ sealed interface DreamContent {
 	// Ephyra: a minimal clock instead of the logo and the library showcase
 	data object Clock : DreamContent
 	data class NowPlaying(val entry: QueueEntry, val item: BaseItemDto) : DreamContent
+
+	// Ephyra: a video left paused in the player, instead of unrelated content over it
+	data class VideoPaused(val item: BaseItemDto, val positionMs: Long, val durationMs: Long) : DreamContent
 }

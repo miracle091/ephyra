@@ -91,4 +91,7 @@
     <string name="ephyra_runtime_minutes">%1$d min</string>
     <string name="ephyra_change_server">Cambia server</string>
     <string name="ephyra_now_playing_album">In riproduzione · %1$s</string>
+    <!-- Long pause screen (integration/dream/composable/DreamContentPaused.kt) -->
+    <string name="ephyra_paused">In pausa</string>
+    <string name="ephyra_paused_hint">Premi un tasto per tornare al player</string>
 </resources>

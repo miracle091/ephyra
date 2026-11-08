@@ -30,12 +30,13 @@ fun DreamView(
 		when (content) {
 			DreamContent.Clock -> DreamContentClock() // Ephyra
 			is DreamContent.NowPlaying -> DreamContentNowPlaying(content)
+			is DreamContent.VideoPaused -> DreamContentPaused(content) // Ephyra
 		}
 	}
 
 	// Header overlay
 	DreamHeader(
-		// Ephyra: the clock screen is the clock already
-		showClock = showClock && content !is DreamContent.Clock,
+		// Ephyra: the clock screen is the clock already; the long pause screen always shows it, as the player does
+		showClock = content is DreamContent.VideoPaused || (showClock && content !is DreamContent.Clock),
 	)
 }

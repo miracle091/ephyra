@@ -16,6 +16,12 @@ import org.jellyfin.sdk.model.api.BaseItemDto
 import org.jellyfin.sdk.model.api.BaseItemKind
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
+
+// Ephyra: a video left paused gets the long pause screen sooner than the screensaver's own timeout
+val LongPauseDelay = 2.minutes
+
+fun screensaverDelay(timeout: Duration, videoPaused: Boolean): Duration = if (videoPaused) LongPauseDelay else timeout
 
 class InteractionTrackerViewModel(
 	private val userPreferences: UserPreferences,
@@ -38,6 +44,7 @@ class InteractionTrackerViewModel(
 	private val inAppEnabled get() = userPreferences[UserPreferences.screensaverInAppEnabled]
 	private val timeout get() = userPreferences[UserPreferences.screensaverInAppTimeout].milliseconds
 	private val stillWatchingBehavior get() = userPreferences[UserPreferences.stillWatchingBehavior]
+	private val videoPaused get() = playbackControllerContainer.playbackController?.let { it.isPaused && !it.isLiveTv } == true
 
 	// State
 
@@ -106,7 +113,7 @@ class InteractionTrackerViewModel(
 		// Create new timer to show screensaver when enabled
 		if (inAppEnabled && !activityPaused && locks == 0) {
 			timer = viewModelScope.launch {
-				delay(timeout)
+				delay(screensaverDelay(timeout, videoPaused))
 				_screensaverVisible.value = true
 			}
 		}

@@ -171,7 +171,7 @@ val appModule = module {
 	viewModel { StillWatchingViewModel(get(), get(), get(), get()) }
 	viewModel { PhotoPlayerViewModel(get(), get()) }
 	viewModel { SearchViewModel(get()) }
-	viewModel { DreamViewModel(get()) } // Ephyra: the clock needs no server or images
+	viewModel { DreamViewModel(get(), get()) } // Ephyra: playback, and the player for the long pause screen
 	viewModel { SettingsViewModel() }
 	viewModel { SettingsLibrariesScreenViewModel(get()) }
 
