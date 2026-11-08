@@ -4,6 +4,8 @@ import androidx.activity.compose.BackHandler
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
+import androidx.compose.foundation.focusGroup
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,8 +13,11 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -26,12 +31,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.focusRestorer
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.selected
@@ -93,10 +105,22 @@ fun SettingsTwoPaneDialog(
 @Composable
 private fun BoxScope.SettingsTwoPane() {
 	val palette = LocalEphyraPalette.current
+	val focusManager = LocalFocusManager.current
 	var selected by remember { mutableStateOf(sections.first().route) }
-	val leftPane = remember { FocusRequester() }
-	val rightPane = remember { FocusRequester() }
+	val sectionRequesters = remember { sections.associate { it.route to FocusRequester() } }
+	val entryAnchor = remember { FocusRequester() }
+	var entryAnchorOpen by remember { mutableStateOf(false) }
 	var rightHasFocus by remember { mutableStateOf(false) }
+
+	// Entering the right pane through its focus group lands on whatever the focus search picks first, which is not always the first item.
+	// Instead, focus a zero-height anchor above the content for a moment and search downwards: that is always the topmost item.
+	val enterRightPane = {
+		entryAnchorOpen = true
+		if (entryAnchor.requestFocus()) {
+			focusManager.moveFocus(FocusDirection.Down)
+		}
+		entryAnchorOpen = false
+	}
 
 	Row(
 		modifier = Modifier
@@ -106,7 +130,7 @@ private fun BoxScope.SettingsTwoPane() {
 		// Left pane: title and sections
 		Column(
 			modifier = Modifier
-				.width(300.dp)
+				.width(SettingsLeftPaneWidth)
 				.fillMaxHeight()
 				.padding(start = 32.dp, top = 27.dp, end = 24.dp, bottom = 27.dp),
 			verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -123,8 +147,14 @@ private fun BoxScope.SettingsTwoPane() {
 				modifier = Modifier
 					// The rows have 12dp of inner padding, shift them so their text lines up with the title
 					.offset(x = (-12).dp)
-					.focusRequester(leftPane)
-					.focusProperties { right = rightPane }
+					.onPreviewKeyEvent { event ->
+						if (event.key == Key.DirectionRight) {
+							if (event.type == KeyEventType.KeyDown) enterRightPane()
+							true
+						} else {
+							false
+						}
+					}
 					.focusRestorer(),
 				verticalArrangement = Arrangement.spacedBy(Tokens.Space.space2xs),
 				contentPadding = PaddingValues(vertical = 4.dp),
@@ -133,8 +163,9 @@ private fun BoxScope.SettingsTwoPane() {
 					SectionButton(
 						section = section,
 						selected = section.route == selected,
+						focusRequester = sectionRequesters.getValue(section.route),
 						onFocused = { selected = section.route },
-						onClick = { rightPane.requestFocus() },
+						onClick = enterRightPane,
 					)
 				}
 			}
@@ -147,18 +178,25 @@ private fun BoxScope.SettingsTwoPane() {
 				.fillMaxHeight()
 				.background(palette.surface1)
 				.clipToBounds()
-				// SettingsColumn already pads its content with the medium space token
-				.padding(start = 8.dp, top = 11.dp, end = 16.dp, bottom = 11.dp)
-				.focusRequester(rightPane)
+				.padding(SettingsRightPanePadding)
 				.onFocusChanged { rightHasFocus = it.hasFocus }
-				.focusRestorer(),
+				.focusGroup(),
 		) {
+			Spacer(
+				Modifier
+					.fillMaxWidth()
+					.height(0.dp)
+					.focusProperties { canFocus = entryAnchorOpen }
+					.focusRequester(entryAnchor)
+					.focusable()
+			)
+
 			key(selected) {
 				ProvideRouter(routes, selected) {
 					val router = LocalRouter.current
-					// BACK on the root of a section returns to the list, deeper screens are popped by the router
+					// BACK on the root of a section returns to the section that is open, deeper screens are popped by the router
 					BackHandler(enabled = rightHasFocus && router.backStack.size <= 1) {
-						leftPane.requestFocus()
+						sectionRequesters[selected]?.requestFocus()
 					}
 
 					SettingsRouterContent()
@@ -172,6 +210,7 @@ private fun BoxScope.SettingsTwoPane() {
 private fun SectionButton(
 	section: SettingsSection,
 	selected: Boolean,
+	focusRequester: FocusRequester,
 	onFocused: () -> Unit,
 	onClick: () -> Unit,
 ) {
@@ -189,6 +228,7 @@ private fun SectionButton(
 		leadingContent = { Icon(painterResource(section.icon), contentDescription = null) },
 		headingContent = { Text(stringResource(section.label), fontWeight = FontWeight.Bold, fontSize = 14.sp) },
 		modifier = Modifier
+			.focusRequester(focusRequester)
 			.onFocusChanged { if (it.isFocused) onFocused() }
 			.semantics { this.selected = selected },
 	)
