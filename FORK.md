@@ -118,6 +118,7 @@ The status column shows how far each change has gone. A change becomes "done" wh
 | UI | The whole interface uses the Atkinson Hyperlegible Next font (and Atkinson Hyperlegible Mono for Quick Connect codes), designed for easy reading from a distance, bundled as variable fonts (SIL OFL 1.1, listed in the licenses screen) | done |
 | UI | The screensaver is a minimal clock on the theme's background: a large clock and the date, moving slowly to a new place every minute against burn-in, instead of the collage of library backdrops; music playing still shows its own screen. The screensaver's age rating options and preferences are gone, as it shows no titles | done |
 | UI | The startup window shows the Dark theme's background from the first frame instead of black, until the chosen theme takes over; the home spotlight's title, details and buttons sit centred on the backdrop's height instead of at its bottom | done |
+| UI | Icons for an active state follow the theme's accent instead of red or the button grey: active shuffle, repeat and grid filters, the live TV guide's favourite heart, checked checkboxes and radio buttons | done |
 
 ## What changes for users
 

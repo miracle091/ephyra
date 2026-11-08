@@ -22,14 +22,15 @@ fun Checkbox(
 	checked: Boolean,
 	modifier: Modifier = Modifier,
 	shape: Shape = JellyfinTheme.shapes.extraSmall,
-	containerColor: Color = JellyfinTheme.colorScheme.button,
-	contentColor: Color = JellyfinTheme.colorScheme.onButton
+	// Ephyra: on in the theme's accent, off as a neutral outline
+	containerColor: Color = JellyfinTheme.colorScheme.badge,
+	contentColor: Color = JellyfinTheme.colorScheme.onBadge,
 ) {
 	Box(
 		modifier = modifier
 			.defaultMinSize(minWidth = 18.dp, minHeight = 18.dp)
 			.background(if (checked) containerColor else Color.Unspecified, shape)
-			.border(if (checked) 0.dp else 2.dp, containerColor, shape),
+			.border(if (checked) 0.dp else 2.dp, JellyfinTheme.colorScheme.button, shape),
 		contentAlignment = Alignment.Center,
 	) {
 		AnimatedVisibility(

@@ -43,6 +43,6 @@
         android:layout_alignParentBottom="true"
         android:layout_toStartOf="@+id/channelImage"
         android:scaleType="center"
-        android:src="@drawable/ic_heart_red"
+        android:src="@drawable/ic_heart_accent"
         android:visibility="gone" />
 </RelativeLayout>

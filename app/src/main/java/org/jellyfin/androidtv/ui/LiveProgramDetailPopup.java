@@ -259,14 +259,14 @@ public class LiveProgramDetailPopup {
         BaseItemDto channel = TvManager.getChannel(TvManager.getAllChannelsIndex(mProgram.getChannelId()));
         boolean isFav = channel != null && channel.getUserData() != null && channel.getUserData().isFavorite();
 
-        android.widget.ImageButton fave = addImgButton(mDButtonRow, isFav ? R.drawable.ic_heart_red : R.drawable.ic_heart);
+        android.widget.ImageButton fave = addImgButton(mDButtonRow, isFav ? R.drawable.ic_heart_accent : R.drawable.ic_heart);
         fave.setEnabled(channel != null);
         if (channel == null) return fave;
         fave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 LiveProgramDetailPopupHelperKt.toggleFavorite(LiveProgramDetailPopup.this, channel, channel -> {
-                    fave.setImageDrawable(ContextCompat.getDrawable(mContext, channel.getUserData().isFavorite() ? R.drawable.ic_heart_red : R.drawable.ic_heart));
+                    fave.setImageDrawable(ContextCompat.getDrawable(mContext, channel.getUserData().isFavorite() ? R.drawable.ic_heart_accent : R.drawable.ic_heart));
                     mTvGuide.refreshFavorite(channel.getId());
                     DataRefreshService dataRefreshService = KoinJavaComponent.<DataRefreshService>get(DataRefreshService.class);
                     dataRefreshService.setLastFavoriteUpdate(Instant.now());
