@@ -194,11 +194,11 @@ public class BrowseViewFragment extends EnhancedBrowseFragment {
 
             GridButtonPresenter mGridPresenter = new GridButtonPresenter();
             ArrayObjectAdapter gridRowAdapter = new ArrayObjectAdapter(mGridPresenter);
-            gridRowAdapter.add(new GridButton(LiveTvOption.LIVE_TV_GUIDE_OPTION_ID, getString(R.string.lbl_live_tv_guide)));
-            gridRowAdapter.add(new GridButton(LiveTvOption.LIVE_TV_RECORDINGS_OPTION_ID, getString(R.string.lbl_recorded_tv)));
+            gridRowAdapter.add(new GridButton(LiveTvOption.LIVE_TV_GUIDE_OPTION_ID, getString(R.string.lbl_live_tv_guide), null, R.drawable.ic_tv_guide));
+            gridRowAdapter.add(new GridButton(LiveTvOption.LIVE_TV_RECORDINGS_OPTION_ID, getString(R.string.lbl_recorded_tv), null, R.drawable.ic_tv_play));
             if (Utils.canManageRecordings(KoinJavaComponent.<UserRepository>get(UserRepository.class).getCurrentUser().getValue())) {
-                gridRowAdapter.add(new GridButton(LiveTvOption.LIVE_TV_SCHEDULE_OPTION_ID, getString(R.string.lbl_schedule)));
-                gridRowAdapter.add(new GridButton(LiveTvOption.LIVE_TV_SERIES_OPTION_ID, getString(R.string.lbl_series)));
+                gridRowAdapter.add(new GridButton(LiveTvOption.LIVE_TV_SCHEDULE_OPTION_ID, getString(R.string.lbl_schedule), null, R.drawable.ic_calendar));
+                gridRowAdapter.add(new GridButton(LiveTvOption.LIVE_TV_SERIES_OPTION_ID, getString(R.string.lbl_series), null, R.drawable.ic_tv_timer));
             }
 
             mRowsAdapter.add(new ListRow(gridHeader, gridRowAdapter));

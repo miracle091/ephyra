@@ -23,6 +23,7 @@ import org.jellyfin.sdk.api.client.ApiClient
 import org.jellyfin.sdk.api.client.extensions.itemsApi
 import org.jellyfin.sdk.model.api.BaseItemDto
 import org.jellyfin.sdk.model.api.BaseItemKind
+import org.jellyfin.sdk.model.api.CollectionType
 import org.jellyfin.sdk.model.api.ImageType
 import org.jellyfin.sdk.model.api.ItemSortBy
 import org.jellyfin.sdk.model.api.SortOrder
@@ -38,6 +39,9 @@ sealed interface LibraryCardBackdrop {
 
 /** Ephyra: libraries (Movies, Shows, Music...) show a title's backdrop on their card instead of the server's image with the name on it. */
 fun isLibraryCard(item: BaseItemDto?): Boolean = item?.type == BaseItemKind.USER_VIEW || item?.type == BaseItemKind.COLLECTION_FOLDER
+
+/** Ephyra: the Live TV library holds channels, not titles with a backdrop, so its card shows the colour tone with a TV icon. */
+fun isLiveTvLibraryCard(item: BaseItemDto?): Boolean = isLibraryCard(item) && item?.collectionType == CollectionType.LIVETV
 
 /** Ephyra: the first backdrop among the titles the server returned for a library, or null when none has one. */
 fun libraryCardBackdrop(titles: List<BaseItemDto>): JellyfinImage? = titles.firstNotNullOfOrNull { it.itemBackdropImages.firstOrNull() }

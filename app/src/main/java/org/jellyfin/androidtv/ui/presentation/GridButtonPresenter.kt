@@ -4,31 +4,45 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.leanback.widget.Presenter
+import kotlinx.coroutines.flow.MutableStateFlow
 import org.jellyfin.androidtv.R
 import org.jellyfin.androidtv.ui.GridButton
+import org.jellyfin.androidtv.ui.base.JellyfinTheme
+import org.jellyfin.androidtv.ui.base.LocalEphyraPalette
 import org.jellyfin.androidtv.ui.base.Text
+import org.jellyfin.androidtv.ui.composable.item.ArtToneCover
+import org.jellyfin.androidtv.ui.composable.item.cardFocusRing
 import org.jellyfin.androidtv.ui.itemhandling.GridButtonBaseRowItem
 
-class GridButtonPresenter @JvmOverloads constructor(
-	private val width: Int = 110,
-	private val imageHeight: Int = 110,
-) : Presenter() {
+// Ephyra: the design system's card overlay shade, rgba(5, 8, 20), as on the library cards
+private val BUTTON_SHADE = Color(0xFF050814)
+
+/**
+ * Ephyra: a grid button (Guide, Recordings, Genres...) drawn as a wide library card: the `art-*` tone of its label with its icon
+ * in the middle, or its picture, and the label in bold on the card's bottom shade. The focus ring and zoom are the cards'.
+ */
+class GridButtonPresenter : Presenter() {
 	private class ComposeViewWrapper(composeView: ComposeView) : FrameLayout(composeView.context) {
 		init {
 			isFocusable = true
@@ -47,31 +61,52 @@ class GridButtonPresenter @JvmOverloads constructor(
 	inner class ViewHolder(
 		private val composeView: ComposeView,
 	) : Presenter.ViewHolder(ComposeViewWrapper(composeView)) {
+		private val focused = MutableStateFlow(false)
+
+		init {
+			view.setOnFocusChangeListener { _, hasFocus -> focused.value = hasFocus }
+		}
+
 		fun bind(value: GridButton) = composeView.setContent {
+			val isFocused by focused.collectAsState()
+			val shape = JellyfinTheme.shapes.medium
+
 			Box(
 				modifier = Modifier
-					.width(width.dp)
-					.clip(RoundedCornerShape(4.dp))
-					.background(colorResource(R.color.button_default_normal_background))
+					.size(CARD_WIDTH.dp, CARD_HEIGHT.dp)
+					.clip(shape)
+					.cardFocusRing(focused = isFocused, ring = LocalEphyraPalette.current.accent, shape = shape)
 			) {
 				if (value.imageRes != null) {
 					Image(
 						painter = painterResource(value.imageRes),
-						contentDescription = value.text,
+						contentDescription = null,
 						contentScale = ContentScale.Crop,
-						modifier = Modifier.size(width.dp, imageHeight.dp)
+						modifier = Modifier.fillMaxSize(),
 					)
+				} else {
+					ArtToneCover(value.text, value.iconRes ?: R.drawable.ic_folder, alwaysShowIcon = true)
 				}
+
+				Box(
+					modifier = Modifier
+						.fillMaxSize()
+						.background(Brush.verticalGradient(0.4f to BUTTON_SHADE.copy(alpha = 0f), 1f to BUTTON_SHADE.copy(alpha = 0.86f))),
+				)
 
 				Text(
 					text = value.text,
-					style = TextStyle(
-						color = colorResource(R.color.button_default_normal_text),
-						fontSize = 12.sp
-					),
+					maxLines = 1,
+					overflow = TextOverflow.Ellipsis,
+					color = LocalEphyraPalette.current.ink,
+					fontSize = 18.sp,
+					fontWeight = FontWeight.Bold,
+					lineHeight = 22.sp,
 					modifier = Modifier
-						.padding(15.dp, 10.dp)
 						.align(Alignment.BottomStart)
+						.fillMaxWidth()
+						.then(if (isFocused) Modifier.basicMarquee(iterations = Int.MAX_VALUE, initialDelayMillis = 0) else Modifier)
+						.padding(start = 8.dp, end = 8.dp, bottom = 8.dp),
 				)
 			}
 		}
@@ -96,4 +131,10 @@ class GridButtonPresenter @JvmOverloads constructor(
 
 	override fun onUnbindViewHolder(viewHolder: Presenter.ViewHolder) = Unit
 	override fun onViewAttachedToWindow(viewHolder: Presenter.ViewHolder) = Unit
+
+	private companion object {
+		// 16:9, the size of the small "My media" cards on a 960dp screen
+		const val CARD_WIDTH = 192
+		const val CARD_HEIGHT = 108
+	}
 }

@@ -166,3 +166,4 @@ included.
 
 Ephyra is not affiliated with or endorsed by the Jellyfin project or NVIDIA. "SHIELD" is a trademark of NVIDIA
 Corporation; it is used here only to name the device the fork targets.
+| UI | Live TV library: the Guide, Recordings, Schedule and Series buttons are 192x108 cards with an icon and their label on the bottom shade, like the other cards; the "Live TV" library tile shows the TV icon on the art tone | done |

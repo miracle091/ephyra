@@ -73,6 +73,7 @@ fun ArtToneCover(
 	title: String?,
 	@DrawableRes iconRes: Int,
 	modifier: Modifier = Modifier,
+	alwaysShowIcon: Boolean = false,
 ) {
 	Box(
 		contentAlignment = Alignment.Center,
@@ -80,11 +81,11 @@ fun ArtToneCover(
 			.fillMaxSize()
 			.background(artToneFor(title)),
 	) {
-		if (title.isNullOrBlank()) {
+		if (alwaysShowIcon || title.isNullOrBlank()) {
 			Image(
 				painter = painterResource(iconRes),
 				contentDescription = null,
-				modifier = Modifier.fillMaxSize(0.4f),
+				modifier = Modifier.fillMaxSize(if (alwaysShowIcon) 0.3f else 0.4f),
 			)
 		}
 	}
