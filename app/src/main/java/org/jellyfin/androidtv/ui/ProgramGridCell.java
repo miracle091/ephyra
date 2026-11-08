@@ -4,18 +4,18 @@ import static org.koin.java.KoinJavaComponent.get;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Color;
 import android.graphics.Rect;
-import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import org.jellyfin.androidtv.R;
 import org.jellyfin.androidtv.preference.LiveTvPreferences;
+import org.jellyfin.androidtv.ui.livetv.GuideStyle;
 import org.jellyfin.androidtv.ui.livetv.LiveTvGuide;
 import org.jellyfin.androidtv.util.DateTimeExtensionsKt;
 import org.jellyfin.androidtv.util.Utils;
@@ -48,6 +48,7 @@ public class ProgramGridCell extends RelativeLayout implements RecordingIndicato
         this.addView(v);
 
         setFocusable(true);
+        setBackground(GuideStyle.cellBackground(context));
 
         mProgramName = findViewById(R.id.programName);
         mInfoRow = findViewById(R.id.infoRow);
@@ -62,7 +63,8 @@ public class ProgramGridCell extends RelativeLayout implements RecordingIndicato
             if (localStart.plusMinutes(1).isBefore(activity.getCurrentLocalStartDate())) {
                 mProgramName.setText("<< "+mProgramName.getText());
                 TextView time = new TextView(context);
-                time.setTypeface(Typeface.create("sans-serif-light", Typeface.NORMAL));
+                time.setTypeface(GuideStyle.monoTypeface(context));
+                time.setTextColor(Utils.getThemeColor(context, R.attr.controlIconForegroundInactive));
                 time.setTextSize(12);
                 time.setText(DateTimeExtensionsKt.getTimeFormatter(getContext()).format(program.getStartDate()));
                 mInfoRow.addView(time);
@@ -72,23 +74,23 @@ public class ProgramGridCell extends RelativeLayout implements RecordingIndicato
         LiveTvPreferences liveTvPreferences = get(LiveTvPreferences.class);
 
         if (liveTvPreferences.get(LiveTvPreferences.Companion.getShowNewIndicator()) && BaseItemExtensionsKt.isNew(program) && (!liveTvPreferences.get(LiveTvPreferences.Companion.getShowPremiereIndicator()) || !Utils.isTrue(program.isPremiere()))) {
-            addBlockText(context.getString(R.string.lbl_new), 10, Color.GRAY, R.drawable.dark_green_gradient);
+            addBlockText(context.getString(R.string.lbl_new));
         }
 
         if (liveTvPreferences.get(LiveTvPreferences.Companion.getShowPremiereIndicator()) && Utils.isTrue(program.isPremiere())) {
-            addBlockText(context.getString(R.string.lbl_premiere), 10, Color.GRAY, R.drawable.dark_green_gradient);
+            addBlockText(context.getString(R.string.lbl_premiere));
         }
 
         if (liveTvPreferences.get(LiveTvPreferences.Companion.getShowRepeatIndicator()) && Utils.isTrue(program.isRepeat())) {
-            addBlockText(context.getString(R.string.lbl_repeat), 10, Color.GRAY, androidx.leanback.R.color.lb_default_brand_color);
+            addBlockText(context.getString(R.string.lbl_repeat));
         }
 
         if (program.getOfficialRating() != null && !program.getOfficialRating().equals("0")) {
-            addBlockText(program.getOfficialRating(), 10, Color.BLACK, R.drawable.block_text_bg);
+            addBlockText(program.getOfficialRating());
         }
 
         if (liveTvPreferences.get(LiveTvPreferences.Companion.getShowHDIndicator()) && Utils.isTrue(program.isHd())) {
-            addBlockText("HD", 10, Color.BLACK, R.drawable.block_text_bg);
+            addBlockText("HD");
         }
 
         if (program.getSeriesTimerId() != null) {
@@ -97,6 +99,16 @@ public class ProgramGridCell extends RelativeLayout implements RecordingIndicato
             mRecIndicator.setImageResource(R.drawable.ic_record_red);
         }
 
+
+        // the programme on air gets a bar in the theme's accent
+        if (program.getStartDate() != null && program.getEndDate() != null) {
+            int now = GuideStyle.nowProgress(program.getStartDate(), program.getEndDate(), activity.getCurrentLocalStartDate(), LocalDateTime.now());
+            if (now >= 0) {
+                ProgressBar nowBar = findViewById(R.id.nowBar);
+                nowBar.setProgress(now);
+                nowBar.setVisibility(View.VISIBLE);
+            }
+        }
 
         if (keyListen) {
             setOnClickListener(new OnClickListener() {
@@ -109,15 +121,14 @@ public class ProgramGridCell extends RelativeLayout implements RecordingIndicato
 
     }
 
-    private void addBlockText(String text, int size, int textColor, int backgroundRes) {
+    private void addBlockText(String text) {
         TextView view = new TextView(getContext());
-        view.setTextSize(size);
-        view.setTextColor(textColor);
-        view.setText(" " + text + " ");
-        view.setBackgroundResource(backgroundRes);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-        params.setMargins(0, Utils.convertDpToPixel(getContext(), -2), 0, 0);
-        view.setLayoutParams(params);
+        view.setTextSize(10);
+        view.setTextColor(Utils.getThemeColor(getContext(), R.attr.controlIconForegroundInactive));
+        view.setText(text);
+        view.setBackgroundResource(R.drawable.ephyra_guide_badge);
+        int sidePadding = Utils.convertDpToPixel(getContext(), 4);
+        view.setPadding(sidePadding, 0, sidePadding, 0);
         mInfoRow.addView(view);
     }
 
@@ -135,7 +146,7 @@ public class ProgramGridCell extends RelativeLayout implements RecordingIndicato
                 mBackgroundColor = getResources().getColor(R.color.guide_kids_bg);
             }
 
-            setBackgroundColor(mBackgroundColor);
+            setBackground(GuideStyle.cellBackground(getContext(), mBackgroundColor));
         }
     }
 
@@ -144,11 +155,7 @@ public class ProgramGridCell extends RelativeLayout implements RecordingIndicato
         super.onFocusChanged(gainFocus, direction, previouslyFocusedRect);
 
         if (gainFocus) {
-            setBackgroundColor(Utils.getThemeColor(getContext(), android.R.attr.colorAccent));
-
             mActivity.setSelectedProgram(this);
-        } else {
-            setBackgroundColor(mBackgroundColor);
         }
     }
 

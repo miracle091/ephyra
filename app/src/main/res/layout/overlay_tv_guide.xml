@@ -17,11 +17,12 @@
         android:layout_height="match_parent"
         android:id="@+id/channelScroller"
         android:layout_gravity="top|start|center"
-        android:background="@color/channel_scroller_bg"
+        android:background="?attr/defaultBackground"
+        android:layout_marginStart="@dimen/ephyra_side_margin"
         android:layout_marginTop="305dp"
         android:focusable="false"
         android:focusableInTouchMode="false"
-        android:layout_marginBottom="20sp">
+        android:layout_marginBottom="27dp">
 
         <LinearLayout
             android:orientation="vertical"
@@ -36,7 +37,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/programVScroller"
-        android:background="@color/program_scroller_bg"
+        android:background="?attr/defaultBackground"
         android:layout_alignTop="@+id/channelScroller"
         android:layout_toEndOf="@+id/channelScroller"
         android:layout_alignBottom="@+id/channelScroller">
@@ -63,7 +64,7 @@
         android:layout_above="@+id/programVScroller"
         android:layout_toEndOf="@+id/channelScroller"
         android:focusable="false"
-        android:background="@color/timeline_bg"
+        android:background="?attr/defaultBackground"
         android:focusableInTouchMode="false">
 
         <LinearLayout
@@ -75,16 +76,19 @@
     </HorizontalScrollView>
 
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="160sp"
         android:layout_height="30sp"
         android:text="Medium Text"
         android:id="@+id/displayDate"
         android:layout_above="@+id/programVScroller"
-        android:layout_toStartOf="@+id/timelineHScroller"
-        android:background="@color/timeline_bg"
-        android:gravity="center"
+        android:background="?attr/defaultBackground"
+        android:gravity="center_vertical"
+        android:paddingStart="4dp"
         android:layout_alignParentStart="true"
+        android:layout_marginStart="@dimen/ephyra_side_margin"
+        android:textColor="?attr/controlIconForegroundInactive"
         android:textSize="14sp"
+        android:textStyle="bold"
         android:enabled="false" />
 
 
@@ -92,7 +96,10 @@
         android:layout_width="315dp"
         android:layout_height="80sp"
         android:id="@+id/guideTitle"
-        android:textSize="25sp"
+        android:layout_marginStart="@dimen/ephyra_side_margin"
+        android:textColor="?attr/headerTextColor"
+        android:textSize="28sp"
+        android:textStyle="bold"
         android:layout_marginEnd="10dp"
         android:ellipsize="end"
         android:maxLines="1"
@@ -105,13 +112,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/textClock2"
-        android:layout_marginEnd="20sp"
+        android:layout_marginEnd="@dimen/ephyra_side_margin"
         android:layout_alignParentEnd="true"
-        android:layout_marginTop="25dp"
+        android:layout_marginTop="@dimen/ephyra_safe_y"
         android:format12Hour="h:mm"
         android:format24Hour="k:mm"
         android:gravity="end"
-        android:textSize="26sp" />
+        android:textColor="?attr/controlIconForegroundInactive"
+        android:textSize="16sp" />
 
     <LinearLayout
         android:orientation="horizontal"
@@ -127,6 +135,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/summary"
+        android:textColor="?attr/controlIconForegroundInactive"
         android:textSize="16sp"
         android:layout_below="@+id/guideInfoRow"
         android:layout_above="@+id/timelineHScroller"
@@ -144,9 +153,9 @@
         android:layout_height="wrap_content"
         android:layout_alignStart="@id/guideCurrentTitle"
         android:layout_alignParentBottom="true"
-        android:layout_marginStart="2sp"
-        android:layout_marginBottom="2sp"
-        android:textColor="@color/grey_light"
+        android:layout_marginStart="@dimen/ephyra_side_margin"
+        android:layout_marginBottom="4dp"
+        android:textColor="?attr/controlIconForegroundInactive"
         android:textSize="12sp"
         android:fontFamily="@font/atkinson_hyperlegible_next_family" />
 
@@ -158,11 +167,11 @@
         android:gravity="end"
         android:layout_alignRight="@+id/programVScroller"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="2sp"
-        android:layout_marginEnd="10sp"
+        android:layout_marginBottom="4dp"
+        android:layout_marginEnd="@dimen/ephyra_side_margin"
         android:textStyle="bold"
         android:textSize="12sp"
-        android:textColor="@color/grey_light"
+        android:textColor="?attr/controlIconForegroundInactive"
         android:fontFamily="@font/atkinson_hyperlegible_next_family" />
 
     <RelativeLayout
@@ -201,6 +210,8 @@
         android:layout_toStartOf="@+id/imageView15"
         android:textSize="20sp"
         android:gravity="center_vertical"
+        android:paddingStart="@dimen/ephyra_side_margin"
+        android:textColor="?attr/headerTextColor"
         android:background="@color/black_transparent"
         android:textStyle="bold"
         android:layout_alignParentStart="true"

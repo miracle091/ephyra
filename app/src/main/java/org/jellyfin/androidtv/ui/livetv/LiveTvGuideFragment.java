@@ -5,7 +5,6 @@ import static org.koin.java.KoinJavaComponent.inject;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.KeyEvent;
@@ -122,8 +121,6 @@ public class LiveTvGuideFragment extends Fragment implements LiveTvGuide, View.O
         mSummary = binding.summary;
         mChannelStatus = binding.channelsStatus;
         mFilterStatus = binding.filterStatus;
-        mChannelStatus.setTextColor(Color.GRAY);
-        mFilterStatus.setTextColor(Color.GRAY);
         mInfoRow = binding.infoRow;
         mImage = binding.programImage;
         mChannels = binding.channels;
@@ -597,7 +594,7 @@ public class LiveTvGuideFragment extends Fragment implements LiveTvGuide, View.O
 
             mChannelStatus.setText(displayedChannels+" of "+mAllChannels.size()+" channels");
             mFilterStatus.setText(mFilters.toString() + " for "+getGuideHours()+" hours");
-            mFilterStatus.setTextColor(mFilters.any() ? Color.WHITE : Color.GRAY);
+            mFilterStatus.setTextColor(Utils.getThemeColor(requireContext(), mFilters.any() ? android.R.attr.colorAccent : R.attr.controlIconForegroundInactive));
 
             mResetButton.setVisibility(mCurrentGuideStart.isAfter(LocalDateTime.now()) ? View.VISIBLE : View.GONE); // show reset button if paged ahead
 
@@ -728,6 +725,9 @@ public class LiveTvGuideFragment extends Fragment implements LiveTvGuide, View.O
         LocalDateTime current = mCurrentGuideStart;
         while (current.isBefore(mCurrentGuideEnd)) {
             TextView time = new TextView(requireContext());
+            time.setTypeface(GuideStyle.monoTypeface(requireContext()));
+            time.setTextColor(Utils.getThemeColor(requireContext(), R.attr.controlIconForegroundInactive));
+            time.setTextSize(14);
             time.setText(DateTimeExtensionsKt.getTimeFormatter(getContext()).format(current));
             time.setWidth(interval != 60 ? ( interval < 15 ? 15 * guideRowWidthPerMinPx : interval * guideRowWidthPerMinPx) : oneHour);
             mTimeline.addView(time);

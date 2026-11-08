@@ -233,11 +233,12 @@ public class RecordPopup {
         LocalDateTime local = program.getStartDate();
         TextView on = new TextView(mContext);
         on.setText(mContext.getString(R.string.lbl_on));
+        on.setTextColor(Utils.getThemeColor(mContext, R.attr.controlIconForegroundInactive));
         timelineRow.addView(on);
         TextView channel = new TextView(mContext);
         channel.setText(program.getChannelName());
         channel.setTypeface(null, Typeface.BOLD);
-        channel.setTextColor(mContext.getResources().getColor(android.R.color.holo_blue_light));
+        channel.setTextColor(Utils.getThemeColor(mContext, R.attr.headerTextColor));
         timelineRow.addView(channel);
         TextView datetime = new TextView(mContext);
         datetime.setText(new StringBuilder()
@@ -248,6 +249,7 @@ public class RecordPopup {
                 .append(DateUtils.getRelativeTimeSpanString(local.toInstant(ZoneOffset.UTC).toEpochMilli(), Instant.now().toEpochMilli(), 0))
                 .append(")")
         );
+        datetime.setTextColor(Utils.getThemeColor(mContext, R.attr.controlIconForegroundInactive));
         timelineRow.addView(datetime);
 
     }

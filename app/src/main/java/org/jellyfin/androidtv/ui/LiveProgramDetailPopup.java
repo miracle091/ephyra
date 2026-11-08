@@ -87,11 +87,6 @@ public class LiveProgramDetailPopup {
         mDButtonRow.removeAllViews();
 
         mDSummary.setText(mProgram.getOverview());
-        if (mDSummary.getLineCount() < 2) {
-            mDSummary.setGravity(Gravity.CENTER);
-        } else {
-            mDSummary.setGravity(Gravity.START);
-        }
 
         // build timeline info
         TvManager.setTimelineRow(mContext, mDTimeline, mProgram);
@@ -111,10 +106,8 @@ public class LiveProgramDetailPopup {
             if (Utils.canManageRecordings(KoinJavaComponent.<UserRepository>get(UserRepository.class).getCurrentUser().getValue())) {
                 if (mProgram.getTimerId() != null) {
                     // cancel button
-                    Button cancel = new Button(mContext);
+                    Button cancel = newButton();
                     cancel.setText(mContext.getResources().getString(R.string.lbl_cancel_recording));
-                    cancel.setTextColor(Color.WHITE);
-                    cancel.setBackgroundResource(R.drawable.jellyfin_button);
                     cancel.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -133,10 +126,8 @@ public class LiveProgramDetailPopup {
                     mDRecordInfo.setText(mProgram.getStartDate().isBefore(LocalDateTime.now()) ? mContext.getResources().getString(R.string.msg_recording_now) : mContext.getResources().getString(R.string.msg_will_record));
                 } else {
                     // record button
-                    Button rec = new Button(mContext);
+                    Button rec = newButton();
                     rec.setText(mContext.getResources().getString(R.string.lbl_record));
-                    rec.setTextColor(Color.WHITE);
-                    rec.setBackgroundResource(R.drawable.jellyfin_button);
                     rec.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -159,10 +150,8 @@ public class LiveProgramDetailPopup {
                 if (Utils.isTrue(mProgram.isSeries())) {
                     if (mProgram.getSeriesTimerId() != null) {
                         // cancel series button
-                        Button cancel = new Button(mContext);
+                        Button cancel = newButton();
                         cancel.setText(mContext.getResources().getString(R.string.lbl_cancel_series));
-                        cancel.setTextColor(Color.WHITE);
-                        cancel.setBackgroundResource(R.drawable.jellyfin_button);
                         cancel.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -188,10 +177,8 @@ public class LiveProgramDetailPopup {
                         mDButtonRow.addView(cancel);
                     } else {
                         // record series button
-                        Button rec = new Button(mContext);
+                        Button rec = newButton();
                         rec.setText(mContext.getResources().getString(R.string.lbl_record_series));
-                        rec.setTextColor(Color.WHITE);
-                        rec.setBackgroundResource(R.drawable.jellyfin_button);
                         rec.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -211,10 +198,8 @@ public class LiveProgramDetailPopup {
                     }
 
                     // manage series button
-                    mSeriesSettingsButton = new Button(mContext);
+                    mSeriesSettingsButton = newButton();
                     mSeriesSettingsButton.setText(mContext.getResources().getString(R.string.lbl_series_settings));
-                    mSeriesSettingsButton.setTextColor(Color.WHITE);
-                    mSeriesSettingsButton.setBackgroundResource(R.drawable.jellyfin_button);
                     mSeriesSettingsButton.setVisibility(mProgram.getSeriesTimerId() != null ? View.VISIBLE : View.GONE);
                     mSeriesSettingsButton.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -259,14 +244,15 @@ public class LiveProgramDetailPopup {
         BaseItemDto channel = TvManager.getChannel(TvManager.getAllChannelsIndex(mProgram.getChannelId()));
         boolean isFav = channel != null && channel.getUserData() != null && channel.getUserData().isFavorite();
 
-        android.widget.ImageButton fave = addImgButton(mDButtonRow, isFav ? R.drawable.ic_heart_accent : R.drawable.ic_heart);
+        android.widget.ImageButton fave = addImgButton(mDButtonRow, R.drawable.ic_heart);
+        setFavoriteIcon(fave, isFav);
         fave.setEnabled(channel != null);
         if (channel == null) return fave;
         fave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 LiveProgramDetailPopupHelperKt.toggleFavorite(LiveProgramDetailPopup.this, channel, channel -> {
-                    fave.setImageDrawable(ContextCompat.getDrawable(mContext, channel.getUserData().isFavorite() ? R.drawable.ic_heart_accent : R.drawable.ic_heart));
+                    setFavoriteIcon(fave, channel.getUserData().isFavorite());
                     mTvGuide.refreshFavorite(channel.getId());
                     DataRefreshService dataRefreshService = KoinJavaComponent.<DataRefreshService>get(DataRefreshService.class);
                     dataRefreshService.setLastFavoriteUpdate(Instant.now());
@@ -281,16 +267,31 @@ public class LiveProgramDetailPopup {
     private android.widget.ImageButton addImgButton(LinearLayout layout, int imgResource) {
         android.widget.ImageButton btn = new android.widget.ImageButton(mContext);
         btn.setImageDrawable(ContextCompat.getDrawable(mContext, imgResource));
-        btn.setBackgroundResource(R.drawable.jellyfin_button);
+        // Ephyra: the player's icon button, 48dp with a 24dp icon and an ink circle when focused
+        int size = mContext.getResources().getDimensionPixelSize(R.dimen.ephyra_osd_button);
+        int padding = (size - mContext.getResources().getDimensionPixelSize(R.dimen.ephyra_osd_icon)) / 2;
+        btn.setBackgroundResource(R.drawable.ephyra_osd_button_back);
+        btn.setPadding(padding, padding, padding, padding);
+        btn.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);
+        btn.setLayoutParams(new LinearLayout.LayoutParams(size, size));
         layout.addView(btn);
         return btn;
     }
 
+    // Ephyra: the design system's ghost button, ink-muted until focused, then the solid ink fill
+    private Button newButton() {
+        return new Button(mContext, null, 0, R.style.Button_Ephyra_Ghost);
+    }
+
+    private void setFavoriteIcon(android.widget.ImageButton button, boolean favorite) {
+        button.setImageResource(favorite ? R.drawable.ic_heart_accent : R.drawable.ic_heart);
+        // the outline heart follows the focus like the other icons; the accent one keeps its colour
+        button.setImageTintList(favorite ? null : ContextCompat.getColorStateList(mContext, R.color.ephyra_osd_icon_tint));
+    }
+
     private Button addButton(LinearLayout layout, int stringResource) {
-        Button btn = new Button(mContext);
+        Button btn = newButton();
         btn.setText(mContext.getResources().getString(stringResource));
-        btn.setTextColor(Color.WHITE);
-        btn.setBackgroundResource(R.drawable.jellyfin_button);
         layout.addView(btn);
         return btn;
     }

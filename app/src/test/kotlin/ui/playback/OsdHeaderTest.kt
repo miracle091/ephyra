@@ -30,4 +30,19 @@ class OsdHeaderTest : FunSpec({
 
 		OsdHeader.overlineOf(item, "") shouldBe ""
 	}
+
+	test("A live channel's overline is Live, its number and its name") {
+		val item = BaseItemDto(id = UUID.randomUUID(), type = BaseItemKind.TV_CHANNEL, number = "102", name = "Sport Uno")
+
+		OsdHeader.overlineOf(item, "", "Live") shouldBe "Live · 102 · Sport Uno"
+	}
+
+	test("A live channel's title is the programme on air, else the channel's name") {
+		val program = BaseItemDto(id = UUID.randomUUID(), type = BaseItemKind.PROGRAM, name = "Match of the Day")
+		val onAir = BaseItemDto(id = UUID.randomUUID(), type = BaseItemKind.TV_CHANNEL, name = "Sport Uno", currentProgram = program)
+		val idle = BaseItemDto(id = UUID.randomUUID(), type = BaseItemKind.TV_CHANNEL, name = "Sport Uno")
+
+		OsdHeader.titleOf(onAir) shouldBe "Match of the Day"
+		OsdHeader.titleOf(idle) shouldBe "Sport Uno"
+	}
 })

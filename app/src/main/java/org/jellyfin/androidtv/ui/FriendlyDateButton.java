@@ -1,7 +1,6 @@
 package org.jellyfin.androidtv.ui;
 
 import android.content.Context;
-import android.graphics.Rect;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -33,15 +32,4 @@ public class FriendlyDateButton extends FrameLayout {
     }
 
     public LocalDateTime getDate() { return dateVal; }
-
-    @Override
-    protected void onFocusChanged(boolean gainFocus, int direction, Rect previouslyFocusedRect) {
-        super.onFocusChanged(gainFocus, direction, previouslyFocusedRect);
-
-        if (gainFocus) {
-            setBackgroundColor(getResources().getColor(androidx.leanback.R.color.lb_default_brand_color));
-        } else {
-            setBackgroundColor(0);
-        }
-    }
 }

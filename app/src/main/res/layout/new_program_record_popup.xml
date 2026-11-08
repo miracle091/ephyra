@@ -8,13 +8,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/title"
-        android:textSize="25sp"
-        android:layout_marginEnd="20sp"
+        android:textColor="?attr/headerTextColor"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        android:layout_marginEnd="24dp"
         android:ellipsize="end"
         android:maxLines="1"
-        android:layout_marginStart="20sp"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="10sp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="20dp"
         android:fontFamily="@font/atkinson_hyperlegible_next_family" />
 
     <LinearLayout
@@ -25,7 +26,8 @@
         android:id="@+id/timeline"
         android:showDividers="middle"
         android:divider="@drawable/blank10x10"
-        android:gravity="center"/>
+        android:gravity="center_vertical"
+        android:paddingStart="24dp"/>
 
     <LinearLayout
         android:orientation="horizontal"
@@ -38,22 +40,20 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            style="@style/Button.Ephyra.Ghost"
             android:text="@string/lbl_save"
             android:id="@+id/okButton"
-            android:background="@drawable/jellyfin_button"
             android:minWidth="90dp"
-            android:layout_marginEnd="10sp"
-            android:textColor="@android:color/white" />
+            android:layout_marginEnd="10sp" />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            style="@style/Button.Ephyra.Ghost"
             android:text="@string/lbl_cancel"
-            android:background="@drawable/jellyfin_button"
             android:id="@+id/cancelButton"
             android:minWidth="90dp"
-            android:layout_marginStart="10sp"
-            android:textColor="@android:color/white" />
+            android:layout_marginStart="10sp" />
     </LinearLayout>
 
     <LinearLayout
@@ -92,7 +92,9 @@
                 android:spinnerMode="dialog"
                 android:layout_marginStart="5dp"
                 android:layout_below="@+id/textView1"
-                android:background="@drawable/jellyfin_button" />
+                android:background="@drawable/ephyra_guide_cell"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="8dp" />
 
         </RelativeLayout>
 
@@ -120,7 +122,9 @@
                 android:spinnerMode="dialog"
                 android:layout_below="@+id/textView2"
                 android:layout_marginStart="5sp"
-                android:background="@drawable/jellyfin_button" />
+                android:background="@drawable/ephyra_guide_cell"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="8dp" />
 
         </RelativeLayout>
 

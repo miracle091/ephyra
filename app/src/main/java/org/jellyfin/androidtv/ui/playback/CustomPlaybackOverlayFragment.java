@@ -4,7 +4,6 @@ import static org.koin.java.KoinJavaComponent.inject;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.graphics.Color;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -53,6 +52,7 @@ import org.jellyfin.androidtv.ui.ProgramGridCell;
 import org.jellyfin.androidtv.ui.ScrollViewListener;
 import org.jellyfin.androidtv.ui.itemhandling.ChapterItemInfoBaseRowItem;
 import org.jellyfin.androidtv.ui.itemhandling.ItemRowAdapter;
+import org.jellyfin.androidtv.ui.livetv.GuideStyle;
 import org.jellyfin.androidtv.ui.livetv.LiveTvGuide;
 import org.jellyfin.androidtv.ui.livetv.LiveTvGuideFragment;
 import org.jellyfin.androidtv.ui.livetv.LiveTvGuideFragmentHelperKt;
@@ -248,8 +248,6 @@ public class CustomPlaybackOverlayFragment extends Fragment implements LiveTvGui
         setupPopupAnimations();
 
         //live guide
-        tvGuideBinding.channelsStatus.setTextColor(Color.GRAY);
-        tvGuideBinding.filterStatus.setTextColor(Color.GRAY);
 
         tvGuideBinding.programRows.setFocusable(false);
         tvGuideBinding.programVScroller.setScrollViewListener(new ScrollViewListener() {
@@ -1018,6 +1016,9 @@ public class CustomPlaybackOverlayFragment extends Fragment implements LiveTvGui
         LocalDateTime current = mCurrentGuideStart;
         while (current.isBefore(mCurrentGuideEnd)) {
             TextView time = new TextView(requireContext());
+            time.setTypeface(GuideStyle.monoTypeface(requireContext()));
+            time.setTextColor(Utils.getThemeColor(requireContext(), R.attr.controlIconForegroundInactive));
+            time.setTextSize(14);
             time.setText(DateTimeExtensionsKt.getTimeFormatter(getContext()).format(current));
             time.setWidth(interval == 30 ? halfHour : oneHour);
             tvGuideBinding.timeline.addView(time);

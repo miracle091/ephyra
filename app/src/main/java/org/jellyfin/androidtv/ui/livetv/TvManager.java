@@ -183,11 +183,12 @@ public class TvManager {
         LocalDateTime local = program.getStartDate();
         TextView on = new TextView(context);
         on.setText(context.getResources().getString(R.string.lbl_on));
+        on.setTextColor(Utils.getThemeColor(context, R.attr.controlIconForegroundInactive));
         timelineRow.addView(on);
         TextView channel = new TextView(context);
         channel.setText(program.getChannelName());
         channel.setTypeface(null, Typeface.BOLD);
-        channel.setTextColor(context.getResources().getColor(android.R.color.holo_blue_light));
+        channel.setTextColor(Utils.getThemeColor(context, R.attr.headerTextColor));
         timelineRow.addView(channel);
         TextView datetime = new TextView(context);
         datetime.setText(new StringBuilder()
@@ -198,6 +199,7 @@ public class TvManager {
                 .append(DateUtils.getRelativeTimeSpanString(local.toInstant(ZoneOffset.UTC).toEpochMilli(), Instant.now().toEpochMilli(), 0))
                 .append(")")
         );
+        datetime.setTextColor(Utils.getThemeColor(context, R.attr.controlIconForegroundInactive));
         timelineRow.addView(datetime);
     }
 

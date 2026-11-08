@@ -1,47 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Ephyra: a channel of the Live TV guide, the number in mono over the name, the logo on the right. The cell background and its
+     focus state come from GuideChannelHeader -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="2sp"
-    android:background="@drawable/light_border">
+    android:paddingHorizontal="12dp"
+    android:paddingVertical="6dp">
 
     <TextView
-        android:layout_width="100sp"
+        android:id="@+id/channelNumber"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Small Text"
-        android:id="@+id/channelName"
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"
-        android:layout_margin="2sp"
+        android:fontFamily="@font/atkinson_hyperlegible_mono"
         android:maxLines="1"
-        android:textSize="18sp" />
+        android:textColor="?attr/controlIconForegroundInactive"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        tools:text="102" />
 
     <TextView
-        android:layout_width="100sp"
+        android:id="@+id/channelName"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Small Text"
-        android:id="@+id/channelNumber"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="48dp"
+        android:ellipsize="end"
         android:maxLines="1"
+        android:textColor="?attr/headerTextColor"
         android:textSize="14sp"
-        android:layout_marginStart="3sp"
-        android:layout_marginEnd="3sp"
-        android:layout_below="@+id/channelName"
-        android:layout_alignParentStart="true" />
+        android:textStyle="bold"
+        tools:text="Sport Uno" />
 
     <org.jellyfin.androidtv.ui.AsyncImageView
-        android:layout_width="100sp"
-        android:layout_height="50sp"
         android:id="@+id/channelImage"
+        android:layout_width="40dp"
+        android:layout_height="32dp"
         android:layout_alignParentTop="true"
-        android:layout_toEndOf="@+id/channelName"
+        android:layout_alignParentEnd="true"
         android:scaleType="centerInside" />
 
     <ImageView
+        android:id="@+id/favImage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/favImage"
+        android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
-        android:layout_toStartOf="@+id/channelImage"
+        android:contentDescription="@null"
         android:scaleType="center"
         android:src="@drawable/ic_heart_accent"
         android:visibility="gone" />

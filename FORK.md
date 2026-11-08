@@ -123,6 +123,7 @@ The status column shows how far each change has gone. A change becomes "done" wh
 | UI | The home spotlight shows the community rating with the gold star and the critics' rating with the Rotten Tomatoes logo before the year and runtime, as in the details' info row | done |
 | UI | Settings follow the home spotlight's scale: each screen's header has an accent overline, a 28sp title and a 14sp caption; the panel sits on the theme's first surface, rows have medium corners and wider padding, and trailing values read as secondary text | done |
 | UI | Home rows leave 12dp between cards instead of 8dp, so the focused card's 6% zoom and its ring stay off the next card; the card widths are recomputed so the rows still fill the screen | done |
+| UI | The live TV guide matches the player and the home rows: rounded cells with the cards' margins and focus ring, times in the clock's figures, an accent bar on the programme on air, popups with the player's buttons; in the player a live channel's header reads "Live · number · channel" above the programme on air. Unused guide drawables and colours removed | done |
 
 ## What changes for users
 

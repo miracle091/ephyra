@@ -23,17 +23,12 @@
     <color name="grey_transparent">#CC4b4b4b</color>
 
     <!-- Gradients -->
-    <color name="dark_green_gradient_start">#c306610a</color>
-    <color name="dark_green_gradient_end">#c3064d07</color>
     <color name="green_gradient_start">#044b13</color>
     <color name="green_gradient_end">#085c04</color>
     <color name="red_gradient_start">#7c0b09</color>
     <color name="red_gradient_end">#900d10</color>
 
     <!-- Live TV Colors -->
-    <color name="channel_scroller_bg">#201b1c</color>
-    <color name="program_scroller_bg">#0b0e14</color>
-    <color name="timeline_bg">#201b1c</color>
     <!-- ProgramGridCell Background Colors -->
     <color name="guide_movie_bg">#328E24AA</color>
     <color name="guide_sports_bg">#323949AB</color>

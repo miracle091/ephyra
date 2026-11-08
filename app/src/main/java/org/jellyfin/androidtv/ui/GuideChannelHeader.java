@@ -9,9 +9,8 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import androidx.core.content.ContextCompat;
-
 import org.jellyfin.androidtv.R;
+import org.jellyfin.androidtv.ui.livetv.GuideStyle;
 import org.jellyfin.androidtv.ui.livetv.LiveTvGuide;
 import org.jellyfin.androidtv.ui.livetv.LiveTvGuideFragment;
 import org.jellyfin.androidtv.util.ImageHelper;
@@ -44,6 +43,7 @@ public class GuideChannelHeader extends RelativeLayout {
         ));
         this.addView(v);
         this.setFocusable(true);
+        this.setBackground(GuideStyle.cellBackground(context));
         ((TextView) findViewById(R.id.channelName)).setText(channel.getName());
         ((TextView) findViewById(R.id.channelNumber)).setText(channel.getNumber());
         mChannelImage = findViewById(R.id.channelImage);
@@ -79,11 +79,7 @@ public class GuideChannelHeader extends RelativeLayout {
         super.onFocusChanged(gainFocus, direction, previouslyFocusedRect);
 
         if (gainFocus) {
-            setBackgroundColor(Utils.getThemeColor(mContext, android.R.attr.colorAccent));
-
             mTvGuide.setSelectedProgram(this);
-        } else {
-            setBackground(ContextCompat.getDrawable(mContext, R.drawable.light_border));
         }
     }
 }
