@@ -2,6 +2,8 @@ package org.jellyfin.androidtv.util.profile.codec
 
 import android.content.Context
 import android.media.AudioFormat
+import android.media.MediaCodecInfo
+import android.media.MediaCodecList
 import androidx.annotation.OptIn
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
@@ -30,4 +32,16 @@ fun isPassthroughAudioAvailable(context: Context, mimetype: String): Boolean {
 		.build()
 
 	return capabilities.isPassthroughPlaybackSupported(format, attributes)
+}
+
+/**
+ * Ephyra: "can pass through" and "can decode" are different questions. A device whose HDMI sink refuses an AC3/E-AC3/DTS/TrueHD
+ * bitstream can still play it when the platform has a hardware or vendor MediaCodec decoder for the format (the player then outputs
+ * PCM). Software-only platform decoders and the bundled FFmpeg decoder do not count: those formats are left to the server to transcode.
+ */
+fun hasPlatformAudioDecoder(
+	mimeType: String,
+	codecInfos: Array<MediaCodecInfo> = MediaCodecList(MediaCodecList.REGULAR_CODECS).codecInfos,
+): Boolean = codecInfos.any { info ->
+	!info.isEncoder && !info.isSoftwareOnly && info.supportedTypes.any { it.equals(mimeType, ignoreCase = true) }
 }

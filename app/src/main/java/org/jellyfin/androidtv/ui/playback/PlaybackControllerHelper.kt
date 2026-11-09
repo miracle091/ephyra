@@ -17,6 +17,7 @@ import org.jellyfin.sdk.api.client.extensions.liveTvApi
 import org.jellyfin.sdk.model.api.BaseItemDto
 import org.jellyfin.sdk.model.api.ItemSortBy
 import org.jellyfin.sdk.model.api.MediaSegmentDto
+import org.jellyfin.sdk.model.api.MediaSourceInfo
 import org.jellyfin.sdk.model.api.MediaStreamType
 import org.jellyfin.sdk.model.api.SubtitleDeliveryMethod
 import org.koin.android.ext.android.inject
@@ -40,6 +41,10 @@ fun PlaybackController.getLiveTvChannel(
 		}
 	}
 }
+
+/** Ephyra: whether [mediaSource] has an audio stream with this [index]. */
+fun hasAudioStream(mediaSource: MediaSourceInfo?, index: Int): Boolean =
+	mediaSource?.mediaStreams.orEmpty().any { it.type == MediaStreamType.AUDIO && it.index == index }
 
 @OptIn(UnstableApi::class)
 fun PlaybackController.disableDefaultSubtitles() {
@@ -68,7 +73,12 @@ fun PlaybackController.setSubtitleIndex(index: Int, force: Boolean = false) {
 		videoQueueManager.setLastPlayedSubtitleLanguageIsoCode("")
 	} else {
 		val stream = currentMediaSource.mediaStreams?.firstOrNull { it.type == MediaStreamType.SUBTITLE && it.index == index }
-		videoQueueManager.setLastPlayedSubtitleLanguageIsoCode(stream?.language)
+		// Ephyra: remember the exact track too, so the next episode picks it among the tracks of that language
+		if (stream != null) {
+			videoQueueManager.setLastPlayedSubtitleTrack(stream)
+		} else {
+			videoQueueManager.setLastPlayedSubtitleLanguageIsoCode(null)
+		}
 	}
 
 	// Disable subtitles
@@ -78,6 +88,7 @@ fun PlaybackController.setSubtitleIndex(index: Int, force: Boolean = false) {
 		if (burningSubs) {
 			Timber.i("Disabling subtitle baking")
 
+			keepAudioForRestart()
 			stop()
 			burningSubs = false
 			play(mCurrentPosition, -1)
@@ -89,6 +100,7 @@ fun PlaybackController.setSubtitleIndex(index: Int, force: Boolean = false) {
 
 		// If we're currently burning subs and want to switch streams we need some special behavior
 		// to stop the current baked subs. We can just stop & start with the new subtitle index for that
+		keepAudioForRestart()
 		stop()
 		burningSubs = false
 		mCurrentOptions.subtitleStreamIndex = index
@@ -105,6 +117,7 @@ fun PlaybackController.setSubtitleIndex(index: Int, force: Boolean = false) {
 			stream.deliveryMethod == SubtitleDeliveryMethod.ENCODE || shouldBurnInSubtitles(currentStreamInfo.playMethod) -> {
 				Timber.i("Restarting playback for subtitle baking")
 
+				keepAudioForRestart()
 				stop()
 				burningSubs = true
 				mCurrentOptions.subtitleStreamIndex = index

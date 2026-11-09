@@ -29,6 +29,7 @@ import org.jellyfin.androidtv.constant.CustomMessage;
 import org.jellyfin.androidtv.data.repository.CustomMessageRepository;
 import org.jellyfin.androidtv.data.service.BackgroundService;
 import org.jellyfin.androidtv.databinding.LiveTvGuideBinding;
+import org.jellyfin.androidtv.preference.LiveTvPreferences;
 import org.jellyfin.androidtv.ui.AsyncImageView;
 import org.jellyfin.androidtv.ui.FriendlyDateButton;
 import org.jellyfin.androidtv.ui.GuideChannelHeader;
@@ -101,6 +102,7 @@ public class LiveTvGuideFragment extends Fragment implements LiveTvGuide, View.O
     private Handler mHandler = new Handler();
 
     private final Lazy<CustomMessageRepository> customMessageRepository = inject(CustomMessageRepository.class);
+    private final Lazy<LiveTvPreferences> liveTvPreferences = inject(LiveTvPreferences.class); // Ephyra
     private final Lazy<PlaybackHelper> playbackHelper = inject(PlaybackHelper.class);
     private final Lazy<ImageHelper> imageHelper = inject(ImageHelper.class);
     private final Lazy<PlaybackLauncher> playbackLauncher = inject(PlaybackLauncher.class);
@@ -218,12 +220,8 @@ public class LiveTvGuideFragment extends Fragment implements LiveTvGuide, View.O
         mCurrentGuideStart = LocalDateTime.now();
         fillTimeLine(mCurrentGuideStart, getGuideHours());
         TvManager.loadAllChannels(this, ndx -> {
-            if (ndx >= PAGE_SIZE) {
-                // last channel is not in first page so grab a set where it will be in the middle
-                ndx = ndx - (PAGE_SIZE / 2);
-            } else {
-                ndx = 0; // just start at beginning
-            }
+            // Ephyra: a last channel past the first page is centred in its page, unless the user turned that off
+            ndx = GuideStartHelperKt.guideStartIndex(ndx, PAGE_SIZE, shouldRestoreLastChannel());
 
             mAllChannels = TvManager.getAllChannels();
             if (!mAllChannels.isEmpty()) {
@@ -283,8 +281,13 @@ public class LiveTvGuideFragment extends Fragment implements LiveTvGuide, View.O
         if (TvManager.shouldForceReload() || mCurrentGuideStart.plusMinutes(30).isBefore(LocalDateTime.now()) || mChannels.getChildCount() == 0) {
             load();
 
-            mFirstFocusChannelId = TvManager.getLastLiveTvChannel();
+            mFirstFocusChannelId = GuideStartHelperKt.guideFocusChannelId(TvManager.getLastLiveTvChannel(), shouldRestoreLastChannel()); // Ephyra
         }
+    }
+
+    // Ephyra
+    private boolean shouldRestoreLastChannel() {
+        return liveTvPreferences.getValue().get(LiveTvPreferences.Companion.getRestoreLastChannel());
     }
 
     @Override

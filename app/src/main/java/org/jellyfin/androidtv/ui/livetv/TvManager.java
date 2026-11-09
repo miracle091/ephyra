@@ -113,12 +113,12 @@ public class TvManager {
         int ndx = 0;
         if (allChannels != null) {
             channelIds = new UUID[allChannels.size()];
+            // Ephyra: fill the ids even without a last channel (the guide asks programmes for them), and return the 0-based index
             UUID last = getLastLiveTvChannel();
-            if (last == null) return ndx;
-            int i = 0;
-            for (BaseItemDto channel : allChannels) {
-                channelIds[i++] = channel.getId();
-                if (channel.getId().equals(last)) ndx = i;
+            for (int i = 0; i < allChannels.size(); i++) {
+                UUID id = allChannels.get(i).getId();
+                channelIds[i] = id;
+                if (id.equals(last)) ndx = i;
             }
         }
 

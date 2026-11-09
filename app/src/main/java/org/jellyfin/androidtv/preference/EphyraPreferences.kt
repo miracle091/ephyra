@@ -2,6 +2,7 @@ package org.jellyfin.androidtv.preference
 
 import android.content.Context
 import org.jellyfin.preference.booleanPreference
+import org.jellyfin.preference.intPreference
 import org.jellyfin.preference.store.SharedPreferenceStore
 
 /** Ephyra: settings of the fork's own features. */
@@ -20,5 +21,8 @@ class EphyraPreferences(context: Context) : SharedPreferenceStore(
 
 		/** Episodes queued after the one started stay in its season. */
 		val stopAtSeasonEnd = booleanPreference("stop_at_season_end", false)
+
+		/** Seconds the skip button stays on screen before it hides by itself; 0 keeps it until the segment ends. */
+		val skipAutoHideSeconds = intPreference("skip_auto_hide_seconds", 15)
 	}
 }

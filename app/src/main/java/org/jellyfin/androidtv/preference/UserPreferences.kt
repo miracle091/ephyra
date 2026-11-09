@@ -173,6 +173,11 @@ class UserPreferences(context: Context) : SharedPreferenceStore(
 		 */
 		var doviProfile8Override = enumPreference("dovi_profile_8_override", HdrOverrideMode.AUTO)
 
+		/**
+		 * Ephyra: Dolby Vision files the server tags DOVI_INVALID. Always unsupported unless set to enable.
+		 */
+		var doviInvalidOverride = enumPreference("dovi_invalid_override", HdrOverrideMode.AUTO)
+
 		/* Live TV */
 		/**
 		 * Use direct play

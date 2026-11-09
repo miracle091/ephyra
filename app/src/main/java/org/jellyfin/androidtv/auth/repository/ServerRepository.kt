@@ -54,8 +54,6 @@ interface ServerRepository {
 	companion object {
 		val minimumServerVersion = Jellyfin.minimumVersion.copy(build = null)
 		val recommendedServerVersion = Jellyfin.apiVersion.copy(build = null)
-
-		val upcomingMinimumServerVersion = ServerVersion(10, 11, 0)
 	}
 }
 

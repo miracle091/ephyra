@@ -36,7 +36,15 @@ class SkipButtonStateTest : FunSpec({
 		isSkipRecallKey(KeyEvent.KEYCODE_BACK) shouldBe false
 	}
 
-	test("the button stays 15 seconds before hiding by itself") {
-		SkipAutoHideDuration shouldBe 15.seconds
+	test("the button hides after the chosen seconds, or never when the choice is until the segment ends") {
+		skipAutoHideDelay(15) shouldBe 15.seconds
+		skipAutoHideDelay(5) shouldBe 5.seconds
+		skipAutoHideDelay(0) shouldBe null
+		skipAutoHideDelay(-1) shouldBe null
+	}
+
+	test("the choices include the 15 second default and the until-segment-end option") {
+		SkipAutoHideChoices.contains(15) shouldBe true
+		SkipAutoHideChoices.contains(0) shouldBe true
 	}
 })

@@ -9,6 +9,7 @@ import org.jellyfin.androidtv.preference.constant.BitstreamAudioFormat
 import org.jellyfin.androidtv.preference.constant.BitstreamAudioMode
 import org.jellyfin.androidtv.preference.constant.HdrFormat
 import org.jellyfin.androidtv.preference.constant.HdrOverrideMode
+import org.jellyfin.androidtv.util.profile.codec.hasPlatformAudioDecoder
 import org.jellyfin.androidtv.util.profile.codec.isPassthroughAudioAvailable
 import org.jellyfin.sdk.model.ServerVersion
 import org.jellyfin.sdk.model.api.CodecType
@@ -68,6 +69,19 @@ private val hlsFmp4AudioCodecs = arrayOf(
 	Codec.Audio.DTS,
 )
 
+// Ephyra: direct play containers whose video rotation Media3 does not apply (everything except the MP4 family and HLS)
+internal val rotationUnawareContainers = listOf(
+	Codec.Container.ASF,
+	Codec.Container.MKV,
+	Codec.Container.OGM,
+	Codec.Container.OGV,
+	Codec.Container.TS,
+	Codec.Container.VOB,
+	Codec.Container.WEBM,
+	Codec.Container.WMV,
+	Codec.Container.XVID,
+)
+
 private fun UserPreferences.getMaxBitrate(): Int {
 	var maxBitrate = this[UserPreferences.maxBitrate].toFloatOrNull()
 
@@ -85,7 +99,8 @@ private fun UserPreferences.getHdrRangeTypesFor(mode: HdrOverrideMode): Set<Vide
 
 private fun UserPreferences.isBitstreamAudioEnabled(context: Context, format: BitstreamAudioFormat): Boolean =
 	when (this[format.preference]) {
-		BitstreamAudioMode.AUTO -> isPassthroughAudioAvailable(context, format.mimeType)
+		// Ephyra: a sink that refuses the bitstream is not the end when a platform decoder can play the format
+		BitstreamAudioMode.AUTO -> isPassthroughAudioAvailable(context, format.mimeType) || hasPlatformAudioDecoder(format.mimeType)
 		BitstreamAudioMode.ENABLE -> true
 		BitstreamAudioMode.DISABLE -> false
 	}
@@ -108,6 +123,7 @@ fun createDeviceProfile(
 	userHEVCLevel = userPreferences[UserPreferences.userHEVCLevel].level,
 	forceEnabledHdr = userPreferences.getHdrRangeTypesFor(HdrOverrideMode.ENABLE),
 	forceDisabledHdr = userPreferences.getHdrRangeTypesFor(HdrOverrideMode.DISABLE),
+	displaySupportsDolbyVision = displaySupportsDolbyVision(context),
 )
 
 fun createDeviceProfile(
@@ -123,7 +139,9 @@ fun createDeviceProfile(
 	userAVCLevel: Int?,
 	userHEVCLevel: Int?,
 	forceEnabledHdr: Set<VideoRangeType>,
-	forceDisabledHdr: Set<VideoRangeType>
+	forceDisabledHdr: Set<VideoRangeType>,
+	displaySupportsDolbyVision: Boolean = true,
+	unreportedDoviProfile7Support: Boolean = KnownDefects.unreportedDoviProfile7Support,
 ) = buildDeviceProfile {
 	val allowedAudioCodecs = when {
 		downMixAudio -> downmixSupportedAudioCodecs
@@ -133,7 +151,7 @@ fun createDeviceProfile(
 			Codec.Audio.AC3 -> isAC3PrefEnabled
 			Codec.Audio.EAC3 -> isEAC3PrefEnabled
 			Codec.Audio.TRUEHD -> isTrueHDPrefEnabled
-			Codec.Audio.DTS -> isDTSPrefEnabled
+			Codec.Audio.DTS, Codec.Audio.DCA -> isDTSPrefEnabled
 			else -> true
 		}
 	}.toTypedArray()
@@ -460,6 +478,19 @@ fun createDeviceProfile(
 		}
 	}
 
+	// Ephyra: rotated video. MediaCodecVideoRenderer hands the rotation to the decoder (MediaFormat.KEY_ROTATION), but only the MP4 family
+	// extractor reads it (display matrix in tkhd); Matroska and the other containers carry no rotation Media3 understands, so the picture
+	// would come out sideways. For those the server must transcode (it auto-rotates) whenever the stream has a rotation. A missing
+	// rotation counts as 0 (isRequired = false). The SDK accepts only servers 12+, which know this condition.
+	codecProfile {
+		type = CodecType.VIDEO
+		container = rotationUnawareContainers.joinToString(",")
+
+		conditions {
+			equals(ProfileConditionValue.VIDEO_ROTATION, 0, false)
+		}
+	}
+
 	/// HDR exclude list
 
 	val unsupportedRangeTypesAv1 = buildSet {
@@ -483,7 +514,9 @@ fun createDeviceProfile(
 
 		if (!supportsHevcDolbyVisionEL) {
 			if (
-				!KnownDefects.unreportedDoviProfile7Support ||
+				!unreportedDoviProfile7Support ||
+				// Ephyra: without a Dolby Vision display the decoder gives SDR; the server strips the RPU and sends the HDR10 layer
+				!displaySupportsDolbyVision ||
 				!supportsHevcDolbyVision ||
 				!supportsHevcMain10 ||
 				!supportsHevcHDR10

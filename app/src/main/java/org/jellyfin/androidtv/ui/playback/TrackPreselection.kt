@@ -71,12 +71,15 @@ internal fun applyTrackPreselection(
 
 	choice.audioIndex?.let { index ->
 		options.audioStreamIndex = index
-		streams.firstOrNull { it.index == index && it.type == MediaStreamType.AUDIO }?.language
-			?.let(queue::setLastPlayedAudioLanguageIsoCode)
+		streams.firstOrNull { it.index == index && it.type == MediaStreamType.AUDIO }?.let(queue::setLastPlayedAudioTrack)
 	}
 	choice.subtitleIndex?.let { index ->
 		options.subtitleStreamIndex = index
-		val language = if (index == SUBTITLES_OFF) "" else streams.firstOrNull { it.index == index }?.language
-		queue.setLastPlayedSubtitleLanguageIsoCode(language)
+		val stream = streams.firstOrNull { it.index == index }
+		when {
+			index == SUBTITLES_OFF -> queue.setLastPlayedSubtitleLanguageIsoCode("")
+			stream != null -> queue.setLastPlayedSubtitleTrack(stream)
+			else -> queue.setLastPlayedSubtitleLanguageIsoCode(null)
+		}
 	}
 }

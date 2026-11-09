@@ -68,6 +68,13 @@
     <string name="ephyra_transcode_reason_video_codec_tag">video codec tag not supported</string>
     <string name="ephyra_transcode_reason_stream_count">too many streams</string>
     <string name="ephyra_transcode_reason_video_rotation">rotated video not supported</string>
+    <string name="ephyra_pref_skip_auto_hide">Skip button duration</string>
+    <string name="ephyra_skip_auto_hide_seconds">%d seconds</string>
+    <string name="ephyra_skip_auto_hide_segment_end">Until the segment ends</string>
+    <string name="ephyra_pref_guide_restore_last_channel">Restore last channel</string>
+    <string name="ephyra_pref_guide_restore_last_channel_description">Open the guide on the channel you watched last</string>
+    <string name="ephyra_dovi_invalid">Out-of-spec Dolby Vision</string>
+    <string name="ephyra_dovi_invalid_description">Files the server marks as invalid Dolby Vision, often profile 8 files converted from profile 7. Auto and Disable send them to the server as unsupported. Enable plays them directly; the server cannot guarantee they play correctly.</string>
 
     <!-- One-time hint on a Shield TV with an HDR display (integration/ShieldDisplayHint.kt); menu names as on Shield Experience 9 (TvSettings), short enough for the 280x90 dp notification card -->
     <string name="ephyra_shield_display_hint">HDR: turn on Match content color space in Device Preferences › Display &amp; Sound › Advanced display settings</string>

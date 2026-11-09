@@ -422,19 +422,13 @@ public class PlaybackController implements PlaybackControllerNotifiable {
 
             Timber.i("qualifying display mode: %s - %dx%d@%f", mode.getModeId(), mode.getPhysicalWidth(), mode.getPhysicalHeight(), mode.getRefreshRate());
 
-            // if scaling on-device, keep native resolution modes at diff 0 (best score)
-            // for other resolutions when scaling on device, or if scaling on tv, score based on distance from media resolution
-
-            // use -1 as the default so, with SCALE_ON_DEVICE, a mode at native resolution will rank higher than
-            // a mode with equal refresh rate and the same resolution as the media
-            int resolutionDifference = -1;
-            if ((refreshRateSwitchingBehavior == RefreshRateSwitchingBehavior.SCALE_ON_DEVICE &&
-                    !(mode.getPhysicalWidth() == defaultMode.getPhysicalWidth() && mode.getPhysicalHeight() == defaultMode.getPhysicalHeight())) ||
-
-                    refreshRateSwitchingBehavior == RefreshRateSwitchingBehavior.SCALE_ON_TV) {
-
-                resolutionDifference = Math.abs(mode.getPhysicalWidth() - videoStream.getWidth());
-            }
+            // Ephyra: SCALE_ON_DEVICE keeps the native resolution even when a lower resolution mode has a closer refresh rate
+            // (upstream #5893), SCALE_ON_TV ranks by distance from the media resolution
+            int resolutionDifference = DisplayModeScoringKt.displayModeResolutionDifference(
+                    refreshRateSwitchingBehavior,
+                    mode.getPhysicalWidth(), mode.getPhysicalHeight(),
+                    defaultMode.getPhysicalWidth(), defaultMode.getPhysicalHeight(),
+                    videoStream.getWidth());
             int refreshRateDifference = rate - sourceRate;
 
             // use 100,000 to account for refresh rates 120Hz+ (at 120Hz rate == 12,000)
@@ -636,14 +630,14 @@ public class PlaybackController implements PlaybackControllerNotifiable {
             internalOptions.setSubtitleStreamIndex(forcedSubtitleIndex);
         }
         MediaSourceInfo currentMediaSource = getCurrentMediaSource();
-        if (forcedAudioLanguage != null) {
-            // find the first audio stream with the requested language
-            for (MediaStream stream : currentMediaSource.getMediaStreams()) {
-                if (stream.getType() == MediaStreamType.AUDIO && forcedAudioLanguage.equals(stream.getLanguage())) {
-                    internalOptions.setAudioStreamIndex(stream.getIndex());
-                    break;
-                }
-            }
+        Integer restartAudioIndex = peekRestartAudioIndex(item);
+        if (restartAudioIndex != null) {
+            // Ephyra: a restart of this very item (subtitle change) keeps the audio track the user is hearing
+            internalOptions.setAudioStreamIndex(restartAudioIndex);
+        } else if (forcedAudioLanguage != null) {
+            // Ephyra: the audio stream matching the language (and title/codec) of the last played track
+            Integer matchingIndex = TrackMatchingKt.preferredAudioIndex(videoQueueManager.getValue(), currentMediaSource.getMediaStreams());
+            if (matchingIndex != null) internalOptions.setAudioStreamIndex(matchingIndex);
         }
         // Ephyra: tracks picked on the details screen
         TrackPreselectionKt.applyTrackPreselection(internalOptions, item, currentMediaSource);
@@ -737,6 +731,15 @@ public class PlaybackController implements PlaybackControllerNotifiable {
         }
 
         mCurrentOptions.setAudioStreamIndex(null); // reset audio stream index to allow auto selection on new item
+        // Ephyra: a restart of the same item (audio switch on a transcode, subtitle baking change) keeps the track the user picked,
+        // or onPrepared falls back to the first track of that language and undoes the switch (upstream #5798).
+        // Only on a transcode, which carries just that track: on direct play onPrepared must still ask the player to switch,
+        // and a preset index would make switchAudioStream think it is already playing (the request already asked the server for it).
+        Integer restartAudioIndex = takeRestartAudioIndex(item);
+        if (restartAudioIndex != null && response.getPlayMethod() == PlayMethod.TRANSCODE
+                && PlaybackControllerHelperKt.hasAudioStream(response.getMediaSource(), restartAudioIndex)) {
+            mCurrentOptions.setAudioStreamIndex(restartAudioIndex);
+        }
 
         mStartPosition = position;
         mCurrentStreamInfo = response;
@@ -765,18 +768,10 @@ public class PlaybackController implements PlaybackControllerNotifiable {
             } else if (response.getMediaSource().getMediaStreams() != null) {
                 // Find subtitle stream matching saved language, keeping the requested stream if it matches
                 // (e.g. when playback restarts to switch between baked and non-baked subtitles)
+                // Ephyra: the exact track of the last episode wins among the tracks of that language (TrackMatching.kt)
                 Integer requestedIndex = mCurrentOptions.getSubtitleStreamIndex();
-                Integer matchingIndex = null;
-                for (MediaStream stream : response.getMediaSource().getMediaStreams()) {
-                    if (stream.getType() == MediaStreamType.SUBTITLE && lastSubtitleLanguage.equals(stream.getLanguage())) {
-                        if (matchingIndex == null) matchingIndex = stream.getIndex();
-                        if (requestedIndex != null && requestedIndex == stream.getIndex()) {
-                            matchingIndex = requestedIndex;
-                            break;
-                        }
-                    }
-                }
-                mCurrentOptions.setSubtitleStreamIndex(matchingIndex);
+                mCurrentOptions.setSubtitleStreamIndex(TrackMatchingKt.preferredSubtitleIndex(
+                        videoQueueManager.getValue(), response.getMediaSource().getMediaStreams(), requestedIndex));
             }
         } else {
             // No saved preference, use server default
@@ -875,19 +870,33 @@ public class PlaybackController implements PlaybackControllerNotifiable {
         if (info == null)
             return null;
 
-        boolean videoFound = false;
-        for (MediaStream track : info.getMediaStreams()) {
-            if (track.getType() == MediaStreamType.VIDEO) {
-                videoFound = true;
-            } else {
-                if (videoFound
-                    && track.getType() == MediaStreamType.AUDIO
-                    && (track.getLanguage() != null && track.getLanguage().equals(videoQueueManager.getValue().getLastPlayedAudioLanguageIsoCode()))
-                )
-                    return track.getIndex();
-            }
-        }
-        return null;
+        // Ephyra: language first, then the title/codec of the last played track (TrackMatching.kt)
+        return TrackMatchingKt.preferredAudioIndex(videoQueueManager.getValue(), info.getMediaStreams());
+    }
+
+    // Ephyra: audio track to keep when the stream of the current item is rebuilt (see startItem)
+    private UUID mRestartAudioItemId = null;
+    private Integer mRestartAudioIndex = null;
+
+    /** Ephyra: call before stop() when the current item will be requested again, so the audio track in use survives the restart. */
+    protected void keepAudioForRestart() {
+        BaseItemDto item = getCurrentlyPlayingItem();
+        Integer audioIndex = mCurrentOptions != null ? mCurrentOptions.getAudioStreamIndex() : null;
+        mRestartAudioItemId = item != null && audioIndex != null ? item.getId() : null;
+        mRestartAudioIndex = mRestartAudioItemId != null ? audioIndex : null;
+    }
+
+    @Nullable
+    private Integer peekRestartAudioIndex(BaseItemDto item) {
+        return item != null && item.getId().equals(mRestartAudioItemId) ? mRestartAudioIndex : null;
+    }
+
+    @Nullable
+    private Integer takeRestartAudioIndex(BaseItemDto item) {
+        Integer index = peekRestartAudioIndex(item);
+        mRestartAudioItemId = null;
+        mRestartAudioIndex = null;
+        return index;
     }
 
     private void setDefaultAudioIndex(StreamInfo info) {
@@ -918,15 +927,8 @@ public class PlaybackController implements PlaybackControllerNotifiable {
             return;
         }
 
-        String lastAudioIsoCode = videoQueueManager.getValue().getLastPlayedAudioLanguageIsoCode();
-        String currentAudioIsoCode = currentMediaSource.getMediaStreams().get(index).getLanguage();
-
-        if (currentAudioIsoCode != null
-                && (lastAudioIsoCode == null || !lastAudioIsoCode.equals(currentAudioIsoCode))) {
-            videoQueueManager.getValue().setLastPlayedAudioLanguageIsoCode(
-                    currentAudioIsoCode
-            );
-        }
+        // Ephyra: remember the exact track, not only its language, so the next episode picks the same one
+        videoQueueManager.getValue().setLastPlayedAudioTrack(currentMediaSource.getMediaStreams().get(index));
 
         int currAudioIndex = getAudioStreamIndex();
         Timber.i("trying to switch audio stream from %s to %s", currAudioIndex, index);
@@ -949,6 +951,7 @@ public class PlaybackController implements PlaybackControllerNotifiable {
             startSpinner();
             mCurrentOptions.setMediaSourceId(currentMediaSource.getId());
             mCurrentOptions.setAudioStreamIndex(index);
+            keepAudioForRestart();
             stop();
             playInternal(getCurrentlyPlayingItem(), mCurrentPosition, mCurrentOptions);
             mPlaybackState = PlaybackState.BUFFERING;
@@ -1394,6 +1397,13 @@ public class PlaybackController implements PlaybackControllerNotifiable {
 
     @Override
     public void onPrepared() {
+        // Ephyra: stop() clears the stream info, but the player can still report isPlaying afterwards
+        // (late callback after stop/end of playback, upstream #5938): nothing to prepare then
+        if (mCurrentStreamInfo == null) {
+            Timber.w("onPrepared ignored: no current stream info (state %s)", mPlaybackState);
+            return;
+        }
+
         if (mPlaybackState == PlaybackState.BUFFERING) {
             if (mFragment != null) {
                 mFragment.setFadingEnabled(true);

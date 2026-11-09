@@ -64,6 +64,19 @@ fun SettingsLiveTvGuideOptionsScreen() {
 		}
 
 		item {
+			// Ephyra
+			var restoreLastChannel by rememberPreference(liveTvPreferences, LiveTvPreferences.restoreLastChannel)
+
+			ListButton(
+				headingContent = { Text(stringResource(R.string.ephyra_pref_guide_restore_last_channel)) },
+				captionContent = { Text(stringResource(R.string.ephyra_pref_guide_restore_last_channel_description)) },
+				trailingContent = { Checkbox(checked = restoreLastChannel) },
+				onClick = { restoreLastChannel = !restoreLastChannel },
+				modifier = Modifier.focusKey("restore_last_channel")
+			)
+		}
+
+		item {
 			var colorCodeGuide by rememberPreference(liveTvPreferences, LiveTvPreferences.colorCodeGuide)
 
 			ListButton(

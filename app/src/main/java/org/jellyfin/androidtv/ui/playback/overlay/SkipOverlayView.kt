@@ -33,10 +33,12 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.jellyfin.androidtv.R
+import org.jellyfin.androidtv.preference.EphyraPreferences
 import org.jellyfin.androidtv.ui.base.EphyraTheme
 import org.jellyfin.androidtv.ui.base.Icon
 import org.jellyfin.androidtv.ui.base.LocalEphyraPalette
 import org.jellyfin.androidtv.ui.base.Text
+import org.koin.compose.koinInject
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -135,7 +137,7 @@ class SkipOverlayView @JvmOverloads constructor(
 	val recallable: Boolean
 		get() = state == SkipButtonState.RECALLABLE
 
-	/** Ephyra: shows the button again for another [SkipAutoHideDuration]. */
+	/** Ephyra: shows the button again for another auto-hide period. */
 	fun recall() {
 		_autoHidden.value = false
 	}
@@ -151,10 +153,14 @@ class SkipOverlayView @JvmOverloads constructor(
 			derivedStateOf { visible }
 		}
 
+		// Ephyra: the user's choice of how long the button stays (no delay: until the segment ends)
+		val preferences = koinInject<EphyraPreferences>()
+		val autoHideDelay = skipAutoHideDelay(preferences[EphyraPreferences.skipAutoHideSeconds])
+
 		// Auto hide; Ephyra: only hides, the segment stays so a key calls the button back
-		LaunchedEffect(skipUiEnabled, targetPosition, autoHidden) {
-			if (autoHidden || targetPosition == null) return@LaunchedEffect
-			delay(SkipAutoHideDuration)
+		LaunchedEffect(skipUiEnabled, targetPosition, autoHidden, autoHideDelay) {
+			if (autoHidden || targetPosition == null || autoHideDelay == null) return@LaunchedEffect
+			delay(autoHideDelay)
 			_autoHidden.value = true
 		}
 

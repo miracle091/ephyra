@@ -18,6 +18,9 @@ class TrackPreselectionTest : FunSpec({
 		every { this@mockk.index } returns index
 		every { this@mockk.type } returns type
 		every { this@mockk.language } returns language
+		every { title } returns null
+		every { codec } returns null
+		every { isForced } returns false
 	}
 
 	fun source(id: String, vararg streams: MediaStream) = mockk<MediaSourceInfo> {

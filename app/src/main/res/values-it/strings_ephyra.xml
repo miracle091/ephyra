@@ -59,6 +59,13 @@
     <string name="ephyra_transcode_reason_video_codec_tag">tag del codec video non supportato</string>
     <string name="ephyra_transcode_reason_stream_count">troppi flussi</string>
     <string name="ephyra_transcode_reason_video_rotation">video ruotato non supportato</string>
+    <string name="ephyra_pref_skip_auto_hide">Durata del pulsante Salta</string>
+    <string name="ephyra_skip_auto_hide_seconds">%d secondi</string>
+    <string name="ephyra_skip_auto_hide_segment_end">Fino alla fine del segmento</string>
+    <string name="ephyra_pref_guide_restore_last_channel">Ripristina l\'ultimo canale</string>
+    <string name="ephyra_pref_guide_restore_last_channel_description">Apri la guida sull\'ultimo canale guardato</string>
+    <string name="ephyra_dovi_invalid">Dolby Vision fuori specifica</string>
+    <string name="ephyra_dovi_invalid_description">File che il server segna come Dolby Vision non valido, spesso profilo 8 convertiti dal profilo 7. Auto e Disabilita li fanno trattare dal server come non supportati. Abilita li riproduce direttamente; il server non garantisce che si vedano correttamente.</string>
 
     <!-- One-time hint on a Shield TV with an HDR display (integration/ShieldDisplayHint.kt); menu names as on Shield Experience 9 (TvSettings it), short enough for the 280x90 dp notification card -->
     <string name="ephyra_shield_display_hint">HDR: attiva Abbina spazio cromatico contenuto in Preferenze del dispositivo › Schermo e suono › Impostazioni display avanzate</string>

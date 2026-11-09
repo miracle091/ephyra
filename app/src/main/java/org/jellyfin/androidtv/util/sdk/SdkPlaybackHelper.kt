@@ -27,6 +27,7 @@ import org.jellyfin.sdk.model.api.ItemFilter
 import org.jellyfin.sdk.model.api.ItemSortBy
 import org.jellyfin.sdk.model.api.MediaType
 import org.jellyfin.sdk.model.extensions.ticks
+import org.jellyfin.sdk.model.serializer.toUUIDOrNull
 import java.util.UUID
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -74,15 +75,7 @@ class SdkPlaybackHelper(
 			BaseItemKind.EPISODE -> {
 				val seriesId = mainItem.seriesId
 				if (userPreferences[UserPreferences.mediaQueuingEnabled] && seriesId != null) {
-					val response by api.showApi.getEpisodes(
-						seriesId = seriesId,
-						startItemId = mainItem.id,
-						isMissing = false,
-						limit = ITEM_QUERY_LIMIT,
-						fields = ItemRepository.itemFields
-					)
-
-					applySeasonEnd(response.items, mainItem) // Ephyra: optional stop at the end of the season
+					applySeasonEnd(getEpisodeQueue(mainItem, seriesId), mainItem) // Ephyra: optional stop at the end of the season
 				} else {
 					listOf(mainItem)
 				}
@@ -245,6 +238,38 @@ class SdkPlaybackHelper(
 				}
 			}
 		}
+	}
+
+	/**
+	 * Ephyra: the episode queue starting at [mainItem] (adapted from upstream #5932). The episodes endpoint only lists the
+	 * primary version of each episode, so when [mainItem] is an alternate version picked by the user it goes back at the
+	 * head of the queue, or the primary version would play instead of the picked one.
+	 */
+	private suspend fun getEpisodeQueue(mainItem: BaseItemDto, seriesId: UUID): List<BaseItemDto> {
+		// The alternate version may not be in the episode list, so try the ids of the other versions too
+		val startItemIds = buildList {
+			add(mainItem.id)
+			mainItem.mediaSources.orEmpty().mapNotNullTo(this) { it.id?.toUUIDOrNull() }
+		}.distinct()
+
+		for (startItemId in startItemIds) {
+			val response by api.showApi.getEpisodes(
+				seriesId = seriesId,
+				startItemId = startItemId,
+				isMissing = false,
+				limit = ITEM_QUERY_LIMIT,
+				fields = ItemRepository.itemFields
+			)
+
+			val episodes = response.items
+			val first = episodes.firstOrNull() ?: continue
+			val isSameEpisode = first.id == mainItem.id || first.mediaSources.orEmpty().any { it.id?.toUUIDOrNull() == mainItem.id }
+			if (!isSameEpisode) continue
+
+			return listOf(mainItem) + episodes.drop(1)
+		}
+
+		return listOf(mainItem)
 	}
 
 	private suspend fun getParts(item: BaseItemDto): List<BaseItemDto> = buildList {

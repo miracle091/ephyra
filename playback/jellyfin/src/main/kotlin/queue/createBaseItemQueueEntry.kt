@@ -10,6 +10,7 @@ import org.jellyfin.sdk.api.client.extensions.imageApi
 import org.jellyfin.sdk.model.api.BaseItemDto
 import org.jellyfin.sdk.model.api.ImageType
 import org.jellyfin.sdk.model.extensions.ticks
+import org.jellyfin.sdk.model.serializer.toUUIDOrNull
 import java.util.UUID
 import org.jellyfin.playback.core.mediastream.mediatype.MediaType as PlayerMediaType
 import org.jellyfin.sdk.model.api.MediaType as SdkMediaType
@@ -48,6 +49,11 @@ fun createBaseItemQueueEntry(api: ApiClient, baseItem: BaseItemDto): QueueEntry 
 		genre = baseItem.genres?.joinToString(", "),
 	)
 	entry.baseItem = baseItem
+	// Ephyra: an item with several versions lists them all as media sources, take the one of this item (upstream #5932)
+	baseItem.mediaSources
+		?.firstOrNull { it.id?.toUUIDOrNull() == baseItem.id }
+		?.id
+		?.let { entry.mediaSourceId = it }
 	entry.normalizationGain = baseItem.normalizationGain
 	entry.mediaType = when (baseItem.mediaType) {
 		SdkMediaType.VIDEO -> PlayerMediaType.Video
