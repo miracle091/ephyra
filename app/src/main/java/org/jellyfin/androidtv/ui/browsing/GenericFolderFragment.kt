@@ -1,5 +1,6 @@
 package org.jellyfin.androidtv.ui.browsing
 
+import androidx.core.view.doOnPreDraw
 import androidx.leanback.widget.ClassPresenterSelector
 import androidx.leanback.widget.FocusHighlight
 import androidx.leanback.widget.HeaderItem
@@ -168,8 +169,10 @@ class GenericFolderFragment : EnhancedBrowseFragment() {
 				adapter.Retrieve()
 			}
 
-			// The other rows were added first, so the focus would stay on one of them
-			if (episodes.isNotEmpty()) mRowsFragment?.setSelectedPosition(0)
+			// The other rows were added first and the list moves the focus past the rows inserted before it when it lays them
+			// out, so the first episode is selected after that layout
+			val grid = mRowsFragment?.verticalGridView
+			if (episodes.isNotEmpty() && grid != null) grid.doOnPreDraw { mRowsFragment?.setSelectedPosition(0, false) }
 		}
 	}
 }
