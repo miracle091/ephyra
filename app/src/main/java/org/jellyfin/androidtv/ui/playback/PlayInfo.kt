@@ -77,5 +77,6 @@ object PlayInfo {
 			TranscodeReason.VIDEO_RANGE_TYPE_NOT_SUPPORTED -> R.string.ephyra_transcode_reason_video_range
 			TranscodeReason.VIDEO_CODEC_TAG_NOT_SUPPORTED -> R.string.ephyra_transcode_reason_video_codec_tag
 			TranscodeReason.STREAM_COUNT_EXCEEDS_LIMIT -> R.string.ephyra_transcode_reason_stream_count
+			TranscodeReason.VIDEO_ROTATION_NOT_SUPPORTED -> R.string.ephyra_transcode_reason_video_rotation
 		}
 }

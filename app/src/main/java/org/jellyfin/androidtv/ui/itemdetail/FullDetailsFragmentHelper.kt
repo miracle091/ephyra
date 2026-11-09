@@ -24,10 +24,9 @@ import org.jellyfin.androidtv.util.sdk.compat.copyWithUserData
 import org.jellyfin.androidtv.util.showIfNotEmpty
 import org.jellyfin.sdk.api.client.ApiClient
 import org.jellyfin.sdk.api.client.exception.ApiClientException
+import org.jellyfin.sdk.api.client.extensions.showApi
 import org.jellyfin.sdk.api.client.extensions.libraryApi
 import org.jellyfin.sdk.api.client.extensions.liveTvApi
-import org.jellyfin.sdk.api.client.extensions.tvShowsApi
-import org.jellyfin.sdk.api.client.extensions.userLibraryApi
 import org.jellyfin.sdk.model.api.BaseItemDto
 import org.jellyfin.sdk.model.api.BaseItemKind
 import org.jellyfin.sdk.model.api.MediaType
@@ -144,7 +143,7 @@ fun FullDetailsFragment.playTrailers() {
 
 		try {
 			val trailers = withContext(Dispatchers.IO) {
-				api.userLibraryApi.getLocalTrailers(mBaseItem.id).content
+				api.libraryApi.getLocalTrailers(mBaseItem.id).content
 			}
 			play(trailers, 0, false)
 		} catch (exception: ApiClientException) {
@@ -164,7 +163,7 @@ fun FullDetailsFragment.getItem(id: UUID, callback: (item: BaseItemDto?) -> Unit
 	lifecycleScope.launch {
 		val response = try {
 			withContext(Dispatchers.IO) {
-				api.userLibraryApi.getItem(id).content
+				api.libraryApi.getItem(id).content
 			}
 		} catch (err: ApiClientException) {
 			Timber.w(err, "Failed to get item $id")
@@ -182,7 +181,7 @@ fun FullDetailsFragment.populatePreviousButton() {
 
 	lifecycleScope.launch {
 		val siblings = withContext(Dispatchers.IO) {
-			api.tvShowsApi.getEpisodes(
+			api.showApi.getEpisodes(
 				seriesId = requireNotNull(mBaseItem.seriesId),
 				adjacentTo = mBaseItem.id,
 			).content
@@ -210,7 +209,7 @@ suspend fun FullDetailsFragment.getNextUpEpisode(): BaseItemDto? {
 
 	try {
 		val episodes = withContext(Dispatchers.IO) {
-			api.tvShowsApi.getNextUp(
+			api.showApi.getNextUp(
 				seriesId = mBaseItem.seriesId ?: mBaseItem.id,
 				fields = ItemRepository.itemFields,
 				limit = 1,

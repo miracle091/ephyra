@@ -26,7 +26,7 @@ import org.jellyfin.androidtv.util.apiclient.getUrl
 import org.jellyfin.androidtv.util.apiclient.itemBackdropImages
 import org.jellyfin.androidtv.util.apiclient.itemImages
 import org.jellyfin.sdk.api.client.ApiClient
-import org.jellyfin.sdk.api.client.extensions.itemsApi
+import org.jellyfin.sdk.api.client.extensions.libraryApi
 import org.jellyfin.sdk.api.client.extensions.liveTvApi
 import org.jellyfin.sdk.model.api.BaseItemDto
 import org.jellyfin.sdk.model.api.BaseItemKind
@@ -158,7 +158,7 @@ fun LibraryCardImage(library: BaseItemDto, title: String?, iconRes: Int, size: D
 
 private suspend fun loadLibraryCardBackdrop(api: ApiClient, libraryId: UUID): Result<JellyfinImage?> = withContext(Dispatchers.IO) {
 	try {
-		val titles = api.itemsApi.getItems(
+		val titles = api.libraryApi.getItems(
 			parentId = libraryId,
 			recursive = true,
 			imageTypes = setOf(ImageType.BACKDROP),
@@ -199,7 +199,7 @@ private const val LOGO_SCALE = 0.5f
 
 private suspend fun loadPhotoCardImage(api: ApiClient, libraryId: UUID): Result<JellyfinImage?> = withContext(Dispatchers.IO) {
 	try {
-		val photos = api.itemsApi.getItems(
+		val photos = api.libraryApi.getItems(
 			parentId = libraryId,
 			recursive = true,
 			includeItemTypes = setOf(BaseItemKind.PHOTO),

@@ -4,7 +4,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jellyfin.androidtv.ui.playback.PlayInfo
 import org.jellyfin.sdk.api.client.ApiClient
-import org.jellyfin.sdk.api.client.extensions.itemsApi
+import org.jellyfin.sdk.api.client.extensions.libraryApi
 import org.jellyfin.sdk.api.client.extensions.mediaInfoApi
 import org.jellyfin.sdk.model.api.BaseItemKind
 import org.jellyfin.sdk.model.api.DeviceProfile
@@ -35,7 +35,7 @@ class ServerBenchmark(
 ) {
 	// The SDK's calls block, so they run on the IO dispatcher, not the activity's main thread
 	suspend fun run(clips: List<BenchmarkClip>): List<ServerResult> = withContext(Dispatchers.IO) {
-		val items = api.itemsApi.getItems(
+		val items = api.libraryApi.getItems(
 			searchTerm = SEARCH_TERM,
 			recursive = true,
 			includeItemTypes = setOf(BaseItemKind.MOVIE, BaseItemKind.VIDEO),

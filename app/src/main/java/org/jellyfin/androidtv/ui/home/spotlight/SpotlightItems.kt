@@ -5,8 +5,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jellyfin.androidtv.R
 import org.jellyfin.sdk.api.client.ApiClient
-import org.jellyfin.sdk.api.client.extensions.itemsApi
-import org.jellyfin.sdk.api.client.extensions.tvShowsApi
+import org.jellyfin.sdk.api.client.extensions.libraryApi
+import org.jellyfin.sdk.api.client.extensions.showApi
 import org.jellyfin.sdk.model.api.BaseItemDto
 import org.jellyfin.sdk.model.api.BaseItemKind
 import org.jellyfin.sdk.model.api.ImageType
@@ -25,7 +25,7 @@ private const val MINUTES_PER_HOUR = 60
 /** Ephyra: the films and series added most recently that the user has not watched, with a backdrop to show. */
 suspend fun loadSpotlightItems(api: ApiClient): List<BaseItemDto> = withContext(Dispatchers.IO) {
 	try {
-		api.itemsApi.getItems(
+		api.libraryApi.getItems(
 			includeItemTypes = setOf(BaseItemKind.MOVIE, BaseItemKind.SERIES),
 			recursive = true,
 			isPlayed = false,
@@ -52,7 +52,7 @@ suspend fun loadSpotlightPlayTarget(api: ApiClient, item: BaseItemDto): UUID {
 	if (item.type != BaseItemKind.SERIES) return item.id
 	val nextUp = withContext(Dispatchers.IO) {
 		try {
-			api.tvShowsApi.getNextUp(seriesId = item.id, enableResumable = true, limit = 1).content.items.firstOrNull()
+			api.showApi.getNextUp(seriesId = item.id, enableResumable = true, limit = 1).content.items.firstOrNull()
 		} catch (error: CancellationException) {
 			throw error
 		} catch (@Suppress("TooGenericExceptionCaught") error: Exception) {

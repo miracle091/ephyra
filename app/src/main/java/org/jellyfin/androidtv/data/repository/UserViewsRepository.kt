@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import org.jellyfin.androidtv.preference.EphyraPreferences
 import org.jellyfin.sdk.api.client.ApiClient
-import org.jellyfin.sdk.api.client.extensions.userViewsApi
+import org.jellyfin.sdk.api.client.extensions.userViewApi
 import org.jellyfin.sdk.model.api.BaseItemDto
 import org.jellyfin.sdk.model.api.CollectionType
 
@@ -24,7 +24,7 @@ class UserViewsRepositoryImpl(
 	private val ephyraPreferences: EphyraPreferences,
 ) : UserViewsRepository {
 	override val views = flow {
-		val views by api.userViewsApi.getUserViews()
+		val views by api.userViewApi.getUserViews()
 		val filteredViews = views.items
 			.filter { isSupported(it.collectionType) }
 		emit(filteredViews)

@@ -23,7 +23,7 @@ import org.jellyfin.androidtv.R
 import org.jellyfin.androidtv.preference.UserPreferences
 import org.jellyfin.androidtv.util.profile.createDeviceProfile
 import org.jellyfin.sdk.api.client.ApiClient
-import org.jellyfin.sdk.api.client.extensions.clientLogApi
+import org.jellyfin.sdk.api.client.extensions.systemApi
 import org.jellyfin.sdk.model.ServerVersion
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
@@ -137,7 +137,7 @@ class CodecBenchmarkActivity : FragmentActivity() {
 	private suspend fun upload(markdown: String) {
 		if (api.accessToken == null) return
 		try {
-			val fileName = withContext(Dispatchers.IO) { api.clientLogApi.logFile(markdown).content.fileName }
+			val fileName = withContext(Dispatchers.IO) { api.systemApi.logFile(markdown).content.fileName }
 			report.append("\n${getString(R.string.ephyra_benchmark_uploaded, fileName)}")
 		} catch (error: CancellationException) {
 			throw error

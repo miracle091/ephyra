@@ -14,7 +14,7 @@ import org.jellyfin.androidtv.ui.navigation.Destinations
 import org.jellyfin.androidtv.ui.navigation.NavigationRepository
 import org.jellyfin.sdk.api.client.ApiClient
 import org.jellyfin.sdk.api.client.exception.ApiClientException
-import org.jellyfin.sdk.api.client.extensions.itemsApi
+import org.jellyfin.sdk.api.client.extensions.userDataApi
 import org.jellyfin.sdk.model.api.BaseItemDto
 import org.jellyfin.sdk.model.api.BaseItemKind
 import org.jellyfin.sdk.model.api.UpdateUserItemDataDto
@@ -68,7 +68,7 @@ enum class ItemMenuExtra(
 			activity.lifecycleScope.launch {
 				try {
 					withContext(Dispatchers.IO) {
-						api.itemsApi.updateItemUserData(itemId = item.id, data = UpdateUserItemDataDto(playbackPositionTicks = 0))
+						api.userDataApi.updateItemUserData(itemId = item.id, data = UpdateUserItemDataDto(playbackPositionTicks = 0))
 					}
 				} catch (err: ApiClientException) {
 					Timber.w(err, "Unable to reset the progress of ${item.id}")
