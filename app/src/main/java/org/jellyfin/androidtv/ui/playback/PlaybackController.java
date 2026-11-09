@@ -1418,7 +1418,8 @@ public class PlaybackController implements PlaybackControllerNotifiable {
             startReportLoop();
         }
 
-        Timber.i("Play method: %s", mCurrentStreamInfo.getPlayMethod() == PlayMethod.TRANSCODE ? "Trans" : "Direct");
+        // Ephyra: the exact method, so a direct stream (server remux, audio possibly re-encoded) is not logged as direct play
+        Timber.i("Play method: %s", mCurrentStreamInfo.getPlayMethod());
 
         if (mPlaybackState == PlaybackState.PAUSED) {
             mPlaybackState = PlaybackState.PLAYING;

@@ -47,11 +47,13 @@ import org.jellyfin.playback.core.support.PlaySupportReport
 import org.jellyfin.playback.core.timedevent.TimedEvent
 import org.jellyfin.playback.core.ui.PlayerSubtitleView
 import org.jellyfin.playback.core.ui.PlayerSurfaceView
+import org.jellyfin.playback.media3.exoplayer.shield.BitstreamFirstRenderersFactory
 import org.jellyfin.playback.media3.exoplayer.shield.ShieldLoadControl
 import org.jellyfin.playback.media3.exoplayer.shield.ShieldMediaCodecSelector
 import org.jellyfin.playback.media3.exoplayer.support.getPlaySupportReport
 import org.jellyfin.playback.media3.exoplayer.support.toFormats
 import timber.log.Timber
+import kotlin.math.roundToInt
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -103,7 +105,8 @@ class ExoPlayerBackend(
 		} else DefaultMediaSourceFactory(dataSourceFactory, extractorsFactory)
 
 		// Ephyra: the default audio sink plus a tee that measures the loudness for the music player's backdrop (AudioLevel)
-		val renderersFactory = object : DefaultRenderersFactory(context) {
+		// Ephyra: when FFmpeg is preferred it still steps aside for formats the sink can pass through as bitstream
+		val renderersFactory = object : BitstreamFirstRenderersFactory(context, exoPlayerOptions.preferFfmpeg) {
 			override fun buildAudioSink(
 				context: Context,
 				enableFloatOutput: Boolean,
@@ -182,7 +185,9 @@ class ExoPlayerBackend(
 
 		override fun onVideoSizeChanged(size: VideoSize) {
 			if (size != VideoSize.UNKNOWN) {
-				listener?.onVideoSizeChange(size.width, size.height)
+				// Ephyra: the displayed width, so anamorphic video (DVD, some MKV) keeps its shape instead of the stored pixel grid's
+				val displayWidth = (size.width * size.pixelWidthHeightRatio).roundToInt()
+				listener?.onVideoSizeChange(displayWidth, size.height)
 			}
 		}
 
@@ -306,7 +311,7 @@ class ExoPlayerBackend(
 		)
 
 		// Enjoy!
-		Timber.i("Playing ${item.mediaStream?.url}")
+		Timber.i("Playing ${item.mediaStream?.url?.redactApiKey()}")
 		exoPlayer.play()
 	}
 

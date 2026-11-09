@@ -38,7 +38,7 @@ private val supportedAudioCodecs = arrayOf(
 	Codec.Audio.DTS,
 	Codec.Audio.EAC3,
 	Codec.Audio.FLAC,
-	Codec.Audio.MLP,
+	// Ephyra: no MLP, neither Media3's extractors nor the FFmpeg extension play it: the server converts it
 	Codec.Audio.MP2,
 	Codec.Audio.MP3,
 	Codec.Audio.OPUS,
@@ -51,17 +51,18 @@ private val supportedAudioCodecs = arrayOf(
 	Codec.Audio.VORBIS,
 )
 
+// Ephyra: the server encodes audio to the first allowed codec: a 5.1 Dolby bitstream beats AAC (the bitstream settings filter it)
 private val hlsMpegTsAudioCodecs = arrayOf(
-	Codec.Audio.AAC,
 	Codec.Audio.AC3,
 	Codec.Audio.EAC3,
+	Codec.Audio.AAC,
 	Codec.Audio.MP3
 )
 
 private val hlsFmp4AudioCodecs = arrayOf(
-	Codec.Audio.AAC,
 	Codec.Audio.AC3,
 	Codec.Audio.EAC3,
+	Codec.Audio.AAC,
 	Codec.Audio.MP3,
 	Codec.Audio.ALAC,
 	Codec.Audio.FLAC,
@@ -69,7 +70,7 @@ private val hlsFmp4AudioCodecs = arrayOf(
 	Codec.Audio.DTS,
 )
 
-// Ephyra: direct play containers whose video rotation Media3 does not apply (everything except the MP4 family and HLS)
+// Ephyra: direct play containers whose video rotation Media3 does not apply reliably (everything except the MP4 family and HLS)
 internal val rotationUnawareContainers = listOf(
 	Codec.Container.ASF,
 	Codec.Container.MKV,
@@ -478,10 +479,11 @@ fun createDeviceProfile(
 		}
 	}
 
-	// Ephyra: rotated video. MediaCodecVideoRenderer hands the rotation to the decoder (MediaFormat.KEY_ROTATION), but only the MP4 family
-	// extractor reads it (display matrix in tkhd); Matroska and the other containers carry no rotation Media3 understands, so the picture
-	// would come out sideways. For those the server must transcode (it auto-rotates) whenever the stream has a rotation. A missing
-	// rotation counts as 0 (isRequired = false). The SDK accepts only servers 12+, which know this condition.
+	// Ephyra: rotated video. MediaCodecVideoRenderer hands the rotation to the decoder (MediaFormat.KEY_ROTATION), which needs the
+	// extractor to read it. The MP4 family extractor does (display matrix in tkhd). The Matroska extractor reads ProjectionPoseRoll, but
+	// whether its sign matches what phones and ffmpeg write is unverified, and the other containers carry no rotation Media3 understands.
+	// For those the server handles any rotation (remux or transcode). A missing rotation counts as 0 (isRequired = false).
+	// The SDK accepts only servers 12+, which know this condition.
 	codecProfile {
 		type = CodecType.VIDEO
 		container = rotationUnawareContainers.joinToString(",")
@@ -586,6 +588,18 @@ fun createDeviceProfile(
 
 		conditions {
 			ProfileConditionValue.AUDIO_CHANNELS lowerThanOrEquals if (downMixAudio) 2 else 8
+		}
+	}
+
+	// Ephyra: Media3's MPEG-TS extractor has no reader for TrueHD (Blu-ray stream type 0x83), so the track would be missing:
+	// a condition no stream meets makes the server remux or convert TrueHD in TS
+	codecProfile {
+		type = CodecType.VIDEO_AUDIO
+		codec = Codec.Audio.TRUEHD
+		container = listOf(Codec.Container.TS, Codec.Container.MPEGTS, Codec.Container.M2TS).joinToString(",")
+
+		conditions {
+			ProfileConditionValue.AUDIO_CHANNELS lowerThanOrEquals 0
 		}
 	}
 

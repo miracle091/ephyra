@@ -8,6 +8,7 @@ object Codec {
 		const val AVI = "avi"
 		const val DVR_MS = "dvr-ms"
 		const val HLS = "hls"
+		const val M2TS = "m2ts"
 		const val M2V = "m2v"
 		const val M4V = "m4v"
 		const val MKV = "mkv"

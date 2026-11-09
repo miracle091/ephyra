@@ -51,6 +51,8 @@ import org.jellyfin.androidtv.data.compat.StreamInfo;
 import org.jellyfin.androidtv.preference.UserPreferences;
 import org.jellyfin.androidtv.preference.constant.BufferLength;
 import org.jellyfin.androidtv.preference.constant.ZoomMode;
+import org.jellyfin.playback.media3.exoplayer.UrlRedactionKt;
+import org.jellyfin.playback.media3.exoplayer.shield.BitstreamFirstRenderersFactory;
 import org.jellyfin.playback.media3.exoplayer.shield.ShieldLoadControl;
 import org.jellyfin.playback.media3.exoplayer.shield.ShieldMediaCodecSelector;
 import org.jellyfin.sdk.api.client.ApiClient;
@@ -222,7 +224,11 @@ public class VideoManager {
      */
     private ExoPlayer.Builder configureExoplayerBuilder(Context context, AssHandler assHandler) {
         ExoPlayer.Builder exoPlayerBuilder = new ExoPlayer.Builder(context);
-        DefaultRenderersFactory defaultRendererFactory = new DefaultRenderersFactory(context);
+        // Ephyra: FFmpeg, when preferred, still steps aside for formats the audio sink can pass through as bitstream
+        DefaultRenderersFactory defaultRendererFactory = new BitstreamFirstRenderersFactory(
+                context,
+                userPreferences.get(UserPreferences.Companion.getPreferExoPlayerFfmpeg())
+        );
         defaultRendererFactory.setMediaCodecSelector(new ShieldMediaCodecSelector());
         defaultRendererFactory.setEnableDecoderFallback(true);
         defaultRendererFactory.setExtensionRendererMode(determineExoPlayerExtensionRendererMode());
@@ -394,7 +400,7 @@ public class VideoManager {
             Timber.w("Video path is null cannot continue");
             return;
         }
-        Timber.i("Video path set to: %s", path);
+        Timber.i("Video path set to: %s", UrlRedactionKt.redactApiKey(path));
 
         try {
             // Add external subtitles
@@ -411,7 +417,7 @@ public class VideoManager {
                             .setLabel(mediaStream.getDisplayTitle())
                             .setSelectionFlags(getSubtitleSelectionFlags(mediaStream))
                             .build();
-                    Timber.i("Adding subtitle track %s of type %s", subtitleConfiguration.uri, subtitleConfiguration.mimeType);
+                    Timber.i("Adding subtitle track %s of type %s", UrlRedactionKt.redactApiKey(subtitleConfiguration.uri.toString()), subtitleConfiguration.mimeType);
                     subtitleConfigurations.add(subtitleConfiguration);
                 }
             }

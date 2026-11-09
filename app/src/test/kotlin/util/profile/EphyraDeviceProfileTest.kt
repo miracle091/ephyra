@@ -22,6 +22,8 @@ import org.jellyfin.sdk.model.api.VideoRangeType
 
 private fun profile(
 	dtsEnabled: Boolean = false,
+	dolbyEnabled: Boolean = false,
+	trueHdEnabled: Boolean = false,
 	doviElSupported: Boolean = false,
 	displaySupportsDolbyVision: Boolean = true,
 	unreportedDoviProfile7Support: Boolean = false,
@@ -43,10 +45,10 @@ private fun profile(
 	return createDeviceProfile(
 		mediaTest = mediaTest,
 		maxBitrate = 100_000_000,
-		isAC3PrefEnabled = false,
-		isEAC3PrefEnabled = false,
+		isAC3PrefEnabled = dolbyEnabled,
+		isEAC3PrefEnabled = dolbyEnabled,
 		isDTSPrefEnabled = dtsEnabled,
-		isTrueHDPrefEnabled = false,
+		isTrueHDPrefEnabled = trueHdEnabled,
 		downMixAudio = false,
 		assDirectPlay = false,
 		pgsDirectPlay = false,
@@ -89,6 +91,36 @@ class EphyraDeviceProfileTest : FunSpec({
 			codecProfile.container.orEmpty().split(",") shouldContain Codec.Container.MKV
 			codecProfile.container.orEmpty().split(",") shouldNotContain Codec.Container.MP4
 			codecProfile.container.orEmpty().split(",") shouldNotContain Codec.Container.MOV
+		}
+	}
+
+	context("audio fallbacks") {
+		test("MLP is never direct played") {
+			profile(dolbyEnabled = true, trueHdEnabled = true).directPlayAudioCodecs() shouldNotContain Codec.Audio.MLP
+		}
+
+		test("a server audio conversion goes to AC3 when the bitstream is allowed, AAC otherwise") {
+			fun DeviceProfile.firstHlsAudioCodec(container: String) = transcodingProfiles.orEmpty()
+				.first { it.type == DlnaProfileType.VIDEO && it.container == container }
+				.audioCodec.orEmpty().split(",").first()
+
+			profile(dolbyEnabled = true).firstHlsAudioCodec(Codec.Container.TS) shouldBe Codec.Audio.AC3
+			profile(dolbyEnabled = true).firstHlsAudioCodec(Codec.Container.MP4) shouldBe Codec.Audio.AC3
+			profile(dolbyEnabled = false).firstHlsAudioCodec(Codec.Container.TS) shouldBe Codec.Audio.AAC
+			profile(dolbyEnabled = false).firstHlsAudioCodec(Codec.Container.MP4) shouldBe Codec.Audio.AAC
+		}
+
+		test("TrueHD in MPEG-TS gets a condition no stream meets, TrueHD in Matroska none") {
+			val trueHdProfiles = profile(trueHdEnabled = true).codecProfiles.orEmpty()
+				.filter { it.type == CodecType.VIDEO_AUDIO && it.codec == Codec.Audio.TRUEHD }
+			val containers = trueHdProfiles.single().container.orEmpty().split(",")
+			containers shouldContain Codec.Container.TS
+			containers shouldContain Codec.Container.M2TS
+			containers shouldNotContain Codec.Container.MKV
+			val condition = trueHdProfiles.single().conditions.orEmpty().single()
+			condition.property shouldBe ProfileConditionValue.AUDIO_CHANNELS
+			condition.condition shouldBe ProfileConditionType.LESS_THAN_EQUAL
+			condition.value shouldBe "0"
 		}
 	}
 
