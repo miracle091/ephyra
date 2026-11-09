@@ -119,4 +119,21 @@
     <string name="ephyra_osd_guide">TV guide</string>
     <string name="ephyra_osd_channels">Channels</string>
     <string name="ephyra_osd_recording">Recording</string>
+    <string name="ephyra_prefer_ffmpeg_content">Decode audio with FFmpeg even when the device has its own decoder. Formats the receiver accepts as bitstream (Dolby, DTS, TrueHD) are still sent to it</string>
+    <string name="ephyra_audio_night_mode_content">Levels out the volume. It has no effect when audio goes to the receiver as bitstream</string>
+    <!-- Accent colour (preference/constant/AccentColor.kt) -->
+    <string name="ephyra_pref_accent_color">Accent colour</string>
+    <string name="ephyra_accent_theme">Theme default</string>
+    <string name="ephyra_accent_violet">Violet</string>
+    <string name="ephyra_accent_blue">Blue</string>
+    <string name="ephyra_accent_teal">Teal</string>
+    <string name="ephyra_accent_green">Green</string>
+    <string name="ephyra_accent_amber">Amber</string>
+    <string name="ephyra_accent_coral">Coral</string>
+    <string name="ephyra_accent_red">Red</string>
+    <!-- Compact episode list (ui/presentation/CompactEpisodePresenter.kt) -->
+    <string name="ephyra_pref_compact_episodes">Compact episode list</string>
+    <string name="ephyra_pref_compact_episodes_description">Show the episodes of a season as rows with the picture and the plot beside the title</string>
+    <!-- Details of a series: the next up card (ui/itemdetail/DetailsNextUpCard.kt) -->
+    <string name="ephyra_next_up_card">Next: %1$s</string>
 </resources>

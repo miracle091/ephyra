@@ -26,6 +26,8 @@ import org.jellyfin.androidtv.preference.UserPreferences
 import org.jellyfin.androidtv.ui.base.EphyraTheme
 import org.jellyfin.androidtv.ui.base.LocalEphyraPalette
 import org.jellyfin.androidtv.ui.base.Text
+import org.jellyfin.androidtv.ui.composable.InfoRowGroups
+import org.jellyfin.androidtv.ui.composable.InfoRowOutlinedBadge
 import org.jellyfin.androidtv.ui.composable.getResolutionName
 import org.jellyfin.androidtv.util.TimeUtils
 import org.jellyfin.androidtv.util.sdk.getProgramSubText
@@ -272,8 +274,15 @@ fun BaseItemInfoRow(
 	item: BaseItemDto,
 	mediaSource: MediaSourceInfo?,
 	includeRuntime: Boolean,
+	separated: Boolean = false,
 ) {
 	val userPreferences = koinInject<UserPreferences>()
+
+	// Ephyra: the details screen shows films, series and episodes as groups divided by vertical lines
+	if (separated && item.type !in SEPARATED_EXCLUDED_KINDS) {
+		InfoRowGroups(buildSeparatedGroups(item, mediaSource, includeRuntime))
+		return
+	}
 
 	Row(
 		horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -412,6 +421,41 @@ fun BaseItemInfoRow(
 	}
 }
 
+// Ephyra: the server rates out of 10 (community) and 100 (critics); the badges take a fraction
+internal const val COMMUNITY_RATING_SCALE = 10f
+internal const val CRITIC_RATING_SCALE = 100f
+
+private val SEPARATED_EXCLUDED_KINDS = setOf(
+	BaseItemKind.PERSON,
+	BaseItemKind.PROGRAM,
+	BaseItemKind.TV_CHANNEL,
+	BaseItemKind.BOX_SET,
+	BaseItemKind.MUSIC_ARTIST,
+	BaseItemKind.MUSIC_ALBUM,
+	BaseItemKind.PLAYLIST,
+)
+
+/**
+ * Ephyra: the groups of the separated info row: episode label, year or date, community rating, critic rating, runtime,
+ * series status, media details and the official rating as an outlined badge at the end. Absent data adds no group.
+ */
+private fun buildSeparatedGroups(
+	item: BaseItemDto,
+	mediaSource: MediaSourceInfo?,
+	includeRuntime: Boolean,
+): List<@Composable () -> Unit> = buildList<@Composable () -> Unit> {
+	if (item.type == BaseItemKind.EPISODE) add { InfoRowSeasonEpisode(item) }
+	if (item.premiereDate != null || item.productionYear != null) add { InfoRowDate(item) }
+	item.communityRating?.let { rating -> add { InfoRowCommunityRating(rating / COMMUNITY_RATING_SCALE) } }
+	item.criticRating?.let { rating -> add { InfoRowCriticRating(rating / CRITIC_RATING_SCALE) } }
+	if (includeRuntime) item.runTimeTicks?.ticks?.let { runtime -> add { BaseItemInfoRowRuntime(runtime) } }
+	if (item.status?.let(SeriesStatus::fromNameOrNull) != null) add { InfoRowSeriesStatus(item) }
+	if (mediaSource?.mediaStreams?.isNotEmpty() == true) {
+		add { Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { InfoRowMediaDetails(mediaSource) } }
+	}
+	item.officialRating?.takeIf { it.isNotBlank() }?.let { rating -> add { InfoRowOutlinedBadge(rating) } }
+}
+
 /**
  * Exposes the [BaseItemInfoRow] composable as Android view.
  */
@@ -422,6 +466,7 @@ class BaseItemInfoRowView @JvmOverloads constructor(
 	private val _item = MutableStateFlow<BaseItemDto?>(null)
 	private val _mediaSource = MutableStateFlow<MediaSourceInfo?>(null)
 	private val _includeRuntime = MutableStateFlow(false)
+	private val _separated = MutableStateFlow(false)
 
 	var item: BaseItemDto?
 		get() = _item.value
@@ -441,6 +486,13 @@ class BaseItemInfoRowView @JvmOverloads constructor(
 			_includeRuntime.value = value
 		}
 
+	/** Ephyra: groups divided by vertical lines and an outlined official rating, used by the details screen. */
+	var separated: Boolean
+		get() = _separated.value
+		set(value) {
+			_separated.value = value
+		}
+
 	init {
 		isFocusable = false
 		descendantFocusability = FOCUS_BLOCK_DESCENDANTS
@@ -451,8 +503,9 @@ class BaseItemInfoRowView @JvmOverloads constructor(
 		val item by _item.collectAsState()
 		val mediaSource by _mediaSource.collectAsState()
 		val includeRuntime by _includeRuntime.collectAsState()
+		val separated by _separated.collectAsState()
 
 		// Ephyra: the theme's tokens for the info row items
-		EphyraTheme { item?.let { BaseItemInfoRow(it, mediaSource, includeRuntime) } }
+		EphyraTheme { item?.let { BaseItemInfoRow(it, mediaSource, includeRuntime, separated) } }
 	}
 }

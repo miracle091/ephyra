@@ -7,6 +7,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -63,6 +64,9 @@ import org.koin.compose.koinInject
 // Ephyra: the design system's card overlay shade, rgba(5, 8, 20)
 private val CARD_SHADE = Color(0xFF050814)
 
+// Ephyra: a landscape card is 130dp tall where a portrait one is 150dp
+private const val LANDSCAPE_HEIGHT_RATIO = 130f / 150f
+
 class CardPresenter(
 	val showInfo: Boolean,
 	val imageType: ImageType,
@@ -73,6 +77,15 @@ class CardPresenter(
 	constructor(showInfo: Boolean, staticHeight: Int) : this(showInfo, ImageType.POSTER, staticHeight)
 	constructor(showInfo: Boolean) : this(showInfo, 150)
 	constructor() : this(true)
+
+	/** Ephyra: episodes show their meta line (runtime, rating, end time) under the title instead of their season and number. */
+	var episodeTiming = false
+
+	/**
+	 * Ephyra: when set, the height in dp of portrait cards, whatever the item asks for; landscape cards keep their usual 130:150
+	 * ratio to it.
+	 */
+	var cardHeight: Int? = null
 
 	override fun onCreateViewHolder(parent: ViewGroup): ViewHolder {
 		val view = ComposeView(parent.context).apply {
@@ -115,10 +128,7 @@ class CardPresenter(
 				CardViewHolderContent(
 					item = item,
 					focused = focused,
-					showInfo = showInfo,
-					imageType = imageType,
-					staticHeight = staticHeight,
-					uniformAspect = uniformAspect,
+					presenter = this@CardPresenter,
 				)
 			}
 
@@ -290,16 +300,24 @@ private fun BaseRowItem.getDisplayConfig(imageType: ImageType, uniformAspect: Bo
 private fun CardViewHolderContent(
 	item: BaseRowItem?,
 	focused: Boolean,
-	showInfo: Boolean,
-	imageType: ImageType,
-	staticHeight: Int,
-	uniformAspect: Boolean,
+	// Ephyra: the presenter carries the card options (info, image type, heights, episode timing)
+	presenter: CardPresenter,
 ) {
+	val showInfo = presenter.showInfo
+	val imageType = presenter.imageType
+	val staticHeight = presenter.staticHeight
+	val uniformAspect = presenter.uniformAspect
+	val episodeTiming = presenter.episodeTiming
+	val cardHeight = presenter.cardHeight
 	val context = LocalContext.current
 	val localDensity = LocalDensity.current
 
 	val title = remember(item, context) { item?.getCardName(context) }
 	val subtitle = remember(item, context) { item?.getSubText(context) }
+	// Ephyra: the end time is worked out when the card is bound, so it is fresh each time the screen is shown
+	val meta = remember(item, context, episodeTiming) {
+		item?.baseItem?.takeIf { episodeTiming && it.type == BaseItemKind.EPISODE }?.episodeMetaLine(context)
+	}
 	val displayConfig = remember(item, imageType, uniformAspect) { item?.getDisplayConfig(imageType, uniformAspect) }
 	if (item == null || displayConfig == null) return
 
@@ -307,7 +325,9 @@ private fun CardViewHolderContent(
 	val aspectRatio = displayConfig.aspectRatio.takeIf { it >= 0.1f }
 		?: image?.aspectRatio?.takeIf { it >= 0.1f } ?: 1f
 
+	val fixedHeight = cardHeight?.dp?.let { if (aspectRatio > 1f) it * LANDSCAPE_HEIGHT_RATIO else it }
 	val size = when (item.staticHeight) {
+		false if fixedHeight != null -> DpSize(fixedHeight * aspectRatio, fixedHeight)
 		true -> DpSize(staticHeight.dp * aspectRatio, staticHeight.dp)
 		false if (aspectRatio > 1f) -> DpSize(130.dp * aspectRatio, 130.dp)
 		else -> DpSize(150.dp * aspectRatio, 150.dp)
@@ -418,15 +438,22 @@ private fun CardViewHolderContent(
 					)
 				}
 			},
-			subtitle = subtitle?.let { text ->
+			subtitle = if (subtitle == null && meta == null) null else {
 				{
-					Text(
-						text = text,
-						maxLines = 1,
-						overflow = TextOverflow.Ellipsis,
-						textAlign = TextAlign.Center,
-						modifier = Modifier.then(focusModifier),
-					)
+					// Ephyra: the episode's meta line goes under its name
+					Column {
+						listOfNotNull(subtitle, meta).forEach { text ->
+							Text(
+								text = text,
+								maxLines = 1,
+								overflow = TextOverflow.Ellipsis,
+								textAlign = TextAlign.Center,
+								modifier = Modifier
+									.fillMaxWidth()
+									.then(focusModifier),
+							)
+						}
+					}
 				}
 			},
 		)

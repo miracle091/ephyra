@@ -283,6 +283,7 @@ fun SettingsPlaybackAdvancedScreen() {
 			ListButton(
 				headingContent = { Text(stringResource(R.string.pref_audio_night_mode)) },
 				trailingContent = { Checkbox(checked = audioNightMode) },
+				captionContent = { Text(stringResource(R.string.ephyra_audio_night_mode_content)) },
 				onClick = { audioNightMode = !audioNightMode },
 				modifier = Modifier.focusKey("audio_night_mode")
 			)
@@ -293,7 +294,7 @@ fun SettingsPlaybackAdvancedScreen() {
 			ListButton(
 				headingContent = { Text(stringResource(R.string.prefer_exoplayer_ffmpeg)) },
 				trailingContent = { Checkbox(checked = preferExoPlayerFfmpeg) },
-				captionContent = { Text(stringResource(R.string.prefer_exoplayer_ffmpeg_content)) },
+				captionContent = { Text(stringResource(R.string.ephyra_prefer_ffmpeg_content)) },
 				onClick = { preferExoPlayerFfmpeg = !preferExoPlayerFfmpeg },
 				modifier = Modifier.focusKey("prefer_exoplayer_ffmpeg")
 			)

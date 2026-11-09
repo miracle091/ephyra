@@ -39,6 +39,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
 import coil3.compose.AsyncImage
 import kotlinx.coroutines.delay
 import org.jellyfin.androidtv.R
@@ -49,6 +50,8 @@ import org.jellyfin.androidtv.ui.base.EphyraTheme
 import org.jellyfin.androidtv.ui.base.Icon
 import org.jellyfin.androidtv.ui.base.LocalEphyraPalette
 import org.jellyfin.androidtv.ui.base.Text
+import org.jellyfin.androidtv.ui.composable.modifier.BackdropPanSpec
+import org.jellyfin.androidtv.ui.composable.modifier.backdropPan
 import org.jellyfin.androidtv.ui.playback.OsdHeader
 import org.jellyfin.androidtv.util.apiclient.getUrl
 import org.jellyfin.androidtv.util.apiclient.itemBackdropImages
@@ -68,6 +71,10 @@ private const val PICTURE_ALPHA_LATE = 0.35f
 private val TextStart = 32.dp
 private val TextStartLate = 56.dp
 private const val LATE_MOVE_MS = 4_000
+
+// Where the shade under the header ends and the one under the progress starts, as a fraction of the height
+private const val HEADER_SHADE_END = 0.3f
+private const val PROGRESS_SHADE_START = 0.6f
 
 // The video player's measures (vlc_player_interface.xml, lb_playback_transport_controls_row.xml): 32dp sides, 27dp top and bottom
 private val SideMargin = 32.dp
@@ -106,8 +113,8 @@ fun DreamContentPaused(content: DreamContent.VideoPaused) = EphyraTheme {
 				.background(
 					Brush.verticalGradient(
 						0f to palette.bg.copy(alpha = 0.8f),
-						0.3f to Color.Transparent,
-						0.6f to Color.Transparent,
+						HEADER_SHADE_END to Color.Transparent,
+						PROGRESS_SHADE_START to Color.Transparent,
 						1f to palette.bg,
 					)
 				)
@@ -156,7 +163,10 @@ private fun PausedPicture(item: BaseItemDto, modifier: Modifier) {
 		model = image.getUrl(api, maxWidth = maxWidth),
 		contentDescription = null,
 		contentScale = ContentScale.Crop,
-		modifier = modifier.fillMaxSize(),
+		// Ephyra: the slow pan also keeps the picture moving against burn-in; a dream never gets past STARTED
+		modifier = modifier
+			.fillMaxSize()
+			.backdropPan(BackdropPanSpec.direction(item.id.hashCode()), key = item.id, activeState = Lifecycle.State.STARTED),
 	)
 }
 

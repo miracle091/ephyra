@@ -33,7 +33,7 @@ suspend fun loadSpotlightItems(api: ApiClient): List<BaseItemDto> = withContext(
 			// The name breaks ties (items scanned together share their date), so the order stays the same between loads
 			sortBy = setOf(ItemSortBy.DATE_CREATED, ItemSortBy.SORT_NAME),
 			sortOrder = setOf(SortOrder.DESCENDING, SortOrder.ASCENDING),
-			fields = setOf(ItemFields.GENRES),
+			fields = setOf(ItemFields.GENRES, ItemFields.TAGLINES),
 			limit = SPOTLIGHT_SIZE,
 		).content.items
 	} catch (error: CancellationException) {
@@ -71,13 +71,14 @@ fun spotlightPlayTarget(item: BaseItemDto, nextUp: BaseItemDto?): UUID =
 fun spotlightOverline(label: String, item: BaseItemDto): String =
 	listOfNotNull(label, item.genres?.firstOrNull()).joinToString(" · ")
 
-/** Ephyra: year, running time (films) and rating, separated by middle dots ("2024 · 2 h 46 min · PG-13"). */
-fun spotlightMeta(item: BaseItemDto, getString: (Int, Array<out Any>) -> String): String {
-	val runtime = item.runTimeTicks?.takeIf { item.type == BaseItemKind.MOVIE && it > 0 }?.let { ticks ->
+/** Ephyra: the running time of a film ("2 h 46 min"), null for anything else or when unknown. */
+fun spotlightRuntime(item: BaseItemDto, getString: (Int, Array<out Any>) -> String): String? =
+	item.runTimeTicks?.takeIf { item.type == BaseItemKind.MOVIE && it > 0 }?.let { ticks ->
 		val minutes = (ticks / TICKS_PER_MINUTE).toInt()
 		val hours = minutes / MINUTES_PER_HOUR
 		if (hours > 0) getString(R.string.ephyra_runtime_hours_minutes, arrayOf(hours, minutes % MINUTES_PER_HOUR))
 		else getString(R.string.ephyra_runtime_minutes, arrayOf(minutes))
 	}
-	return listOfNotNull(item.productionYear?.toString(), runtime, item.officialRating).joinToString(" · ")
-}
+
+/** Ephyra: the first non blank tagline, or null so the spotlight shows no line. */
+fun spotlightTagline(item: BaseItemDto): String? = item.taglines?.firstOrNull { it.isNotBlank() }?.trim()

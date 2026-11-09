@@ -12,6 +12,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import org.jellyfin.androidtv.R
 import org.jellyfin.androidtv.integration.LeanbackChannelWorker
+import org.jellyfin.androidtv.preference.EphyraPreferences
 import org.jellyfin.androidtv.preference.UserPreferences
 import org.jellyfin.androidtv.ui.base.Icon
 import org.jellyfin.androidtv.ui.base.Text
@@ -23,6 +24,7 @@ import org.jellyfin.androidtv.ui.navigation.focus.focusKey
 import org.jellyfin.androidtv.ui.settings.Routes
 import org.jellyfin.androidtv.ui.settings.compat.rememberPreference
 import org.jellyfin.androidtv.ui.settings.composable.SettingsColumn
+import org.jellyfin.androidtv.ui.settings.screen.CompactEpisodesListButton
 import org.jellyfin.androidtv.ui.settings.screen.SpoilerBlurListButton
 import org.koin.compose.koinInject
 
@@ -42,67 +44,14 @@ fun SettingsCustomizationScreen() {
 			)
 		}
 
-		item {
-			var appTheme by rememberPreference(userPreferences, UserPreferences.appTheme)
-
-			ListButton(
-				headingContent = { Text(stringResource(R.string.pref_app_theme)) },
-				captionContent = { Text(stringResource(appTheme.nameRes)) },
-				onClick = { router.push(Routes.CUSTOMIZATION_THEME) },
-				modifier = Modifier.focusKey(Routes.CUSTOMIZATION_THEME)
-			)
-		}
-
-		item {
-			var clockBehavior by rememberPreference(userPreferences, UserPreferences.clockBehavior)
-
-			ListButton(
-				headingContent = { Text(stringResource(R.string.pref_clock_display)) },
-				captionContent = { Text(stringResource(clockBehavior.nameRes)) },
-				onClick = { router.push(Routes.CUSTOMIZATION_CLOCK) },
-				modifier = Modifier.focusKey(Routes.CUSTOMIZATION_CLOCK)
-			)
-		}
-
-		item {
-			var watchedIndicatorBehavior by rememberPreference(userPreferences, UserPreferences.watchedIndicatorBehavior)
-
-			ListButton(
-				headingContent = { Text(stringResource(R.string.pref_watched_indicator)) },
-				captionContent = { Text(stringResource(watchedIndicatorBehavior.nameRes)) },
-				onClick = { router.push(Routes.CUSTOMIZATION_WATCHED_INDICATOR) },
-				modifier = Modifier.focusKey(Routes.CUSTOMIZATION_WATCHED_INDICATOR)
-			)
-		}
-
-		item {
-			var seriesThumbnailsEnabled by rememberPreference(userPreferences, UserPreferences.seriesThumbnailsEnabled)
-
-			ListButton(
-				headingContent = { Text(stringResource(R.string.lbl_use_series_thumbnails)) },
-				trailingContent = { Checkbox(checked = seriesThumbnailsEnabled) },
-				captionContent = { Text(stringResource(R.string.lbl_use_series_thumbnails_description)) },
-				onClick = { seriesThumbnailsEnabled = !seriesThumbnailsEnabled },
-				modifier = Modifier.focusKey("series_thumbnails_enabled")
-			)
-		}
-
+		item { ThemeListButton(userPreferences) }
+		item { AccentListButton() } // Ephyra
+		item { ClockListButton(userPreferences) }
+		item { WatchedIndicatorListButton(userPreferences) }
+		item { SeriesThumbnailsListButton(userPreferences) }
 		item { SpoilerBlurListButton() } // Ephyra
-
-		if (leanbackChannelWorkerAvailable) item {
-			var tvProviderEnabled by rememberPreference(userPreferences, UserPreferences.tvProviderEnabled)
-
-			ListButton(
-				headingContent = { Text(stringResource(R.string.tv_provider_enabled)) },
-				captionContent = { Text(stringResource(R.string.ephyra_tv_provider_enabled_description)) },
-				trailingContent = { Checkbox(checked = tvProviderEnabled) },
-				onClick = {
-					tvProviderEnabled = !tvProviderEnabled
-					workManager.enqueue(OneTimeWorkRequestBuilder<LeanbackChannelWorker>().build())
-				},
-				modifier = Modifier.focusKey("leanback_channels_enabled")
-			)
-		}
+		item { CompactEpisodesListButton() } // Ephyra
+		if (leanbackChannelWorkerAvailable) item { TvProviderListButton(userPreferences, workManager) }
 
 		item { ListSection(headingContent = { Text(stringResource(R.string.pref_browsing)) }) }
 
@@ -124,4 +73,86 @@ fun SettingsCustomizationScreen() {
 			)
 		}
 	}
+}
+
+@Composable
+private fun ThemeListButton(userPreferences: UserPreferences) {
+	val router = LocalRouter.current
+	var appTheme by rememberPreference(userPreferences, UserPreferences.appTheme)
+
+	ListButton(
+		headingContent = { Text(stringResource(R.string.pref_app_theme)) },
+		captionContent = { Text(stringResource(appTheme.nameRes)) },
+		onClick = { router.push(Routes.CUSTOMIZATION_THEME) },
+		modifier = Modifier.focusKey(Routes.CUSTOMIZATION_THEME)
+	)
+}
+
+// Ephyra: the accent colour, apart from the theme
+@Composable
+private fun AccentListButton() {
+	val router = LocalRouter.current
+	var accentColor by rememberPreference(koinInject<EphyraPreferences>(), EphyraPreferences.accentColor)
+
+	ListButton(
+		headingContent = { Text(stringResource(R.string.ephyra_pref_accent_color)) },
+		captionContent = { Text(stringResource(accentColor.nameRes)) },
+		onClick = { router.push(Routes.CUSTOMIZATION_ACCENT) },
+		modifier = Modifier.focusKey(Routes.CUSTOMIZATION_ACCENT)
+	)
+}
+
+@Composable
+private fun ClockListButton(userPreferences: UserPreferences) {
+	val router = LocalRouter.current
+	var clockBehavior by rememberPreference(userPreferences, UserPreferences.clockBehavior)
+
+	ListButton(
+		headingContent = { Text(stringResource(R.string.pref_clock_display)) },
+		captionContent = { Text(stringResource(clockBehavior.nameRes)) },
+		onClick = { router.push(Routes.CUSTOMIZATION_CLOCK) },
+		modifier = Modifier.focusKey(Routes.CUSTOMIZATION_CLOCK)
+	)
+}
+
+@Composable
+private fun WatchedIndicatorListButton(userPreferences: UserPreferences) {
+	val router = LocalRouter.current
+	var watchedIndicatorBehavior by rememberPreference(userPreferences, UserPreferences.watchedIndicatorBehavior)
+
+	ListButton(
+		headingContent = { Text(stringResource(R.string.pref_watched_indicator)) },
+		captionContent = { Text(stringResource(watchedIndicatorBehavior.nameRes)) },
+		onClick = { router.push(Routes.CUSTOMIZATION_WATCHED_INDICATOR) },
+		modifier = Modifier.focusKey(Routes.CUSTOMIZATION_WATCHED_INDICATOR)
+	)
+}
+
+@Composable
+private fun SeriesThumbnailsListButton(userPreferences: UserPreferences) {
+	var seriesThumbnailsEnabled by rememberPreference(userPreferences, UserPreferences.seriesThumbnailsEnabled)
+
+	ListButton(
+		headingContent = { Text(stringResource(R.string.lbl_use_series_thumbnails)) },
+		trailingContent = { Checkbox(checked = seriesThumbnailsEnabled) },
+		captionContent = { Text(stringResource(R.string.lbl_use_series_thumbnails_description)) },
+		onClick = { seriesThumbnailsEnabled = !seriesThumbnailsEnabled },
+		modifier = Modifier.focusKey("series_thumbnails_enabled")
+	)
+}
+
+@Composable
+private fun TvProviderListButton(userPreferences: UserPreferences, workManager: WorkManager) {
+	var tvProviderEnabled by rememberPreference(userPreferences, UserPreferences.tvProviderEnabled)
+
+	ListButton(
+		headingContent = { Text(stringResource(R.string.tv_provider_enabled)) },
+		captionContent = { Text(stringResource(R.string.ephyra_tv_provider_enabled_description)) },
+		trailingContent = { Checkbox(checked = tvProviderEnabled) },
+		onClick = {
+			tvProviderEnabled = !tvProviderEnabled
+			workManager.enqueue(OneTimeWorkRequestBuilder<LeanbackChannelWorker>().build())
+		},
+		modifier = Modifier.focusKey("leanback_channels_enabled")
+	)
 }

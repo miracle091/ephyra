@@ -7,7 +7,6 @@ import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -62,8 +61,14 @@ import org.jellyfin.androidtv.ui.base.LocalEphyraPalette
 import org.jellyfin.androidtv.ui.base.LocalTextStyle
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.base.button.IconButton
+import org.jellyfin.androidtv.ui.browsing.composable.inforow.COMMUNITY_RATING_SCALE
+import org.jellyfin.androidtv.ui.browsing.composable.inforow.CRITIC_RATING_SCALE
 import org.jellyfin.androidtv.ui.browsing.composable.inforow.InfoRowCommunityRating
 import org.jellyfin.androidtv.ui.browsing.composable.inforow.InfoRowCriticRating
+import org.jellyfin.androidtv.ui.composable.InfoRowGroups
+import org.jellyfin.androidtv.ui.composable.InfoRowOutlinedBadge
+import org.jellyfin.androidtv.ui.composable.modifier.BackdropPanSpec
+import org.jellyfin.androidtv.ui.composable.modifier.backdropPan
 import org.jellyfin.androidtv.ui.home.HomeRowsFragment
 import org.jellyfin.androidtv.ui.navigation.Destinations
 import org.jellyfin.androidtv.ui.navigation.NavigationRepository
@@ -89,16 +94,22 @@ private val LogoMaxHeight = 72.dp
 // The backdrop covers the right two thirds and fades out at the top, towards the text and towards the rows, without blur
 // (Android 11 has none)
 private const val BACKDROP_WIDTH = 0.66f
+// Positions of the backdrop fade's stops, as fractions of its width (horizontal) and height (vertical)
+private const val FADE_H_SOFT = 0.25f
+private const val FADE_H_FULL = 0.5f
+private const val FADE_V_IN = 0.3f
+private const val FADE_V_HOLD = 0.55f
+private const val FADE_V_OUT = 0.8f
 private val BackdropFadeHorizontal = Brush.horizontalGradient(
 	0f to Color.Transparent,
-	0.25f to Color.Black.copy(alpha = 0.6f),
-	0.5f to Color.Black,
+	FADE_H_SOFT to Color.Black.copy(alpha = 0.6f),
+	FADE_H_FULL to Color.Black,
 )
 private val BackdropFadeVertical = Brush.verticalGradient(
 	0f to Color.Transparent,
-	0.3f to Color.Black,
-	0.55f to Color.Black,
-	0.8f to Color.Black.copy(alpha = 0.4f),
+	FADE_V_IN to Color.Black,
+	FADE_V_HOLD to Color.Black,
+	FADE_V_OUT to Color.Black.copy(alpha = 0.4f),
 	1f to Color.Transparent,
 )
 
@@ -141,7 +152,10 @@ fun HomeSpotlight(rowsFragment: HomeRowsFragment?, modifier: Modifier = Modifier
 				.align(Alignment.TopEnd)
 				.fillMaxWidth(BACKDROP_WIDTH)
 				.fillMaxHeight(),
-		) { shown -> SpotlightBackdrop(shown, api) }
+		) { shown ->
+			// Ephyra: the pan alternates its side from title to title and each title's pan goes on through the crossfade
+			SpotlightBackdrop(shown, api, BackdropPanSpec.direction(items.indexOfFirst { it.id == shown.id }))
+		}
 
 		SpotlightInfo(
 			item = item,
@@ -155,7 +169,7 @@ fun HomeSpotlight(rowsFragment: HomeRowsFragment?, modifier: Modifier = Modifier
 }
 
 @Composable
-private fun SpotlightBackdrop(item: BaseItemDto, api: ApiClient) {
+private fun SpotlightBackdrop(item: BaseItemDto, api: ApiClient, panDirection: Int) {
 	val image = item.itemBackdropImages.firstOrNull() ?: return
 	val maxWidth = with(LocalDensity.current) { 640.dp.roundToPx() }
 	val logoMaxWidth = with(LocalDensity.current) { LogoMaxWidth.roundToPx() }
@@ -166,6 +180,7 @@ private fun SpotlightBackdrop(item: BaseItemDto, api: ApiClient) {
 			contentScale = ContentScale.Crop,
 			modifier = Modifier
 				.fillMaxSize()
+				.backdropPan(panDirection, key = item.id)
 				.graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
 				.drawWithContent {
 					drawContent()
@@ -192,16 +207,6 @@ private fun SpotlightBackdrop(item: BaseItemDto, api: ApiClient) {
 
 @Composable
 private fun SpotlightInfo(item: BaseItemDto, modifier: Modifier = Modifier) {
-	val context = LocalContext.current
-	val resources = LocalResources.current
-	val api = koinInject<ApiClient>()
-	val playbackHelper = koinInject<PlaybackHelper>()
-	val navigationRepository = koinInject<NavigationRepository>()
-	val itemMutationRepository = koinInject<ItemMutationRepository>()
-	val scope = rememberCoroutineScope()
-	// Favorite changes made here, until the next load
-	val favorites = remember { mutableStateMapOf<UUID, Boolean>() }
-	val favorite = favorites[item.id] ?: (item.userData?.isFavorite == true)
 	val playFocusRequester = remember { FocusRequester() }
 
 	Column(
@@ -212,79 +217,118 @@ private fun SpotlightInfo(item: BaseItemDto, modifier: Modifier = Modifier) {
 			.focusGroup(),
 		verticalArrangement = Arrangement.spacedBy(4.dp),
 	) {
+		SpotlightTexts(item)
+		Spacer(Modifier.height(8.dp))
+		SpotlightButtons(item, playFocusRequester)
+	}
+}
+
+/** The overline, the title, the tagline and the info row of the spotlight. */
+@Composable
+private fun SpotlightTexts(item: BaseItemDto) {
+	val resources = LocalResources.current
+
+	Text(
+		text = spotlightOverline(stringResource(R.string.ephyra_spotlight), item).uppercase(),
+		fontSize = 11.sp,
+		fontWeight = FontWeight.Bold,
+		letterSpacing = 1.sp,
+		color = LocalEphyraPalette.current.accent,
+	)
+	Text(
+		text = item.name.orEmpty(),
+		fontSize = 28.sp,
+		lineHeight = 34.sp,
+		fontWeight = FontWeight.Bold,
+		color = LocalEphyraPalette.current.ink,
+		maxLines = 1,
+		overflow = TextOverflow.Ellipsis,
+	)
+	// Ephyra: the tagline, one line, when the title has one
+	spotlightTagline(item)?.let { tagline ->
 		Text(
-			text = spotlightOverline(stringResource(R.string.ephyra_spotlight), item).uppercase(),
-			fontSize = 11.sp,
-			fontWeight = FontWeight.Bold,
-			letterSpacing = 1.sp,
-			color = LocalEphyraPalette.current.accent,
-		)
-		Text(
-			text = item.name.orEmpty(),
-			fontSize = 28.sp,
-			lineHeight = 34.sp,
-			fontWeight = FontWeight.Bold,
-			color = LocalEphyraPalette.current.ink,
+			text = tagline,
+			fontSize = 14.sp,
+			color = LocalEphyraPalette.current.inkMuted,
 			maxLines = 1,
 			overflow = TextOverflow.Ellipsis,
 		)
-		// Ratings first, with the gold star and the Rotten Tomatoes logo, as in the details' info row
-		Row(
-			horizontalArrangement = Arrangement.spacedBy(8.dp),
-			verticalAlignment = Alignment.CenterVertically,
-			modifier = Modifier.height(IntrinsicSize.Min),
+	}
+	// Ratings first, with the gold star and the Rotten Tomatoes logo, as in the details' info row; groups divided by thin
+	// lines and the official rating in an outlined badge
+	// Written out for one and two arguments (the runtime's) rather than spread
+	val getString = { res: Int, args: Array<out Any> ->
+		if (args.size > 1) resources.getString(res, args[0], args[1]) else resources.getString(res, args[0])
+	}
+	val runtime = spotlightRuntime(item, getString)
+	InfoRowGroups(
+		buildList<@Composable () -> Unit> {
+			item.communityRating?.let { add { InfoRowCommunityRating(it / COMMUNITY_RATING_SCALE) } }
+			item.criticRating?.let { add { InfoRowCriticRating(it / CRITIC_RATING_SCALE) } }
+			item.productionYear?.let { add { SpotlightMetaText(it.toString()) } }
+			runtime?.let { add { SpotlightMetaText(it) } }
+			item.officialRating?.takeIf { it.isNotBlank() }?.let { add { InfoRowOutlinedBadge(it) } }
+		}
+	)
+}
+
+/** Play, Details and Favorite; [playFocusRequester] takes the focus when it enters the spotlight. */
+@Composable
+private fun SpotlightButtons(item: BaseItemDto, playFocusRequester: FocusRequester) {
+	val context = LocalContext.current
+	val api = koinInject<ApiClient>()
+	val playbackHelper = koinInject<PlaybackHelper>()
+	val navigationRepository = koinInject<NavigationRepository>()
+	val itemMutationRepository = koinInject<ItemMutationRepository>()
+	val scope = rememberCoroutineScope()
+	// Favorite changes made here, until the next load
+	val favorites = remember { mutableStateMapOf<UUID, Boolean>() }
+	val favorite = favorites[item.id] ?: (item.userData?.isFavorite == true)
+
+	Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+		IconButton(
+			// A series starts from its next up episode
+			onClick = { scope.launch { playbackHelper.retrieveAndPlay(loadSpotlightPlayTarget(api, item), false, context) } },
+			modifier = Modifier.focusRequester(playFocusRequester),
 		) {
-			item.communityRating?.let { InfoRowCommunityRating(it / 10f) }
-			item.criticRating?.let { InfoRowCriticRating(it / 100f) }
-			Text(
-				text = spotlightMeta(item) { res, args -> resources.getString(res, *args) },
-				fontSize = 14.sp,
-				fontWeight = FontWeight.Medium,
-				color = LocalEphyraPalette.current.inkMuted,
-				maxLines = 1,
+			Icon(
+				painterResource(R.drawable.ic_play),
+				contentDescription = stringResource(R.string.lbl_play),
+				modifier = Modifier.size(20.dp),
 			)
 		}
-		Spacer(Modifier.height(8.dp))
-		Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-			IconButton(
-				// A series starts from its next up episode
-				onClick = { scope.launch { playbackHelper.retrieveAndPlay(loadSpotlightPlayTarget(api, item), false, context) } },
-				modifier = Modifier.focusRequester(playFocusRequester),
-			) {
-				Icon(
-					painterResource(R.drawable.ic_play),
-					contentDescription = stringResource(R.string.lbl_play),
-					modifier = Modifier.size(20.dp),
-				)
-			}
-			IconButton(onClick = { navigationRepository.navigate(Destinations.itemDetails(item.id)) }) {
-				Icon(
-					painterResource(R.drawable.ic_info),
-					contentDescription = stringResource(R.string.ephyra_spotlight_details),
-					modifier = Modifier.size(20.dp),
-				)
-			}
-			IconButton(onClick = {
-				scope.launch {
-					try {
-						favorites[item.id] = itemMutationRepository.setFavorite(item.id, !favorite).isFavorite
-					} catch (error: CancellationException) {
-						throw error
-					} catch (@Suppress("TooGenericExceptionCaught") error: Exception) {
-						Timber.w(error, "Could not change the favorite from the home spotlight")
-					}
+		IconButton(onClick = { navigationRepository.navigate(Destinations.itemDetails(item.id)) }) {
+			Icon(
+				painterResource(R.drawable.ic_info),
+				contentDescription = stringResource(R.string.ephyra_spotlight_details),
+				modifier = Modifier.size(20.dp),
+			)
+		}
+		IconButton(onClick = {
+			scope.launch {
+				try {
+					favorites[item.id] = itemMutationRepository.setFavorite(item.id, !favorite).isFavorite
+				} catch (error: CancellationException) {
+					throw error
+				} catch (@Suppress("TooGenericExceptionCaught") error: Exception) {
+					Timber.w(error, "Could not change the favorite from the home spotlight")
 				}
-			}) {
-				Icon(
-					painterResource(R.drawable.ic_heart),
-					contentDescription = stringResource(R.string.lbl_favorite),
-					modifier = Modifier.size(20.dp),
-					// A favorite shows in the theme's accent instead of red
-					tint = if (favorite) LocalEphyraPalette.current.accent else LocalTextStyle.current.color,
-				)
 			}
+		}) {
+			Icon(
+				painterResource(R.drawable.ic_heart),
+				contentDescription = stringResource(R.string.lbl_favorite),
+				modifier = Modifier.size(20.dp),
+				// A favorite shows in the theme's accent instead of red
+				tint = if (favorite) LocalEphyraPalette.current.accent else LocalTextStyle.current.color,
+			)
 		}
 	}
+}
+
+@Composable
+private fun SpotlightMetaText(text: String) {
+	Text(text = text, fontSize = 14.sp, fontWeight = FontWeight.Medium, color = LocalEphyraPalette.current.inkMuted, maxLines = 1)
 }
 
 /** Whether the first row of [rowsFragment] is selected, watched through focus changes (Leanback has no Compose state). */

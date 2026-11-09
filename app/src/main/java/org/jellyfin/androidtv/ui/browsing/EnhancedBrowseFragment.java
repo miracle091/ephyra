@@ -23,6 +23,8 @@ import androidx.leanback.widget.ListRow;
 import androidx.leanback.widget.OnItemViewClickedListener;
 import androidx.leanback.widget.OnItemViewSelectedListener;
 import androidx.leanback.widget.Presenter;
+import androidx.leanback.widget.PresenterSelector;
+import androidx.leanback.widget.SinglePresenterSelector;
 import androidx.leanback.widget.Row;
 import androidx.leanback.widget.RowPresenter;
 import androidx.lifecycle.Lifecycle;
@@ -111,7 +113,7 @@ public class EnhancedBrowseFragment extends Fragment implements RowLoader, View.
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mRowsAdapter = new MutableObjectAdapter<Row>(new PositionableListRowPresenter());
+        mRowsAdapter = new MutableObjectAdapter<Row>(createRowPresenterSelector());
 
         setupViews();
         setupQueries(this);
@@ -224,7 +226,7 @@ public class EnhancedBrowseFragment extends Fragment implements RowLoader, View.
     }
 
     public void loadRows(List<BrowseRowDef> rows) {
-        mRowsAdapter = new MutableObjectAdapter<Row>(new PositionableListRowPresenter());
+        mRowsAdapter = new MutableObjectAdapter<Row>(createRowPresenterSelector());
         mCardPresenter = new CardPresenter(false, 140);
         ClassPresenterSelector ps = new ClassPresenterSelector();
         ps.addClassPresenter(GridButtonBaseRowItem.class, new GridButtonPresenter());
@@ -268,7 +270,7 @@ public class EnhancedBrowseFragment extends Fragment implements RowLoader, View.
                     rowAdapter = new ItemRowAdapter(requireContext(), def.getSpecialsQuery(), new CardPresenter(true, ImageType.THUMB, 150), mRowsAdapter);
                     break;
                 default:
-                    rowAdapter = new ItemRowAdapter(requireContext(), def.getQuery(), def.getChunkSize(), def.getPreferParentThumb(), def.isStaticHeight(), ps, mRowsAdapter, def.getQueryType());
+                    rowAdapter = new ItemRowAdapter(requireContext(), def.getQuery(), def.getChunkSize(), def.getPreferParentThumb(), def.isStaticHeight(), getPresenterSelector(def, ps), mRowsAdapter, def.getQueryType());
                     break;
             }
 
@@ -283,6 +285,16 @@ public class EnhancedBrowseFragment extends Fragment implements RowLoader, View.
         addAdditionalRows(mRowsAdapter);
 
         if (mRowsFragment != null) mRowsFragment.setAdapter(mRowsAdapter);
+    }
+
+    // Ephyra: lets a screen give some of its rows another row presenter, e.g. the compact episodes of a season
+    protected PresenterSelector createRowPresenterSelector() {
+        return new SinglePresenterSelector(new PositionableListRowPresenter());
+    }
+
+    // Ephyra: lets a screen give one row its own presenters, e.g. the episodes of a season
+    protected PresenterSelector getPresenterSelector(BrowseRowDef def, PresenterSelector defaultSelector) {
+        return defaultSelector;
     }
 
     protected void addAdditionalRows(MutableObjectAdapter<Row> rowAdapter) {

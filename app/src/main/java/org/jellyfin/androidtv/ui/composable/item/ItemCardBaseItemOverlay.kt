@@ -5,8 +5,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
@@ -24,7 +22,6 @@ import org.jellyfin.androidtv.preference.UserPreferences
 import org.jellyfin.androidtv.preference.constant.WatchedIndicatorBehavior
 import org.jellyfin.androidtv.ui.base.Badge
 import org.jellyfin.androidtv.ui.base.Icon
-import org.jellyfin.androidtv.ui.base.Seekbar
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.composable.rememberPlayerProgress
 import org.jellyfin.androidtv.ui.composable.rememberQueueEntry
@@ -43,30 +40,36 @@ fun ItemCardBaseItemOverlay(
 	item: BaseItemDto,
 	footer: (@Composable () -> Unit)? = null,
 ) = Box(
-	modifier = Modifier
-		.fillMaxSize()
-		.padding(Tokens.Space.spaceXs)
+	modifier = Modifier.fillMaxSize()
 ) {
-	// Ephyra: the favorite and recording marks sit in the top right corner, next to the watched badge
-	Row(
-		modifier = Modifier.align(Alignment.TopEnd),
-		horizontalArrangement = Arrangement.spacedBy(Tokens.Space.spaceXs),
-		verticalAlignment = Alignment.CenterVertically,
+	Box(
+		modifier = Modifier
+			.fillMaxSize()
+			.padding(Tokens.Space.spaceXs)
 	) {
-		StateIndicator(item = item)
-		WatchIndicator(item = item)
+		// Ephyra: the favorite and recording marks sit in the top right corner, next to the watched badge
+		Row(
+			modifier = Modifier.align(Alignment.TopEnd),
+			horizontalArrangement = Arrangement.spacedBy(Tokens.Space.spaceXs),
+			verticalAlignment = Alignment.CenterVertically,
+		) {
+			StateIndicator(item = item)
+			WatchIndicator(item = item)
+		}
+
+		Column(
+			modifier = Modifier.align(Alignment.BottomCenter),
+			verticalArrangement = Arrangement.spacedBy(Tokens.Space.spaceXs)
+		) {
+			if (footer != null) footer()
+		}
 	}
 
-	Column(
+	// Ephyra: the shared card progress bar, on the card's bottom edge instead of floating above the footer
+	ProgressIndicator(
+		item = item,
 		modifier = Modifier.align(Alignment.BottomCenter),
-		verticalArrangement = Arrangement.spacedBy(Tokens.Space.spaceXs)
-	) {
-		ProgressIndicator(
-			item = item,
-		)
-
-		if (footer != null) footer()
-	}
+	)
 }
 
 @Composable
@@ -169,14 +172,9 @@ private fun ProgressIndicator(
 	}
 
 	if (playedPercentage != null) {
-		Box(modifier = modifier.padding(Tokens.Space.spaceXs)) {
-			Seekbar(
-				progress = playedPercentage,
-				enabled = false,
-				modifier = Modifier
-					.fillMaxWidth()
-					.height(4.dp)
-			)
-		}
+		CardProgressBar(
+			progress = playedPercentage,
+			modifier = modifier,
+		)
 	}
 }

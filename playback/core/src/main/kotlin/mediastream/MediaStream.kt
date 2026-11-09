@@ -35,6 +35,11 @@ data class PlayableMediaStream(
 	override val tracks: Collection<MediaStreamTrack>,
 	val queueEntry: QueueEntry,
 	val url: String,
+	/**
+	 * Ephyra: index (see [MediaStreamAudioTrack.index]) of the audio track the server chose for this stream, or null when unknown.
+	 * Only meaningful for a stream that is not converted: a remuxed or transcoded stream carries just the requested track.
+	 */
+	val defaultAudioStreamIndex: Int? = null,
 ) : MediaStream
 
 data class MediaStreamContainer(
@@ -50,6 +55,10 @@ data class MediaStreamAudioTrack(
 	val bitrate: Int,
 	val channels: Int,
 	val sampleRate: Int,
+	/** Ephyra: index of the track in the source (Jellyfin media stream index), or null when unknown. */
+	val index: Int? = null,
+	/** Ephyra: whether the track lives in a separate file, so it is not one of the container's own tracks. */
+	val isExternal: Boolean = false,
 ) : MediaStreamTrack
 
 data class MediaStreamVideoTrack(

@@ -4,6 +4,7 @@ import org.jellyfin.playback.core.mediastream.MediaConversionMethod
 import org.jellyfin.playback.core.mediastream.MediaStreamResolver
 import org.jellyfin.playback.core.mediastream.PlayableMediaStream
 import org.jellyfin.playback.core.queue.QueueEntry
+import org.jellyfin.playback.jellyfin.queue.audioStreamIndex
 import org.jellyfin.playback.jellyfin.queue.baseItem
 import org.jellyfin.playback.jellyfin.queue.mediaSourceId
 import org.jellyfin.sdk.api.client.ApiClient
@@ -28,7 +29,7 @@ class JellyfinMediaStreamResolver(
 		val baseItem = queueEntry.baseItem
 		if (baseItem == null || !supportedMediaTypes.contains(baseItem.mediaType)) return null
 
-		val mediaInfo = getPlaybackInfo(baseItem, queueEntry.mediaSourceId)
+		val mediaInfo = getPlaybackInfo(baseItem, queueEntry.mediaSourceId, queueEntry.audioStreamIndex)
 
 		return when {
 			// Direct play video
@@ -81,12 +82,15 @@ class JellyfinMediaStreamResolver(
 	private suspend fun getPlaybackInfo(
 		item: BaseItemDto,
 		mediaSourceId: String? = null,
+		audioStreamIndex: Int? = null,
 	): MediaInfo {
 		val profile = deviceProfileBuilder()
 		val response by api.mediaInfoApi.getPostedPlaybackInfo(
 			itemId = item.id,
 			data = PlaybackInfoDto(
 				mediaSourceId = mediaSourceId,
+				// Ephyra: the requested audio track; without one the server picks from the user's language preferences
+				audioStreamIndex = audioStreamIndex,
 				deviceProfile = profile,
 				enableDirectPlay = true,
 				enableDirectStream = true,
@@ -128,5 +132,6 @@ class JellyfinMediaStreamResolver(
 		tracks = getTracks(),
 		queueEntry = queueEntry,
 		url = url,
+		defaultAudioStreamIndex = mediaSource.defaultAudioStreamIndex,
 	)
 }

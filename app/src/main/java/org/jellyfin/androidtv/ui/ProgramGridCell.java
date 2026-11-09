@@ -49,6 +49,8 @@ public class ProgramGridCell extends RelativeLayout implements RecordingIndicato
 
         setFocusable(true);
         setBackground(GuideStyle.cellBackground(context));
+        // Ephyra: the now bar hugs the bottom edge, so the cell's rounded corners clip it
+        setClipToOutline(true);
 
         mProgramName = findViewById(R.id.programName);
         mInfoRow = findViewById(R.id.infoRow);

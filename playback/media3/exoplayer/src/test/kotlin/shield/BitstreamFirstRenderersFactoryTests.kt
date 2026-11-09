@@ -1,6 +1,7 @@
 package org.jellyfin.playback.media3.exoplayer.shield
 
 import androidx.annotation.OptIn
+import androidx.media3.common.C
 import androidx.media3.common.MimeTypes
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.audio.AudioSink
@@ -28,6 +29,12 @@ class BitstreamFirstRenderersFactoryTests : FunSpec({
 			shouldFfmpegStepAside(mimeType, AudioSink.SINK_FORMAT_UNSUPPORTED) shouldBe false
 			shouldFfmpegStepAside(mimeType, AudioSink.SINK_FORMAT_SUPPORTED_WITH_TRANSCODING) shouldBe false
 		}
+	}
+
+	test("DTS-HD that would pass through only as the DTS core goes to FFmpeg, full DTS-HD passthrough does not") {
+		shouldFfmpegStepAside(MimeTypes.AUDIO_DTS_HD, AudioSink.SINK_FORMAT_SUPPORTED_DIRECTLY, C.ENCODING_DTS) shouldBe false
+		shouldFfmpegStepAside(MimeTypes.AUDIO_DTS_HD, AudioSink.SINK_FORMAT_SUPPORTED_DIRECTLY, C.ENCODING_DTS_HD) shouldBe true
+		shouldFfmpegStepAside(MimeTypes.AUDIO_DTS, AudioSink.SINK_FORMAT_SUPPORTED_DIRECTLY, C.ENCODING_DTS) shouldBe true
 	}
 
 	test("FFmpeg never steps aside for PCM or an unknown MIME type") {

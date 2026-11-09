@@ -61,7 +61,8 @@ fun ToolbarClock(
 		text = currentTime,
 		fontSize = 20.sp,
 		color = Color.White,
-		modifier = modifier,
+		// Ephyra: with the toolbar's 24dp the clock ends 32dp from the edge, like the clock of the library and details screens
+		modifier = modifier.padding(end = 8.dp),
 	)
 }
 

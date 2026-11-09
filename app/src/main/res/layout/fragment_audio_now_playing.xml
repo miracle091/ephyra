@@ -247,6 +247,6 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="@dimen/ephyra_clock_top"
         android:layout_marginEnd="@dimen/ephyra_side_margin" />
 </RelativeLayout>

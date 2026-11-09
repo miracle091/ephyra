@@ -25,6 +25,8 @@ public class ChannelCardView extends FrameLayout {
     public ChannelCardView(Context context) {
         super(context);
         setBackground(GuideStyle.cellBackground(context));
+        // Ephyra: the progress bar hugs the bottom edge, so the cell's rounded corners clip it
+        setClipToOutline(true);
         binding.time.setTypeface(GuideStyle.monoTypeface(context));
     }
 

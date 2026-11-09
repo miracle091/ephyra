@@ -733,10 +733,11 @@ public class PlaybackController implements PlaybackControllerNotifiable {
         mCurrentOptions.setAudioStreamIndex(null); // reset audio stream index to allow auto selection on new item
         // Ephyra: a restart of the same item (audio switch on a transcode, subtitle baking change) keeps the track the user picked,
         // or onPrepared falls back to the first track of that language and undoes the switch (upstream #5798).
-        // Only on a transcode, which carries just that track: on direct play onPrepared must still ask the player to switch,
-        // and a preset index would make switchAudioStream think it is already playing (the request already asked the server for it).
+        // Only when the server builds the stream (transcode or direct stream), which then carries just that track: on direct play
+        // onPrepared must still ask the player to switch, and a preset index would make switchAudioStream think it is already playing.
+        // On a direct stream the player's track ids don't map to the server's indexes, so without it every check would restart again.
         Integer restartAudioIndex = takeRestartAudioIndex(item);
-        if (restartAudioIndex != null && response.getPlayMethod() == PlayMethod.TRANSCODE
+        if (restartAudioIndex != null && response.getPlayMethod() != PlayMethod.DIRECT_PLAY
                 && PlaybackControllerHelperKt.hasAudioStream(response.getMediaSource(), restartAudioIndex)) {
             mCurrentOptions.setAudioStreamIndex(restartAudioIndex);
         }

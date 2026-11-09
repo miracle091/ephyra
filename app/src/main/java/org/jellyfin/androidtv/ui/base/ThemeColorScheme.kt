@@ -4,7 +4,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import org.jellyfin.androidtv.preference.EphyraPreferences
 import org.jellyfin.androidtv.preference.UserPreferences
+import org.jellyfin.androidtv.preference.constant.AccentColor
 import org.jellyfin.androidtv.preference.constant.AppTheme
 import org.jellyfin.design.token.EphyraColorTokens
 import org.jellyfin.design.token.EphyraPalette
@@ -27,10 +30,25 @@ fun paletteFor(theme: AppTheme): EphyraPalette = when (theme) {
  */
 fun colorSchemeFor(theme: AppTheme): ColorScheme = ephyraColorScheme(paletteFor(theme))
 
-/** Ephyra: [JellyfinTheme] with the colours of [theme], which also provides its tokens as [LocalEphyraPalette]. */
+/** Ephyra: the [palette] with the accent tokens of the user's [accent] choice; [AccentColor.THEME] keeps the theme's own. */
+fun EphyraPalette.withAccent(accent: AccentColor, resolve: (colorRes: Int) -> Color): EphyraPalette {
+	val color = accent.accent ?: return this
+	return copy(
+		accent = resolve(color),
+		onAccent = accent.onAccent?.let(resolve) ?: onAccent,
+		accentSoft = accent.accentSoft?.let(resolve) ?: accentSoft,
+	)
+}
+
+/**
+ * Ephyra: [JellyfinTheme] with the colours of [theme] and the user's accent colour, which also provides its tokens as
+ * [LocalEphyraPalette].
+ */
 @Composable
 fun EphyraTheme(theme: AppTheme, content: @Composable () -> Unit) {
-	val palette = paletteFor(theme)
+	val ephyraPreferences = koinInject<EphyraPreferences>()
+	val context = LocalContext.current
+	val palette = paletteFor(theme).withAccent(ephyraPreferences[EphyraPreferences.accentColor]) { Color(context.getColor(it)) }
 	CompositionLocalProvider(LocalEphyraPalette provides palette) {
 		JellyfinTheme(colorScheme = ephyraColorScheme(palette), content = content)
 	}

@@ -25,6 +25,7 @@ import androidx.leanback.app.RowsSupportFragment;
 import androidx.leanback.widget.ArrayObjectAdapter;
 import androidx.leanback.widget.ClassPresenterSelector;
 import androidx.leanback.widget.HeaderItem;
+import androidx.leanback.widget.FocusHighlight;
 import androidx.leanback.widget.ListRow;
 import androidx.leanback.widget.OnItemViewClickedListener;
 import androidx.leanback.widget.OnItemViewSelectedListener;
@@ -63,6 +64,7 @@ import org.jellyfin.androidtv.ui.navigation.NavigationRepository;
 import org.jellyfin.androidtv.ui.playback.MediaManager;
 import org.jellyfin.androidtv.ui.playback.PlaybackLauncher;
 import org.jellyfin.androidtv.ui.presentation.CardPresenter;
+import org.jellyfin.androidtv.ui.presentation.CastCardPresenter;
 import org.jellyfin.androidtv.ui.presentation.CustomListRowPresenter;
 import org.jellyfin.androidtv.ui.presentation.InfoCardPresenter;
 import org.jellyfin.androidtv.ui.presentation.MutableObjectAdapter;
@@ -105,7 +107,6 @@ import kotlinx.serialization.json.Json;
 import timber.log.Timber;
 
 public class FullDetailsFragment extends Fragment implements RecordingIndicatorView, View.OnKeyListener {
-
     private int BUTTON_SIZE;
 
     TextUnderButton mResumeButton;
@@ -129,8 +130,8 @@ public class FullDetailsFragment extends Fragment implements RecordingIndicatorV
     private RowsSupportFragment mRowsFragment;
     private MutableObjectAdapter<Row> mRowsAdapter;
 
-    private MyDetailsOverviewRowPresenter mDorPresenter;
-    private MyDetailsOverviewRow mDetailsOverviewRow;
+    MyDetailsOverviewRowPresenter mDorPresenter; // Ephyra: package-private for FullDetailsFragmentHelper
+    MyDetailsOverviewRow mDetailsOverviewRow; // Ephyra: package-private for FullDetailsFragmentHelper
     private CustomListRowPresenter mListRowPresenter;
 
     private Handler mLoopHandler = new Handler();
@@ -481,7 +482,7 @@ public class FullDetailsFragment extends Fragment implements RecordingIndicatorV
 
             ClassPresenterSelector ps = new ClassPresenterSelector();
             ps.addClassPresenter(MyDetailsOverviewRow.class, mDorPresenter);
-            mListRowPresenter = new CustomListRowPresenter(Utils.convertDpToPixel(requireContext(), 10));
+            mListRowPresenter = new CustomListRowPresenter(Utils.convertDpToPixel(requireContext(), 10), FocusHighlight.ZOOM_FACTOR_MEDIUM, 0);
             ps.addClassPresenter(ListRow.class, mListRowPresenter);
             mRowsAdapter = new MutableObjectAdapter<Row>(ps);
             mRowsFragment.setAdapter(mRowsAdapter);
@@ -540,7 +541,7 @@ public class FullDetailsFragment extends Fragment implements RecordingIndicatorV
 
                 //Cast/Crew
                 if (mBaseItem.getPeople() != null && !mBaseItem.getPeople().isEmpty()) {
-                    ItemRowAdapter castAdapter = new ItemRowAdapter(mBaseItem.getPeople(), requireContext(), new CardPresenter(true, 130), adapter);
+                    ItemRowAdapter castAdapter = new ItemRowAdapter(mBaseItem.getPeople(), requireContext(), new CastCardPresenter(), adapter);
                     addItemRow(adapter, castAdapter, 1, getString(R.string.lbl_cast_crew));
                 }
 
@@ -571,7 +572,7 @@ public class FullDetailsFragment extends Fragment implements RecordingIndicatorV
 
                 //Cast/Crew
                 if (mBaseItem.getPeople() != null && !mBaseItem.getPeople().isEmpty()) {
-                    ItemRowAdapter castAdapter = new ItemRowAdapter(mBaseItem.getPeople(), requireContext(), new CardPresenter(true, 130), adapter);
+                    ItemRowAdapter castAdapter = new ItemRowAdapter(mBaseItem.getPeople(), requireContext(), new CastCardPresenter(), adapter);
                     addItemRow(adapter, castAdapter, 0, getString(R.string.lbl_cast_crew));
                 }
 
@@ -581,13 +582,13 @@ public class FullDetailsFragment extends Fragment implements RecordingIndicatorV
                 addInfoRows(adapter);
                 break;
             case PERSON:
-                ItemRowAdapter personMoviesAdapter = new ItemRowAdapter(requireContext(), BrowsingUtils.createPersonItemsRequest(mBaseItem.getId(), BaseItemKind.MOVIE), 100, false, new CardPresenter(), adapter);
+                ItemRowAdapter personMoviesAdapter = new ItemRowAdapter(requireContext(), BrowsingUtils.createPersonItemsRequest(mBaseItem.getId(), BaseItemKind.MOVIE), 100, false, DetailsRowPresentersKt.createFirstRowCardPresenter(), adapter);
                 addItemRow(adapter, personMoviesAdapter, 0, getString(R.string.lbl_movies));
 
-                ItemRowAdapter personSeriesAdapter = new ItemRowAdapter(requireContext(), BrowsingUtils.createPersonItemsRequest(mBaseItem.getId(), BaseItemKind.SERIES), 100, false, new CardPresenter(), adapter);
+                ItemRowAdapter personSeriesAdapter = new ItemRowAdapter(requireContext(), BrowsingUtils.createPersonItemsRequest(mBaseItem.getId(), BaseItemKind.SERIES), 100, false, DetailsRowPresentersKt.createFirstRowCardPresenter(), adapter);
                 addItemRow(adapter, personSeriesAdapter, 1, getString(R.string.lbl_tv_series));
 
-                ItemRowAdapter personEpisodesAdapter = new ItemRowAdapter(requireContext(), BrowsingUtils.createPersonItemsRequest(mBaseItem.getId(), BaseItemKind.EPISODE), 100, false, new CardPresenter(), adapter);
+                ItemRowAdapter personEpisodesAdapter = new ItemRowAdapter(requireContext(), BrowsingUtils.createPersonItemsRequest(mBaseItem.getId(), BaseItemKind.EPISODE), 100, false, DetailsRowPresentersKt.createFirstRowCardPresenter(), adapter);
                 addItemRow(adapter, personEpisodesAdapter, 2, getString(R.string.lbl_episodes));
 
                 break;
@@ -597,10 +598,9 @@ public class FullDetailsFragment extends Fragment implements RecordingIndicatorV
 
                 break;
             case SERIES:
-                ItemRowAdapter nextUpAdapter = new ItemRowAdapter(requireContext(), BrowsingUtils.createSeriesGetNextUpRequest(mBaseItem.getId()), false, new CardPresenter(true, 130), adapter);
-                addItemRow(adapter, nextUpAdapter, 0, getString(R.string.lbl_next_up));
+                // Ephyra: the next up episode is the card beside the buttons, so the Next up row is gone
 
-                ItemRowAdapter seasonsAdapter = new ItemRowAdapter(requireContext(), BrowsingUtils.createSeasonsRequest(mBaseItem.getId()), new CardPresenter(), adapter);
+                ItemRowAdapter seasonsAdapter = new ItemRowAdapter(requireContext(), BrowsingUtils.createSeasonsRequest(mBaseItem.getId()), DetailsRowPresentersKt.createFirstRowCardPresenter(), adapter);
                 addItemRow(adapter, seasonsAdapter, 1, getString(R.string.lbl_seasons));
 
                 //Specials
@@ -612,7 +612,7 @@ public class FullDetailsFragment extends Fragment implements RecordingIndicatorV
                 addItemRow(adapter, upcomingAdapter, 2, getString(R.string.lbl_upcoming));
 
                 if (mBaseItem.getPeople() != null && !mBaseItem.getPeople().isEmpty()) {
-                    ItemRowAdapter seriesCastAdapter = new ItemRowAdapter(mBaseItem.getPeople(), requireContext(), new CardPresenter(true, 130), adapter);
+                    ItemRowAdapter seriesCastAdapter = new ItemRowAdapter(mBaseItem.getPeople(), requireContext(), new CastCardPresenter(), adapter);
                     addItemRow(adapter, seriesCastAdapter, 3, getString(R.string.lbl_cast_crew));
                 }
 
@@ -640,7 +640,7 @@ public class FullDetailsFragment extends Fragment implements RecordingIndicatorV
                         if (person.getType() == PersonKind.GUEST_STAR) guests.add(person);
                     }
                     if (!guests.isEmpty()) {
-                        ItemRowAdapter castAdapter = new ItemRowAdapter(guests, requireContext(), new CardPresenter(true, 130), adapter);
+                        ItemRowAdapter castAdapter = new ItemRowAdapter(guests, requireContext(), new CastCardPresenter(), adapter);
                         addItemRow(adapter, castAdapter, 0, getString(R.string.lbl_guest_stars));
                     }
                 }
@@ -794,6 +794,8 @@ public class FullDetailsFragment extends Fragment implements RecordingIndicatorV
                 }
             });
             mDetailsOverviewRow.addAction(playButton);
+            // Ephyra: the next up episode as a card beside the buttons
+            if (isSeries) DetailsNextUpLoaderKt.loadNextUpCard(this);
 
             if (isSeries && !isStarted) {
                 FullDetailsFragmentHelperKt.getNextUpEpisode(this, nextUpEpisode -> {

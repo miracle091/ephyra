@@ -16,6 +16,8 @@ import org.jellyfin.androidtv.auth.model.Server
 import org.jellyfin.androidtv.auth.model.ServerAdditionState
 import org.jellyfin.androidtv.auth.model.UnableToConnectState
 import org.jellyfin.androidtv.auth.store.AuthenticationStore
+import org.jellyfin.androidtv.util.sdk.discoveredServerAddress
+import org.jellyfin.androidtv.util.sdk.localNetworks
 import org.jellyfin.androidtv.util.sdk.toServer
 import org.jellyfin.sdk.Jellyfin
 import org.jellyfin.sdk.api.client.ApiClient
@@ -27,7 +29,6 @@ import org.jellyfin.sdk.discovery.RecommendedServerInfo
 import org.jellyfin.sdk.discovery.RecommendedServerInfoScore
 import org.jellyfin.sdk.model.ServerVersion
 import org.jellyfin.sdk.model.api.BrandingOptionsDto
-import org.jellyfin.sdk.model.api.ServerDiscoveryInfo
 import org.jellyfin.sdk.model.serializer.toUUID
 import timber.log.Timber
 import java.time.Instant
@@ -81,10 +82,16 @@ class ServerRepositoryImpl(
 
 	override suspend fun loadDiscoveryServers() {
 		val servers = mutableListOf<Server>()
+		val networks = withContext(Dispatchers.IO) { localNetworks() }
 
 		jellyfin.discovery
 			.discoverLocalServers()
-			.map(ServerDiscoveryInfo::toServer)
+			.map { info ->
+				// Ephyra: the SDK puts the address the reply came from in endpointAddress; use it when the announced one is unreachable
+				val address = discoveredServerAddress(info.address, info.endpointAddress, networks)
+				if (address != info.address) Timber.i("Discovered server %s announces %s, using %s", info.name, info.address, address)
+				info.copy(address = address).toServer()
+			}
 			.collect { server ->
 				servers += server
 				_discoveredServers.emit(servers.toList())

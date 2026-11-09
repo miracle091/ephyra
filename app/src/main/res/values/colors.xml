@@ -59,4 +59,7 @@
     <color name="lb_basic_card_info_bg_color">@color/grey</color>
 
     <color name="background_filter">#94101010</color>
+
+    <!-- Ephyra: track of the progress bar on cards, black at 38% so it reads on any picture and in every theme -->
+    <color name="ephyra_card_progress_track">#61000000</color>
 </resources>

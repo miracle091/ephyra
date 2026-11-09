@@ -109,4 +109,21 @@
     <string name="ephyra_osd_guide">Guida TV</string>
     <string name="ephyra_osd_channels">Canali</string>
     <string name="ephyra_osd_recording">In registrazione</string>
+    <string name="ephyra_prefer_ffmpeg_content">Decodifica l\'audio con FFmpeg anche se il dispositivo ha un suo decoder. I formati che l\'amplificatore accetta in bitstream (Dolby, DTS, TrueHD) gli arrivano comunque</string>
+    <string name="ephyra_audio_night_mode_content">Livella il volume. Non ha effetto quando l\'audio va all\'amplificatore in bitstream</string>
+    <!-- Accent colour (preference/constant/AccentColor.kt) -->
+    <string name="ephyra_pref_accent_color">Colore d\'accento</string>
+    <string name="ephyra_accent_theme">Predefinito del tema</string>
+    <string name="ephyra_accent_violet">Viola</string>
+    <string name="ephyra_accent_blue">Blu</string>
+    <string name="ephyra_accent_teal">Verde acqua</string>
+    <string name="ephyra_accent_green">Verde</string>
+    <string name="ephyra_accent_amber">Ambra</string>
+    <string name="ephyra_accent_coral">Corallo</string>
+    <string name="ephyra_accent_red">Rosso</string>
+    <!-- Compact episode list (ui/presentation/CompactEpisodePresenter.kt) -->
+    <string name="ephyra_pref_compact_episodes">Lista episodi compatta</string>
+    <string name="ephyra_pref_compact_episodes_description">Mostra gli episodi di una stagione come righe, con l\'immagine e la trama accanto al titolo</string>
+    <!-- Details of a series: the next up card (ui/itemdetail/DetailsNextUpCard.kt) -->
+    <string name="ephyra_next_up_card">Prossimo: %1$s</string>
 </resources>

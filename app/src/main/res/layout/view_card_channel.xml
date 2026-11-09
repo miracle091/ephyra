@@ -1,14 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Ephyra: a channel of the player's quick channel changer, styled like the Live TV guide's cells (the surface and the focus ring
      come from ChannelCardView): the number in mono and the name over the programme on air with its red dot, the times in mono and
-     the bar that runs with the clock -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+     the bar on the bottom edge that runs with the clock -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="220dp"
+    android:layout_height="wrap_content">
+
+<LinearLayout
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:paddingHorizontal="16dp"
-    android:paddingVertical="14dp">
+    android:paddingTop="14dp"
+    android:paddingBottom="14dp">
 
     <TextView
         android:id="@+id/name"
@@ -44,13 +49,17 @@
         android:textSize="12sp"
         tools:text="9:00 AM - 9:30 AM" />
 
+</LinearLayout>
+
     <ProgressBar
         android:id="@+id/progress"
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
-        android:layout_height="3dp"
-        android:layout_marginTop="8dp"
+        android:layout_height="@dimen/ephyra_card_progress_height"
+        android:layout_gravity="bottom"
+        android:layout_marginHorizontal="2dp"
+        android:layout_marginBottom="2dp"
         android:max="1000"
-        android:progressDrawable="@drawable/ephyra_guide_now_bar"
+        android:progressDrawable="@drawable/ephyra_card_progress"
         tools:progress="600" />
-</LinearLayout>
+</FrameLayout>

@@ -1,7 +1,9 @@
 package org.jellyfin.androidtv.preference
 
 import android.content.Context
+import org.jellyfin.androidtv.preference.constant.AccentColor
 import org.jellyfin.preference.booleanPreference
+import org.jellyfin.preference.enumPreference
 import org.jellyfin.preference.intPreference
 import org.jellyfin.preference.store.SharedPreferenceStore
 
@@ -24,5 +26,11 @@ class EphyraPreferences(context: Context) : SharedPreferenceStore(
 
 		/** Seconds the skip button stays on screen before it hides by itself; 0 keeps it until the segment ends. */
 		val skipAutoHideSeconds = intPreference("skip_auto_hide_seconds", 15)
+
+		/** The accent colour, apart from the theme; [AccentColor.THEME] keeps the theme's own. */
+		val accentColor = enumPreference("accent_color", AccentColor.THEME)
+
+		/** The episodes of a season as rows with the picture on the left and the plot beside it, instead of a row of cards. */
+		val compactEpisodeList = booleanPreference("compact_episode_list", false)
 	}
 }

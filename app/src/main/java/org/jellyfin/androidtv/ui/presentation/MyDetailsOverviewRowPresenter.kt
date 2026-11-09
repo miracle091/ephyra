@@ -2,13 +2,18 @@ package org.jellyfin.androidtv.ui.presentation
 
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.children
+import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.leanback.widget.RowPresenter
 import org.jellyfin.androidtv.ui.DetailRowView
+import org.jellyfin.androidtv.ui.browsing.composable.inforow.BaseItemInfoRowView
+import org.jellyfin.androidtv.ui.itemdetail.DetailsTagline
 import org.jellyfin.androidtv.ui.itemdetail.MyDetailsOverviewRow
 import org.jellyfin.androidtv.ui.itemdetail.showButtonIconsOnly
 import org.jellyfin.androidtv.util.InfoLayoutHelper
 import org.jellyfin.androidtv.util.MarkdownRenderer
+import org.jellyfin.sdk.model.api.BaseItemDto
 import org.jellyfin.sdk.model.api.BaseItemKind
 
 class MyDetailsOverviewRowPresenter(
@@ -24,7 +29,14 @@ class MyDetailsOverviewRowPresenter(
 			setTitle(row.item.name)
 
 			InfoLayoutHelper.addInfoRow(view.context, row.item, row.item.mediaSources?.getOrNull(row.selectedMediaSourceIndex), binding.fdMainInfoRow, false)
+			// Ephyra: groups divided by vertical lines and the official rating as an outlined badge
+			binding.fdMainInfoRow.children.filterIsInstance<BaseItemInfoRowView>().forEach { it.separated = true }
 			binding.fdGenreRow.text = row.item.genres?.joinToString(" · ") // Ephyra: the spotlight's separator
+
+			// Ephyra: the tagline under the title, hidden when the item has none
+			val tagline = DetailsTagline.of(row.item.taglines)
+			binding.fdTagline.text = tagline
+			binding.fdTagline.isVisible = tagline != null
 
 			binding.infoTitle1.text = row.infoItem1?.label
 			binding.infoValue1.text = row.infoItem1?.value
@@ -39,10 +51,11 @@ class MyDetailsOverviewRowPresenter(
 
 			setSummary(row.summary)
 
-			// Ephyra: a person's biography keeps the same three lines as the other details, the popup shows all of it
-			if (row.item.type == BaseItemKind.PERSON) {
-				binding.fdGenreRow.isVisible = false
-			}
+			// Ephyra: a person has no genres, but the empty genre line keeps its space so the name sits where the other details
+			// put the title, on the clock's line
+			binding.fdGenreRow.isInvisible = row.item.type == BaseItemKind.PERSON
+
+			setNextUp(row.nextUpEpisode, row.onNextUpClick)
 
 			binding.fdButtonRow.removeAllViews()
 			for (button in row.actions) {
@@ -58,12 +71,22 @@ class MyDetailsOverviewRowPresenter(
 			}
 		}
 
+		/** Ephyra: shows the series' next up episode as a card beside the buttons, or hides the card when there is none. */
+		fun setNextUp(episode: BaseItemDto?, onClick: ((BaseItemDto) -> Unit)?) {
+			binding.fdNextUpCard.episode = episode
+			binding.fdNextUpCard.setOnClickListener {
+				if (episode != null) onClick?.invoke(episode)
+			}
+		}
+
 		fun setTitle(title: String?) {
 			binding.fdTitle.text = title
 		}
 
 		fun setSummary(summary: String?) {
 			binding.fdSummaryText.text = summary?.let { markdownRenderer.toMarkdownSpanned(it) }
+			// Ephyra: no empty gap when there is no overview (a person without a biography): the buttons move up under the info row
+			binding.fdSummaryText.isVisible = !summary.isNullOrBlank()
 		}
 
 		fun setInfoValue3(text: String?) {

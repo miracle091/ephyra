@@ -10,7 +10,9 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.common.Timeline
+import androidx.media3.common.TrackSelectionOverride
 import androidx.media3.common.TrackSelectionParameters
+import androidx.media3.common.Tracks
 import androidx.media3.common.VideoSize
 import androidx.media3.common.text.CueGroup
 import androidx.media3.common.util.UnstableApi
@@ -34,6 +36,7 @@ import io.github.peerless2012.ass.media.parser.AssSubtitleParserFactory
 import io.github.peerless2012.ass.media.type.AssRenderType
 import io.github.peerless2012.ass.media.widget.AssSubtitleView
 import org.jellyfin.playback.core.backend.BasePlayerBackend
+import org.jellyfin.playback.core.mediastream.MediaConversionMethod
 import org.jellyfin.playback.core.mediastream.MediaStream
 import org.jellyfin.playback.core.mediastream.PlayableMediaStream
 import org.jellyfin.playback.core.mediastream.mediaStream
@@ -47,6 +50,7 @@ import org.jellyfin.playback.core.support.PlaySupportReport
 import org.jellyfin.playback.core.timedevent.TimedEvent
 import org.jellyfin.playback.core.ui.PlayerSubtitleView
 import org.jellyfin.playback.core.ui.PlayerSurfaceView
+import org.jellyfin.playback.media3.exoplayer.mapping.findAudioGroupPosition
 import org.jellyfin.playback.media3.exoplayer.shield.BitstreamFirstRenderersFactory
 import org.jellyfin.playback.media3.exoplayer.shield.ShieldLoadControl
 import org.jellyfin.playback.media3.exoplayer.shield.ShieldMediaCodecSelector
@@ -74,6 +78,7 @@ class ExoPlayerBackend(
 	private val audioAttributeState = AudioAttributeState()
 	private val timedEventState = TimedEventState()
 	private var lastKnownDuration: Duration? = null
+	private var audioSelectionDone: PlayableMediaStream? = null
 
 	private val assHandler by lazy {
 		AssHandler(AssRenderType.OVERLAY_OPEN_GL)
@@ -209,6 +214,10 @@ class ExoPlayerBackend(
 			audioPipeline.setAudioSessionId(audioSessionId)
 		}
 
+		override fun onTracksChanged(tracks: Tracks) {
+			selectServerAudioTrack(tracks)
+		}
+
 		override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
 			val queueEntry = mediaItem?.localConfiguration?.tag as? QueueEntry
 			audioPipeline.normalizationGain = queueEntry?.normalizationGain
@@ -224,6 +233,42 @@ class ExoPlayerBackend(
 		override fun onPositionDiscontinuity(oldPosition: Player.PositionInfo, newPosition: Player.PositionInfo, reason: Int) {
 			timedEventState.onSeek(oldPosition.positionMs.milliseconds, newPosition.positionMs.milliseconds, lastKnownDuration ?: Duration.ZERO)
 		}
+	}
+
+	/**
+	 * Ephyra: on direct play ExoPlayer would pick the audio track by its own rules (default flag, device language), so select the
+	 * one the server chose (the requested track or the default from the user's language preferences). Done once per stream, as soon
+	 * as the audio tracks are known, so a track picked later in the player is not overridden. A remuxed or transcoded stream holds
+	 * only the requested track: nothing to select.
+	 */
+	private fun selectServerAudioTrack(tracks: Tracks) {
+		val stream = currentStream ?: return
+		if (stream.conversionMethod != MediaConversionMethod.None || audioSelectionDone == stream) return
+		// Tracks of another (prepared) item must not be matched against this stream
+		if (exoPlayer.currentMediaItem?.mediaId != stream.hashCode().toString()) return
+
+		val audioGroups = tracks.groups.filter { it.type == C.TRACK_TYPE_AUDIO }
+		if (audioGroups.isEmpty()) return
+		audioSelectionDone = stream
+
+		val wantedIndex = stream.defaultAudioStreamIndex ?: return
+		val position = findAudioGroupPosition(stream.tracks, wantedIndex, audioGroups.size)
+		if (position == null) {
+			Timber.w("Cannot map server audio stream $wantedIndex to a player track (${audioGroups.size} player audio tracks)")
+			return
+		}
+
+		val group = audioGroups[position]
+		if (!group.isSupported) {
+			Timber.w("Server audio stream $wantedIndex is not supported by the player, keeping its own choice")
+			return
+		}
+		if (group.isSelected) return
+
+		Timber.i("Selecting audio track $position for server audio stream $wantedIndex")
+		exoPlayer.trackSelectionParameters = exoPlayer.trackSelectionParameters.buildUpon()
+			.setOverrideForType(TrackSelectionOverride(group.mediaTrackGroup, 0))
+			.build()
 	}
 
 	override fun supportsStream(
@@ -328,6 +373,7 @@ class ExoPlayerBackend(
 	override fun stop() {
 		exoPlayer.stop()
 		currentStream = null
+		audioSelectionDone = null
 	}
 
 	override fun seekTo(position: Duration) {

@@ -25,12 +25,12 @@
                 android:gravity="top"
                 android:orientation="horizontal"
                 android:paddingStart="@dimen/ephyra_side_margin"
-                android:paddingTop="95dp"
+                android:paddingTop="@dimen/ephyra_details_top"
                 android:paddingEnd="@dimen/ephyra_side_margin">
 
                 <androidx.cardview.widget.CardView
-                    android:layout_width="200dp"
-                    android:layout_height="200dp"
+                    android:layout_width="@dimen/ephyra_details_cover_width"
+                    android:layout_height="@dimen/ephyra_details_cover_width"
                     android:foreground="@null"
                     app:cardBackgroundColor="?attr/cardImageBackground"
                     app:cardCornerRadius="12dp"
@@ -52,6 +52,7 @@
 
                     <TextView
                         android:id="@+id/fdGenreRow"
+                        android:layout_marginEnd="@dimen/ephyra_details_toolbar_room"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:ellipsize="end"
@@ -65,6 +66,7 @@
 
                     <TextView
                         android:id="@+id/fdTitle"
+                        android:layout_marginEnd="@dimen/ephyra_details_toolbar_room"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
@@ -118,7 +120,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_marginStart="25dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="@dimen/ephyra_clock_top"
         android:layout_marginEnd="@dimen/ephyra_side_margin" />
 
     <org.jellyfin.androidtv.ui.NowPlayingView

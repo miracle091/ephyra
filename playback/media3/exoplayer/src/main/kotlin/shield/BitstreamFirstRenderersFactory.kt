@@ -3,6 +3,7 @@ package org.jellyfin.playback.media3.exoplayer.shield
 import android.content.Context
 import android.os.Handler
 import androidx.annotation.OptIn
+import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.Format
 import androidx.media3.common.MimeTypes
@@ -11,6 +12,7 @@ import androidx.media3.exoplayer.DefaultRenderersFactory
 import androidx.media3.exoplayer.ForwardingRenderer
 import androidx.media3.exoplayer.Renderer
 import androidx.media3.exoplayer.RendererCapabilities
+import androidx.media3.exoplayer.audio.AudioCapabilities
 import androidx.media3.exoplayer.audio.AudioRendererEventListener
 import androidx.media3.exoplayer.audio.AudioSink
 import androidx.media3.exoplayer.mediacodec.MediaCodecSelector
@@ -32,12 +34,20 @@ open class BitstreamFirstRenderersFactory(
 
 		/**
 		 * True when FFmpeg must not take [sampleMimeType]: it is encoded (not PCM) and the audio sink can play it as bitstream.
-		 * [sinkFormatSupport] is the result of [AudioSink.getFormatSupport].
+		 * [sinkFormatSupport] is the result of [AudioSink.getFormatSupport]. [passthroughEncoding] is the encoding the passthrough
+		 * would use: a DTS-HD track sent as plain DTS loses its lossless part, so FFmpeg decodes it to PCM instead.
 		 */
-		fun shouldFfmpegStepAside(sampleMimeType: String?, sinkFormatSupport: Int): Boolean =
+		fun shouldFfmpegStepAside(sampleMimeType: String?, sinkFormatSupport: Int, passthroughEncoding: Int? = null): Boolean =
 			sampleMimeType != null &&
 				sampleMimeType != MimeTypes.AUDIO_RAW &&
-				sinkFormatSupport == AudioSink.SINK_FORMAT_SUPPORTED_DIRECTLY
+				sinkFormatSupport == AudioSink.SINK_FORMAT_SUPPORTED_DIRECTLY &&
+				!(sampleMimeType == MimeTypes.AUDIO_DTS_HD && passthroughEncoding == C.ENCODING_DTS)
+
+		// The attributes both players give their audio sink (movie content, media usage)
+		private val playbackAttributes = AudioAttributes.Builder()
+			.setUsage(C.USAGE_MEDIA)
+			.setContentType(C.AUDIO_CONTENT_TYPE_MOVIE)
+			.build()
 	}
 
 	override fun buildAudioRenderers(
@@ -64,7 +74,9 @@ open class BitstreamFirstRenderersFactory(
 		if (!ffmpegYieldsToPassthrough) return
 		for (index in renderers.indices) {
 			val renderer = renderers[index]
-			if (renderer.javaClass.name == FFMPEG_AUDIO_RENDERER) renderers[index] = PassthroughYieldingRenderer(renderer, audioSink)
+			if (renderer.javaClass.name == FFMPEG_AUDIO_RENDERER) {
+				renderers[index] = PassthroughYieldingRenderer(renderer, audioSink, context.applicationContext)
+			}
 		}
 	}
 
@@ -72,6 +84,7 @@ open class BitstreamFirstRenderersFactory(
 	private class PassthroughYieldingRenderer(
 		renderer: Renderer,
 		private val audioSink: AudioSink,
+		private val context: Context,
 	) : ForwardingRenderer(renderer) {
 		// ForwardingRenderer hands out the wrapped renderer's own capabilities, which would bypass the check
 		private val capabilities = object : RendererCapabilities {
@@ -82,7 +95,7 @@ open class BitstreamFirstRenderersFactory(
 			override fun getTrackType(): Int = delegate.trackType
 
 			override fun supportsFormat(format: Format): Int =
-				if (shouldFfmpegStepAside(format.sampleMimeType, audioSink.getFormatSupport(format))) {
+				if (shouldFfmpegStepAside(format.sampleMimeType, audioSink.getFormatSupport(format), passthroughEncoding(format))) {
 					RendererCapabilities.create(C.FORMAT_UNSUPPORTED_TYPE)
 				} else {
 					delegate.supportsFormat(format)
@@ -96,5 +109,13 @@ open class BitstreamFirstRenderersFactory(
 		}
 
 		override fun getCapabilities(): RendererCapabilities = capabilities
+
+		// Only DTS-HD needs it: the sink may accept it by falling back to the DTS core
+		private fun passthroughEncoding(format: Format): Int? {
+			if (format.sampleMimeType != MimeTypes.AUDIO_DTS_HD) return null
+			return AudioCapabilities.getCapabilities(context, playbackAttributes, null)
+				.getEncodingAndChannelConfigForPassthrough(format, playbackAttributes)
+				?.first
+		}
 	}
 }

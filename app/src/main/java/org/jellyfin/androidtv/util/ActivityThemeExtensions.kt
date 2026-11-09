@@ -2,9 +2,12 @@ package org.jellyfin.androidtv.util
 
 import androidx.activity.viewModels
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModel
 import org.jellyfin.androidtv.R
+import org.jellyfin.androidtv.preference.EphyraPreferences
 import org.jellyfin.androidtv.preference.UserPreferences
+import org.jellyfin.androidtv.preference.constant.AccentColor
 import org.jellyfin.androidtv.preference.constant.AppTheme
 import org.koin.android.ext.android.inject
 import timber.log.Timber
@@ -26,6 +29,7 @@ private val AppTheme.style
  */
 class ThemeViewModel : ViewModel() {
 	var theme: AppTheme? = null
+	var accent: AccentColor? = null // Ephyra
 }
 
 /**
@@ -36,17 +40,55 @@ class ThemeViewModel : ViewModel() {
 fun FragmentActivity.applyTheme() {
 	val viewModel by viewModels<ThemeViewModel>()
 	val userPreferences by inject<UserPreferences>()
+	val ephyraPreferences by inject<EphyraPreferences>()
 	val theme = userPreferences[UserPreferences.appTheme]
+	val accent = ephyraPreferences[EphyraPreferences.accentColor] // Ephyra
 
-	if (viewModel.theme != theme) {
-		if (viewModel.theme != null) {
+	// Ephyra: before onCreate the instance has no theme yet, even when the retained view model says it was applied
+	val newInstance = lifecycle.currentState == Lifecycle.State.INITIALIZED
+
+	val step = themeStep(
+		applied = viewModel.theme,
+		wanted = theme,
+		newInstance = newInstance,
+		appliedAccent = viewModel.accent,
+		wantedAccent = accent,
+	)
+
+	when (step) {
+		ThemeStep.KEEP -> Unit
+		ThemeStep.RECREATE -> {
 			Timber.i("Recreating activity to apply theme")
 			viewModel.theme = null
+			viewModel.accent = null
 			recreate()
-		} else {
-			Timber.i("Applying theme $theme")
+		}
+		ThemeStep.APPLY -> {
+			Timber.i("Applying theme $theme with accent $accent")
 			viewModel.theme = theme
+			viewModel.accent = accent
 			setTheme(theme.style)
+			// Ephyra: the accent overlay goes over the theme and replaces only the attributes that carry the accent
+			accent.overlayRes?.let { getTheme().applyStyle(it, true) }
 		}
 	}
+}
+
+/** Ephyra: what [applyTheme] does for the theme [applied] to the view model, the [wanted] one and a not yet created activity. */
+enum class ThemeStep { KEEP, APPLY, RECREATE }
+
+/**
+ * Ephyra: a changed theme or accent recreates a running activity; a new instance, or none applied yet, gets both applied.
+ */
+fun themeStep(
+	applied: AppTheme?,
+	wanted: AppTheme,
+	newInstance: Boolean,
+	appliedAccent: AccentColor?,
+	wantedAccent: AccentColor,
+): ThemeStep = when {
+	applied == null -> ThemeStep.APPLY
+	applied != wanted || appliedAccent != wantedAccent -> ThemeStep.RECREATE
+	newInstance -> ThemeStep.APPLY
+	else -> ThemeStep.KEEP
 }

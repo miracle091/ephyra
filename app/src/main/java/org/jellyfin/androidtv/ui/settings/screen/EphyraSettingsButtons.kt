@@ -73,3 +73,18 @@ fun StopAtSeasonEndListButton() {
 		modifier = Modifier.focusKey("ephyra_stop_at_season_end"),
 	)
 }
+
+/** Ephyra: "Compact episode list" in Customization. */
+@Composable
+fun CompactEpisodesListButton() {
+	val preferences = koinInject<EphyraPreferences>()
+	var compactEpisodes by rememberPreference(preferences, EphyraPreferences.compactEpisodeList)
+
+	ListButton(
+		headingContent = { Text(stringResource(R.string.ephyra_pref_compact_episodes)) },
+		captionContent = { Text(stringResource(R.string.ephyra_pref_compact_episodes_description)) },
+		trailingContent = { Checkbox(checked = compactEpisodes) },
+		onClick = { compactEpisodes = !compactEpisodes },
+		modifier = Modifier.focusKey("ephyra_compact_episodes"),
+	)
+}

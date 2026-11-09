@@ -15,6 +15,10 @@ class MyDetailsOverviewRow @JvmOverloads constructor(
 	var infoItem3: InfoItem? = null,
 	var selectedMediaSourceIndex: Int = 0,
 ) : Row() {
+	/** Ephyra: the series' next up episode shown as a card beside the buttons, and what a click on it does. */
+	var nextUpEpisode: BaseItemDto? = null
+	var onNextUpClick: ((BaseItemDto) -> Unit)? = null
+
 	private val _actions = mutableListOf<TextUnderButton>()
 	val actions get() = _actions.toList()
 	val visibleActions get() = _actions.count { it.isVisible }

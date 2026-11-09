@@ -30,10 +30,10 @@ class SpotlightItemsTest : FunSpec({
 		spotlightOverline("Spotlight", item(BaseItemKind.MOVIE)) shouldBe "Spotlight"
 	}
 
-	test("films show year, running time and rating; series leave the running time out") {
-		spotlightMeta(item(BaseItemKind.MOVIE, minutes = 166), getString) shouldBe "2024 · 2 h 46 min · PG-13"
-		spotlightMeta(item(BaseItemKind.MOVIE, minutes = 45), getString) shouldBe "2024 · 45 min · PG-13"
-		spotlightMeta(item(BaseItemKind.SERIES, minutes = 45), getString) shouldBe "2024 · PG-13"
+	test("films show their running time; series leave it out") {
+		spotlightRuntime(item(BaseItemKind.MOVIE, minutes = 166), getString) shouldBe "2 h 46 min"
+		spotlightRuntime(item(BaseItemKind.MOVIE, minutes = 45), getString) shouldBe "45 min"
+		spotlightRuntime(item(BaseItemKind.SERIES, minutes = 45), getString) shouldBe null
 	}
 
 	test("play starts a series from its next up episode, else from the series itself") {
