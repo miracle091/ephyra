@@ -61,6 +61,7 @@ import org.jellyfin.androidtv.ui.livetv.TvManager;
 import org.jellyfin.androidtv.ui.navigation.Destinations;
 import org.jellyfin.androidtv.ui.navigation.NavigationRepository;
 import org.jellyfin.androidtv.ui.playback.overlay.LeanbackOverlayFragment;
+import org.jellyfin.androidtv.ui.playback.overlay.SkipOverlayDimKt;
 import org.jellyfin.androidtv.ui.presentation.CardPresenter;
 import org.jellyfin.androidtv.ui.presentation.ChannelCardPresenter;
 import org.jellyfin.androidtv.ui.presentation.MutableObjectAdapter;
@@ -478,6 +479,12 @@ public class CustomPlaybackOverlayFragment extends Fragment implements LiveTvGui
                 else {
                     leanbackOverlayFragment.setShouldShowOverlay(false);
                     leanbackOverlayFragment.hideOverlay();
+                }
+
+                // Ephyra: a skip button that hid by itself comes back on centre, up or down while its segment lasts
+                if (binding.skipOverlay.getRecallable() && SkipOverlayDimKt.isSkipRecallKey(keyCode)) {
+                    binding.skipOverlay.recall();
+                    return true;
                 }
 
                 if (binding.skipOverlay.getVisible()) {

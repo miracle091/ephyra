@@ -1,5 +1,6 @@
 package org.jellyfin.androidtv.ui.playback.overlay
 
+import android.view.KeyEvent
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
@@ -9,7 +10,29 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import kotlinx.coroutines.delay
+import org.jellyfin.androidtv.ui.playback.segment.MediaSegmentRepository
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
+
+/** Ephyra: how long the skip button stays on screen before it hides by itself (upstream: 8 s, then gone for the segment). */
+internal val SkipAutoHideDuration = 15.seconds
+
+/** Ephyra: whether the skip button is on screen, hidden but ready to be called back, or not there at all. */
+enum class SkipButtonState { SHOWN, RECALLABLE, NONE }
+
+/**
+ * Ephyra: the skip button's state, like a streaming service's "Skip intro": shown inside a segment while the player's controls are
+ * closed ([enabled]); once it hid by itself ([autoHidden]) it can be called back until the segment ends.
+ */
+fun skipButtonState(enabled: Boolean, autoHidden: Boolean, target: Duration?, position: Duration): SkipButtonState = when {
+	!enabled || target == null || position > target - MediaSegmentRepository.SkipMinDuration -> SkipButtonState.NONE
+	autoHidden -> SkipButtonState.RECALLABLE
+	else -> SkipButtonState.SHOWN
+}
+
+/** Ephyra: the keys that call a hidden skip button back; left and right keep seeking. */
+fun isSkipRecallKey(keyCode: Int): Boolean = keyCode == KeyEvent.KEYCODE_DPAD_CENTER || keyCode == KeyEvent.KEYCODE_ENTER ||
+	keyCode == KeyEvent.KEYCODE_DPAD_UP || keyCode == KeyEvent.KEYCODE_DPAD_DOWN
 
 /** Ephyra: how long the skip button stays fully visible before it dims. */
 internal val SkipDimDelay = 3.seconds

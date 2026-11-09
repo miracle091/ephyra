@@ -19,8 +19,8 @@ class UserSettingPreferences(
 
 		val homesection0 = enumPreference("homesection0", HomeSectionType.LIBRARY_TILES_SMALL)
 		val homesection1 = enumPreference("homesection1", HomeSectionType.RESUME)
-		val homesection2 = enumPreference("homesection2", HomeSectionType.RESUME_AUDIO)
-		val homesection3 = enumPreference("homesection3", HomeSectionType.RESUME_BOOK)
+		val homesection2 = enumPreference("homesection2", HomeSectionType.NONE) // Ephyra: lighter home, upstream RESUME_AUDIO
+		val homesection3 = enumPreference("homesection3", HomeSectionType.NONE) // Ephyra: no books, upstream RESUME_BOOK
 		val homesection4 = enumPreference("homesection4", HomeSectionType.LIVE_TV)
 		val homesection5 = enumPreference("homesection5", HomeSectionType.NEXT_UP)
 		val homesection6 = enumPreference("homesection6", HomeSectionType.LATEST_MEDIA)

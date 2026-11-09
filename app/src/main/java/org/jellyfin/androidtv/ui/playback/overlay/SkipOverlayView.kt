@@ -37,7 +37,6 @@ import org.jellyfin.androidtv.ui.base.EphyraTheme
 import org.jellyfin.androidtv.ui.base.Icon
 import org.jellyfin.androidtv.ui.base.LocalEphyraPalette
 import org.jellyfin.androidtv.ui.base.Text
-import org.jellyfin.androidtv.ui.playback.segment.MediaSegmentRepository
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -91,6 +90,8 @@ class SkipOverlayView @JvmOverloads constructor(
 	private val _currentPosition = MutableStateFlow(Duration.ZERO)
 	private val _targetPosition = MutableStateFlow<Duration?>(null)
 	private val _skipUiEnabled = MutableStateFlow(true)
+	// Ephyra: hidden by itself after a while, but the segment is kept so the button can be called back
+	private val _autoHidden = MutableStateFlow(false)
 
 	var currentPosition: Duration
 		get() = _currentPosition.value
@@ -107,12 +108,14 @@ class SkipOverlayView @JvmOverloads constructor(
 	var targetPosition: Duration?
 		get() = _targetPosition.value
 		set(value) {
+			_autoHidden.value = false
 			_targetPosition.value = value
 		}
 
 	var targetPositionMs: Long?
 		get() = _targetPosition.value?.inWholeMilliseconds
 		set(value) {
+			_autoHidden.value = false
 			_targetPosition.value = value?.milliseconds
 		}
 
@@ -122,29 +125,37 @@ class SkipOverlayView @JvmOverloads constructor(
 			_skipUiEnabled.value = value
 		}
 
-	val visible: Boolean
-		get() {
-			val enabled = _skipUiEnabled.value
-			val targetPosition = _targetPosition.value
-			val currentPosition = _currentPosition.value
+	private val state: SkipButtonState
+		get() = skipButtonState(_skipUiEnabled.value, _autoHidden.value, _targetPosition.value, _currentPosition.value)
 
-			return enabled && targetPosition != null && currentPosition <= (targetPosition - MediaSegmentRepository.SkipMinDuration)
-		}
+	val visible: Boolean
+		get() = state == SkipButtonState.SHOWN
+
+	/** Ephyra: whether a key would call the button back (it hid by itself and the segment still lasts). */
+	val recallable: Boolean
+		get() = state == SkipButtonState.RECALLABLE
+
+	/** Ephyra: shows the button again for another [SkipAutoHideDuration]. */
+	fun recall() {
+		_autoHidden.value = false
+	}
 
 	@Composable
 	override fun Content() {
 		val skipUiEnabled by _skipUiEnabled.collectAsState()
 		val currentPosition by _currentPosition.collectAsState()
 		val targetPosition by _targetPosition.collectAsState()
+		val autoHidden by _autoHidden.collectAsState()
 
-		val visible by remember(skipUiEnabled, currentPosition, targetPosition) {
+		val visible by remember(skipUiEnabled, currentPosition, targetPosition, autoHidden) {
 			derivedStateOf { visible }
 		}
 
-		// Auto hide
-		LaunchedEffect(skipUiEnabled, targetPosition) {
-			delay(MediaSegmentRepository.AskToSkipAutoHideDuration)
-			_targetPosition.value = null
+		// Auto hide; Ephyra: only hides, the segment stays so a key calls the button back
+		LaunchedEffect(skipUiEnabled, targetPosition, autoHidden) {
+			if (autoHidden || targetPosition == null) return@LaunchedEffect
+			delay(SkipAutoHideDuration)
+			_autoHidden.value = true
 		}
 
 		// Ephyra: the user's theme colours

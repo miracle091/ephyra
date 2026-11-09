@@ -187,3 +187,5 @@ Corporation; it is used here only to name the device the fork targets.
 | UI | Long pause screen: the end time sits under "Paused" in the header with a clock icon, and "Press any key to return" is centred on the screen on the times' line (position and duration) | done |
 | Fix | Programme details opened for a channel load the programme on air when the one shown has ended, e.g. after watching the channel past its end | done |
 | Licences | About → Licenses lists Jellyfin's Media3 FFmpeg decoder as Apache-2.0 and LGPL-2.1-or-later (the code it ships) instead of the GPL-3.0 of its POM | done |
+| UI | Lighter home by default: libraries, Continue watching, Live TV, Next up and Latest; "Continue listening" and "Continue reading" are no longer default rows (sections set by the user, here or in the web client, stay). Books are dropped: the "Continue reading" section is removed from the choices, book libraries and audiobooks stay hidden | done |
+| Playback | Skip button like a streaming service's "Skip intro": it stays 15 s instead of 8, and when it has hidden by itself centre, up or down call it back while the segment lasts (left and right keep seeking) | done |
