@@ -29,6 +29,21 @@ fun HomeSpotlightListButton() {
 	)
 }
 
+/** Ephyra: "Playlists in My media" in Customization, Home. */
+@Composable
+fun HomePlaylistsListButton() {
+	val preferences = koinInject<EphyraPreferences>()
+	var homePlaylists by rememberPreference(preferences, EphyraPreferences.homePlaylists)
+
+	ListButton(
+		headingContent = { Text(stringResource(R.string.ephyra_pref_home_playlists)) },
+		captionContent = { Text(stringResource(R.string.ephyra_pref_home_playlists_description)) },
+		trailingContent = { Checkbox(checked = homePlaylists) },
+		onClick = { homePlaylists = !homePlaylists },
+		modifier = Modifier.focusKey("ephyra_home_playlists"),
+	)
+}
+
 /** Ephyra: "Blur unwatched episodes" in Customization. */
 @Composable
 fun SpoilerBlurListButton() {

@@ -26,7 +26,7 @@ fun SettingsScreensaverScreen() {
 	SettingsColumn {
 		item {
 			ListSection(
-				overlineContent = { Text(stringResource(R.string.settings_title).uppercase()) },
+				overlineContent = { Text(stringResource(R.string.settings).uppercase()) },
 				headingContent = { Text(stringResource(R.string.pref_screensaver)) },
 			)
 		}

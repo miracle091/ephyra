@@ -356,7 +356,7 @@ public class AudioNowPlayingFragment extends Fragment {
             }
             mCurrentNdx.setText(getString(R.string.lbl_now_playing_track, mediaManager.getValue().getCurrentAudioQueueDisplayPosition(), mediaManager.getValue().getCurrentAudioQueueDisplaySize()));
             addGenres(mGenreRow);
-            backgroundService.getValue().setBackground(item);
+            backgroundService.getValue().clearBackgrounds();
         }
     }
 

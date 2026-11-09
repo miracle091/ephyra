@@ -4,10 +4,10 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 
 class LiveStreamRetryTest : FunSpec({
-	test("a live stream is retried three times") {
+	test("a live stream is retried twice") {
 		LiveStreamRetry.shouldRetry(isLiveTv = true, attemptsDone = 0) shouldBe true
-		LiveStreamRetry.shouldRetry(isLiveTv = true, attemptsDone = 2) shouldBe true
-		LiveStreamRetry.shouldRetry(isLiveTv = true, attemptsDone = 3) shouldBe false
+		LiveStreamRetry.shouldRetry(isLiveTv = true, attemptsDone = 1) shouldBe true
+		LiveStreamRetry.shouldRetry(isLiveTv = true, attemptsDone = 2) shouldBe false
 	}
 
 	test("anything but live TV is never retried here") {
@@ -21,7 +21,7 @@ class LiveStreamRetryTest : FunSpec({
 	}
 
 	test("a live stream gets 20 seconds to leave buffering, anything else no timeout") {
-		LiveStreamRetry.bufferTimeoutMs(isLiveTv = true) shouldBe 30_000
+		LiveStreamRetry.bufferTimeoutMs(isLiveTv = true) shouldBe 20_000
 		LiveStreamRetry.bufferTimeoutMs(isLiveTv = false) shouldBe 0
 	}
 

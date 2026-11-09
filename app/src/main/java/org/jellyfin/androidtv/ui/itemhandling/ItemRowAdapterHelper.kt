@@ -235,7 +235,7 @@ fun ItemRowAdapter.retrieveUserViews(api: ApiClient, userViewsRepository: UserVi
 			}
 
 			val filteredItems = response.items
-				.filter { userViewsRepository.isSupported(it.collectionType) }
+				.filter { userViewsRepository.isShownInMyMedia(it.collectionType) }
 
 			setItems(
 				items = filteredItems,

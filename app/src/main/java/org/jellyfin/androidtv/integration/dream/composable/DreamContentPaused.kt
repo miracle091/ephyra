@@ -113,8 +113,13 @@ fun DreamContentPaused(content: DreamContent.VideoPaused) = EphyraTheme {
 				)
 		)
 
+		val context = LocalContext.current
+		val progress = remember(content) { pausedVideoProgress(content.positionMs, content.durationMs, LocalTime.now()) }
+		val endsAt = remember(progress) { context.getTimeFormatter().format(progress.endsAt) }
+
 		PausedHeader(
 			item = content.item,
+			endsAt = endsAt,
 			modifier = Modifier
 				.align(Alignment.TopStart)
 				.padding(start = textStart, top = SafeY, end = SideMargin),
@@ -122,9 +127,22 @@ fun DreamContentPaused(content: DreamContent.VideoPaused) = EphyraTheme {
 
 		PausedProgress(
 			content = content,
+			fraction = progress.fraction,
 			modifier = Modifier
 				.align(Alignment.BottomCenter)
 				.padding(start = textStart, end = SideMargin, bottom = SafeY),
+		)
+
+		// The way back, centred on the screen on the times' line (same type and bottom margin), between the position and the duration
+		Text(
+			text = stringResource(R.string.ephyra_paused_hint),
+			style = TimeStyle,
+			color = palette.inkFaint,
+			textAlign = TextAlign.Center,
+			maxLines = 1,
+			modifier = Modifier
+				.align(Alignment.BottomCenter)
+				.padding(bottom = SafeY),
 		)
 	}
 }
@@ -142,9 +160,9 @@ private fun PausedPicture(item: BaseItemDto, modifier: Modifier) {
 	)
 }
 
-/** The player's header (OsdHeader): the overline, the title, then the pause in place of the play method. */
+/** The player's header (OsdHeader): the overline, the title, then the pause in place of the play method and the end time. */
 @Composable
-private fun PausedHeader(item: BaseItemDto, modifier: Modifier) {
+private fun PausedHeader(item: BaseItemDto, endsAt: String, modifier: Modifier) {
 	val palette = LocalEphyraPalette.current
 	val context = LocalContext.current
 	val overline = remember(item) { OsdHeader.overlineOf(item, item.getSeasonEpisodeName(context)) }
@@ -178,19 +196,24 @@ private fun PausedHeader(item: BaseItemDto, modifier: Modifier) {
 			Icon(painterResource(R.drawable.ic_pause), contentDescription = null, tint = palette.accent, modifier = Modifier.size(14.dp))
 			Text(text = stringResource(R.string.ephyra_paused), fontSize = 14.sp, color = palette.accent)
 		}
+		Row(
+			horizontalArrangement = Arrangement.spacedBy(6.dp),
+			verticalAlignment = Alignment.CenterVertically,
+			modifier = Modifier.padding(top = 4.dp),
+		) {
+			Icon(painterResource(R.drawable.ic_time), contentDescription = null, tint = palette.inkMuted, modifier = Modifier.size(14.dp))
+			Text(text = stringResource(R.string.lbl_playback_control_ends, endsAt), fontSize = 14.sp, color = palette.inkMuted)
+		}
 	}
 }
 
-/** The player's seek bar and times, then the way back to the player where its buttons would be. */
+/** The player's seek bar with the position and the duration under it. */
 @Composable
-private fun PausedProgress(content: DreamContent.VideoPaused, modifier: Modifier) {
+private fun PausedProgress(content: DreamContent.VideoPaused, fraction: Float, modifier: Modifier) {
 	val palette = LocalEphyraPalette.current
-	val context = LocalContext.current
-	val progress = remember(content) { pausedVideoProgress(content.positionMs, content.durationMs, LocalTime.now()) }
-	val endsAt = remember(progress) { context.getTimeFormatter().format(progress.endsAt) }
 
 	Column(modifier = modifier.fillMaxWidth()) {
-		PausedProgressBar(progress.fraction)
+		PausedProgressBar(fraction)
 		Row(
 			modifier = Modifier
 				.fillMaxWidth()
@@ -198,19 +221,8 @@ private fun PausedProgress(content: DreamContent.VideoPaused, modifier: Modifier
 		) {
 			Text(formatPlaybackTime(content.positionMs), style = TimeStyle, color = palette.inkMuted)
 			Spacer(Modifier.weight(1f))
-			Text(stringResource(R.string.lbl_playback_control_ends, endsAt), style = TimeStyle, color = palette.inkMuted)
-			Spacer(Modifier.width(24.dp))
 			Text(formatPlaybackTime(content.durationMs), style = TimeStyle, color = palette.inkMuted)
 		}
-		Text(
-			text = stringResource(R.string.ephyra_paused_hint),
-			fontSize = 14.sp,
-			color = palette.inkFaint,
-			textAlign = TextAlign.Center,
-			modifier = Modifier
-				.fillMaxWidth()
-				.padding(top = 24.dp),
-		)
 	}
 }
 

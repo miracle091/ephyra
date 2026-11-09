@@ -15,7 +15,7 @@ import kotlin.time.Duration.Companion.seconds
 internal val SkipDimDelay = 3.seconds
 
 /** Ephyra: the skip button's opacity once dimmed, until it hides. */
-internal const val SKIP_DIMMED_ALPHA = 0.4f
+internal const val SKIP_DIMMED_ALPHA = 0.8f
 
 private const val SKIP_DIM_FADE_MS = 600
 

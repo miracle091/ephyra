@@ -1,0 +1,8 @@
+{
+  "uniqueId": "org.jellyfin.media3:media3-ffmpeg-decoder",
+  "name": "Jellyfin AndroidX Media3 libraries - media3-ffmpeg-decoder",
+  "description": "Media3's FFmpeg audio decoder as packaged by Jellyfin: the Java and JNI parts are Media3's (Apache-2.0), libffmpegJNI.so is FFmpeg built without GPL or version 3 parts (LGPL-2.1-or-later). The GPL-3.0 in its POM is the packaging repository's licence, not the shipped code's.",
+  "website": "https://github.com/jellyfin/jellyfin-androidx-media",
+  "developers": [{ "name": "The Jellyfin developers", "organisationUrl": "https://jellyfin.org" }],
+  "licenses": ["Apache-2.0", "LGPL-2.1-or-later"]
+}

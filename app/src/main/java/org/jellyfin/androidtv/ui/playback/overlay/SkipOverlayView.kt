@@ -9,8 +9,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -23,15 +25,17 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.AbstractComposeView
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.jellyfin.androidtv.R
+import org.jellyfin.androidtv.ui.base.EphyraTheme
 import org.jellyfin.androidtv.ui.base.Icon
+import org.jellyfin.androidtv.ui.base.LocalEphyraPalette
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.playback.segment.MediaSegmentRepository
 import kotlin.time.Duration
@@ -44,27 +48,35 @@ fun SkipOverlayComposable(
 	Box(
 		contentAlignment = Alignment.BottomEnd,
 		modifier = Modifier
-			.padding(48.dp, 48.dp)
+			// Ephyra: the controls' safe area (ephyra_side_margin, ephyra_safe_y)
+			.padding(end = 32.dp, bottom = 27.dp)
 	) {
 		AnimatedVisibility(visible, enter = fadeIn(), exit = fadeOut()) {
+			val palette = LocalEphyraPalette.current
+			// Ephyra: the player's text pills (ephyra_osd_pill.xml): solid surface-2, a full pill, 48dp high, ink content
 			Row(
 				modifier = Modifier
 					.alpha(skipButtonAlpha(visible)) // Ephyra: dims after a few seconds
-					.clip(RoundedCornerShape(6.dp))
-					.background(colorResource(R.color.popup_menu_background).copy(alpha = 0.6f))
-					.padding(10.dp),
+					.height(48.dp)
+					.clip(CircleShape)
+					.background(palette.surface2)
+					.padding(start = 16.dp, end = 20.dp),
 				horizontalArrangement = Arrangement.spacedBy(8.dp),
 				verticalAlignment = Alignment.CenterVertically,
 			) {
 				Icon(
 					imageVector = ImageVector.vectorResource(R.drawable.ic_control_select),
 					contentDescription = null,
+					modifier = Modifier.size(24.dp),
+					tint = palette.ink,
 				)
 
 				Text(
 					text = stringResource(R.string.segment_action_skip),
-					color = colorResource(R.color.button_default_normal_text),
-					fontSize = 18.sp,
+					color = palette.ink,
+					fontSize = 14.sp,
+					fontWeight = FontWeight.Bold,
+					maxLines = 1,
 				)
 			}
 		}
@@ -135,6 +147,9 @@ class SkipOverlayView @JvmOverloads constructor(
 			_targetPosition.value = null
 		}
 
-		SkipOverlayComposable(visible)
+		// Ephyra: the user's theme colours
+		EphyraTheme {
+			SkipOverlayComposable(visible)
+		}
 	}
 }

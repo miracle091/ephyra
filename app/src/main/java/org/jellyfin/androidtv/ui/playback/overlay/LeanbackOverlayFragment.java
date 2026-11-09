@@ -55,6 +55,13 @@ public class LeanbackOverlayFragment extends PlaybackSupportFragment {
         super.hideControlsOverlay(false);
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        // Ephyra: the controls row and its shade reach the screen's bottom edge
+        LeanbackOverlayFragmentHelperKt.alignControlsToBottomEdge(this);
+    }
+
     public void initFromView(CustomPlaybackOverlayFragment customPlaybackOverlayFragment) {
         playerGlue.setInitialPlaybackDrawable();
         playerAdapter.setMasterOverlayFragment(customPlaybackOverlayFragment);

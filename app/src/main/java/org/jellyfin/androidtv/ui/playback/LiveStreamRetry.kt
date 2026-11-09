@@ -6,16 +6,16 @@ package org.jellyfin.androidtv.ui.playback
  * as a playback error; anything else keeps the player's normal error handling.
  */
 object LiveStreamRetry {
-	const val MAX_ATTEMPTS = 3
+	const val MAX_ATTEMPTS = 2
 	private const val STEP_MS = 1_000L
-	// A transcoded channel took about 15 s to start on the Shield; twice that leaves room for a slow server
-	private const val BUFFER_TIMEOUT_MS = 30_000L
+	// A transcoded channel took about 15 s to start on the Shield; 20 s leaves some room and closes a dead channel in about a minute
+	private const val BUFFER_TIMEOUT_MS = 20_000L
 
 	/** Whether a live stream that failed after [attemptsDone] retries is tried again. */
 	@JvmStatic
 	fun shouldRetry(isLiveTv: Boolean, attemptsDone: Int): Boolean = isLiveTv && attemptsDone < MAX_ATTEMPTS
 
-	/** The pause before the retry number [attempt] (1 for the first): 1 s, 2 s, 3 s. */
+	/** The pause before the retry number [attempt] (1 for the first): 1 s, 2 s. */
 	@JvmStatic
 	fun delayMs(attempt: Int): Long = STEP_MS * attempt.coerceAtLeast(1)
 

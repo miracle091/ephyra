@@ -4,6 +4,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import org.jellyfin.androidtv.preference.EphyraPreferences
 import org.jellyfin.sdk.api.client.ApiClient
 import org.jellyfin.sdk.api.client.extensions.userViewsApi
 import org.jellyfin.sdk.model.api.BaseItemDto
@@ -13,12 +14,14 @@ interface UserViewsRepository {
 	val views: Flow<Collection<BaseItemDto>>
 
 	fun isSupported(collectionType: CollectionType?): Boolean
+	fun isShownInMyMedia(collectionType: CollectionType?): Boolean
 	fun allowViewSelection(collectionType: CollectionType?): Boolean
 	fun allowGridView(collectionType: CollectionType?): Boolean
 }
 
 class UserViewsRepositoryImpl(
 	private val api: ApiClient,
+	private val ephyraPreferences: EphyraPreferences,
 ) : UserViewsRepository {
 	override val views = flow {
 		val views by api.userViewsApi.getUserViews()
@@ -28,6 +31,9 @@ class UserViewsRepositoryImpl(
 	}.flowOn(Dispatchers.IO)
 
 	override fun isSupported(collectionType: CollectionType?) = collectionType !in unsupportedCollectionTypes
+	// Ephyra: the home's "My media" row leaves out playlists unless the setting (off by default) shows them
+	override fun isShownInMyMedia(collectionType: CollectionType?) = isSupported(collectionType) &&
+		(collectionType != CollectionType.PLAYLISTS || ephyraPreferences[EphyraPreferences.homePlaylists])
 	override fun allowViewSelection(collectionType: CollectionType?) = collectionType !in disallowViewSelectionCollectionTypes
 	override fun allowGridView(collectionType: CollectionType?) = collectionType !in disallowGridViewCollectionTypes
 

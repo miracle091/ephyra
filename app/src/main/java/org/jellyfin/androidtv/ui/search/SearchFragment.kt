@@ -79,7 +79,7 @@ class SearchFragment : Fragment() {
 				modifier = Modifier
 					.focusRestorer()
 					.focusGroup()
-					.padding(horizontal = 48.dp)
+					.padding(horizontal = 32.dp)
 			) {
 				if (speechRecognizerAvailability) {
 					SearchVoiceInput(
@@ -136,7 +136,6 @@ class SearchFragment : Fragment() {
 					rowsSupportFragment = fragment
 					fragment.adapter = searchFragmentDelegate.rowsAdapter
 					fragment.onItemViewClickedListener = searchFragmentDelegate.onItemViewClickedListener
-					fragment.onItemViewSelectedListener = searchFragmentDelegate.onItemViewSelectedListener
 				}
 			)
 		}

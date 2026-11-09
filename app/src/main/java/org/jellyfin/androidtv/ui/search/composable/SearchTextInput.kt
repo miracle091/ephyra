@@ -1,6 +1,6 @@
 package org.jellyfin.androidtv.ui.search.composable
 
-import androidx.compose.foundation.border
+import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Row
@@ -16,8 +16,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -38,6 +45,7 @@ fun SearchTextInput(
 ) {
 	val interactionSource = remember { MutableInteractionSource() }
 	val focused by interactionSource.collectIsFocusedAsState()
+	val focusManager = LocalFocusManager.current
 
 	val color = when {
 		focused -> JellyfinTheme.colorScheme.inputFocused to JellyfinTheme.colorScheme.onInputFocused
@@ -51,7 +59,17 @@ fun SearchTextInput(
 		)
 	) {
 		BasicTextField(
-			modifier = modifier,
+			// Ephyra: the text field keeps up and down for its cursor, so on a remote focus could never leave it upwards (to the
+			// toolbar) and the D-pad seemed dead; up and down move the focus instead
+			modifier = modifier.onPreviewKeyEvent { event ->
+				val direction = when (event.key) {
+					Key.DirectionUp -> FocusDirection.Up
+					Key.DirectionDown -> FocusDirection.Down
+					else -> return@onPreviewKeyEvent false
+				}
+				if (event.type == KeyEventType.KeyDown) focusManager.moveFocus(direction)
+				true
+			},
 			value = query,
 			singleLine = true,
 			interactionSource = interactionSource,
@@ -69,11 +87,13 @@ fun SearchTextInput(
 			textStyle = LocalTextStyle.current,
 			cursorBrush = SolidColor(color.first),
 			decorationBox = { innerTextField ->
+				// Ephyra: a filled field like the sign-in inputs (surface-2, solid ink when focused, the 12dp input radius), so the
+				// focused field and its text are visible in every theme
 				Row(
 					verticalAlignment = Alignment.CenterVertically,
 					modifier = Modifier
-						.border(2.dp, color.first, RoundedCornerShape(percent = 30))
-						.padding(12.dp)
+						.background(color.first, RoundedCornerShape(12.dp))
+						.padding(horizontal = 16.dp, vertical = 12.dp)
 				) {
 					Icon(ImageVector.vectorResource(R.drawable.ic_search), contentDescription = null)
 					Spacer(Modifier.width(12.dp))

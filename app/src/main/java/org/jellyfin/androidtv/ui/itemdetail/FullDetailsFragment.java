@@ -234,6 +234,13 @@ public class FullDetailsFragment extends Fragment implements RecordingIndicatorV
             startClock();
         }
 
+        // Ephyra: details opened for a channel show what was on air then; once that programme is over, load the one on air now
+        if (mChannelId != null && ProgramOnAirKt.hasProgramEnded(mProgramInfo, LocalDateTime.now())) {
+            mProgramInfo = null;
+            loadItem(null);
+            return;
+        }
+
         //Update information that may have changed - delay slightly to allow changes to take on the server
         new Handler().postDelayed(new Runnable() {
             @Override

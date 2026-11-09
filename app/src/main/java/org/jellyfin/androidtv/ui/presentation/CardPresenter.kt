@@ -321,12 +321,9 @@ private fun CardViewHolderContent(
 				CardPlaceholder() // Ephyra
 				val library = item.baseItem?.takeIf(::isLibraryCard) // Ephyra
 				if (library != null) {
-					if (isLiveTvLibraryCard(library)) {
-							// Ephyra: Live TV has no titles with a backdrop, so no lookup: the colour tone with a TV icon
-							ArtToneCover(title, R.drawable.ic_tv, alwaysShowIcon = true)
-						} else {
-							LibraryCardImage(library, title, displayConfig.iconRes, size, aspectRatio)
-						}
+					// Ephyra: Live TV shows a programme on air, with the TV icon when none has a picture
+					val iconRes = if (isLiveTvLibraryCard(library)) R.drawable.ic_tv else displayConfig.iconRes
+					LibraryCardImage(library, title, iconRes, size, aspectRatio)
 				} else if (image != null && hidesEpisodeSpoiler(item.baseItem, image)) {
 					EpisodeSpoilerImage(image, aspectRatio, Modifier.fillMaxSize()) // Ephyra
 				} else if (image != null) {

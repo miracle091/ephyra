@@ -50,7 +50,7 @@ fun SettingsSubtitlesScreen() {
 	SettingsColumn {
 		item {
 			ListSection(
-				overlineContent = { Text(stringResource(R.string.pref_customization).uppercase()) },
+				overlineContent = { Text(stringResource(R.string.settings).uppercase()) },
 				headingContent = { Text(stringResource(R.string.pref_subtitles)) },
 			)
 		}

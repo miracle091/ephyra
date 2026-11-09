@@ -80,8 +80,8 @@ fun StillWatchingScreen(
 	val item by viewModel.item.collectAsState()
 	if (item == null) return
 
-	LaunchedEffect(item?.baseItem) {
-		backgroundService.setBackground(item?.baseItem)
+	LaunchedEffect(Unit) {
+		backgroundService.clearBackgrounds()
 	}
 
 	LaunchedEffect(state) {

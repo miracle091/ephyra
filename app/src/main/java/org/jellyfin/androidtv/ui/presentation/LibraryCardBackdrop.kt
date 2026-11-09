@@ -1,12 +1,15 @@
 package org.jellyfin.androidtv.ui.presentation
 
 import android.widget.ImageView
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.DpSize
@@ -17,9 +20,11 @@ import kotlinx.coroutines.withContext
 import org.jellyfin.androidtv.auth.repository.UserRepository
 import org.jellyfin.androidtv.ui.composable.AsyncImage
 import org.jellyfin.androidtv.ui.composable.item.ArtToneCover
+import org.jellyfin.androidtv.ui.composable.item.artToneFor
 import org.jellyfin.androidtv.util.apiclient.JellyfinImage
 import org.jellyfin.androidtv.util.apiclient.getUrl
 import org.jellyfin.androidtv.util.apiclient.itemBackdropImages
+import org.jellyfin.androidtv.util.apiclient.itemImages
 import org.jellyfin.sdk.api.client.ApiClient
 import org.jellyfin.sdk.api.client.extensions.itemsApi
 import org.jellyfin.sdk.api.client.extensions.liveTvApi
@@ -32,6 +37,7 @@ import org.jellyfin.sdk.model.api.SortOrder
 import org.koin.compose.koinInject
 import timber.log.Timber
 import java.util.UUID
+import kotlin.random.Random
 
 /** Ephyra: what a library card shows while its backdrop is looked up, then the backdrop (null when the library has none). */
 sealed interface LibraryCardBackdrop {
@@ -42,7 +48,7 @@ sealed interface LibraryCardBackdrop {
 /** Ephyra: libraries (Movies, Shows, Music...) show a title's backdrop on their card instead of the server's image with the name on it. */
 fun isLibraryCard(item: BaseItemDto?): Boolean = item?.type == BaseItemKind.USER_VIEW || item?.type == BaseItemKind.COLLECTION_FOLDER
 
-/** Ephyra: the Live TV library holds channels, not titles with a backdrop, so its card shows the colour tone with a TV icon. */
+/** Ephyra: the Live TV library holds channels, not titles: its card shows a channel's logo instead of the newest title's backdrop. */
 fun isLiveTvLibraryCard(item: BaseItemDto?): Boolean = isLibraryCard(item) && item?.collectionType == CollectionType.LIVETV
 
 /** Ephyra: the icon of a library card without a backdrop: the REC symbol for the server's recordings folders, else [defaultIcon]. */
@@ -51,6 +57,22 @@ fun libraryCardIcon(libraryId: UUID, recordingFolderIds: Collection<UUID>, defau
 
 /** Ephyra: the first backdrop among the titles the server returned for a library, or null when none has one. */
 fun libraryCardBackdrop(titles: List<BaseItemDto>): JellyfinImage? = titles.firstNotNullOfOrNull { it.itemBackdropImages.firstOrNull() }
+
+/** Ephyra: a photo library has no titles with a backdrop: its card shows one of its photos, a new one at each start of the app. */
+fun isPhotoLibraryCard(item: BaseItemDto?): Boolean = isLibraryCard(item) && item?.collectionType == CollectionType.PHOTOS
+
+/** Ephyra: the picture of the first of [photos] (the server picks them at random) that has one, or null. */
+fun photoCardImage(photos: List<BaseItemDto>): JellyfinImage? = photos.firstNotNullOfOrNull { it.itemImages[ImageType.PRIMARY] }
+
+/**
+ * Ephyra: a channel logo for the Live TV card: among the [channels] with a logo (their primary image), the one at [pick] (wrapping
+ * around), so the card changes from one start of the app to the next.
+ */
+fun liveTvCardLogo(channels: List<BaseItemDto>, pick: Int): JellyfinImage? {
+	val logos = channels.mapNotNull { it.itemImages[ImageType.PRIMARY] }
+	if (logos.isEmpty()) return null
+	return logos[pick.mod(logos.size)]
+}
 
 /**
  * Ephyra: the key a library's backdrop is kept under. Users of a server share library ids but not what they may see
@@ -90,7 +112,11 @@ fun rememberLibraryCardBackdrop(library: BaseItemDto): State<LibraryCardBackdrop
 	return produceState(libraryBackdrops[key] ?: LibraryCardBackdrop.Loading, key) {
 		if (key in libraryBackdrops) return@produceState
 		// A failed lookup is not cached, so the next bind tries again; meanwhile the card shows its colour tone
-		val result = loadLibraryCardBackdrop(api, library.id)
+		val result = when {
+			isLiveTvLibraryCard(library) -> loadLiveTvCardLogo(api)
+			isPhotoLibraryCard(library) -> loadPhotoCardImage(api, library.id)
+			else -> loadLibraryCardBackdrop(api, library.id)
+		}
 		val backdrop = LibraryCardBackdrop.Ready(result.getOrNull())
 		if (result.isSuccess) libraryBackdrops[key] = backdrop
 		value = backdrop
@@ -106,7 +132,9 @@ fun LibraryCardImage(library: BaseItemDto, title: String?, iconRes: Int, size: D
 		LibraryCardBackdrop.Loading -> Unit
 		is LibraryCardBackdrop.Ready -> {
 			val image = state.image
-			if (image != null) {
+			if (image != null && isLiveTvLibraryCard(library)) {
+				LiveTvCardLogo(image, title, size)
+			} else if (image != null) {
 				val api = koinInject<ApiClient>()
 				val density = LocalDensity.current
 				AsyncImage(
@@ -146,6 +174,67 @@ private suspend fun loadLibraryCardBackdrop(api: ApiClient, libraryId: UUID): Re
 		Result.failure(error)
 	}
 }
+
+/** Ephyra: a channel logo (usually a transparent picture) whole and centred on the card's colour tone, not cropped to fill the card. */
+@Composable
+private fun LiveTvCardLogo(logo: JellyfinImage, title: String?, size: DpSize) {
+	val api = koinInject<ApiClient>()
+	val density = LocalDensity.current
+	Box(
+		contentAlignment = Alignment.Center,
+		modifier = Modifier
+			.fillMaxSize()
+			.background(artToneFor(title)),
+	) {
+		AsyncImage(
+			url = logo.getUrl(api, maxWidth = with(density) { (size.width * LOGO_SCALE).roundToPx() }),
+			scaleType = ImageView.ScaleType.FIT_CENTER,
+			modifier = Modifier.fillMaxSize(LOGO_SCALE),
+		)
+	}
+}
+
+// The share of the card the channel logo may fill
+private const val LOGO_SCALE = 0.5f
+
+private suspend fun loadPhotoCardImage(api: ApiClient, libraryId: UUID): Result<JellyfinImage?> = withContext(Dispatchers.IO) {
+	try {
+		val photos = api.itemsApi.getItems(
+			parentId = libraryId,
+			recursive = true,
+			includeItemTypes = setOf(BaseItemKind.PHOTO),
+			imageTypes = setOf(ImageType.PRIMARY),
+			sortBy = setOf(ItemSortBy.RANDOM),
+			limit = 1,
+		).content.items
+		Result.success(photoCardImage(photos))
+	} catch (error: CancellationException) {
+		throw error
+	} catch (@Suppress("TooGenericExceptionCaught") error: Exception) {
+		Timber.w(error, "Could not load a photo for a photo library card")
+		Result.failure(error)
+	}
+}
+
+private suspend fun loadLiveTvCardLogo(api: ApiClient): Result<JellyfinImage?> = withContext(Dispatchers.IO) {
+	try {
+		val channels = api.liveTvApi.getLiveTvChannels(
+			limit = LIVE_TV_CARD_CHANNELS,
+			enableImageTypes = setOf(ImageType.PRIMARY),
+			imageTypeLimit = 1,
+			enableUserData = false,
+		).content.items
+		Result.success(liveTvCardLogo(channels, Random.nextInt(LIVE_TV_CARD_CHANNELS)))
+	} catch (error: CancellationException) {
+		throw error
+	} catch (@Suppress("TooGenericExceptionCaught") error: Exception) {
+		Timber.w(error, "Could not load a channel logo for the Live TV card")
+		Result.failure(error)
+	}
+}
+
+// How many channels (in the server's order) the Live TV card picks a logo from
+private const val LIVE_TV_CARD_CHANNELS = 50
 
 private suspend fun loadRecordingFolderIds(api: ApiClient, userId: UUID): Set<UUID>? = withContext(Dispatchers.IO) {
 	try {

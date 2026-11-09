@@ -148,7 +148,7 @@ val appModule = module {
 	single { InteractionTrackerViewModel(get(), get()) }
 
 	single<UserRepository> { UserRepositoryImpl() }
-	single<UserViewsRepository> { UserViewsRepositoryImpl(get()) }
+	single<UserViewsRepository> { UserViewsRepositoryImpl(get(), get()) }
 	single<NotificationsRepository> { NotificationsRepositoryImpl(get(), get()) }
 	single<ItemMutationRepository> { ItemMutationRepositoryImpl(get(), get()) }
 	single<CustomMessageRepository> { CustomMessageRepositoryImpl() }
@@ -175,7 +175,7 @@ val appModule = module {
 	viewModel { SettingsViewModel() }
 	viewModel { SettingsLibrariesScreenViewModel(get()) }
 
-	single { BackgroundService(get(), get(), get(), get(), get()) }
+	single { BackgroundService() }
 
 	single { MarkdownRenderer(get()) }
 	single { ItemLauncher() }
@@ -183,7 +183,7 @@ val appModule = module {
 	single { ReportingHelper(get(), get()) }
 	single<PlaybackHelper> { SdkPlaybackHelper(get(), get(), get(), get()) }
 
-	factory { (context: Context) -> SearchFragmentDelegate(context, get(), get()) }
+	factory { (context: Context) -> SearchFragmentDelegate(context, get()) }
 
 	// Ephyra: updates from GitHub Releases
 	single {

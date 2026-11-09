@@ -122,6 +122,10 @@ aboutLibraries {
 	collect {
 		configPath = file("config/aboutlibraries")
 	}
+	library {
+		// Its POM says GPL-3.0 (the packaging repository's licence); config/aboutlibraries lists it with the shipped code's licences
+		exclusionPatterns.add(Regex("org\\.jellyfin\\.media3:media3-ffmpeg-decoder").toPattern())
+	}
 }
 
 tasks.register("versionTxt") {
