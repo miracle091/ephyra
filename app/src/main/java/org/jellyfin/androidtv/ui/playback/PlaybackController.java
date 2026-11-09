@@ -31,6 +31,7 @@ import org.jellyfin.androidtv.util.apiclient.ReportingHelper;
 import org.jellyfin.androidtv.util.apiclient.Response;
 import org.jellyfin.androidtv.util.profile.DeviceProfileKt;
 import org.jellyfin.androidtv.util.sdk.compat.JavaCompat;
+import org.jellyfin.playback.jellyfin.mediastream.BluRayTransportStream;
 import org.jellyfin.sdk.api.client.ApiClient;
 import org.jellyfin.sdk.model.ServerVersion;
 import org.jellyfin.sdk.model.api.BaseItemDto;
@@ -630,6 +631,10 @@ public class PlaybackController implements PlaybackControllerNotifiable {
             internalOptions.setSubtitleStreamIndex(forcedSubtitleIndex);
         }
         MediaSourceInfo currentMediaSource = getCurrentMediaSource();
+        // Ephyra: Media3 cannot read Blu-ray transport streams, so they skip the direct play attempt that would fail first
+        if (currentMediaSource != null && BluRayTransportStream.isBluRayTransportStream(currentMediaSource.getPath())) {
+            internalOptions.setEnableDirectPlay(false);
+        }
         Integer restartAudioIndex = peekRestartAudioIndex(item);
         if (restartAudioIndex != null) {
             // Ephyra: a restart of this very item (subtitle change) keeps the audio track the user is hearing
@@ -778,6 +783,10 @@ public class PlaybackController implements PlaybackControllerNotifiable {
             // No saved preference, use server default
             mCurrentOptions.setSubtitleStreamIndex(response.getMediaSource().getDefaultSubtitleStreamIndex());
         }
+        // Ephyra: a subtitle the server burns in is on screen whatever was picked above; remember it, or an audio switch on this
+        // transcode asks for no subtitle and the restarted stream loses it
+        mCurrentOptions.setSubtitleStreamIndex(StreamRules.shownSubtitleIndex(response.getSubtitleDeliveryMethod(),
+                response.getMediaSource().getDefaultSubtitleStreamIndex(), mCurrentOptions.getSubtitleStreamIndex()));
         setDefaultAudioIndex(response);
         Timber.i("default audio index set to %s remote default %s", mDefaultAudioIndex, response.getMediaSource().getDefaultAudioStreamIndex());
         Timber.i("default sub index set to %s remote default %s", mCurrentOptions.getSubtitleStreamIndex(), response.getMediaSource().getDefaultSubtitleStreamIndex());

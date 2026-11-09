@@ -85,7 +85,8 @@ fun SearchTextInput(
 				showKeyboardOnFocus = true,
 			),
 			textStyle = LocalTextStyle.current,
-			cursorBrush = SolidColor(color.first),
+			// Ephyra: the cursor takes the text colour; the field's own colour made it invisible on the filled field
+			cursorBrush = SolidColor(color.second),
 			decorationBox = { innerTextField ->
 				// Ephyra: a filled field like the sign-in inputs (surface-2, solid ink when focused, the 12dp input radius), so the
 				// focused field and its text are visible in every theme

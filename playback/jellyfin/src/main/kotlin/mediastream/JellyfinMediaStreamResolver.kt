@@ -29,7 +29,11 @@ class JellyfinMediaStreamResolver(
 		val baseItem = queueEntry.baseItem
 		if (baseItem == null || !supportedMediaTypes.contains(baseItem.mediaType)) return null
 
-		val mediaInfo = getPlaybackInfo(baseItem, queueEntry.mediaSourceId, queueEntry.audioStreamIndex)
+		var mediaInfo = getPlaybackInfo(baseItem, queueEntry.mediaSourceId, queueEntry.audioStreamIndex)
+		// Ephyra: Media3 can't read Blu-ray transport streams, and the path is only known from the answer: ask again without direct play
+		if (mediaInfo.mediaSource.supportsDirectPlay && isBluRayTransportStream(mediaInfo.mediaSource.path)) {
+			mediaInfo = getPlaybackInfo(baseItem, mediaInfo.mediaSource.id, queueEntry.audioStreamIndex, enableDirectPlay = false)
+		}
 
 		return when {
 			// Direct play video
@@ -83,6 +87,7 @@ class JellyfinMediaStreamResolver(
 		item: BaseItemDto,
 		mediaSourceId: String? = null,
 		audioStreamIndex: Int? = null,
+		enableDirectPlay: Boolean = true,
 	): MediaInfo {
 		val profile = deviceProfileBuilder()
 		val response by api.mediaInfoApi.getPostedPlaybackInfo(
@@ -92,7 +97,7 @@ class JellyfinMediaStreamResolver(
 				// Ephyra: the requested audio track; without one the server picks from the user's language preferences
 				audioStreamIndex = audioStreamIndex,
 				deviceProfile = profile,
-				enableDirectPlay = true,
+				enableDirectPlay = enableDirectPlay,
 				enableDirectStream = true,
 				enableTranscoding = true,
 				allowVideoStreamCopy = true,
