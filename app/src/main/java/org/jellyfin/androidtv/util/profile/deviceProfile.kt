@@ -11,7 +11,6 @@ import org.jellyfin.androidtv.preference.constant.HdrFormat
 import org.jellyfin.androidtv.preference.constant.HdrOverrideMode
 import org.jellyfin.androidtv.util.profile.codec.hasPlatformAudioDecoder
 import org.jellyfin.androidtv.util.profile.codec.isPassthroughAudioAvailable
-import org.jellyfin.sdk.model.ServerVersion
 import org.jellyfin.sdk.model.api.CodecType
 import org.jellyfin.sdk.model.api.DlnaProfileType
 import org.jellyfin.sdk.model.api.EncodingContext
@@ -109,7 +108,6 @@ private fun UserPreferences.isBitstreamAudioEnabled(context: Context, format: Bi
 fun createDeviceProfile(
 	context: Context,
 	userPreferences: UserPreferences,
-	serverVersion: ServerVersion,
 ) = createDeviceProfile(
 	mediaTest = MediaCodecCapabilitiesTest(userPreferences[UserPreferences.softwareCodecsEnabled]),
 	maxBitrate = userPreferences.getMaxBitrate(),
@@ -199,7 +197,7 @@ fun createDeviceProfile(
 	val hlsVideoCodecs = listOfNotNull(
 		if (supportsHevc) Codec.Video.HEVC else null,
 		Codec.Video.H264
-	).toTypedArray()
+	)
 
 	transcodingProfile {
 		type = DlnaProfileType.VIDEO
@@ -208,8 +206,9 @@ fun createDeviceProfile(
 		container = Codec.Container.TS
 		protocol = MediaStreamProtocol.HLS
 
-		videoCodec(*hlsVideoCodecs)
-		audioCodec(*hlsMpegTsAudioCodecs.filter(allowedAudioCodecs::contains).toTypedArray())
+		// The builder appends each call, so adding the codecs one by one equals one vararg call (and avoids the array copy)
+		hlsVideoCodecs.forEach { videoCodec(it) }
+		hlsMpegTsAudioCodecs.filter(allowedAudioCodecs::contains).forEach { audioCodec(it) }
 
 		copyTimestamps = false
 		enableSubtitlesInManifest = true
@@ -222,8 +221,9 @@ fun createDeviceProfile(
 		container = Codec.Container.MP4
 		protocol = MediaStreamProtocol.HLS
 
-		videoCodec(*hlsVideoCodecs)
-		audioCodec(*hlsFmp4AudioCodecs.filter(allowedAudioCodecs::contains).toTypedArray())
+		// The builder appends each call, so adding the codecs one by one equals one vararg call (and avoids the array copy)
+		hlsVideoCodecs.forEach { videoCodec(it) }
+		hlsFmp4AudioCodecs.filter(allowedAudioCodecs::contains).forEach { audioCodec(it) }
 
 		copyTimestamps = false
 		enableSubtitlesInManifest = true
@@ -272,14 +272,14 @@ fun createDeviceProfile(
 			Codec.Video.VP9,
 		)
 
-		audioCodec(*allowedAudioCodecs)
+		allowedAudioCodecs.forEach { audioCodec(it) }
 	}
 
 	// Audio
 	directPlayProfile {
 		type = DlnaProfileType.AUDIO
 
-		audioCodec(*allowedAudioCodecs)
+		allowedAudioCodecs.forEach { audioCodec(it) }
 	}
 
 	/// Codec profiles
@@ -515,13 +515,12 @@ fun createDeviceProfile(
 		add(VideoRangeType.DOVI_INVALID)
 
 		if (!supportsHevcDolbyVisionEL) {
+			val decodesHevcDolbyVisionHdr10 = supportsHevcDolbyVision && supportsHevcMain10 && supportsHevcHDR10
 			if (
 				!unreportedDoviProfile7Support ||
 				// Ephyra: without a Dolby Vision display the decoder gives SDR; the server strips the RPU and sends the HDR10 layer
 				!displaySupportsDolbyVision ||
-				!supportsHevcDolbyVision ||
-				!supportsHevcMain10 ||
-				!supportsHevcHDR10
+				!decodesHevcDolbyVisionHdr10
 			) {
 				add(VideoRangeType.DOVI_WITH_EL)
 

@@ -22,7 +22,6 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.jellyfin.androidtv.R
-import org.jellyfin.androidtv.preference.UserPreferences
 import org.jellyfin.androidtv.ui.base.EphyraTheme
 import org.jellyfin.androidtv.ui.base.LocalEphyraPalette
 import org.jellyfin.androidtv.ui.base.Text
@@ -42,7 +41,6 @@ import org.jellyfin.sdk.model.api.SeriesStatus
 import org.jellyfin.sdk.model.api.VideoRangeType
 import org.jellyfin.sdk.model.api.Video3dFormat
 import org.jellyfin.sdk.model.extensions.ticks
-import org.koin.compose.koinInject
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -276,8 +274,6 @@ fun BaseItemInfoRow(
 	includeRuntime: Boolean,
 	separated: Boolean = false,
 ) {
-	val userPreferences = koinInject<UserPreferences>()
-
 	// Ephyra: the details screen shows films, series and episodes as groups divided by vertical lines
 	if (separated && item.type !in SEPARATED_EXCLUDED_KINDS) {
 		InfoRowGroups(buildSeparatedGroups(item, mediaSource, includeRuntime))

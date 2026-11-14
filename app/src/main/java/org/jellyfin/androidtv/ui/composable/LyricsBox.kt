@@ -30,11 +30,6 @@ import org.jellyfin.sdk.model.api.LyricDto
 import org.jellyfin.sdk.model.extensions.ticks
 import kotlin.time.Duration
 
-data class TimedLine(
-	val timestamp: Duration,
-	val text: String,
-)
-
 private data class LyricsBoxContentMeasurements(
 	val size: Size,
 	val items: List<Measured>,

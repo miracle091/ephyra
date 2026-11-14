@@ -24,13 +24,6 @@ import org.jellyfin.androidtv.ui.base.list.ListControlDefaults
 import org.jellyfin.design.Tokens
 import timber.log.Timber
 
-enum class SettingsAsyncActionListButtonState {
-	PENDING,
-	WORKING,
-	SUCCESS,
-	FAILED,
-}
-
 @Composable
 fun <T> SettingsAsyncActionListButton(
 	action: suspend CoroutineScope.() -> T,

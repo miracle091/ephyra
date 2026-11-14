@@ -8,27 +8,13 @@ import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import org.jellyfin.androidtv.ui.base.JellyfinTheme
 import org.jellyfin.androidtv.ui.base.LocalShapes
-
-object ListControlDefaults {
-	@ReadOnlyComposable
-	@Composable
-	fun colors(
-		containerColor: Color = JellyfinTheme.colorScheme.listButton,
-		focusedContainerColor: Color = JellyfinTheme.colorScheme.listButtonFocused,
-	) = ListControlColors(
-		containerColor = containerColor,
-		focusedContainerColor = focusedContainerColor,
-	)
-}
 
 @Composable
 fun ListControl(

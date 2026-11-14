@@ -24,7 +24,7 @@ import org.jellyfin.playback.core.PlaybackManager
 import org.jellyfin.playback.core.model.PlayState
 import org.koin.compose.koinInject
 
-private const val DefaultVideoAspectRatio = 16f / 9f
+private const val DEFAULT_VIDEO_ASPECT_RATIO = 16f / 9f
 
 @Composable
 fun VideoPlayerScreen() {
@@ -43,7 +43,7 @@ fun VideoPlayerScreen() {
 	)
 
 	val videoSize by playbackManager.state.videoSize.collectAsState()
-	val aspectRatio = videoSize.aspectRatio.takeIf { !it.isNaN() && it > 0f } ?: DefaultVideoAspectRatio
+	val aspectRatio = videoSize.aspectRatio.takeIf { !it.isNaN() && it > 0f } ?: DEFAULT_VIDEO_ASPECT_RATIO
 
 	val coroutineScope = rememberCoroutineScope()
 	val mediaToastRegistry = remember { MediaToastRegistry(coroutineScope) }

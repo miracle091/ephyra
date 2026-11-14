@@ -43,6 +43,8 @@ const val ROW_ITEM_GAP_DP = 12
 // The browsePaddingStart/End of the Ephyra themes
 private val RowSideMargin = 32.dp
 private val RowItemGap = ROW_ITEM_GAP_DP.dp
+private const val ICON_FRACTION_ALWAYS = 0.3f
+private const val ICON_FRACTION_PLACEHOLDER = 0.4f
 
 /**
  * Ephyra: the height of the cards of a row, so that [count] cards of [aspectRatio] fill a screen [screenWidth] wide edge to edge,
@@ -85,7 +87,7 @@ fun ArtToneCover(
 			Image(
 				painter = painterResource(iconRes),
 				contentDescription = null,
-				modifier = Modifier.fillMaxSize(if (alwaysShowIcon) 0.3f else 0.4f),
+				modifier = Modifier.fillMaxSize(if (alwaysShowIcon) ICON_FRACTION_ALWAYS else ICON_FRACTION_PLACEHOLDER),
 			)
 		}
 	}

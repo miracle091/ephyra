@@ -12,14 +12,14 @@ class TrackMatchingTest : FunSpec({
 	fun track(index: Int, language: String?, title: String? = null, codec: String? = null, forced: Boolean = false) =
 		TrackInfo(index, language, title, codec, forced)
 
-	fun stream(index: Int, type: MediaStreamType, language: String?, title: String? = null, codec: String? = null, forced: Boolean = false) =
+	fun stream(type: MediaStreamType, info: TrackInfo) =
 		mockk<MediaStream> {
-			every { this@mockk.index } returns index
+			every { index } returns info.index
 			every { this@mockk.type } returns type
-			every { this@mockk.language } returns language
-			every { this@mockk.title } returns title
-			every { this@mockk.codec } returns codec
-			every { isForced } returns forced
+			every { language } returns info.language
+			every { title } returns info.title
+			every { codec } returns info.codec
+			every { isForced } returns info.isForced
 		}
 
 	context("matchTrack") {
@@ -77,11 +77,11 @@ class TrackMatchingTest : FunSpec({
 
 	context("remembered tracks of the queue") {
 		val streams = listOf(
-			stream(0, MediaStreamType.VIDEO, null),
-			stream(1, MediaStreamType.AUDIO, "rus", "DUB", "ac3"),
-			stream(2, MediaStreamType.AUDIO, "rus", "MVO", "ac3"),
-			stream(3, MediaStreamType.SUBTITLE, "rus", "Signs", "ass", forced = true),
-			stream(4, MediaStreamType.SUBTITLE, "rus", "Full", "subrip"),
+			stream(MediaStreamType.VIDEO, track(0, null)),
+			stream(MediaStreamType.AUDIO, track(1, "rus", "DUB", "ac3")),
+			stream(MediaStreamType.AUDIO, track(2, "rus", "MVO", "ac3")),
+			stream(MediaStreamType.SUBTITLE, track(3, "rus", "Signs", "ass", forced = true)),
+			stream(MediaStreamType.SUBTITLE, track(4, "rus", "Full", "subrip")),
 		)
 
 		test("the audio track played in one episode is picked again in the next") {
@@ -90,9 +90,9 @@ class TrackMatchingTest : FunSpec({
 
 			// The next episode lists the tracks in another order
 			val next = listOf(
-				stream(0, MediaStreamType.VIDEO, null),
-				stream(1, MediaStreamType.AUDIO, "rus", "MVO", "ac3"),
-				stream(2, MediaStreamType.AUDIO, "rus", "DUB", "ac3"),
+				stream(MediaStreamType.VIDEO, track(0, null)),
+				stream(MediaStreamType.AUDIO, track(1, "rus", "MVO", "ac3")),
+				stream(MediaStreamType.AUDIO, track(2, "rus", "DUB", "ac3")),
 			)
 			preferredAudioIndex(queue, next) shouldBe 1
 		}
@@ -100,7 +100,7 @@ class TrackMatchingTest : FunSpec({
 		test("audio falls back to nothing when the language is missing, so the server default stays") {
 			val queue = VideoQueueManager()
 			queue.setLastPlayedAudioTrack(streams[2])
-			preferredAudioIndex(queue, listOf(stream(1, MediaStreamType.AUDIO, "eng"))) shouldBe null
+			preferredAudioIndex(queue, listOf(stream(MediaStreamType.AUDIO, track(1, "eng")))) shouldBe null
 			preferredAudioIndex(VideoQueueManager(), streams) shouldBe null
 		}
 
@@ -131,8 +131,8 @@ class TrackMatchingTest : FunSpec({
 	context("hasAudioStream") {
 		val source = mockk<MediaSourceInfo> {
 			every { mediaStreams } returns listOf(
-				stream(1, MediaStreamType.AUDIO, "rus"),
-				stream(2, MediaStreamType.SUBTITLE, "rus"),
+				stream(MediaStreamType.AUDIO, track(1, "rus")),
+				stream(MediaStreamType.SUBTITLE, track(2, "rus")),
 			)
 		}
 

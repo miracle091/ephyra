@@ -54,7 +54,13 @@ class MyDetailsOverviewRowPresenter(
 		fun setItem(row: MyDetailsOverviewRow) {
 			setTitle(row.item.name)
 
-			InfoLayoutHelper.addInfoRow(view.context, row.item, row.item.mediaSources?.getOrNull(row.selectedMediaSourceIndex), binding.fdMainInfoRow, false)
+			InfoLayoutHelper.addInfoRow(
+				view.context,
+				row.item,
+				row.item.mediaSources?.getOrNull(row.selectedMediaSourceIndex),
+				binding.fdMainInfoRow,
+				false,
+			)
 			// Ephyra: groups divided by vertical lines and the official rating as an outlined badge
 			binding.fdMainInfoRow.children.filterIsInstance<BaseItemInfoRowView>().forEach { it.separated = true }
 			binding.fdGenreRow.text = row.item.genres?.joinToString(" · ") // Ephyra: the spotlight's separator

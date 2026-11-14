@@ -1,5 +1,5 @@
-
-
+// Design tokens: every literal is a named token value.
+@file:Suppress("MagicNumber")
 
 package org.jellyfin.design.token
 

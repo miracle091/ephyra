@@ -3,6 +3,8 @@ package org.jellyfin.androidtv.ui.playback.overlay
 import androidx.leanback.app.PlaybackSupportFragment
 import androidx.leanback.app.RowsSupportFragment
 
+private const val FULL_ALIGNMENT_PERCENT = 100f
+
 /**
  * Ephyra: [PlaybackSupportFragment.onStart] (setVerticalGridViewLayout) sets the rows grid's window alignment offset to
  * -lb_playback_controls_padding_bottom, and the controls row (with the bottom shade) ends at that line, so a strip of video stayed
@@ -13,5 +15,5 @@ fun PlaybackSupportFragment.alignControlsToBottomEdge() {
 	val rows = childFragmentManager.findFragmentById(androidx.leanback.R.id.playback_controls_dock) as? RowsSupportFragment
 	val grid = rows?.verticalGridView ?: return
 	grid.windowAlignmentOffset = 0
-	grid.windowAlignmentOffsetPercent = 100f
+	grid.windowAlignmentOffsetPercent = FULL_ALIGNMENT_PERCENT
 }

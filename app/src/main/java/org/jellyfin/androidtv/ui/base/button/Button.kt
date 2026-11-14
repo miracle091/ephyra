@@ -7,38 +7,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
-import org.jellyfin.androidtv.ui.base.JellyfinTheme
-
-object ButtonDefaults {
-	val Shape: Shape = CircleShape
-	val ContentPadding: PaddingValues = PaddingValues(horizontal = 16.dp, vertical = 10.dp)
-
-	@ReadOnlyComposable
-	@Composable
-	fun colors(
-		containerColor: Color = JellyfinTheme.colorScheme.button,
-		contentColor: Color = JellyfinTheme.colorScheme.onButton,
-		focusedContainerColor: Color = JellyfinTheme.colorScheme.buttonFocused,
-		focusedContentColor: Color = JellyfinTheme.colorScheme.onButtonFocused,
-		disabledContainerColor: Color = JellyfinTheme.colorScheme.buttonDisabled,
-		disabledContentColor: Color = JellyfinTheme.colorScheme.onButtonDisabled,
-	) = ButtonColors(
-		containerColor = containerColor,
-		contentColor = contentColor,
-		focusedContainerColor = focusedContainerColor,
-		focusedContentColor = focusedContentColor,
-		disabledContainerColor = disabledContainerColor,
-		disabledContentColor = disabledContentColor,
-	)
-}
 
 @Composable
 fun Button(

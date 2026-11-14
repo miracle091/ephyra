@@ -39,19 +39,19 @@ class Router(
 	// Route resolving
 
 	fun resolve(route: String): RouteComposable? = routes[route]
-	fun verifyRoute(route: String, parameters: RouteParameters = emptyMap()) = require(resolve(route) != null) { "Invalid route $route" }
+	fun verifyRoute(route: String) = require(resolve(route) != null) { "Invalid route $route" }
 
 	// Route manipulation
 
 	fun push(route: String, parameters: RouteParameters = emptyMap()) {
-		verifyRoute(route, parameters)
+		verifyRoute(route)
 
 		val context = RouteContext(route, parameters)
 		backStack.add(context)
 	}
 
 	fun replace(route: String, parameters: RouteParameters = emptyMap()) {
-		verifyRoute(route, parameters)
+		verifyRoute(route)
 
 		val context = RouteContext(route, parameters)
 		backStack.removeLastOrNull()
@@ -95,7 +95,8 @@ fun RouterContent(
 	fallbackRoute: String = "/",
 	transitionSpec: AnimatedContentTransitionScope<Scene<RouteContext>>.() -> ContentTransform = defaultTransitionSpec(),
 	popTransitionSpec: AnimatedContentTransitionScope<Scene<RouteContext>>.() -> ContentTransform = defaultPopTransitionSpec(),
-	predictivePopTransitionSpec: AnimatedContentTransitionScope<Scene<RouteContext>>.(@NavigationEvent.SwipeEdge Int) -> ContentTransform = { popTransitionSpec() },
+	predictivePopTransitionSpec: AnimatedContentTransitionScope<Scene<RouteContext>>.(@NavigationEvent.SwipeEdge Int) -> ContentTransform =
+		{ popTransitionSpec() },
 ) {
 	SharedTransitionLayout {
 		CompositionLocalProvider(LocalRouterTransitionScope provides this@SharedTransitionLayout) {

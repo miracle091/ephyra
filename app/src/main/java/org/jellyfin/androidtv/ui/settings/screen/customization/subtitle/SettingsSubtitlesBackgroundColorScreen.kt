@@ -48,7 +48,6 @@ fun SettingsSubtitlesBackgroundColorScreen() {
 		item {
 			SubtitleColorPresetsControl(
 				presets = SubtitleBackgroundColorPresets,
-				value = colorValue,
 				onValueChange = { subtitlesBackgroundColor = it.toArgb().toLong() }
 			)
 		}

@@ -36,7 +36,11 @@ import org.jellyfin.androidtv.ui.composable.item.cardFocusRing
 import org.jellyfin.androidtv.ui.itemhandling.GridButtonBaseRowItem
 
 // Ephyra: the design system's card overlay shade, rgba(5, 8, 20), as on the library cards
-private val BUTTON_SHADE = Color(0xFF050814)
+private val BUTTON_SHADE = Color(red = 5, green = 8, blue = 20)
+
+// Ephyra: where the shade starts and how opaque it is at the bottom, as on the other cards
+private const val SHADE_START = 0.4f
+private const val SHADE_END_ALPHA = 0.86f
 
 /**
  * Ephyra: a grid button (Guide, Recordings, Genres...) drawn as a wide library card: the `art-*` tone of its label with its icon
@@ -91,7 +95,12 @@ class GridButtonPresenter : Presenter() {
 				Box(
 					modifier = Modifier
 						.fillMaxSize()
-						.background(Brush.verticalGradient(0.4f to BUTTON_SHADE.copy(alpha = 0f), 1f to BUTTON_SHADE.copy(alpha = 0.86f))),
+						.background(
+							Brush.verticalGradient(
+								SHADE_START to BUTTON_SHADE.copy(alpha = 0f),
+								1f to BUTTON_SHADE.copy(alpha = SHADE_END_ALPHA),
+							),
+						),
 				)
 
 				Text(

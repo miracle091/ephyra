@@ -48,7 +48,6 @@ fun SettingsSubtitleTextStrokeColorScreen() {
 		item {
 			SubtitleColorPresetsControl(
 				presets = SubtitleTextStrokeColorPresets,
-				value = colorValue,
 				onValueChange = { subtitleTextStrokeColor = it.toArgb().toLong() }
 			)
 		}

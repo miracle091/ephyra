@@ -59,10 +59,10 @@ class TimedEventState {
 	}
 
 	fun onSeek(from: Duration, to: Duration, duration: Duration) {
-		for ((timedEvent) in _currentEvents) {
-			if (timedEvent !is TimedEvent.Block) continue
-			val eventStart = timedEvent.start.withMediaDuration(duration) ?: continue
-			val eventEnd = timedEvent.end.withMediaDuration(duration) ?: continue
+		for (timedEvent in _currentEvents.asSequence().map { it.first }.filterIsInstance<TimedEvent.Block>()) {
+			val eventStart = timedEvent.start.withMediaDuration(duration)
+			val eventEnd = timedEvent.end.withMediaDuration(duration)
+			if (eventStart == null || eventEnd == null) continue
 
 			val wasInBlock = from in eventStart..eventEnd
 			val isInBlock = to in eventStart..eventEnd

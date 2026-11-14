@@ -31,4 +31,7 @@ abstract class BaseRowItem protected constructor(
 		if (other is BaseRowItem) return other.itemId == itemId
 		return super.equals(other)
 	}
+
+	// Matches equals(): rows compare by item ID (a null ID hashes to 0, as two null IDs are equal)
+	override fun hashCode(): Int = itemId.hashCode()
 }

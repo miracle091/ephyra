@@ -1,10 +1,6 @@
 package org.jellyfin.androidtv.ui.composable.modifier
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.BlendMode
@@ -12,7 +8,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
@@ -95,21 +90,3 @@ fun Modifier.fadingEdges(
 			}
 		}
 )
-
-@Preview
-@Composable
-private fun FadingEdgePreview() {
-	Box(
-		modifier = Modifier
-			.size(100.dp)
-			.background(Color.Red)
-	) {
-		Box(
-			modifier = Modifier
-				.size(50.dp)
-				.fadingEdges(10.dp, 0.dp, 25.dp, 3.dp)
-				.background(Color.Blue)
-				.align(Alignment.Center)
-		) { }
-	}
-}

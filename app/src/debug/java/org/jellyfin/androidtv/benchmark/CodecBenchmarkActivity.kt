@@ -24,8 +24,6 @@ import org.jellyfin.androidtv.preference.UserPreferences
 import org.jellyfin.androidtv.util.profile.createDeviceProfile
 import org.jellyfin.sdk.api.client.ApiClient
 import org.jellyfin.sdk.api.client.extensions.systemApi
-import org.jellyfin.sdk.model.ServerVersion
-import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import timber.log.Timber
 
@@ -124,7 +122,7 @@ class CodecBenchmarkActivity : FragmentActivity() {
 	private suspend fun runServerPass(): List<ServerResult>? {
 		if (api.accessToken == null) return null
 		return try {
-			val profile = createDeviceProfile(this, userPreferences, get<ServerVersion>())
+			val profile = createDeviceProfile(this, userPreferences)
 			ServerBenchmark(api, profile).run(benchmarkClips)
 		} catch (error: CancellationException) {
 			throw error

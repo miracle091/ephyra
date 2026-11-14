@@ -97,10 +97,21 @@ fun rememberSpeechRecognizer(
 
 			// Unused callbacks
 
-			override fun onBufferReceived(buffer: ByteArray?) {}
-			override fun onEndOfSpeech() {}
-			override fun onEvent(eventType: Int, params: Bundle?) {}
-			override fun onRmsChanged(rmsdB: Float) {}
+			override fun onBufferReceived(buffer: ByteArray?) {
+				// Intentionally empty
+			}
+
+			override fun onEndOfSpeech() {
+				// Intentionally empty
+			}
+
+			override fun onEvent(eventType: Int, params: Bundle?) {
+				// Intentionally empty
+			}
+
+			override fun onRmsChanged(rmsdB: Float) {
+				// Intentionally empty
+			}
 		}
 
 		speechRecognizer.setRecognitionListener(listener)

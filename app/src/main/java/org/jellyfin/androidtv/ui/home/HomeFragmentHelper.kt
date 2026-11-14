@@ -35,7 +35,9 @@ class HomeFragmentHelper(
 			excludeItemTypes = setOf(BaseItemKind.AUDIO_BOOK),
 		)
 
-		return HomeFragmentBrowseRowDefRow(BrowseRowDef(title, query, 0, false, true, arrayOf(ChangeTriggerType.TvPlayback, ChangeTriggerType.MoviePlayback)))
+		return HomeFragmentBrowseRowDefRow(
+			BrowseRowDef(title, query, 0, false, true, arrayOf(ChangeTriggerType.TvPlayback, ChangeTriggerType.MoviePlayback))
+		)
 	}
 
 	fun loadResumeVideo(): HomeFragmentRow {

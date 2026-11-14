@@ -7,7 +7,7 @@ import org.jellyfin.androidtv.preference.constant.RefreshRateSwitchingBehavior
 
 class DisplayModeScoringTest : FunSpec({
 	fun difference(behavior: RefreshRateSwitchingBehavior, modeWidth: Int, modeHeight: Int) =
-		displayModeResolutionDifference(behavior, modeWidth, modeHeight, 3840, 2160, 1920)
+		displayModeResolutionDifference(behavior, DisplaySize(modeWidth, modeHeight), DisplaySize(3840, 2160), 1920)
 
 	test("SCALE_ON_DEVICE scores the native resolution 0") {
 		difference(RefreshRateSwitchingBehavior.SCALE_ON_DEVICE, 3840, 2160) shouldBe 0
@@ -32,7 +32,7 @@ class DisplayModeScoringTest : FunSpec({
 	test("SCALE_ON_DEVICE prefers the non-native width closest to the video when the native mode is out") {
 		// Native 1080p, 4K media: the native mode is excluded upstream of the scoring
 		fun score(modeWidth: Int) = displayModeResolutionDifference(
-			RefreshRateSwitchingBehavior.SCALE_ON_DEVICE, modeWidth, 2160, 1920, 1080, 3840,
+			RefreshRateSwitchingBehavior.SCALE_ON_DEVICE, DisplaySize(modeWidth, 2160), DisplaySize(1920, 1080), 3840,
 		)
 		score(4096) shouldBeGreaterThan score(3840)
 	}

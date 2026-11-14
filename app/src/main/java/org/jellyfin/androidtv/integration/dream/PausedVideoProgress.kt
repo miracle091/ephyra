@@ -22,11 +22,15 @@ fun pausedVideoProgress(positionMs: Long, durationMs: Long, now: LocalTime): Pau
 	)
 }
 
+private const val MS_PER_SECOND = 1000
+private const val SECONDS_PER_MINUTE = 60
+private const val SECONDS_PER_HOUR = 3600
+
 /** A playback time as the player shows it: 4:05, 24:20 or 1:02:03. */
 fun formatPlaybackTime(ms: Long): String {
-	val totalSeconds = ms.coerceAtLeast(0) / 1000
-	val hours = totalSeconds / 3600
-	val minutes = totalSeconds % 3600 / 60
-	val seconds = totalSeconds % 60
+	val totalSeconds = ms.coerceAtLeast(0) / MS_PER_SECOND
+	val hours = totalSeconds / SECONDS_PER_HOUR
+	val minutes = totalSeconds % SECONDS_PER_HOUR / SECONDS_PER_MINUTE
+	val seconds = totalSeconds % SECONDS_PER_MINUTE
 	return if (hours > 0) "%d:%02d:%02d".format(hours, minutes, seconds) else "%d:%02d".format(minutes, seconds)
 }

@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -127,80 +128,118 @@ private fun BoxScope.SettingsTwoPane() {
 			.fillMaxSize()
 			.background(palette.bg),
 	) {
-		// Left pane: title and sections
-		Column(
-			modifier = Modifier
-				.width(SettingsLeftPaneWidth)
-				.fillMaxHeight()
-				.padding(start = 32.dp, top = 27.dp, end = 24.dp, bottom = 27.dp),
-			verticalArrangement = Arrangement.spacedBy(16.dp),
-		) {
-			Text(
-				text = stringResource(R.string.settings),
-				color = palette.ink,
-				fontSize = 28.sp,
-				lineHeight = 34.sp,
-				fontWeight = FontWeight.Bold,
-			)
+		SettingsLeftPane(
+			selected = selected,
+			sectionRequesters = sectionRequesters,
+			onSelected = { selected = it },
+			enterRightPane = enterRightPane,
+		)
 
-			LazyColumn(
-				modifier = Modifier
-					// The rows have 12dp of inner padding, shift them so their text lines up with the title
-					.offset(x = (-12).dp)
-					.onPreviewKeyEvent { event ->
-						if (event.key == Key.DirectionRight) {
-							if (event.type == KeyEventType.KeyDown) enterRightPane()
-							true
-						} else {
-							false
-						}
+		SettingsRightPane(
+			selected = selected,
+			sectionRequesters = sectionRequesters,
+			entryAnchor = entryAnchor,
+			isEntryAnchorOpen = { entryAnchorOpen },
+			rightHasFocus = rightHasFocus,
+			onRightFocusChanged = { rightHasFocus = it },
+		)
+	}
+}
+
+/** Left pane: title and sections. */
+@Composable
+private fun SettingsLeftPane(
+	selected: String,
+	sectionRequesters: Map<String, FocusRequester>,
+	onSelected: (String) -> Unit,
+	enterRightPane: () -> Unit,
+) {
+	val palette = LocalEphyraPalette.current
+
+	Column(
+		modifier = Modifier
+			.width(SettingsLeftPaneWidth)
+			.fillMaxHeight()
+			.padding(start = 32.dp, top = 27.dp, end = 24.dp, bottom = 27.dp),
+		verticalArrangement = Arrangement.spacedBy(16.dp),
+	) {
+		Text(
+			text = stringResource(R.string.settings),
+			color = palette.ink,
+			fontSize = 28.sp,
+			lineHeight = 34.sp,
+			fontWeight = FontWeight.Bold,
+		)
+
+		LazyColumn(
+			modifier = Modifier
+				// The rows have 12dp of inner padding, shift them so their text lines up with the title
+				.offset(x = (-12).dp)
+				.onPreviewKeyEvent { event ->
+					if (event.key == Key.DirectionRight) {
+						if (event.type == KeyEventType.KeyDown) enterRightPane()
+						true
+					} else {
+						false
 					}
-					.focusRestorer(),
-				verticalArrangement = Arrangement.spacedBy(Tokens.Space.space2xs),
-				contentPadding = PaddingValues(vertical = 4.dp),
-			) {
-				items(sections, key = { it.route }) { section ->
-					SectionButton(
-						section = section,
-						selected = section.route == selected,
-						focusRequester = sectionRequesters.getValue(section.route),
-						onFocused = { selected = section.route },
-						onClick = enterRightPane,
-					)
 				}
+				.focusRestorer(),
+			verticalArrangement = Arrangement.spacedBy(Tokens.Space.space2xs),
+			contentPadding = PaddingValues(vertical = 4.dp),
+		) {
+			items(sections, key = { it.route }) { section ->
+				SectionButton(
+					section = section,
+					selected = section.route == selected,
+					focusRequester = sectionRequesters.getValue(section.route),
+					onFocused = { onSelected(section.route) },
+					onClick = enterRightPane,
+				)
 			}
 		}
+	}
+}
 
-		// Right pane: the selected section, with its own router for the sub-screens
-		Box(
-			modifier = Modifier
-				.weight(1f)
-				.fillMaxHeight()
-				.background(palette.surface1)
-				.clipToBounds()
-				.padding(SettingsRightPanePadding)
-				.onFocusChanged { rightHasFocus = it.hasFocus }
-				.focusGroup(),
-		) {
-			Spacer(
-				Modifier
-					.fillMaxWidth()
-					.height(0.dp)
-					.focusProperties { canFocus = entryAnchorOpen }
-					.focusRequester(entryAnchor)
-					.focusable()
-			)
+/** Right pane: the selected section, with its own router for the sub-screens. */
+@Composable
+private fun RowScope.SettingsRightPane(
+	selected: String,
+	sectionRequesters: Map<String, FocusRequester>,
+	entryAnchor: FocusRequester,
+	isEntryAnchorOpen: () -> Boolean,
+	rightHasFocus: Boolean,
+	onRightFocusChanged: (Boolean) -> Unit,
+) {
+	val palette = LocalEphyraPalette.current
 
-			key(selected) {
-				ProvideRouter(routes, selected) {
-					val router = LocalRouter.current
-					// BACK on the root of a section returns to the section that is open, deeper screens are popped by the router
-					BackHandler(enabled = rightHasFocus && router.backStack.size <= 1) {
-						sectionRequesters[selected]?.requestFocus()
-					}
+	Box(
+		modifier = Modifier
+			.weight(1f)
+			.fillMaxHeight()
+			.background(palette.surface1)
+			.clipToBounds()
+			.padding(SettingsRightPanePadding)
+			.onFocusChanged { onRightFocusChanged(it.hasFocus) }
+			.focusGroup(),
+	) {
+		Spacer(
+			Modifier
+				.fillMaxWidth()
+				.height(0.dp)
+				.focusProperties { canFocus = isEntryAnchorOpen() }
+				.focusRequester(entryAnchor)
+				.focusable()
+		)
 
-					SettingsRouterContent()
+		key(selected) {
+			ProvideRouter(routes, selected) {
+				val router = LocalRouter.current
+				// BACK on the root of a section returns to the section that is open, deeper screens are popped by the router
+				BackHandler(enabled = rightHasFocus && router.backStack.size <= 1) {
+					sectionRequesters[selected]?.requestFocus()
 				}
+
+				SettingsRouterContent()
 			}
 		}
 	}

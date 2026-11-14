@@ -1,3 +1,6 @@
+// Design tokens: every literal is a named token value.
+@file:Suppress("MagicNumber")
+
 package org.jellyfin.androidtv.ui.base
 
 import androidx.compose.runtime.Immutable

@@ -35,6 +35,10 @@ private const val CLOCK_DRIFT_MS = 4_000
 // How far the clock wanders from the centre, against burn-in on OLED and plasma screens
 private const val CLOCK_DRIFT_X_DP = 120
 private const val CLOCK_DRIFT_Y_DP = 60
+private const val CLOCK_DRIFT_X_STRIDE = 3
+private const val CLOCK_DRIFT_X_POINTS = 8
+private const val CLOCK_DRIFT_Y_STRIDE = 5
+private const val CLOCK_DRIFT_Y_POINTS = 12
 
 /**
  * Ephyra: where the clock sits at the given minute, as an offset from the centre in dp. It walks a fixed loop of points spread
@@ -42,9 +46,15 @@ private const val CLOCK_DRIFT_Y_DP = 60
  */
 fun clockDriftOffset(step: Int): Pair<Int, Int> {
 	// Steps of 3/8 and 5/12 of the way on each axis: 24 different points (24 minutes) before the loop repeats
-	val x = CLOCK_DRIFT_X_DP * (((step * 3) % 8) - 3.5f) / 3.5f
-	val y = CLOCK_DRIFT_Y_DP * (((step * 5) % 12) - 5.5f) / 5.5f
+	val x = driftOnAxis(step, CLOCK_DRIFT_X_DP, stride = CLOCK_DRIFT_X_STRIDE, points = CLOCK_DRIFT_X_POINTS)
+	val y = driftOnAxis(step, CLOCK_DRIFT_Y_DP, stride = CLOCK_DRIFT_Y_STRIDE, points = CLOCK_DRIFT_Y_POINTS)
 	return x.toInt() to y.toInt()
+}
+
+/** One axis of the drift: [points] positions spread evenly between -[amplitude] and +[amplitude], visited [stride] at a time. */
+private fun driftOnAxis(step: Int, amplitude: Int, stride: Int, points: Int): Float {
+	val half = (points - 1) / 2f
+	return amplitude * (((step * stride) % points) - half) / half
 }
 
 /** Ephyra: the screensaver: the theme's background with a large clock and the date, moving slowly. */

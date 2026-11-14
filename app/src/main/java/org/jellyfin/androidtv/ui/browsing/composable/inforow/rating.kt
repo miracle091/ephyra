@@ -8,6 +8,7 @@ import androidx.compose.ui.res.vectorResource
 import org.jellyfin.androidtv.R
 import org.jellyfin.androidtv.ui.base.Text
 import java.text.NumberFormat
+import java.util.Locale
 
 /**
  * A community rating item in the [BaseItemInfoRow].
@@ -21,7 +22,7 @@ fun InfoRowCommunityRating(communityRating: Float) {
 		iconTint = Color(0xFFEECE55),
 		contentDescription = stringResource(R.string.lbl_community_rating),
 	) {
-		Text(String.format("%.1f", communityRating * 10f))
+		Text(String.format(Locale.getDefault(), "%.1f", communityRating * 10f))
 	}
 }
 

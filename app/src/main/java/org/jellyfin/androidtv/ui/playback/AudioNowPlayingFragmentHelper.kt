@@ -3,6 +3,7 @@ package org.jellyfin.androidtv.ui.playback
 import android.widget.ImageView
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -21,6 +22,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.withFrameNanos
@@ -87,6 +89,25 @@ private const val BACKDROP_PULSE_SMOOTHING = 0.18f
 private const val BACKDROP_PULSE_SCALE = 0.15f
 private const val BACKDROP_PULSE_SCRIM_LIFT = 0.35f
 
+/** Ephyra: the loudness of the playing music, smoothed, 0 to 1; it eases back to 0 when playback is not running. */
+@Composable
+private fun rememberBackdropPulse(playbackManager: PlaybackManager): Animatable<Float, AnimationVector1D> {
+	val playState by remember { playbackManager.state.playState }.collectAsState()
+	val pulse = remember { Animatable(0f) }
+	LaunchedEffect(playState) {
+		if (playState != PlayState.PLAYING) {
+			pulse.animateTo(0f)
+			return@LaunchedEffect
+		}
+		while (isActive) {
+			withFrameNanos { }
+			val target = (AudioLevel.level.value * BACKDROP_PULSE_GAIN).coerceIn(0f, 1f)
+			pulse.snapTo(pulse.value + (target - pulse.value) * BACKDROP_PULSE_SMOOTHING)
+		}
+	}
+	return pulse
+}
+
 /**
  * Ephyra: the player's moving backdrop, the cover's blurhash (already a soft blur, also on Android 11 where Compose can't blur)
  * slowly zooming and drifting under the theme's scrim and a gradient into the background colour. While music plays it breathes
@@ -118,19 +139,7 @@ fun initializeBackdropView(
 				label = "backdropDrift",
 			)
 
-			val playState by remember { playbackManager.state.playState }.collectAsState()
-			val pulse = remember { Animatable(0f) }
-			LaunchedEffect(playState) {
-				if (playState != PlayState.PLAYING) {
-					pulse.animateTo(0f)
-					return@LaunchedEffect
-				}
-				while (isActive) {
-					withFrameNanos { }
-					val target = (AudioLevel.level.value * BACKDROP_PULSE_GAIN).coerceIn(0f, 1f)
-					pulse.snapTo(pulse.value + (target - pulse.value) * BACKDROP_PULSE_SMOOTHING)
-				}
-			}
+			val pulse = rememberBackdropPulse(playbackManager)
 
 			Box(Modifier.fillMaxSize()) {
 				AnimatedContent(cover?.blurHash, transitionSpec = { fadeIn() togetherWith fadeOut() }, label = "backdropCover") { blurHash ->

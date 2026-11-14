@@ -18,9 +18,10 @@ fun MediaInfo.getTracks() =
 fun MediaStream.getMediaStreamTrack() = when (type) {
 	MediaStreamType.AUDIO -> getAudioTrack(this)
 	MediaStreamType.VIDEO -> getVideoTrack(this)
-	MediaStreamType.SUBTITLE -> getSubtitleTrack(this)
 
 	// Ignore other track types
+	// TODO Implement Subtitle track type
+	MediaStreamType.SUBTITLE,
 	MediaStreamType.EMBEDDED_IMAGE,
 	MediaStreamType.DATA,
 	MediaStreamType.LYRIC -> null
@@ -42,6 +43,3 @@ private fun getVideoTrack(stream: MediaStream) = MediaStreamVideoTrack(
 	height = stream.height ?: 0,
 	videoRange = stream.videoRangeType.name,
 )
-
-// TODO Implement Subtitle track type
-private fun getSubtitleTrack(stream: MediaStream) = null

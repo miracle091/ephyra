@@ -76,7 +76,6 @@ class PlaybackManager(
 
 	fun changeVideoStream(
 		lifecycleOwner: LifecycleOwner,
-		stream: StreamInfo,
 		options: VideoOptions,
 		startTimeTicks: Long,
 		callback: Response<StreamInfo>

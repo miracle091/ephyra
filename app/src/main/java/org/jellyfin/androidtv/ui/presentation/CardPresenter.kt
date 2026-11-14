@@ -62,10 +62,18 @@ import org.jellyfin.sdk.model.api.BaseItemKind
 import org.koin.compose.koinInject
 
 // Ephyra: the design system's card overlay shade, rgba(5, 8, 20)
-private val CARD_SHADE = Color(0xFF050814)
+private val CARD_SHADE = Color(red = 5, green = 8, blue = 20)
 
 // Ephyra: a landscape card is 130dp tall where a portrait one is 150dp
 private const val LANDSCAPE_HEIGHT_RATIO = 130f / 150f
+private const val DEFAULT_CARD_HEIGHT_DP = 150
+
+// Ephyra: aspect ratios below this are treated as missing
+private const val MIN_ASPECT_RATIO = 0.1f
+
+// Ephyra: where the card overlay shade starts and how opaque it is at the bottom
+private const val SHADE_START = 0.4f
+private const val SHADE_END_ALPHA = 0.86f
 
 class CardPresenter(
 	val showInfo: Boolean,
@@ -75,7 +83,7 @@ class CardPresenter(
 ) : Presenter() {
 	constructor(showInfo: Boolean, imageType: ImageType, staticHeight: Int) : this(showInfo, imageType, staticHeight, false)
 	constructor(showInfo: Boolean, staticHeight: Int) : this(showInfo, ImageType.POSTER, staticHeight)
-	constructor(showInfo: Boolean) : this(showInfo, 150)
+	constructor(showInfo: Boolean) : this(showInfo, DEFAULT_CARD_HEIGHT_DP)
 	constructor() : this(true)
 
 	/** Ephyra: episodes show their meta line (runtime, rating, end time) under the title instead of their season and number. */
@@ -160,11 +168,13 @@ private fun BaseRowItem.getDisplayConfig(imageType: ImageType, uniformAspect: Bo
 	BaseRowType.BaseItem -> {
 		val preferSeriesPoster = this is BaseItemDtoBaseRowItem && preferSeriesPoster
 		val primaryAspectRatio = baseItem?.primaryImageAspectRatio?.toFloat()
+		val aspectRatio16x9 = ImageHelper.ASPECT_RATIO_16_9.toFloat()
 		val defaultAspectRatio = when {
-			preferParentThumb && (baseItem?.parentThumbItemId != null || baseItem?.seriesThumbImageTag != null) -> ImageHelper.ASPECT_RATIO_16_9.toFloat()
+			preferParentThumb && (baseItem?.parentThumbItemId != null || baseItem?.seriesThumbImageTag != null) -> aspectRatio16x9
 			baseItem?.type == BaseItemKind.EPISODE && primaryAspectRatio != null -> primaryAspectRatio
-			baseItem?.type == BaseItemKind.EPISODE && (baseItem.parentThumbItemId != null || baseItem.seriesThumbImageTag != null) -> ImageHelper.ASPECT_RATIO_16_9.toFloat()
-			baseItem?.type == BaseItemKind.USER_VIEW -> ImageHelper.ASPECT_RATIO_16_9.toFloat()
+			baseItem?.type == BaseItemKind.EPISODE && (baseItem.parentThumbItemId != null || baseItem.seriesThumbImageTag != null) ->
+				aspectRatio16x9
+			baseItem?.type == BaseItemKind.USER_VIEW -> aspectRatio16x9
 			else -> primaryAspectRatio ?: ImageHelper.ASPECT_RATIO_7_9.toFloat()
 		}
 
@@ -322,8 +332,8 @@ private fun CardViewHolderContent(
 	if (item == null || displayConfig == null) return
 
 	val image = displayConfig.image
-	val aspectRatio = displayConfig.aspectRatio.takeIf { it >= 0.1f }
-		?: image?.aspectRatio?.takeIf { it >= 0.1f } ?: 1f
+	val aspectRatio = displayConfig.aspectRatio.takeIf { it >= MIN_ASPECT_RATIO }
+		?: image?.aspectRatio?.takeIf { it >= MIN_ASPECT_RATIO } ?: 1f
 
 	val fixedHeight = cardHeight?.dp?.let { if (aspectRatio > 1f) it * LANDSCAPE_HEIGHT_RATIO else it }
 	val size = when (item.staticHeight) {
@@ -378,7 +388,7 @@ private fun CardViewHolderContent(
 					Box(
 						modifier = Modifier
 							.fillMaxSize()
-							.background(Brush.verticalGradient(0.4f to CARD_SHADE.copy(alpha = 0f), 1f to CARD_SHADE.copy(alpha = 0.86f))),
+							.background(Brush.verticalGradient(SHADE_START to CARD_SHADE.copy(alpha = 0f), 1f to CARD_SHADE.copy(alpha = SHADE_END_ALPHA))),
 					)
 				}
 				item.baseItem?.let { baseItem ->

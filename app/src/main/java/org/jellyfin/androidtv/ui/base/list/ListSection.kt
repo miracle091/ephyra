@@ -29,7 +29,11 @@ fun ListSection(
 ) {
 	val colors = JellyfinTheme.colorScheme
 	val isGroup = overlineContent == null && captionContent == null
-	val headingStyle = if (isGroup) GroupHeading.copy(color = LocalEphyraPalette.current.inkFaint) else SectionHeading.copy(color = colors.listHeader)
+	val headingStyle = if (isGroup) {
+		GroupHeading.copy(color = LocalEphyraPalette.current.inkFaint)
+	} else {
+		SectionHeading.copy(color = colors.listHeader)
+	}
 	ListItemContent(
 		headingContent = headingContent,
 		overlineContent = overlineContent?.let { content ->

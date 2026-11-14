@@ -262,11 +262,10 @@ class SdkPlaybackHelper(
 			)
 
 			val episodes = response.items
-			val first = episodes.firstOrNull() ?: continue
-			val isSameEpisode = first.id == mainItem.id || first.mediaSources.orEmpty().any { it.id?.toUUIDOrNull() == mainItem.id }
-			if (!isSameEpisode) continue
-
-			return listOf(mainItem) + episodes.drop(1)
+			val first = episodes.firstOrNull()
+			val isSameEpisode = first != null &&
+				(first.id == mainItem.id || first.mediaSources.orEmpty().any { it.id?.toUUIDOrNull() == mainItem.id })
+			if (isSameEpisode) return listOf(mainItem) + episodes.drop(1)
 		}
 
 		return listOf(mainItem)

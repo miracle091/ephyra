@@ -24,7 +24,6 @@ private fun profile(
 	dtsEnabled: Boolean = false,
 	dolbyEnabled: Boolean = false,
 	trueHdEnabled: Boolean = false,
-	doviElSupported: Boolean = false,
 	displaySupportsDolbyVision: Boolean = true,
 	unreportedDoviProfile7Support: Boolean = false,
 	forceEnabledHdr: Set<VideoRangeType> = emptySet(),
@@ -38,7 +37,7 @@ private fun profile(
 		every { supportsHevcMain10() } returns true
 		every { supportsHevcHDR10() } returns true
 		every { supportsHevcDolbyVision() } returns true
-		every { supportsHevcDolbyVisionEL() } returns doviElSupported
+		every { supportsHevcDolbyVisionEL() } returns false
 		every { getMaxResolution(any()) } returns size
 	}
 

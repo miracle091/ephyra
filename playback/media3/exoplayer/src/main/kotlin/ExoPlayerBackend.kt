@@ -140,7 +140,8 @@ class ExoPlayerBackend(
 			exoPlayerOptions.minBufferDuration?.inWholeMilliseconds?.toInt() ?: DefaultLoadControl.DEFAULT_MIN_BUFFER_MS,
 			exoPlayerOptions.maxBufferDuration?.inWholeMilliseconds?.toInt() ?: DefaultLoadControl.DEFAULT_MAX_BUFFER_MS,
 			exoPlayerOptions.bufferForPlaybackDuration?.inWholeMilliseconds?.toInt() ?: DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_MS,
-			exoPlayerOptions.bufferForPlaybackAfterRebufferDuration?.inWholeMilliseconds?.toInt() ?: DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS,
+			exoPlayerOptions.bufferForPlaybackAfterRebufferDuration?.inWholeMilliseconds?.toInt()
+				?: DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS,
 		)
 
 		ExoPlayer.Builder(context)
@@ -243,32 +244,41 @@ class ExoPlayerBackend(
 	 */
 	private fun selectServerAudioTrack(tracks: Tracks) {
 		val stream = currentStream ?: return
-		if (stream.conversionMethod != MediaConversionMethod.None || audioSelectionDone == stream) return
-		// Tracks of another (prepared) item must not be matched against this stream
-		if (exoPlayer.currentMediaItem?.mediaId != stream.hashCode().toString()) return
+		// The media id check: tracks of another (prepared) item must not be matched against this stream
+		if (
+			stream.conversionMethod != MediaConversionMethod.None ||
+			audioSelectionDone == stream ||
+			exoPlayer.currentMediaItem?.mediaId != stream.hashCode().toString()
+		) return
 
 		val audioGroups = tracks.groups.filter { it.type == C.TRACK_TYPE_AUDIO }
 		if (audioGroups.isEmpty()) return
 		audioSelectionDone = stream
 
 		val wantedIndex = stream.defaultAudioStreamIndex ?: return
-		val position = findAudioGroupPosition(stream.tracks, wantedIndex, audioGroups.size)
-		if (position == null) {
-			Timber.w("Cannot map server audio stream $wantedIndex to a player track (${audioGroups.size} player audio tracks)")
-			return
-		}
-
+		val position = findSupportedAudioGroupPosition(stream, wantedIndex, audioGroups) ?: return
 		val group = audioGroups[position]
-		if (!group.isSupported) {
-			Timber.w("Server audio stream $wantedIndex is not supported by the player, keeping its own choice")
-			return
-		}
 		if (group.isSelected) return
 
 		Timber.i("Selecting audio track $position for server audio stream $wantedIndex")
 		exoPlayer.trackSelectionParameters = exoPlayer.trackSelectionParameters.buildUpon()
 			.setOverrideForType(TrackSelectionOverride(group.mediaTrackGroup, 0))
 			.build()
+	}
+
+	/** The position in [audioGroups] of the player track for the server audio stream [wantedIndex], or null (logged) if there is none. */
+	private fun findSupportedAudioGroupPosition(stream: PlayableMediaStream, wantedIndex: Int, audioGroups: List<Tracks.Group>): Int? {
+		val position = findAudioGroupPosition(stream.tracks, wantedIndex, audioGroups.size)
+		if (position == null) {
+			Timber.w("Cannot map server audio stream $wantedIndex to a player track (${audioGroups.size} player audio tracks)")
+			return null
+		}
+
+		if (!audioGroups[position].isSupported) {
+			Timber.w("Server audio stream $wantedIndex is not supported by the player, keeping its own choice")
+			return null
+		}
+		return position
 	}
 
 	override fun supportsStream(

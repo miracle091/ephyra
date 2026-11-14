@@ -33,7 +33,6 @@ import org.jellyfin.androidtv.util.profile.DeviceProfileKt;
 import org.jellyfin.androidtv.util.sdk.compat.JavaCompat;
 import org.jellyfin.playback.jellyfin.mediastream.BluRayTransportStream;
 import org.jellyfin.sdk.api.client.ApiClient;
-import org.jellyfin.sdk.model.ServerVersion;
 import org.jellyfin.sdk.model.api.BaseItemDto;
 import org.jellyfin.sdk.model.api.BaseItemKind;
 import org.jellyfin.sdk.model.api.DeviceProfile;
@@ -427,8 +426,8 @@ public class PlaybackController implements PlaybackControllerNotifiable {
             // (upstream #5893), SCALE_ON_TV ranks by distance from the media resolution
             int resolutionDifference = DisplayModeScoringKt.displayModeResolutionDifference(
                     refreshRateSwitchingBehavior,
-                    mode.getPhysicalWidth(), mode.getPhysicalHeight(),
-                    defaultMode.getPhysicalWidth(), defaultMode.getPhysicalHeight(),
+                    new DisplaySize(mode.getPhysicalWidth(), mode.getPhysicalHeight()),
+                    new DisplaySize(defaultMode.getPhysicalWidth(), defaultMode.getPhysicalHeight()),
                     videoStream.getWidth());
             int refreshRateDifference = rate - sourceRate;
 
@@ -641,7 +640,7 @@ public class PlaybackController implements PlaybackControllerNotifiable {
             internalOptions.setAudioStreamIndex(restartAudioIndex);
         } else if (forcedAudioLanguage != null) {
             // Ephyra: the audio stream matching the language (and title/codec) of the last played track
-            Integer matchingIndex = TrackMatchingKt.preferredAudioIndex(videoQueueManager.getValue(), currentMediaSource.getMediaStreams());
+            Integer matchingIndex = TrackInfoKt.preferredAudioIndex(videoQueueManager.getValue(), currentMediaSource.getMediaStreams());
             if (matchingIndex != null) internalOptions.setAudioStreamIndex(matchingIndex);
         }
         // Ephyra: tracks picked on the details screen
@@ -651,8 +650,7 @@ public class PlaybackController implements PlaybackControllerNotifiable {
         }
         DeviceProfile internalProfile = DeviceProfileKt.createDeviceProfile(
                 mFragment.getContext(),
-                userPreferences.getValue(),
-                get(ServerVersion.class)
+                userPreferences.getValue()
         );
         internalOptions.setProfile(internalProfile);
         return internalOptions;
@@ -774,9 +772,9 @@ public class PlaybackController implements PlaybackControllerNotifiable {
             } else if (response.getMediaSource().getMediaStreams() != null) {
                 // Find subtitle stream matching saved language, keeping the requested stream if it matches
                 // (e.g. when playback restarts to switch between baked and non-baked subtitles)
-                // Ephyra: the exact track of the last episode wins among the tracks of that language (TrackMatching.kt)
+                // Ephyra: the exact track of the last episode wins among the tracks of that language (TrackInfo.kt)
                 Integer requestedIndex = mCurrentOptions.getSubtitleStreamIndex();
-                mCurrentOptions.setSubtitleStreamIndex(TrackMatchingKt.preferredSubtitleIndex(
+                mCurrentOptions.setSubtitleStreamIndex(TrackInfoKt.preferredSubtitleIndex(
                         videoQueueManager.getValue(), response.getMediaSource().getMediaStreams(), requestedIndex));
             }
         } else {
@@ -880,8 +878,8 @@ public class PlaybackController implements PlaybackControllerNotifiable {
         if (info == null)
             return null;
 
-        // Ephyra: language first, then the title/codec of the last played track (TrackMatching.kt)
-        return TrackMatchingKt.preferredAudioIndex(videoQueueManager.getValue(), info.getMediaStreams());
+        // Ephyra: language first, then the title/codec of the last played track (TrackInfo.kt)
+        return TrackInfoKt.preferredAudioIndex(videoQueueManager.getValue(), info.getMediaStreams());
     }
 
     // Ephyra: audio track to keep when the stream of the current item is rebuilt (see startItem)
@@ -1146,7 +1144,7 @@ public class PlaybackController implements PlaybackControllerNotifiable {
             mVideoManager.stopPlayback();
             mPlaybackState = PlaybackState.BUFFERING;
 
-            playbackManager.getValue().changeVideoStream(mFragment, mCurrentStreamInfo, mCurrentOptions, pos * 10000, new Response<StreamInfo>(mFragment.getLifecycle()) {
+            playbackManager.getValue().changeVideoStream(mFragment, mCurrentOptions, pos * 10000, new Response<StreamInfo>(mFragment.getLifecycle()) {
                 @Override
                 public void onResponse(StreamInfo response) {
                     if (!isActive()) return;

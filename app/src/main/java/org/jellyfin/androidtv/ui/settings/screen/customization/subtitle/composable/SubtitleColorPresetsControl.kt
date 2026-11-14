@@ -27,7 +27,6 @@ import org.jellyfin.design.Tokens
 @Composable
 fun SubtitleColorPresetsControl(
 	presets: Collection<Color>,
-	value: Color,
 	onValueChange: (color: Color) -> Unit,
 ) {
 	Row(

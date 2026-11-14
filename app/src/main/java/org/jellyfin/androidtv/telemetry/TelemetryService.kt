@@ -46,8 +46,8 @@ object TelemetryService {
 		}
 	}
 
-	class AcraPluginLoader(vararg plugins: Class<out Plugin>) : PluginLoader {
-		private val simplePluginLoader = SimplePluginLoader(*plugins)
+	class AcraPluginLoader(plugin: Class<out Plugin>) : PluginLoader {
+		private val simplePluginLoader = SimplePluginLoader(plugin)
 		private val servicePluginLoader = ServicePluginLoader()
 
 		override fun <T : Plugin> load(clazz: Class<T>): List<T> =

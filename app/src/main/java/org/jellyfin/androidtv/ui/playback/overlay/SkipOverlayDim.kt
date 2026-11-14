@@ -14,8 +14,14 @@ import org.jellyfin.androidtv.ui.playback.segment.MediaSegmentRepository
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
+private const val SKIP_HIDE_5_S = 5
+private const val SKIP_HIDE_10_S = 10
+private const val SKIP_HIDE_15_S = 15
+private const val SKIP_HIDE_20_S = 20
+private const val SKIP_HIDE_30_S = 30
+
 /** Ephyra: the choices for how long the skip button stays on screen, in seconds; 0 keeps it until the segment ends. */
-val SkipAutoHideChoices = listOf(5, 10, 15, 20, 30, 0)
+val SkipAutoHideChoices = listOf(SKIP_HIDE_5_S, SKIP_HIDE_10_S, SKIP_HIDE_15_S, SKIP_HIDE_20_S, SKIP_HIDE_30_S, 0)
 
 /** Ephyra: how long the skip button stays on screen before it hides by itself, or null to keep it until the segment ends. */
 fun skipAutoHideDelay(seconds: Int): Duration? = if (seconds > 0) seconds.seconds else null

@@ -135,4 +135,7 @@ open class BaseItemDtoBaseRowItem @JvmOverloads constructor(
 		if (other is BaseItemDtoBaseRowItem) return other.baseItem == baseItem
 		return super.equals(other)
 	}
+
+	// Matches equals(): rows compare by the wrapped item
+	override fun hashCode(): Int = baseItem.hashCode()
 }

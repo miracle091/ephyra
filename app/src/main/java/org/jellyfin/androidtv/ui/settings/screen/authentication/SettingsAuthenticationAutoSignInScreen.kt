@@ -100,7 +100,13 @@ fun SettingsAuthenticationAutoSignInScreen() {
 						)
 					},
 					headingContent = { Text(user.name) },
-					trailingContent = { RadioButton(checked = autoLoginUserBehavior == UserSelectBehavior.SPECIFIC_USER && autoLoginServerId == serverId && autoLoginUserId == userId) },
+					trailingContent = {
+						RadioButton(
+							checked = autoLoginUserBehavior == UserSelectBehavior.SPECIFIC_USER &&
+								autoLoginServerId == serverId &&
+								autoLoginUserId == userId
+						)
+					},
 					onClick = {
 						autoLoginUserBehavior = UserSelectBehavior.SPECIFIC_USER
 						autoLoginServerId = serverId
