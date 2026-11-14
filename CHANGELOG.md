@@ -18,6 +18,8 @@ section 2(a) of the GPL-2.0.
 
 ### Changed
 
+- The issue and pull request templates are written for Ephyra: they point to this repository and the wiki instead of
+  Jellyfin's forum and repository, and ask for the Shield model, the system version and, for playback bugs, the TV.
 - The detekt and Android lint configurations live in `config/` (`config/detekt.yaml`, `config/android-lint.xml`).
 - `FORK.md` keeps the origin, the license and the change notice; the per-change table moved to this changelog and
   the user documentation to the [wiki](https://github.com/miracle091/ephyra/wiki).

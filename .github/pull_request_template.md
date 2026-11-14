@@ -1,10 +1,14 @@
 <!--
-Ensure your title is short, descriptive, and in the imperative mood (Fix X, Change Y, instead of Fixed X, Changed Y).
-For a good inspiration of what to write in commit messages and PRs please review https://chris.beams.io/posts/git-commit/ and our https://jellyfin.org/docs/general/contributing/issues/ page.
+Title: "ephyra: " and a short title in the imperative mood (ephyra: Fix X, not Fixed X).
+Read https://github.com/miracle091/ephyra/wiki/Contributing first: add the change to the [Unreleased] section of
+CHANGELOG.md and run ./gradlew assembleDebug detekt lint test before opening the pull request.
 -->
 
 **Changes**
 <!-- Describe your changes here in 1-5 sentences. -->
+
+**Testing**
+<!-- How you checked the change: tests, emulator, or which Shield model. -->
 
 **Code assistance**
 <!-- If code assistance was used, describe how it contributed
