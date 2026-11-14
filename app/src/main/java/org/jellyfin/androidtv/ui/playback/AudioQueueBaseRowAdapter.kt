@@ -13,6 +13,8 @@ import org.jellyfin.playback.core.PlaybackManager
 import org.jellyfin.playback.core.queue.queue
 import org.jellyfin.playback.jellyfin.queue.baseItem
 
+private const val UPCOMING_ITEMS_COUNT = 100
+
 class AudioQueueBaseRowAdapter @JvmOverloads constructor(
 	private val playbackManager: PlaybackManager,
 	lifecycleScope: LifecycleCoroutineScope,
@@ -38,7 +40,7 @@ class AudioQueueBaseRowAdapter @JvmOverloads constructor(
 		}
 
 		// It's safe to run this blocking as all items are prefetched via the [BaseItemQueueSupplier]
-		val upcomingItems = runBlocking { playbackManager.queue.peekNext(100) }
+		val upcomingItems = runBlocking { playbackManager.queue.peekNext(UPCOMING_ITEMS_COUNT) }
 			.mapIndexedNotNull { index, item -> item.takeIf { it.baseItem != null }?.let(::AudioQueueBaseRowItem) }
 
 		val items = listOfNotNull(currentItem) + upcomingItems

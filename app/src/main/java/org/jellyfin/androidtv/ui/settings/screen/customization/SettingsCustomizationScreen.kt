@@ -18,6 +18,7 @@ import org.jellyfin.androidtv.ui.base.Icon
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.base.form.Checkbox
 import org.jellyfin.androidtv.ui.base.list.ListButton
+import org.jellyfin.androidtv.ui.base.list.ListItemSlots
 import org.jellyfin.androidtv.ui.base.list.ListSection
 import org.jellyfin.androidtv.ui.navigation.LocalRouter
 import org.jellyfin.androidtv.ui.navigation.focus.focusKey
@@ -57,7 +58,9 @@ fun SettingsCustomizationScreen() {
 
 		item {
 			ListButton(
-				leadingContent = { Icon(painterResource(R.drawable.ic_grid), contentDescription = null) },
+				slots = ListItemSlots(
+					leadingContent = { Icon(painterResource(R.drawable.ic_grid), contentDescription = null) },
+				),
 				headingContent = { Text(stringResource(R.string.pref_libraries)) },
 				onClick = { router.push(Routes.LIBRARIES) },
 				modifier = Modifier.focusKey(Routes.LIBRARIES)
@@ -66,7 +69,9 @@ fun SettingsCustomizationScreen() {
 
 		item {
 			ListButton(
-				leadingContent = { Icon(painterResource(R.drawable.ic_house), contentDescription = null) },
+				slots = ListItemSlots(
+					leadingContent = { Icon(painterResource(R.drawable.ic_house), contentDescription = null) },
+				),
 				headingContent = { Text(stringResource(R.string.home_prefs)) },
 				onClick = { router.push(Routes.HOME) },
 				modifier = Modifier.focusKey(Routes.HOME)
@@ -82,7 +87,9 @@ private fun ThemeListButton(userPreferences: UserPreferences) {
 
 	ListButton(
 		headingContent = { Text(stringResource(R.string.pref_app_theme)) },
-		captionContent = { Text(stringResource(appTheme.nameRes)) },
+		slots = ListItemSlots(
+			captionContent = { Text(stringResource(appTheme.nameRes)) },
+		),
 		onClick = { router.push(Routes.CUSTOMIZATION_THEME) },
 		modifier = Modifier.focusKey(Routes.CUSTOMIZATION_THEME)
 	)
@@ -96,7 +103,9 @@ private fun AccentListButton() {
 
 	ListButton(
 		headingContent = { Text(stringResource(R.string.ephyra_pref_accent_color)) },
-		captionContent = { Text(stringResource(accentColor.nameRes)) },
+		slots = ListItemSlots(
+			captionContent = { Text(stringResource(accentColor.nameRes)) },
+		),
 		onClick = { router.push(Routes.CUSTOMIZATION_ACCENT) },
 		modifier = Modifier.focusKey(Routes.CUSTOMIZATION_ACCENT)
 	)
@@ -109,7 +118,9 @@ private fun ClockListButton(userPreferences: UserPreferences) {
 
 	ListButton(
 		headingContent = { Text(stringResource(R.string.pref_clock_display)) },
-		captionContent = { Text(stringResource(clockBehavior.nameRes)) },
+		slots = ListItemSlots(
+			captionContent = { Text(stringResource(clockBehavior.nameRes)) },
+		),
 		onClick = { router.push(Routes.CUSTOMIZATION_CLOCK) },
 		modifier = Modifier.focusKey(Routes.CUSTOMIZATION_CLOCK)
 	)
@@ -122,7 +133,9 @@ private fun WatchedIndicatorListButton(userPreferences: UserPreferences) {
 
 	ListButton(
 		headingContent = { Text(stringResource(R.string.pref_watched_indicator)) },
-		captionContent = { Text(stringResource(watchedIndicatorBehavior.nameRes)) },
+		slots = ListItemSlots(
+			captionContent = { Text(stringResource(watchedIndicatorBehavior.nameRes)) },
+		),
 		onClick = { router.push(Routes.CUSTOMIZATION_WATCHED_INDICATOR) },
 		modifier = Modifier.focusKey(Routes.CUSTOMIZATION_WATCHED_INDICATOR)
 	)
@@ -134,8 +147,10 @@ private fun SeriesThumbnailsListButton(userPreferences: UserPreferences) {
 
 	ListButton(
 		headingContent = { Text(stringResource(R.string.lbl_use_series_thumbnails)) },
-		trailingContent = { Checkbox(checked = seriesThumbnailsEnabled) },
-		captionContent = { Text(stringResource(R.string.lbl_use_series_thumbnails_description)) },
+		slots = ListItemSlots(
+			trailingContent = { Checkbox(checked = seriesThumbnailsEnabled) },
+			captionContent = { Text(stringResource(R.string.lbl_use_series_thumbnails_description)) },
+		),
 		onClick = { seriesThumbnailsEnabled = !seriesThumbnailsEnabled },
 		modifier = Modifier.focusKey("series_thumbnails_enabled")
 	)
@@ -147,8 +162,10 @@ private fun TvProviderListButton(userPreferences: UserPreferences, workManager: 
 
 	ListButton(
 		headingContent = { Text(stringResource(R.string.tv_provider_enabled)) },
-		captionContent = { Text(stringResource(R.string.ephyra_tv_provider_enabled_description)) },
-		trailingContent = { Checkbox(checked = tvProviderEnabled) },
+		slots = ListItemSlots(
+			captionContent = { Text(stringResource(R.string.ephyra_tv_provider_enabled_description)) },
+			trailingContent = { Checkbox(checked = tvProviderEnabled) },
+		),
 		onClick = {
 			tvProviderEnabled = !tvProviderEnabled
 			workManager.enqueue(OneTimeWorkRequestBuilder<LeanbackChannelWorker>().build())

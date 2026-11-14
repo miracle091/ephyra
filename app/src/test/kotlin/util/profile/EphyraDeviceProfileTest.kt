@@ -20,13 +20,22 @@ import org.jellyfin.sdk.model.api.ProfileConditionType
 import org.jellyfin.sdk.model.api.ProfileConditionValue
 import org.jellyfin.sdk.model.api.VideoRangeType
 
+private fun hdrOptions(
+	displaySupportsDolbyVision: Boolean = true,
+	unreportedDoviProfile7Support: Boolean = false,
+	forceEnabledHdr: Set<VideoRangeType> = emptySet(),
+) = HdrProfileOptions(
+	forceEnabledHdr = forceEnabledHdr,
+	forceDisabledHdr = emptySet(),
+	displaySupportsDolbyVision = displaySupportsDolbyVision,
+	unreportedDoviProfile7Support = unreportedDoviProfile7Support,
+)
+
 private fun profile(
 	dtsEnabled: Boolean = false,
 	dolbyEnabled: Boolean = false,
 	trueHdEnabled: Boolean = false,
-	displaySupportsDolbyVision: Boolean = true,
-	unreportedDoviProfile7Support: Boolean = false,
-	forceEnabledHdr: Set<VideoRangeType> = emptySet(),
+	hdr: HdrProfileOptions = hdrOptions(),
 ): DeviceProfile {
 	val size = mockk<Size> {
 		every { width } returns 3840
@@ -43,20 +52,19 @@ private fun profile(
 
 	return createDeviceProfile(
 		mediaTest = mediaTest,
-		maxBitrate = 100_000_000,
-		isAC3PrefEnabled = dolbyEnabled,
-		isEAC3PrefEnabled = dolbyEnabled,
-		isDTSPrefEnabled = dtsEnabled,
-		isTrueHDPrefEnabled = trueHdEnabled,
-		downMixAudio = false,
-		assDirectPlay = false,
-		pgsDirectPlay = false,
-		userAVCLevel = null,
-		userHEVCLevel = null,
-		forceEnabledHdr = forceEnabledHdr,
-		forceDisabledHdr = emptySet(),
-		displaySupportsDolbyVision = displaySupportsDolbyVision,
-		unreportedDoviProfile7Support = unreportedDoviProfile7Support,
+		options = DeviceProfileOptions(
+			maxBitrate = 100_000_000,
+			audio = AudioProfileOptions(
+				isAC3PrefEnabled = dolbyEnabled,
+				isEAC3PrefEnabled = dolbyEnabled,
+				isDTSPrefEnabled = dtsEnabled,
+				isTrueHDPrefEnabled = trueHdEnabled,
+				downMixAudio = false,
+			),
+			subtitles = SubtitleProfileOptions(assDirectPlay = false, pgsDirectPlay = false),
+			codecLevels = CodecLevelOverrides(userAVCLevel = null, userHEVCLevel = null),
+			hdr = hdr,
+		),
 	)
 }
 
@@ -155,20 +163,26 @@ class EphyraDeviceProfileTest : FunSpec({
 		val elTypes = listOf(VideoRangeType.DOVI_WITH_EL.serialName, VideoRangeType.DOVI_WITH_ELHDR10_PLUS.serialName)
 
 		test("the unreported support workaround keeps profile 7 direct play on a Dolby Vision display") {
-			val unsupported = profile(unreportedDoviProfile7Support = true, displaySupportsDolbyVision = true).unsupportedHevcRangeTypes()
+			val unsupported = profile(
+				hdr = hdrOptions(unreportedDoviProfile7Support = true, displaySupportsDolbyVision = true)
+			).unsupportedHevcRangeTypes()
 			elTypes.forEach { unsupported shouldNotContain it }
 		}
 
 		test("without a Dolby Vision display profile 7 is unsupported, so the server strips the RPU") {
-			val unsupported = profile(unreportedDoviProfile7Support = true, displaySupportsDolbyVision = false).unsupportedHevcRangeTypes()
+			val unsupported = profile(
+				hdr = hdrOptions(unreportedDoviProfile7Support = true, displaySupportsDolbyVision = false)
+			).unsupportedHevcRangeTypes()
 			elTypes.forEach { unsupported shouldContain it }
 		}
 
 		test("the profile 7 override still wins on a display without Dolby Vision") {
 			val unsupported = profile(
-				unreportedDoviProfile7Support = true,
-				displaySupportsDolbyVision = false,
-				forceEnabledHdr = HdrFormat.DOVI_PROFILE_7.videoRangeTypes,
+				hdr = hdrOptions(
+					unreportedDoviProfile7Support = true,
+					displaySupportsDolbyVision = false,
+					forceEnabledHdr = HdrFormat.DOVI_PROFILE_7.videoRangeTypes,
+				),
 			).unsupportedHevcRangeTypes()
 			elTypes.forEach { unsupported shouldNotContain it }
 		}
@@ -180,7 +194,7 @@ class EphyraDeviceProfileTest : FunSpec({
 		}
 
 		test("the override entry lets it direct play") {
-			profile(forceEnabledHdr = HdrFormat.DOVI_INVALID.videoRangeTypes).unsupportedHevcRangeTypes() shouldNotContain
+			profile(hdr = hdrOptions(forceEnabledHdr = HdrFormat.DOVI_INVALID.videoRangeTypes)).unsupportedHevcRangeTypes() shouldNotContain
 				VideoRangeType.DOVI_INVALID.serialName
 		}
 	}

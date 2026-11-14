@@ -42,6 +42,9 @@ import timber.log.Timber
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
+private const val OVERLAY_SCRIM_ALPHA = 0.8f
+private const val OVERLAY_HEIGHT_FRACTION = 1f / 3
+
 @Composable
 fun PlayerOverlayLayout(
 	modifier: Modifier = Modifier,
@@ -78,22 +81,7 @@ fun PlayerOverlayLayout(
 			enter = slideInVertically() + fadeIn(),
 			exit = slideOutVertically() + fadeOut(),
 		) {
-			Box(
-				modifier = Modifier
-					.fillMaxWidth()
-					.fillMaxHeight(1f / 3)
-					.background(
-						brush = Brush.verticalGradient(
-							colors = listOf(
-								Color.Black.copy(alpha = 0.8f),
-								Color.Transparent,
-							)
-						)
-					)
-					.overscan()
-			) {
-				header()
-			}
+			PlayerOverlayHeader(header)
 		}
 	}
 
@@ -105,47 +93,75 @@ fun PlayerOverlayLayout(
 			enter = slideInVertically(initialOffsetY = { it }) + fadeIn(),
 			exit = slideOutVertically(targetOffsetY = { it }) + fadeOut(),
 		) {
-			// Focus trap to detect when controls need to be closed by moving the focus up
-			Box(
-				modifier = Modifier
-					.fillMaxWidth()
-					.height(0.dp)
-					.focusTarget()
-			)
+			PlayerOverlayControls(visibilityState, controls)
+		}
+	}
+}
 
-			Box(
-				contentAlignment = Alignment.BottomCenter,
-				modifier = Modifier
-					.fillMaxWidth()
-					.fillMaxHeight(1f / 3)
-					.background(
-						brush = Brush.verticalGradient(
-							colors = listOf(
-								Color.Transparent,
-								Color.Black.copy(alpha = 0.8f),
-							)
-						)
+@Composable
+private fun PlayerOverlayHeader(header: @Composable () -> Unit) {
+	Box(
+		modifier = Modifier
+			.fillMaxWidth()
+			.fillMaxHeight(OVERLAY_HEIGHT_FRACTION)
+			.background(
+				brush = Brush.verticalGradient(
+					colors = listOf(
+						Color.Black.copy(alpha = OVERLAY_SCRIM_ALPHA),
+						Color.Transparent,
 					)
-					.overscan()
-					.focusProperties {
-						// Hide overlay when focus is moved out by going up
-						onExit = {
-							if (requestedFocusDirection == FocusDirection.Up) {
-								Timber.i("Hide reason: focus moved up")
-								visibilityState.hide()
-								cancelFocusChange()
-							}
-						}
-					},
-			) {
-				JellyfinTheme(
-					colorScheme = JellyfinTheme.colorScheme.copy(
-						button = Color.Transparent
+				)
+			)
+			.overscan()
+	) {
+		header()
+	}
+}
+
+@Composable
+private fun PlayerOverlayControls(
+	visibilityState: PlayerOverlayVisibilityState,
+	controls: @Composable () -> Unit,
+) {
+	// Focus trap to detect when controls need to be closed by moving the focus up
+	Box(
+		modifier = Modifier
+			.fillMaxWidth()
+			.height(0.dp)
+			.focusTarget()
+	)
+
+	Box(
+		contentAlignment = Alignment.BottomCenter,
+		modifier = Modifier
+			.fillMaxWidth()
+			.fillMaxHeight(OVERLAY_HEIGHT_FRACTION)
+			.background(
+				brush = Brush.verticalGradient(
+					colors = listOf(
+						Color.Transparent,
+						Color.Black.copy(alpha = OVERLAY_SCRIM_ALPHA),
 					)
-				) {
-					controls()
+				)
+			)
+			.overscan()
+			.focusProperties {
+				// Hide overlay when focus is moved out by going up
+				onExit = {
+					if (requestedFocusDirection == FocusDirection.Up) {
+						Timber.i("Hide reason: focus moved up")
+						visibilityState.hide()
+						cancelFocusChange()
+					}
 				}
-			}
+			},
+	) {
+		JellyfinTheme(
+			colorScheme = JellyfinTheme.colorScheme.copy(
+				button = Color.Transparent
+			)
+		) {
+			controls()
 		}
 	}
 }

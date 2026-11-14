@@ -30,6 +30,7 @@ import org.jellyfin.androidtv.R
 import org.jellyfin.androidtv.ui.GridButton
 import org.jellyfin.androidtv.ui.base.JellyfinTheme
 import org.jellyfin.androidtv.ui.base.LocalEphyraPalette
+import org.jellyfin.androidtv.ui.base.LocalTextStyle
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.composable.item.ArtToneCover
 import org.jellyfin.androidtv.ui.composable.item.cardFocusRing
@@ -107,10 +108,12 @@ class GridButtonPresenter : Presenter() {
 					text = value.text,
 					maxLines = 1,
 					overflow = TextOverflow.Ellipsis,
-					color = LocalEphyraPalette.current.ink,
-					fontSize = 18.sp,
-					fontWeight = FontWeight.Bold,
-					lineHeight = 22.sp,
+					style = LocalTextStyle.current.merge(
+						color = LocalEphyraPalette.current.ink,
+						fontSize = 18.sp,
+						fontWeight = FontWeight.Bold,
+						lineHeight = 22.sp,
+					),
 					modifier = Modifier
 						.align(Alignment.BottomStart)
 						.fillMaxWidth()

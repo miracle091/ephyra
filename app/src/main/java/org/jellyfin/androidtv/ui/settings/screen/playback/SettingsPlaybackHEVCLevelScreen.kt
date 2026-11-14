@@ -12,6 +12,7 @@ import org.jellyfin.androidtv.preference.constant.HEVCLevel
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.base.form.RadioButton
 import org.jellyfin.androidtv.ui.base.list.ListButton
+import org.jellyfin.androidtv.ui.base.list.ListItemSlots
 import org.jellyfin.androidtv.ui.base.list.ListSection
 import org.jellyfin.androidtv.ui.navigation.LocalRouter
 import org.jellyfin.androidtv.ui.navigation.focus.focusKey
@@ -39,7 +40,9 @@ fun SettingsPlaybackHEVCLevelScreen() {
 		item {
 			ListButton(
 				headingContent = { Text(stringResource(HEVCLevel.AUTO.nameRes)) },
-				trailingContent = { RadioButton(checked = userHEVCLevel == HEVCLevel.AUTO) },
+				slots = ListItemSlots(
+					trailingContent = { RadioButton(checked = userHEVCLevel == HEVCLevel.AUTO) },
+				),
 				onClick = {
 					userHEVCLevel = HEVCLevel.AUTO
 					router.back()
@@ -54,7 +57,9 @@ fun SettingsPlaybackHEVCLevelScreen() {
 		items(manualOptions) { level ->
 			ListButton(
 				headingContent = { Text(stringResource(level.nameRes)) },
-				trailingContent = { RadioButton(checked = userHEVCLevel == level) },
+				slots = ListItemSlots(
+					trailingContent = { RadioButton(checked = userHEVCLevel == level) },
+				),
 				onClick = {
 					userHEVCLevel = level
 					router.back()

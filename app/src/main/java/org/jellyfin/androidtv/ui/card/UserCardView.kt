@@ -60,8 +60,8 @@ fun UserCard(
 	onClick: () -> Unit,
 	modifier: Modifier = Modifier,
 	interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-	shape: Shape = CircleShape,
 ) {
+	val shape: Shape = CircleShape
 	val focused by interactionSource.collectIsFocusedAsState()
 
 	// Ephyra: the avatar of the design system, on surface-3 with the covers' focus ring and zoom, the name muted until focused

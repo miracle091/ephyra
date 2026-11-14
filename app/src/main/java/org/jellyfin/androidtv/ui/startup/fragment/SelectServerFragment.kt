@@ -42,6 +42,7 @@ import org.jellyfin.androidtv.databinding.FragmentSelectServerBinding
 import org.jellyfin.androidtv.ui.ServerButtonView
 import org.jellyfin.androidtv.ui.SpacingItemDecoration
 import org.jellyfin.androidtv.ui.base.JellyfinTheme
+import org.jellyfin.androidtv.ui.base.LocalTextStyle
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.startup.StartupViewModel
 import org.jellyfin.androidtv.util.ListAdapter
@@ -184,7 +185,7 @@ class SelectServerFragment : Fragment() {
 						Text(
 							text = notification.message,
 							modifier = Modifier.padding(10.dp),
-							color = colorResource(id = R.color.white),
+							style = LocalTextStyle.current.merge(color = colorResource(id = R.color.white)),
 						)
 					}
 				}

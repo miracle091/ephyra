@@ -21,7 +21,9 @@ import org.jellyfin.androidtv.preference.constant.NEXTUP_TIMER_DISABLED
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.base.form.Checkbox
 import org.jellyfin.androidtv.ui.base.form.RangeControl
+import org.jellyfin.androidtv.ui.base.form.RangeControlState
 import org.jellyfin.androidtv.ui.base.list.ListButton
+import org.jellyfin.androidtv.ui.base.list.ListItemSlots
 import org.jellyfin.androidtv.ui.base.list.ListControl
 import org.jellyfin.androidtv.ui.base.list.ListSection
 import org.jellyfin.androidtv.ui.navigation.LocalRouter
@@ -33,6 +35,8 @@ import org.jellyfin.androidtv.ui.settings.screen.StopAtSeasonEndListButton
 import org.jellyfin.design.Tokens
 import org.koin.compose.koinInject
 import kotlin.math.roundToInt
+
+private const val MILLIS_PER_SECOND = 1000
 
 @Composable
 fun SettingsPlaybackNextUpScreen() {
@@ -52,8 +56,10 @@ fun SettingsPlaybackNextUpScreen() {
 
 			ListButton(
 				headingContent = { Text(stringResource(R.string.pref_media_queueing)) },
-				trailingContent = { Checkbox(checked = mediaQueuingEnabled) },
-				captionContent = { Text(stringResource(R.string.pref_media_queueing_description)) },
+				slots = ListItemSlots(
+					trailingContent = { Checkbox(checked = mediaQueuingEnabled) },
+					captionContent = { Text(stringResource(R.string.pref_media_queueing_description)) },
+				),
 				onClick = { mediaQueuingEnabled = !mediaQueuingEnabled },
 				modifier = Modifier.focusKey("media_queuing_enabled")
 			)
@@ -66,7 +72,9 @@ fun SettingsPlaybackNextUpScreen() {
 
 			ListButton(
 				headingContent = { Text(stringResource(R.string.pref_next_up_behavior_title)) },
-				captionContent = { Text(stringResource(nextUpBehavior.nameRes)) },
+				slots = ListItemSlots(
+					captionContent = { Text(stringResource(nextUpBehavior.nameRes)) },
+				),
 				onClick = { router.push(Routes.PLAYBACK_NEXT_UP_BEHAVIOR) },
 				modifier = Modifier.focusKey(Routes.PLAYBACK_NEXT_UP_BEHAVIOR)
 			)
@@ -74,14 +82,21 @@ fun SettingsPlaybackNextUpScreen() {
 
 		item {
 			var nextUpTimeout by rememberPreference(userPreferences, UserPreferences.nextUpTimeout)
-			val interactionSource = remember { MutableInteractionSource() }
 
-			ListControl(
-				headingContent = { Text(stringResource(R.string.pref_next_up_timeout_title)) },
-				captionContent = { Text(stringResource(R.string.pref_next_up_timeout_summary)) },
-				interactionSource = interactionSource,
-				modifier = Modifier.focusKey("next_up_timeout")
-			) {
+			NextUpTimeoutControl(value = nextUpTimeout, onValueChange = { nextUpTimeout = it })
+		}
+	}
+}
+
+@Composable
+private fun NextUpTimeoutControl(value: Int, onValueChange: (Int) -> Unit) {
+	val interactionSource = remember { MutableInteractionSource() }
+
+	ListControl(
+		headingContent = { Text(stringResource(R.string.pref_next_up_timeout_title)) },
+		slots = ListItemSlots(
+			captionContent = { Text(stringResource(R.string.pref_next_up_timeout_summary)) },
+			footerContent = {
 				Row(
 					verticalAlignment = Alignment.CenterVertically,
 				) {
@@ -91,12 +106,14 @@ fun SettingsPlaybackNextUpScreen() {
 							.weight(1f),
 						interactionSource = interactionSource,
 						// 0 - 30 seconds with 1 second increment
-						min = 0f,
-						max = 30_000f,
-						markers = listOf(UserPreferences.nextUpTimeout.defaultValue.toFloat()),
-						stepForward = 1_000f,
-						value = nextUpTimeout.toFloat(),
-						onValueChange = { nextUpTimeout = it.roundToInt() }
+						state = RangeControlState(
+							value = value.toFloat(),
+							min = 0f,
+							max = 30_000f,
+							step = 1_000f,
+							markers = listOf(UserPreferences.nextUpTimeout.defaultValue.toFloat()),
+						),
+						onValueChange = { onValueChange(it.roundToInt()) }
 					)
 
 					Spacer(Modifier.width(Tokens.Space.spaceSm))
@@ -105,11 +122,13 @@ fun SettingsPlaybackNextUpScreen() {
 						modifier = Modifier.sizeIn(minWidth = 32.dp),
 						contentAlignment = Alignment.CenterEnd
 					) {
-						if (nextUpTimeout == NEXTUP_TIMER_DISABLED) Text(stringResource(R.string.pref_next_up_timeout_disabled))
-						else Text("${nextUpTimeout / 1000}s")
+						if (value == NEXTUP_TIMER_DISABLED) Text(stringResource(R.string.pref_next_up_timeout_disabled))
+						else Text("${value / MILLIS_PER_SECOND}s")
 					}
 				}
-			}
-		}
-	}
+			},
+		),
+		interactionSource = interactionSource,
+		modifier = Modifier.focusKey("next_up_timeout")
+	)
 }

@@ -19,6 +19,7 @@ import org.jellyfin.androidtv.auth.repository.ServerUserRepository
 import org.jellyfin.androidtv.ui.base.Icon
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.base.list.ListButton
+import org.jellyfin.androidtv.ui.base.list.ListItemSlots
 import org.jellyfin.androidtv.ui.base.list.ListSection
 import org.jellyfin.androidtv.ui.navigation.LocalRouter
 import org.jellyfin.androidtv.ui.navigation.focus.focusKey
@@ -52,9 +53,11 @@ fun SettingsAuthenticationServerUserScreen(serverId: UUID, userId: UUID) {
 
 		item {
 			ListButton(
-				leadingContent = { Icon(painterResource(R.drawable.ic_logout), contentDescription = null) },
 				headingContent = { Text(stringResource(R.string.lbl_sign_out)) },
-				captionContent = { Text(stringResource(R.string.lbl_sign_out_content)) },
+				slots = ListItemSlots(
+					leadingContent = { Icon(painterResource(R.drawable.ic_logout), contentDescription = null) },
+					captionContent = { Text(stringResource(R.string.lbl_sign_out_content)) },
+				),
 				onClick = {
 					lifecycleScope.launch {
 						if (user != null) authenticationRepository.logout(user)
@@ -67,9 +70,11 @@ fun SettingsAuthenticationServerUserScreen(serverId: UUID, userId: UUID) {
 
 		item {
 			ListButton(
-				leadingContent = { Icon(painterResource(R.drawable.ic_delete), contentDescription = null) },
 				headingContent = { Text(stringResource(R.string.lbl_remove)) },
-				captionContent = { Text(stringResource(R.string.lbl_remove_user_content)) },
+				slots = ListItemSlots(
+					leadingContent = { Icon(painterResource(R.drawable.ic_delete), contentDescription = null) },
+					captionContent = { Text(stringResource(R.string.lbl_remove_user_content)) },
+				),
 				onClick = {
 					lifecycleScope.launch {
 						if (user != null) serverUserRepository.deleteStoredUser(user)

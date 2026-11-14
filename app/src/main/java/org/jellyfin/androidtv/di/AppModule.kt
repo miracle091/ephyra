@@ -17,7 +17,9 @@ import org.jellyfin.androidtv.EphyraInfo
 import org.jellyfin.androidtv.auth.repository.ServerRepository
 import org.jellyfin.androidtv.auth.repository.UserRepository
 import org.jellyfin.androidtv.auth.repository.UserRepositoryImpl
+import org.jellyfin.androidtv.data.eventhandling.SocketBrowsingDependencies
 import org.jellyfin.androidtv.data.eventhandling.SocketHandler
+import org.jellyfin.androidtv.data.eventhandling.SocketPlaybackDependencies
 import org.jellyfin.androidtv.data.model.DataRefreshService
 import org.jellyfin.androidtv.data.repository.CustomMessageRepository
 import org.jellyfin.androidtv.data.repository.CustomMessageRepositoryImpl
@@ -112,7 +114,16 @@ val appModule = module {
 		get<JellyfinSdk>().createApi(httpClientOptions = get<HttpClientOptions>())
 	}
 
-	single { SocketHandler(get(), get(), get(), get(), get(), get(), get(), get(), get(), ProcessLifecycleOwner.get().lifecycle) }
+	single {
+		SocketHandler(
+			context = get(),
+			api = get(),
+			playback = SocketPlaybackDependencies(mediaManager = get(), playbackControllerContainer = get(), playbackHelper = get()),
+			browsing = SocketBrowsingDependencies(dataRefreshService = get(), navigationRepository = get(), itemLauncher = get()),
+			audioManager = get(),
+			lifecycle = ProcessLifecycleOwner.get().lifecycle,
+		)
+	}
 
 	// Coil (images)
 	single {

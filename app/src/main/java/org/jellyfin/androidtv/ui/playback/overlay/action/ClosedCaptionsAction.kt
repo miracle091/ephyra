@@ -2,6 +2,7 @@ package org.jellyfin.androidtv.ui.playback.overlay.action
 
 import android.content.Context
 import android.view.Gravity
+import android.view.Menu
 import android.view.View
 import android.widget.PopupMenu
 import android.widget.Toast
@@ -38,23 +39,7 @@ class ClosedCaptionsAction(
 		videoPlayerAdapter.leanbackOverlayFragment.setFading(false)
 		removePopup()
 		popup = PopupMenu(context, view, Gravity.END).apply {
-			with(menu) {
-				var order = 0
-				add(0, -1, order++, context.getString(R.string.lbl_none)).apply {
-					isChecked = playbackController.subtitleStreamIndex == -1
-				}
-
-				// Ephyra: preferred languages first
-				val subtitles = playbackController.currentMediaSource.mediaStreams.orEmpty().filter { it.type == MediaStreamType.SUBTITLE }
-				for (sub in subtitles.preferredLanguagesFirst { it.subtitleLanguagePreference }) {
-
-					add(0, sub.index, order++, sub.displayTitle).apply {
-						isChecked = sub.index == playbackController.subtitleStreamIndex
-					}
-				}
-
-				setGroupCheckable(0, true, false)
-			}
+			menu.addSubtitleEntries(playbackController, context)
 			setOnDismissListener {
 				videoPlayerAdapter.leanbackOverlayFragment.setFading(true)
 				popup = null
@@ -65,6 +50,23 @@ class ClosedCaptionsAction(
 			}
 		}
 		popup?.show()
+	}
+
+	private fun Menu.addSubtitleEntries(playbackController: PlaybackController, context: Context) {
+		var order = 0
+		add(0, -1, order++, context.getString(R.string.lbl_none)).apply {
+			isChecked = playbackController.subtitleStreamIndex == -1
+		}
+
+		// Ephyra: preferred languages first
+		val subtitles = playbackController.currentMediaSource.mediaStreams.orEmpty().filter { it.type == MediaStreamType.SUBTITLE }
+		for (sub in subtitles.preferredLanguagesFirst { it.subtitleLanguagePreference }) {
+			add(0, sub.index, order++, sub.displayTitle).apply {
+				isChecked = sub.index == playbackController.subtitleStreamIndex
+			}
+		}
+
+		setGroupCheckable(0, true, false)
 	}
 
 	fun removePopup() {

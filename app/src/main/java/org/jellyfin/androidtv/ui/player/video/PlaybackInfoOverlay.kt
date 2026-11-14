@@ -84,13 +84,16 @@ fun PlaybackInfoOverlay(
 	}
 }
 
+private const val BITS_PER_MBIT = 1_000_000
+private const val BITS_PER_KBIT = 1_000
+
 @Composable
 private fun formatBitrate(bitrate: Int): String {
 	val mbitStr = stringResource(R.string.bitrate_mbit, 0f).substringAfter("0")
 	val kbitStr = stringResource(R.string.bitrate_kbit, 0f).substringAfter("0")
 	return when {
-		bitrate >= 1_000_000 -> "%.1f$mbitStr".format(bitrate / 1_000_000f)
-		else -> "%.0f$kbitStr".format(bitrate / 1_000f)
+		bitrate >= BITS_PER_MBIT -> "%.1f$mbitStr".format(bitrate / BITS_PER_MBIT.toFloat())
+		else -> "%.0f$kbitStr".format(bitrate / BITS_PER_KBIT.toFloat())
 	}
 }
 

@@ -13,6 +13,7 @@ import org.jellyfin.androidtv.data.repository.ItemRepository
 import org.jellyfin.androidtv.preference.UserPreferences
 import org.jellyfin.androidtv.ui.playback.PlaybackControllerContainer
 import org.jellyfin.androidtv.ui.playback.PlaybackLauncher
+import org.jellyfin.androidtv.ui.playback.QueueStart
 import org.jellyfin.androidtv.util.PlaybackHelper
 import org.jellyfin.androidtv.util.apiclient.Response
 import org.jellyfin.sdk.api.client.ApiClient
@@ -20,12 +21,8 @@ import org.jellyfin.sdk.api.client.extensions.libraryApi
 import org.jellyfin.sdk.api.client.extensions.showApi
 import org.jellyfin.sdk.api.client.extensions.videoApi
 import org.jellyfin.sdk.api.client.extensions.instantMixApi
-import org.jellyfin.sdk.api.client.extensions.liveTvApi
 import org.jellyfin.sdk.model.api.BaseItemDto
 import org.jellyfin.sdk.model.api.BaseItemKind
-import org.jellyfin.sdk.model.api.ItemFilter
-import org.jellyfin.sdk.model.api.ItemSortBy
-import org.jellyfin.sdk.model.api.MediaType
 import org.jellyfin.sdk.model.extensions.ticks
 import org.jellyfin.sdk.model.serializer.toUUIDOrNull
 import java.util.UUID
@@ -72,171 +69,42 @@ class SdkPlaybackHelper(
 		shuffle: Boolean,
 	): List<BaseItemDto> = withContext(Dispatchers.IO) {
 		when (mainItem.type) {
-			BaseItemKind.EPISODE -> {
-				val seriesId = mainItem.seriesId
-				if (userPreferences[UserPreferences.mediaQueuingEnabled] && seriesId != null) {
-					applySeasonEnd(getEpisodeQueue(mainItem, seriesId), mainItem) // Ephyra: optional stop at the end of the season
-				} else {
-					listOf(mainItem)
-				}
-			}
+			BaseItemKind.EPISODE -> getEpisodeItems(mainItem)
+			BaseItemKind.SERIES -> api.getSeriesEpisodes(mainItem, shuffle)
+			BaseItemKind.SEASON -> api.getSeasonEpisodes(mainItem, shuffle)
+			BaseItemKind.FOLDER -> api.getFolderItems(mainItem, shuffle)
+			BaseItemKind.BOX_SET -> api.getBoxSetItems(mainItem, shuffle)
+			BaseItemKind.MUSIC_ALBUM -> api.getAlbumTracks(mainItem, shuffle)
+			BaseItemKind.MUSIC_ARTIST -> api.getArtistTracks(mainItem, shuffle)
+			BaseItemKind.PLAYLIST -> api.getPlaylistItems(mainItem, shuffle)
+			BaseItemKind.PROGRAM -> api.getProgramChannel(mainItem)
+			BaseItemKind.TV_CHANNEL -> api.getChannelWithCurrentProgram(mainItem)
+			else -> getPartsWithIntros(mainItem, allowIntros)
+		}
+	}
 
-			BaseItemKind.SERIES -> {
-				val response by api.showApi.getEpisodes(
-					seriesId = mainItem.id,
-					isMissing = false,
-					sortBy = if (shuffle) ItemSortBy.RANDOM else ItemSortBy.SORT_NAME,
-					limit = ITEM_QUERY_LIMIT,
-					fields = ItemRepository.itemFields,
-				)
-				response.items
-			}
+	private suspend fun getEpisodeItems(mainItem: BaseItemDto): List<BaseItemDto> {
+		val seriesId = mainItem.seriesId
+		return if (userPreferences[UserPreferences.mediaQueuingEnabled] && seriesId != null) {
+			applySeasonEnd(getEpisodeQueue(mainItem, seriesId), mainItem) // Ephyra: optional stop at the end of the season
+		} else {
+			listOf(mainItem)
+		}
+	}
 
-			BaseItemKind.SEASON -> {
-				val response by api.showApi.getEpisodes(
-					seriesId = requireNotNull(mainItem.seriesId),
-					seasonId = mainItem.id,
-					isMissing = false,
-					sortBy = if (shuffle) ItemSortBy.RANDOM else ItemSortBy.SORT_NAME,
-					limit = ITEM_QUERY_LIMIT,
-					fields = ItemRepository.itemFields,
-				)
-				response.items
-			}
+	private suspend fun getPartsWithIntros(mainItem: BaseItemDto, allowIntros: Boolean): List<BaseItemDto> {
+		val parts = getParts(mainItem)
+		val addIntros = allowIntros && userPreferences[UserPreferences.cinemaModeEnabled]
 
-			BaseItemKind.FOLDER -> {
-				val response by api.libraryApi.getItems(
-					parentId = mainItem.id,
-					isMissing = false,
-					includeItemTypes = listOf(
-						BaseItemKind.EPISODE,
-						BaseItemKind.MOVIE,
-						BaseItemKind.VIDEO
-					),
-					sortBy = if (shuffle) listOf(ItemSortBy.RANDOM) else listOf(ItemSortBy.SORT_NAME),
-					recursive = true,
-					limit = ITEM_QUERY_LIMIT,
-					fields = ItemRepository.itemFields
-				)
+		return if (addIntros) {
+			val intros = runCatching { api.libraryApi.getIntros(mainItem.id).content.items }.getOrNull()
+				.orEmpty()
+				// Force the type to be trailer as the legacy playback UI uses it to determine if it should show the next up screen
+				.map { it.copy(type = BaseItemKind.TRAILER) }
 
-				response.items
-			}
-
-			BaseItemKind.BOX_SET -> {
-				val response by api.libraryApi.getItems(
-					parentId = mainItem.id,
-					isMissing = false,
-					includeItemTypes = listOf(
-						BaseItemKind.EPISODE,
-						BaseItemKind.MOVIE,
-						BaseItemKind.VIDEO
-					),
-					sortBy = if (shuffle) listOf(ItemSortBy.RANDOM) else null,
-					recursive = true,
-					limit = ITEM_QUERY_LIMIT,
-					fields = ItemRepository.itemFields
-				)
-
-				response.items
-			}
-
-			BaseItemKind.MUSIC_ALBUM -> {
-				val response by api.libraryApi.getItems(
-					isMissing = false,
-					mediaTypes = listOf(MediaType.AUDIO),
-					filters = listOf(ItemFilter.IS_NOT_FOLDER),
-					sortBy = if (shuffle) listOf(ItemSortBy.RANDOM) else listOf(
-						ItemSortBy.ALBUM,
-						ItemSortBy.PARENT_INDEX_NUMBER,
-						ItemSortBy.INDEX_NUMBER,
-						ItemSortBy.SORT_NAME
-					),
-					recursive = true,
-					limit = ITEM_QUERY_LIMIT,
-					fields = ItemRepository.itemFields,
-					albumIds = listOf(mainItem.id)
-				)
-
-				response.items
-			}
-
-			BaseItemKind.MUSIC_ARTIST -> {
-				val response by api.libraryApi.getItems(
-					isMissing = false,
-					mediaTypes = listOf(MediaType.AUDIO),
-					filters = listOf(ItemFilter.IS_NOT_FOLDER),
-					sortBy = if (shuffle) listOf(ItemSortBy.RANDOM) else listOf(
-						ItemSortBy.ALBUM,
-						ItemSortBy.PARENT_INDEX_NUMBER,
-						ItemSortBy.INDEX_NUMBER,
-						ItemSortBy.SORT_NAME
-					),
-					recursive = true,
-					limit = ITEM_QUERY_LIMIT,
-					fields = ItemRepository.itemFields,
-					artistIds = listOf(mainItem.id)
-				)
-
-				response.items
-			}
-
-			BaseItemKind.PLAYLIST -> {
-				val response by api.libraryApi.getItems(
-					parentId = mainItem.id,
-					isMissing = false,
-					sortBy = if (shuffle) listOf(ItemSortBy.RANDOM) else null,
-					recursive = true,
-					limit = ITEM_QUERY_LIMIT,
-					fields = ItemRepository.itemFields
-				)
-
-				response.items
-			}
-
-			BaseItemKind.PROGRAM -> {
-				val parentId = requireNotNull(mainItem.parentId)
-				val channel by api.libraryApi.getItem(parentId)
-				val channelWithProgramMetadata = channel.copy(
-					premiereDate = mainItem.premiereDate,
-					endDate = mainItem.endDate,
-					officialRating = mainItem.officialRating,
-					runTimeTicks = mainItem.runTimeTicks,
-				)
-
-				listOf(channelWithProgramMetadata)
-			}
-
-			BaseItemKind.TV_CHANNEL -> {
-				val channel by api.liveTvApi.getChannel(mainItem.id)
-				val currentProgram = channel.currentProgram
-				if (currentProgram != null) {
-					val channelWithCurrentProgramMetadata = channel.copy(
-						premiereDate = currentProgram.premiereDate,
-						endDate = currentProgram.endDate,
-						officialRating = currentProgram.officialRating,
-						runTimeTicks = currentProgram.runTimeTicks,
-					)
-					listOf(channelWithCurrentProgramMetadata)
-				} else {
-					listOf(channel)
-				}
-			}
-
-			else -> {
-				val parts = getParts(mainItem)
-				val addIntros = allowIntros && userPreferences[UserPreferences.cinemaModeEnabled]
-
-				if (addIntros) {
-					val intros = runCatching { api.libraryApi.getIntros(mainItem.id).content.items }.getOrNull()
-						.orEmpty()
-						// Force the type to be trailer as the legacy playback UI uses it to determine if it should show the next up screen
-						.map { it.copy(type = BaseItemKind.TRAILER) }
-
-					intros + parts
-				} else {
-					parts
-				}
-			}
+			intros + parts
+		} else {
+			parts
 		}
 	}
 
@@ -302,8 +170,7 @@ class SdkPlaybackHelper(
 				items,
 				pos.inWholeMilliseconds.toInt(),
 				playbackControllerContainer.playbackController?.hasFragment() == true,
-				0,
-				shuffle,
+				QueueStart(0, shuffle),
 			)
 		}
 	}
@@ -330,8 +197,7 @@ class SdkPlaybackHelper(
 				items,
 				pos.inWholeMilliseconds.toInt(),
 				playbackControllerContainer.playbackController?.hasFragment() == true,
-				index ?: 0,
-				shuffle,
+				QueueStart(index ?: 0, shuffle),
 			)
 		}
 	}

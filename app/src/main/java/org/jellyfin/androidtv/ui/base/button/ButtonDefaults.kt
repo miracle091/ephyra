@@ -18,16 +18,20 @@ object ButtonDefaults {
 	fun colors(
 		containerColor: Color = JellyfinTheme.colorScheme.button,
 		contentColor: Color = JellyfinTheme.colorScheme.onButton,
-		focusedContainerColor: Color = JellyfinTheme.colorScheme.buttonFocused,
-		focusedContentColor: Color = JellyfinTheme.colorScheme.onButtonFocused,
-		disabledContainerColor: Color = JellyfinTheme.colorScheme.buttonDisabled,
-		disabledContentColor: Color = JellyfinTheme.colorScheme.onButtonDisabled,
 	) = ButtonColors(
 		containerColor = containerColor,
 		contentColor = contentColor,
-		focusedContainerColor = focusedContainerColor,
-		focusedContentColor = focusedContentColor,
-		disabledContainerColor = disabledContainerColor,
-		disabledContentColor = disabledContentColor,
+		focusedContainerColor = JellyfinTheme.colorScheme.buttonFocused,
+		focusedContentColor = JellyfinTheme.colorScheme.onButtonFocused,
+		disabledContainerColor = JellyfinTheme.colorScheme.buttonDisabled,
+		disabledContentColor = JellyfinTheme.colorScheme.onButtonDisabled,
 	)
+
+	@ReadOnlyComposable
+	@Composable
+	fun style(
+		shape: Shape = Shape,
+		colors: ButtonColors = colors(),
+		enabled: Boolean = true,
+	) = ButtonStyle(shape = shape, colors = colors, enabled = enabled)
 }

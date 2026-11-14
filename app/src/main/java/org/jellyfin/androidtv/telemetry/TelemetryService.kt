@@ -29,6 +29,8 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 object TelemetryService {
+	private const val LOG_FILE_LINES = 250
+
 	/**
 	 * Call in the attachBaseContext function of the application.
 	 */
@@ -38,7 +40,7 @@ object TelemetryService {
 			buildConfigClass = BuildConfig::class.java
 			sharedPreferencesName = TelemetryPreferences.SHARED_PREFERENCES_NAME
 			pluginLoader = AcraPluginLoader(AcraReportSenderFactory::class.java)
-			applicationLogFileLines = 250
+			applicationLogFileLines = LOG_FILE_LINES
 
 			toast {
 				text = context.getString(R.string.crash_report_toast)

@@ -10,6 +10,7 @@ import org.jellyfin.androidtv.preference.UserPreferences
 import org.jellyfin.androidtv.preference.UserSettingPreferences
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.base.list.ListButton
+import org.jellyfin.androidtv.ui.base.list.ListItemSlots
 import org.jellyfin.androidtv.ui.base.list.ListSection
 import org.jellyfin.androidtv.ui.navigation.LocalRouter
 import org.jellyfin.androidtv.ui.navigation.focus.focusKey
@@ -40,7 +41,9 @@ fun SettingsHomeScreen() {
 		itemsIndexed(userSettingPreferences.homesections) { index, section ->
 			ListButton(
 				headingContent = { Text(stringResource(R.string.home_section_i, index + 1)) },
-				captionContent = { Text(stringResource(userSettingPreferences[section].nameRes)) },
+				slots = ListItemSlots(
+					captionContent = { Text(stringResource(userSettingPreferences[section].nameRes)) },
+				),
 				onClick = { router.push(Routes.HOME_SECTION, mapOf("index" to index.toString())) },
 				modifier = Modifier.focusKey("home_section_$index")
 			)
@@ -60,7 +63,9 @@ fun SettingsHomeScreen() {
 
 			ListButton(
 				headingContent = { Text(stringResource(R.string.home_next_up_max_days)) },
-				captionContent = { Text(selectedCaption) },
+				slots = ListItemSlots(
+					captionContent = { Text(selectedCaption) },
+				),
 				onClick = { router.push(Routes.HOME_NEXT_UP_CUTOFF) },
 				modifier = Modifier.focusKey(Routes.HOME_NEXT_UP_CUTOFF)
 			)

@@ -12,6 +12,7 @@ import org.jellyfin.androidtv.preference.UserSettingPreferences
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.base.form.RadioButton
 import org.jellyfin.androidtv.ui.base.list.ListButton
+import org.jellyfin.androidtv.ui.base.list.ListItemSlots
 import org.jellyfin.androidtv.ui.base.list.ListMessage
 import org.jellyfin.androidtv.ui.base.list.ListSection
 import org.jellyfin.androidtv.ui.navigation.LocalRouter
@@ -47,7 +48,9 @@ fun SettingsHomeSectionScreen(index: Int) {
 		items(HomeSectionType.entries) { entry ->
 			ListButton(
 				headingContent = { Text(stringResource(entry.nameRes)) },
-				trailingContent = { RadioButton(checked = sectionType == entry) },
+				slots = ListItemSlots(
+					trailingContent = { RadioButton(checked = sectionType == entry) },
+				),
 				onClick = {
 					sectionType = entry
 					router.back()

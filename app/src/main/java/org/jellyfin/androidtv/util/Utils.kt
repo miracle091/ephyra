@@ -12,6 +12,8 @@ import kotlin.math.roundToInt
  * A collection of utility methods, all static.
  */
 object Utils : KoinComponent {
+	private const val SEEK_END_MARGIN_MS = 1000L
+
 	/**
 	 * Shows a (long) toast
 	 */
@@ -64,7 +66,7 @@ object Utils : KoinComponent {
 
 	@JvmStatic
 	fun getSafeSeekPosition(position: Long, duration: Long): Long = when {
-		position >= duration -> (duration - 1000).coerceAtLeast(0)
+		position >= duration -> (duration - SEEK_END_MARGIN_MS).coerceAtLeast(0)
 		else -> position.coerceAtLeast(0)
 	}
 

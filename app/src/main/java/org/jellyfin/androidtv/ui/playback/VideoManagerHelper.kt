@@ -23,6 +23,21 @@ fun getSubtitleMediaStreamCodec(stream: MediaStream): String {
 	return urlExtensionMediaType ?: codecMediaType ?: urlSubtitleExtension ?: codec
 }
 
+private const val LIMITER_ATTACK_MS = 30f
+private const val LIMITER_RELEASE_MS = 300f
+private const val LIMITER_RATIO = 10f
+private const val LIMITER_THRESHOLD_DB = -24f
+private const val LIMITER_POST_GAIN_DB = 3f
+private const val EQ_BAND_COUNT = 5
+private const val EQ_GAIN_LOW = 0.02f
+private const val EQ_GAIN_HIGH = 0.03f
+private const val EQ_LEVEL_LOW: Short = 2
+private const val EQ_LEVEL_HIGH: Short = 3
+
+// Night mode curve: a gentle boost of the lower-mid bands, per band
+private val NIGHTMODE_EQ_GAINS = floatArrayOf(0f, EQ_GAIN_LOW, EQ_GAIN_HIGH, EQ_GAIN_LOW, 0f)
+private val NIGHTMODE_EQ_LEVELS = shortArrayOf(0, EQ_LEVEL_LOW, EQ_LEVEL_HIGH, EQ_LEVEL_LOW, 0)
+
 private var audioEffect: AudioEffect? = null
 
 fun applyAudioNightmode(audioSessionId: Int) {
@@ -38,20 +53,16 @@ fun applyAudioNightmode(audioSessionId: Int) {
 					true,
 					true,
 					1,
-					30f,
-					300f,
-					10f,
-					-24f,
-					3f
+					LIMITER_ATTACK_MS,
+					LIMITER_RELEASE_MS,
+					LIMITER_RATIO,
+					LIMITER_THRESHOLD_DB,
+					LIMITER_POST_GAIN_DB
 				)
 			)
 
-			setPreEqAllChannelsTo(DynamicsProcessing.Eq(true, true, 5).apply {
-				getBand(0).gain = 0f
-				getBand(1).gain = 0.02f
-				getBand(2).gain = 0.03f
-				getBand(3).gain = 0.02f
-				getBand(4).gain = 0f
+			setPreEqAllChannelsTo(DynamicsProcessing.Eq(true, true, EQ_BAND_COUNT).apply {
+				NIGHTMODE_EQ_GAINS.forEachIndexed { band, gain -> getBand(band).gain = gain }
 			})
 
 			enabled = true
@@ -59,11 +70,7 @@ fun applyAudioNightmode(audioSessionId: Int) {
 
 		// Use more simple equalizer implementation on older versions
 		else -> Equalizer(0, audioSessionId).apply {
-			setBandLevel(0, 0)
-			setBandLevel(1, 2)
-			setBandLevel(2, 3)
-			setBandLevel(3, 2)
-			setBandLevel(4, 0)
+			NIGHTMODE_EQ_LEVELS.forEachIndexed { band, level -> setBandLevel(band.toShort(), level) }
 			enabled = true
 		}
 	}

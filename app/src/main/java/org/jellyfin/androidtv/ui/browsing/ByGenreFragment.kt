@@ -10,6 +10,8 @@ import org.jellyfin.sdk.model.api.ItemSortBy
 import org.jellyfin.sdk.model.api.request.GetItemsRequest
 import org.koin.android.ext.android.inject
 
+private const val GENRE_ROW_CHUNK_SIZE = 40
+
 class ByGenreFragment : BrowseFolderFragment() {
 	private val apiClient by inject<ApiClient>()
 
@@ -34,7 +36,7 @@ class ByGenreFragment : BrowseFolderFragment() {
 				recursive = true,
 				fields = ItemRepository.itemFields,
 			)
-			rows.add(BrowseRowDef(genre.name, itemsRequest, 40))
+			rows.add(BrowseRowDef(genre.name, itemsRequest, GENRE_ROW_CHUNK_SIZE))
 		}
 
 		rowLoader.loadRows(rows)

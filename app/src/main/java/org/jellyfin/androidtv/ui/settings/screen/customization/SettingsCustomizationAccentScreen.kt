@@ -21,6 +21,7 @@ import org.jellyfin.androidtv.preference.constant.AccentColor
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.base.form.RadioButton
 import org.jellyfin.androidtv.ui.base.list.ListButton
+import org.jellyfin.androidtv.ui.base.list.ListItemSlots
 import org.jellyfin.androidtv.ui.base.list.ListSection
 import org.jellyfin.androidtv.ui.base.paletteFor
 import org.jellyfin.androidtv.ui.navigation.LocalRouter
@@ -49,16 +50,18 @@ fun SettingsCustomizationAccentScreen() {
 
 		items(AccentColor.entries) { entry ->
 			ListButton(
-				leadingContent = {
-					Box(
-						modifier = Modifier
-							.size(24.dp)
-							.background(entry.accent?.let { colorResource(it) } ?: themeAccent, CircleShape)
-							.border(1.dp, Color.White.copy(alpha = 0.4f), CircleShape)
-					)
-				},
 				headingContent = { Text(stringResource(entry.nameRes)) },
-				trailingContent = { RadioButton(checked = accentColor == entry) },
+				slots = ListItemSlots(
+					leadingContent = {
+						Box(
+							modifier = Modifier
+								.size(24.dp)
+								.background(entry.accent?.let { colorResource(it) } ?: themeAccent, CircleShape)
+								.border(1.dp, Color.White.copy(alpha = 0.4f), CircleShape)
+						)
+					},
+					trailingContent = { RadioButton(checked = accentColor == entry) },
+				),
 				onClick = {
 					accentColor = entry
 					router.back()

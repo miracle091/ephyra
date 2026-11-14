@@ -2,31 +2,22 @@ package org.jellyfin.androidtv.ui.settings.screen.playback
 
 import android.annotation.SuppressLint
 import android.widget.Toast
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.sizeIn
-import androidx.compose.foundation.layout.width
+import androidx.annotation.StringRes
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import org.jellyfin.androidtv.R
 import org.jellyfin.androidtv.constant.getQualityProfiles
 import org.jellyfin.androidtv.preference.UserPreferences
 import org.jellyfin.androidtv.preference.UserSettingPreferences
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.base.form.Checkbox
-import org.jellyfin.androidtv.ui.base.form.RangeControl
 import org.jellyfin.androidtv.ui.base.list.ListButton
-import org.jellyfin.androidtv.ui.base.list.ListControl
+import org.jellyfin.androidtv.ui.base.list.ListItemSlots
 import org.jellyfin.androidtv.ui.base.list.ListSection
 import org.jellyfin.androidtv.ui.navigation.LocalRouter
 import org.jellyfin.androidtv.ui.navigation.focus.focusKey
@@ -35,19 +26,14 @@ import org.jellyfin.androidtv.ui.settings.compat.rememberPreference
 import org.jellyfin.androidtv.ui.settings.composable.SettingsAsyncActionListButton
 import org.jellyfin.androidtv.ui.settings.composable.SettingsColumn
 import org.jellyfin.androidtv.util.profile.createDeviceProfileReport
-import org.jellyfin.design.Tokens
+import org.jellyfin.preference.Preference
 import org.jellyfin.sdk.api.client.ApiClient
 import org.jellyfin.sdk.api.client.extensions.systemApi
 import org.jellyfin.sdk.model.ServerVersion
 import org.koin.compose.koinInject
-import java.text.DecimalFormat
-import kotlin.math.roundToInt
-import kotlin.math.roundToLong
 
 @Composable
 fun SettingsPlaybackAdvancedScreen() {
-	val context = LocalContext.current
-	val router = LocalRouter.current
 	val userPreferences = koinInject<UserPreferences>()
 	val userSettingPreferences = koinInject<UserSettingPreferences>()
 
@@ -59,274 +45,253 @@ fun SettingsPlaybackAdvancedScreen() {
 			)
 		}
 
-		item { ListSection(headingContent = { Text(stringResource(R.string.pref_customization)) }) }
-
-		item {
-			var resumeSubtractDuration by rememberPreference(userPreferences, UserPreferences.resumeSubtractDuration)
-			val options = getResumeSubtractDurationOptions()
-
-			ListButton(
-				headingContent = { Text(stringResource(R.string.lbl_resume_preroll)) },
-				captionContent = { Text(options[resumeSubtractDuration].orEmpty()) },
-				onClick = { router.push(Routes.PLAYBACK_RESUME_SUBTRACT_DURATION) },
-				modifier = Modifier.focusKey(Routes.PLAYBACK_RESUME_SUBTRACT_DURATION)
-			)
-		}
-
-		item {
-			var skipForwardLength by rememberPreference(userSettingPreferences, UserSettingPreferences.skipForwardLength)
-			val interactionSource = remember { MutableInteractionSource() }
-
-			ListControl(
-				headingContent = { Text(stringResource(R.string.skip_forward_length)) },
-				interactionSource = interactionSource,
-				modifier = Modifier.focusKey("skip_forward_length")
-			) {
-				Row(
-					verticalAlignment = Alignment.CenterVertically,
-				) {
-					RangeControl(
-						modifier = Modifier
-							.height(4.dp)
-							.weight(1f),
-						interactionSource = interactionSource,
-						// 5 - 30 seconds with 5 second increment
-						min = 5_000f,
-						max = 30_000f,
-						stepForward = 5_000f,
-						value = skipForwardLength.toFloat(),
-						onValueChange = { skipForwardLength = it.roundToInt() }
-					)
-
-					Spacer(Modifier.width(Tokens.Space.spaceSm))
-
-					Box(
-						modifier = Modifier.sizeIn(minWidth = 32.dp),
-						contentAlignment = Alignment.CenterEnd
-					) {
-						Text("${skipForwardLength / 1000}s")
-					}
-				}
-			}
-		}
-
-		item {
-			var bufferLength by rememberPreference(userPreferences, UserPreferences.bufferLength)
-
-			ListButton(
-				headingContent = { Text(stringResource(R.string.playback_buffer_length)) },
-				captionContent = { Text(stringResource(bufferLength.nameRes)) },
-				onClick = { router.push(Routes.PLAYBACK_BUFFER_LENGTH) },
-				modifier = Modifier.focusKey(Routes.PLAYBACK_BUFFER_LENGTH)
-			)
-		}
-
-		item { ListSection(headingContent = { Text(stringResource(R.string.pref_video)) }) }
-
-		item {
-			var maxBitrate by rememberPreference(userPreferences, UserPreferences.maxBitrate)
-			val options = getQualityProfiles(context)
-
-			ListButton(
-				headingContent = { Text(stringResource(R.string.pref_max_bitrate_title)) },
-				captionContent = { Text(options[maxBitrate].orEmpty()) },
-				onClick = { router.push(Routes.PLAYBACK_MAX_BITRATE) },
-				modifier = Modifier.focusKey(Routes.PLAYBACK_MAX_BITRATE)
-			)
-		}
-
-		item {
-			var refreshRateSwitchingBehavior by rememberPreference(userPreferences, UserPreferences.refreshRateSwitchingBehavior)
-
-			ListButton(
-				headingContent = { Text(stringResource(R.string.lbl_refresh_switching)) },
-				captionContent = { Text(stringResource(refreshRateSwitchingBehavior.nameRes)) },
-				onClick = { router.push(Routes.PLAYBACK_REFRESH_RATE_SWITCHING_BEHAVIOR) },
-				modifier = Modifier.focusKey(Routes.PLAYBACK_REFRESH_RATE_SWITCHING_BEHAVIOR)
-			)
-		}
-
-		item {
-			var videoStartDelay by rememberPreference(userPreferences, UserPreferences.videoStartDelay)
-			val interactionSource = remember { MutableInteractionSource() }
-
-			ListControl(
-				headingContent = { Text(stringResource(R.string.video_start_delay)) },
-				interactionSource = interactionSource,
-				modifier = Modifier.focusKey("video_start_delay")
-			) {
-				Row(
-					verticalAlignment = Alignment.CenterVertically,
-				) {
-					RangeControl(
-						modifier = Modifier
-							.height(4.dp)
-							.weight(1f),
-						interactionSource = interactionSource,
-						// 0 - 5 seconds with 0.25 second increment
-						min = 0_000f,
-						max = 5_000f,
-						stepForward = 250f,
-						value = videoStartDelay.toFloat(),
-						onValueChange = { videoStartDelay = it.roundToLong() }
-					)
-
-					Spacer(Modifier.width(Tokens.Space.spaceSm))
-
-					Box(
-						modifier = Modifier.sizeIn(minWidth = 48.dp),
-						contentAlignment = Alignment.CenterEnd
-					) {
-						val formatter = remember { DecimalFormat("0.##") }
-						Text("${formatter.format(videoStartDelay / 1000f)}s")
-					}
-				}
-			}
-		}
-
-		item {
-			var playerZoomMode by rememberPreference(userPreferences, UserPreferences.playerZoomMode)
-
-			ListButton(
-				headingContent = { Text(stringResource(R.string.default_video_zoom)) },
-				captionContent = { Text(stringResource(playerZoomMode.nameRes)) },
-				onClick = { router.push(Routes.PLAYBACK_ZOOM_MODE) },
-				modifier = Modifier.focusKey(Routes.PLAYBACK_ZOOM_MODE)
-			)
-		}
-
-		item {
-			ListButton(
-				headingContent = { Text(stringResource(R.string.preference_hdr_overrides)) },
-				captionContent = { Text(stringResource(R.string.preference_hdr_overrides_summary)) },
-				onClick = { router.push(Routes.PLAYBACK_HDR_OVERRIDES) },
-				modifier = Modifier.focusKey(Routes.PLAYBACK_HDR_OVERRIDES)
-			)
-		}
-
-		item {
-			ListButton(
-				headingContent = { Text(stringResource(R.string.preference_codecs)) },
-				captionContent = { Text(stringResource(R.string.preference_codecs_summary)) },
-				onClick = { router.push(Routes.PLAYBACK_CODEC) },
-				modifier = Modifier.focusKey(Routes.PLAYBACK_CODEC)
-			)
-		}
-
-		item { ListSection(headingContent = { Text(stringResource(R.string.pref_subtitles)) }) }
-
-		item {
-			var pgsDirectPlay by rememberPreference(userPreferences, UserPreferences.pgsDirectPlay)
-
-			ListButton(
-				headingContent = { Text(stringResource(R.string.preference_enable_pgs)) },
-				captionContent = { Text(stringResource(R.string.preference_enable_pgs_description)) },
-				trailingContent = { Checkbox(checked = pgsDirectPlay) },
-				onClick = { pgsDirectPlay = !pgsDirectPlay },
-				modifier = Modifier.focusKey("pgs_direct_play")
-			)
-		}
-
-		item {
-			var assDirectPlay by rememberPreference(userPreferences, UserPreferences.assDirectPlay)
-
-			ListButton(
-				headingContent = { Text(stringResource(R.string.preference_enable_ass)) },
-				captionContent = { Text(stringResource(R.string.preference_enable_ass_description)) },
-				trailingContent = { Checkbox(checked = assDirectPlay) },
-				onClick = { assDirectPlay = !assDirectPlay },
-				modifier = Modifier.focusKey("ass_direct_play")
-			)
-		}
-
-		item {
-			var subtitlesBurnDuringTranscode by rememberPreference(userPreferences, UserPreferences.subtitlesBurnDuringTranscode)
-
-			ListButton(
-				headingContent = { Text(stringResource(R.string.pref_burn_subtitles_when_transcoding)) },
-				captionContent = { Text(stringResource(R.string.pref_burn_subtitles_when_transcoding_description)) },
-				trailingContent = { Checkbox(checked = subtitlesBurnDuringTranscode) },
-				onClick = { subtitlesBurnDuringTranscode = !subtitlesBurnDuringTranscode },
-				modifier = Modifier.focusKey("subtitles_burn_during_transcode")
-			)
-		}
-
-		item { ListSection(headingContent = { Text(stringResource(R.string.pref_live_tv_cat)) }) }
-
-		item {
-			var liveTvDirectPlayEnabled by rememberPreference(userPreferences, UserPreferences.liveTvDirectPlayEnabled)
-
-			ListButton(
-				headingContent = { Text(stringResource(R.string.lbl_direct_stream_live)) },
-				trailingContent = { Checkbox(checked = liveTvDirectPlayEnabled) },
-				onClick = { liveTvDirectPlayEnabled = !liveTvDirectPlayEnabled },
-				modifier = Modifier.focusKey("live_tv_direct_play_enabled")
-			)
-		}
-
-		item { ListSection(headingContent = { Text(stringResource(R.string.pref_audio)) }) }
-
-		item {
-			var audioBehaviour by rememberPreference(userPreferences, UserPreferences.audioBehaviour)
-
-			ListButton(
-				headingContent = { Text(stringResource(R.string.lbl_audio_output)) },
-				captionContent = { Text(stringResource(audioBehaviour.nameRes)) },
-				onClick = { router.push(Routes.PLAYBACK_AUDIO_BEHAVIOR) },
-				modifier = Modifier.focusKey(Routes.PLAYBACK_AUDIO_BEHAVIOR)
-			)
-		}
-
-		item {
-			var audioNightMode by rememberPreference(userPreferences, UserPreferences.audioNightMode)
-
-			ListButton(
-				headingContent = { Text(stringResource(R.string.pref_audio_night_mode)) },
-				trailingContent = { Checkbox(checked = audioNightMode) },
-				captionContent = { Text(stringResource(R.string.ephyra_audio_night_mode_content)) },
-				onClick = { audioNightMode = !audioNightMode },
-				modifier = Modifier.focusKey("audio_night_mode")
-			)
-		}
-
-		item {
-			var preferExoPlayerFfmpeg by rememberPreference(userPreferences, UserPreferences.preferExoPlayerFfmpeg)
-			ListButton(
-				headingContent = { Text(stringResource(R.string.prefer_exoplayer_ffmpeg)) },
-				trailingContent = { Checkbox(checked = preferExoPlayerFfmpeg) },
-				captionContent = { Text(stringResource(R.string.ephyra_prefer_ffmpeg_content)) },
-				onClick = { preferExoPlayerFfmpeg = !preferExoPlayerFfmpeg },
-				modifier = Modifier.focusKey("prefer_exoplayer_ffmpeg")
-			)
-		}
-
-		item { ListSection(headingContent = { Text(stringResource(R.string.pref_troubleshooting)) }) }
-
-		item {
-			val api = koinInject<ApiClient>()
-			val serverVersion = koinInject<ServerVersion>()
-
-			SettingsAsyncActionListButton(
-				headingContent = { Text(stringResource(R.string.pref_report_device_profile_title)) },
-				captionContent = { Text(stringResource(R.string.pref_report_device_profile_summary)) },
-				action = {
-					val report = createDeviceProfileReport(context, userPreferences, serverVersion)
-					val response by api.systemApi.logFile(report)
-					response
-				},
-				onSuccess = { result ->
-					Toast.makeText(
-						context,
-						@SuppressLint("LocalContextGetResourceValueCall")
-						context.getString(R.string.pref_report_device_profile_success, result.fileName),
-						Toast.LENGTH_LONG
-					).show()
-				},
-				onFailure = {
-					Toast.makeText(context, R.string.pref_report_device_profile_failure, Toast.LENGTH_LONG).show()
-				},
-				modifier = Modifier.focusKey("report_device_profile")
-			)
-		}
+		customizationItems(userPreferences, userSettingPreferences)
+		videoItems(userPreferences)
+		subtitleItems(userPreferences)
+		liveTvItems(userPreferences)
+		audioItems(userPreferences)
+		troubleshootingItems(userPreferences)
 	}
+}
+
+private fun LazyListScope.customizationItems(userPreferences: UserPreferences, userSettingPreferences: UserSettingPreferences) {
+	item { ListSection(headingContent = { Text(stringResource(R.string.pref_customization)) }) }
+
+	item {
+		val resumeSubtractDuration by rememberPreference(userPreferences, UserPreferences.resumeSubtractDuration)
+		val options = getResumeSubtractDurationOptions()
+
+		NavigationButton(
+			heading = R.string.lbl_resume_preroll,
+			route = Routes.PLAYBACK_RESUME_SUBTRACT_DURATION,
+			caption = options[resumeSubtractDuration].orEmpty(),
+		)
+	}
+
+	item {
+		var skipForwardLength by rememberPreference(userSettingPreferences, UserSettingPreferences.skipForwardLength)
+
+		SkipForwardLengthControl(value = skipForwardLength, onValueChange = { skipForwardLength = it })
+	}
+
+	item {
+		val bufferLength by rememberPreference(userPreferences, UserPreferences.bufferLength)
+
+		NavigationButton(
+			heading = R.string.playback_buffer_length,
+			route = Routes.PLAYBACK_BUFFER_LENGTH,
+			caption = stringResource(bufferLength.nameRes),
+		)
+	}
+}
+
+private fun LazyListScope.videoItems(userPreferences: UserPreferences) {
+	item { ListSection(headingContent = { Text(stringResource(R.string.pref_video)) }) }
+
+	item {
+		val maxBitrate by rememberPreference(userPreferences, UserPreferences.maxBitrate)
+		val options = getQualityProfiles(LocalContext.current)
+
+		NavigationButton(
+			heading = R.string.pref_max_bitrate_title,
+			route = Routes.PLAYBACK_MAX_BITRATE,
+			caption = options[maxBitrate].orEmpty(),
+		)
+	}
+
+	item {
+		val refreshRateSwitchingBehavior by rememberPreference(userPreferences, UserPreferences.refreshRateSwitchingBehavior)
+
+		NavigationButton(
+			heading = R.string.lbl_refresh_switching,
+			route = Routes.PLAYBACK_REFRESH_RATE_SWITCHING_BEHAVIOR,
+			caption = stringResource(refreshRateSwitchingBehavior.nameRes),
+		)
+	}
+
+	item {
+		var videoStartDelay by rememberPreference(userPreferences, UserPreferences.videoStartDelay)
+
+		VideoStartDelayControl(value = videoStartDelay, onValueChange = { videoStartDelay = it })
+	}
+
+	item {
+		val playerZoomMode by rememberPreference(userPreferences, UserPreferences.playerZoomMode)
+
+		NavigationButton(
+			heading = R.string.default_video_zoom,
+			route = Routes.PLAYBACK_ZOOM_MODE,
+			caption = stringResource(playerZoomMode.nameRes),
+		)
+	}
+
+	item {
+		NavigationButton(
+			heading = R.string.preference_hdr_overrides,
+			route = Routes.PLAYBACK_HDR_OVERRIDES,
+			caption = stringResource(R.string.preference_hdr_overrides_summary),
+		)
+	}
+
+	item {
+		NavigationButton(
+			heading = R.string.preference_codecs,
+			route = Routes.PLAYBACK_CODEC,
+			caption = stringResource(R.string.preference_codecs_summary),
+		)
+	}
+}
+
+private fun LazyListScope.subtitleItems(userPreferences: UserPreferences) {
+	item { ListSection(headingContent = { Text(stringResource(R.string.pref_subtitles)) }) }
+
+	item {
+		PreferenceCheckbox(
+			store = userPreferences,
+			preference = UserPreferences.pgsDirectPlay,
+			heading = R.string.preference_enable_pgs,
+			key = "pgs_direct_play",
+			caption = R.string.preference_enable_pgs_description,
+		)
+	}
+
+	item {
+		PreferenceCheckbox(
+			store = userPreferences,
+			preference = UserPreferences.assDirectPlay,
+			heading = R.string.preference_enable_ass,
+			key = "ass_direct_play",
+			caption = R.string.preference_enable_ass_description,
+		)
+	}
+
+	item {
+		PreferenceCheckbox(
+			store = userPreferences,
+			preference = UserPreferences.subtitlesBurnDuringTranscode,
+			heading = R.string.pref_burn_subtitles_when_transcoding,
+			key = "subtitles_burn_during_transcode",
+			caption = R.string.pref_burn_subtitles_when_transcoding_description,
+		)
+	}
+}
+
+private fun LazyListScope.liveTvItems(userPreferences: UserPreferences) {
+	item { ListSection(headingContent = { Text(stringResource(R.string.pref_live_tv_cat)) }) }
+
+	item {
+		PreferenceCheckbox(
+			store = userPreferences,
+			preference = UserPreferences.liveTvDirectPlayEnabled,
+			heading = R.string.lbl_direct_stream_live,
+			key = "live_tv_direct_play_enabled",
+		)
+	}
+}
+
+private fun LazyListScope.audioItems(userPreferences: UserPreferences) {
+	item { ListSection(headingContent = { Text(stringResource(R.string.pref_audio)) }) }
+
+	item {
+		val audioBehaviour by rememberPreference(userPreferences, UserPreferences.audioBehaviour)
+
+		NavigationButton(
+			heading = R.string.lbl_audio_output,
+			route = Routes.PLAYBACK_AUDIO_BEHAVIOR,
+			caption = stringResource(audioBehaviour.nameRes),
+		)
+	}
+
+	item {
+		PreferenceCheckbox(
+			store = userPreferences,
+			preference = UserPreferences.audioNightMode,
+			heading = R.string.pref_audio_night_mode,
+			key = "audio_night_mode",
+			caption = R.string.ephyra_audio_night_mode_content,
+		)
+	}
+
+	item {
+		PreferenceCheckbox(
+			store = userPreferences,
+			preference = UserPreferences.preferExoPlayerFfmpeg,
+			heading = R.string.prefer_exoplayer_ffmpeg,
+			key = "prefer_exoplayer_ffmpeg",
+			caption = R.string.ephyra_prefer_ffmpeg_content,
+		)
+	}
+}
+
+private fun LazyListScope.troubleshootingItems(userPreferences: UserPreferences) {
+	item { ListSection(headingContent = { Text(stringResource(R.string.pref_troubleshooting)) }) }
+
+	item {
+		val context = LocalContext.current
+		val api = koinInject<ApiClient>()
+		val serverVersion = koinInject<ServerVersion>()
+
+		SettingsAsyncActionListButton(
+			headingContent = { Text(stringResource(R.string.pref_report_device_profile_title)) },
+			captionContent = { Text(stringResource(R.string.pref_report_device_profile_summary)) },
+			action = {
+				val report = createDeviceProfileReport(context, userPreferences, serverVersion)
+				val response by api.systemApi.logFile(report)
+				response
+			},
+			onResult = { result ->
+				result.fold(
+					onSuccess = { response ->
+						Toast.makeText(
+							context,
+							@SuppressLint("LocalContextGetResourceValueCall")
+							context.getString(R.string.pref_report_device_profile_success, response.fileName),
+							Toast.LENGTH_LONG
+						).show()
+					},
+					onFailure = {
+						Toast.makeText(context, R.string.pref_report_device_profile_failure, Toast.LENGTH_LONG).show()
+					},
+				)
+			},
+			modifier = Modifier.focusKey("report_device_profile")
+		)
+	}
+}
+
+/** A button that opens [route], with the current value (or a description) as caption. */
+@Composable
+private fun NavigationButton(@StringRes heading: Int, route: String, caption: String) {
+	val router = LocalRouter.current
+
+	ListButton(
+		headingContent = { Text(stringResource(heading)) },
+		slots = ListItemSlots(
+			captionContent = { Text(caption) },
+		),
+		onClick = { router.push(route) },
+		modifier = Modifier.focusKey(route)
+	)
+}
+
+/** A checkbox for a boolean user preference, with an optional caption. */
+@Composable
+private fun PreferenceCheckbox(
+	store: UserPreferences,
+	preference: Preference<Boolean>,
+	@StringRes heading: Int,
+	key: String,
+	@StringRes caption: Int? = null,
+) {
+	var checked by rememberPreference(store, preference)
+
+	ListButton(
+		headingContent = { Text(stringResource(heading)) },
+		slots = ListItemSlots(
+			captionContent = if (caption != null) ({ Text(stringResource(caption)) }) else null,
+			trailingContent = { Checkbox(checked = checked) },
+		),
+		onClick = { checked = !checked },
+		modifier = Modifier.focusKey(key)
+	)
 }

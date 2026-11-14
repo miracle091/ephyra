@@ -10,6 +10,7 @@ import org.jellyfin.androidtv.preference.UserPreferences
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.base.form.Checkbox
 import org.jellyfin.androidtv.ui.base.list.ListButton
+import org.jellyfin.androidtv.ui.base.list.ListItemSlots
 import org.jellyfin.androidtv.ui.base.list.ListSection
 import org.jellyfin.androidtv.ui.navigation.focus.focusKey
 import org.jellyfin.androidtv.ui.settings.compat.rememberPreference
@@ -33,8 +34,10 @@ fun SettingsPlaybackPrerollsScreen() {
 
 			ListButton(
 				headingContent = { Text(stringResource(R.string.pref_prerolls_enabled)) },
-				trailingContent = { Checkbox(checked = cinemaModeEnabled) },
-				captionContent = { Text(stringResource(R.string.pref_prerolls_enabled_description)) },
+				slots = ListItemSlots(
+					trailingContent = { Checkbox(checked = cinemaModeEnabled) },
+					captionContent = { Text(stringResource(R.string.pref_prerolls_enabled_description)) },
+				),
 				onClick = { cinemaModeEnabled = !cinemaModeEnabled },
 				modifier = Modifier.focusKey("cinema_mode_enabled")
 			)

@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalResources
 import org.jellyfin.androidtv.ui.composable.AsyncImage
+import org.jellyfin.androidtv.ui.composable.AsyncImageSource
 import org.jellyfin.androidtv.util.apiclient.getUrl
 import org.jellyfin.androidtv.util.apiclient.itemImages
 import org.jellyfin.sdk.api.client.ApiClient
@@ -32,12 +33,14 @@ fun PhotoPlayerContent(
 		val image = item?.itemImages[ImageType.PRIMARY]
 
 		AsyncImage(
-			url = image?.getUrl(
-				api = api,
-				maxWidth = resources.displayMetrics.widthPixels,
-				maxHeight = resources.displayMetrics.heightPixels,
+			source = AsyncImageSource(
+				url = image?.getUrl(
+					api = api,
+					maxWidth = resources.displayMetrics.widthPixels,
+					maxHeight = resources.displayMetrics.heightPixels,
+				),
+				blurHash = image?.blurHash,
 			),
-			blurHash = image?.blurHash,
 			aspectRatio = image?.aspectRatio ?: 1f,
 			modifier = Modifier
 				.fillMaxSize()

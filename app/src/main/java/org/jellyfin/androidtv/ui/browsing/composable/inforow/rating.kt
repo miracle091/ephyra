@@ -3,12 +3,12 @@ package org.jellyfin.androidtv.ui.browsing.composable.inforow
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import org.jellyfin.androidtv.R
 import org.jellyfin.androidtv.ui.base.Text
 import java.text.NumberFormat
-import java.util.Locale
 
 /**
  * A community rating item in the [BaseItemInfoRow].
@@ -19,10 +19,10 @@ import java.util.Locale
 fun InfoRowCommunityRating(communityRating: Float) {
 	InfoRowItem(
 		icon = ImageVector.vectorResource(R.drawable.ic_star),
-		iconTint = Color(0xFFEECE55),
+		iconTint = Color(color = 0xFFEECE55),
 		contentDescription = stringResource(R.string.lbl_community_rating),
 	) {
-		Text(String.format(Locale.getDefault(), "%.1f", communityRating * 10f))
+		Text(String.format(LocalConfiguration.current.locales[0], "%.1f", communityRating * COMMUNITY_RATING_SCALE))
 	}
 }
 

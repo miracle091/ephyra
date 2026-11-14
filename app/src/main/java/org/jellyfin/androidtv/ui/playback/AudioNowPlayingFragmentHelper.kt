@@ -48,9 +48,12 @@ import org.jellyfin.androidtv.R
 import org.jellyfin.androidtv.ui.base.EphyraTheme
 import org.jellyfin.androidtv.ui.base.Icon
 import org.jellyfin.androidtv.ui.base.LocalEphyraPalette
+import org.jellyfin.androidtv.ui.base.LocalTextStyle
 import org.jellyfin.androidtv.ui.composable.AsyncImage
+import org.jellyfin.androidtv.ui.composable.AsyncImageSource
 import org.jellyfin.androidtv.ui.composable.blurHashPainter
 import org.jellyfin.androidtv.ui.composable.LyricsDtoBox
+import org.jellyfin.androidtv.ui.composable.LyricsPosition
 import org.jellyfin.androidtv.ui.composable.modifier.fadingEdges
 import org.jellyfin.androidtv.ui.composable.rememberPlayerPositionInfo
 import org.jellyfin.androidtv.ui.composable.rememberQueueEntry
@@ -222,8 +225,7 @@ fun initializePreviewView(
 						.background(Color.Black)
 				) {
 					AsyncImage(
-						url = cover.getUrl(api),
-						blurHash = cover.blurHash,
+						source = AsyncImageSource(url = cover.getUrl(api), blurHash = cover.blurHash),
 						aspectRatio = 1f,
 						scaleType = ImageView.ScaleType.CENTER_CROP,
 						modifier = Modifier
@@ -244,11 +246,12 @@ fun initializePreviewView(
 
 			LyricsDtoBox(
 				lyricDto = lyrics,
-				currentTimestamp = positionInfo.active,
-				duration = positionInfo.duration,
-				paused = playState != PlayState.PLAYING,
-				fontSize = 12.sp,
-				color = Color.White,
+				position = LyricsPosition(
+					timestamp = positionInfo.active,
+					duration = positionInfo.duration,
+					paused = playState != PlayState.PLAYING,
+				),
+				textStyle = LocalTextStyle.current.merge(color = Color.White, fontSize = 12.sp),
 				modifier = Modifier
 					.fillMaxSize()
 					.fadingEdges(vertical = 50.dp)

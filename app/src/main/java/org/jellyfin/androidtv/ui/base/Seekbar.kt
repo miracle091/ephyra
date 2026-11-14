@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
@@ -53,64 +54,80 @@ object SeekbarDefaults {
 	)
 }
 
+private const val SEEK_STEP_DIVISOR = 100
+
+/** Where a [Seekbar] is: the [progress], the buffered part and the [duration], with the distance one key press seeks. */
+@Immutable
+data class SeekbarPosition(
+	val progress: Duration = Duration.ZERO,
+	val buffer: Duration = Duration.ZERO,
+	val duration: Duration = Duration.ZERO,
+	val seekForwardAmount: Duration = duration / SEEK_STEP_DIVISOR,
+	val seekRewindAmount: Duration = duration / SEEK_STEP_DIVISOR,
+)
+
+/** What a [Seekbar] reports: when scrubbing starts or stops and the position a seek moves to. */
+@Immutable
+data class SeekbarCallbacks(
+	val onScrubbing: ((scrubbing: Boolean) -> Unit)? = null,
+	val onSeek: ((progress: Duration) -> Unit)? = null,
+)
+
 @Composable
 fun Seekbar(
+	position: SeekbarPosition,
 	modifier: Modifier = Modifier,
-	interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-	progress: Duration = Duration.ZERO,
-	buffer: Duration = Duration.ZERO,
-	duration: Duration = Duration.ZERO,
-	seekForwardAmount: Duration = duration / 100,
-	seekRewindAmount: Duration = duration / 100,
-	onScrubbing: ((scrubbing: Boolean) -> Unit)? = null,
-	onSeek: ((progress: Duration) -> Unit)? = null,
+	callbacks: SeekbarCallbacks = SeekbarCallbacks(),
 	enabled: Boolean = true,
 	colors: SeekbarColors = SeekbarDefaults.colors(),
 ) {
-	val durationMs = duration.inWholeMilliseconds.toFloat().coerceAtLeast(1f)
-	val progressPercentage = progress.inWholeMilliseconds.toFloat() / durationMs
-	val bufferPercentage = buffer.inWholeMilliseconds.toFloat() / durationMs
-	val seekForwardPercentage = seekForwardAmount.inWholeMilliseconds.toFloat() / durationMs
-	val seekRewindPercentage = seekRewindAmount.inWholeMilliseconds.toFloat() / durationMs
+	val durationMs = position.duration.inWholeMilliseconds.toFloat().coerceAtLeast(1f)
+	val onSeek = callbacks.onSeek
 
-	Seekbar(
+	SeekbarBar(
+		state = SeekbarBarState(
+			progress = position.progress.inWholeMilliseconds.toFloat() / durationMs,
+			buffer = position.buffer.inWholeMilliseconds.toFloat() / durationMs,
+			seekForwardAmount = position.seekForwardAmount.inWholeMilliseconds.toFloat() / durationMs,
+			seekRewindAmount = position.seekRewindAmount.inWholeMilliseconds.toFloat() / durationMs,
+			enabled = enabled,
+		),
 		modifier = modifier,
-		interactionSource = interactionSource,
-		progress = progressPercentage,
-		buffer = bufferPercentage,
-		seekForwardAmount = seekForwardPercentage,
-		seekRewindAmount = seekRewindPercentage,
-		onScrubbing = onScrubbing,
-		onSeek = if (onSeek == null) null else { progress -> onSeek(progress.toDouble() * duration) },
-		enabled = enabled,
+		onScrubbing = callbacks.onScrubbing,
+		onSeek = if (onSeek == null) null else { progress -> onSeek(progress.toDouble() * position.duration) },
 		colors = colors,
 	)
 }
 
+/** The [Seekbar] position as fractions of its duration, and whether it reacts to keys. */
+private data class SeekbarBarState(
+	val progress: Float,
+	val buffer: Float,
+	val seekForwardAmount: Float,
+	val seekRewindAmount: Float,
+	val enabled: Boolean,
+)
+
 @Composable
-fun Seekbar(
-	modifier: Modifier = Modifier,
-	interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-	progress: Float = 0f,
-	buffer: Float = 0f,
-	seekForwardAmount: Float = 0.01f,
-	seekRewindAmount: Float = 0.01f,
-	onScrubbing: ((scrubbing: Boolean) -> Unit)? = null,
-	onSeek: ((progress: Float) -> Unit)? = null,
-	enabled: Boolean = true,
-	colors: SeekbarColors = SeekbarDefaults.colors(),
+private fun SeekbarBar(
+	state: SeekbarBarState,
+	modifier: Modifier,
+	onScrubbing: ((scrubbing: Boolean) -> Unit)?,
+	onSeek: ((progress: Float) -> Unit)?,
+	colors: SeekbarColors,
 ) {
+	val interactionSource = remember { MutableInteractionSource() }
 	val coroutineScope = rememberCoroutineScope()
 	val focused by interactionSource.collectIsFocusedAsState()
 	var progressOverride by remember { mutableStateOf<Float?>(null) }
-	val visibleProgress = progressOverride ?: progress
+	val visibleProgress = progressOverride ?: state.progress
 	val knobAlpha by animateFloatAsState(if (focused) 1f else 0f)
 	var scrubCancelJob by remember { mutableStateOf<Job?>(null) }
 
 	Box(
 		modifier = modifier
 			.onKeyEvent {
-				if (!enabled) return@onKeyEvent false
+				if (!state.enabled) return@onKeyEvent false
 
 				val isForward = it.key == Key.DirectionRight
 				val isRewind = it.key == Key.DirectionLeft
@@ -118,11 +135,13 @@ fun Seekbar(
 				val isKeyUp = it.type == KeyEventType.KeyUp
 				val isKeyDown = it.type == KeyEventType.KeyDown
 
-				val newProgress = when {
-					isKeyDown && isForward -> (visibleProgress + seekForwardAmount).coerceAtMost(1f)
-					isKeyDown && isRewind -> (visibleProgress - seekRewindAmount).coerceAtLeast(0f)
-					else -> visibleProgress
-				}
+				val newProgress = nextProgress(
+					current = visibleProgress,
+					state = state,
+					isKeyDown = isKeyDown,
+					isForward = isForward,
+					isRewind = isRewind,
+				)
 
 				if (isScrubbing && isKeyDown && onScrubbing != null) {
 					scrubCancelJob?.cancel()
@@ -145,47 +164,68 @@ fun Seekbar(
 
 				return@onKeyEvent isScrubbing
 			}
-			.focusable(interactionSource = interactionSource, enabled = enabled)
+			.focusable(interactionSource = interactionSource, enabled = state.enabled)
 			.drawWithContent {
-				val barCornerRadius = CornerRadius(size.minDimension, size.minDimension)
-
-				// Background bar
-				drawRoundRect(
-					color = colors.backgroundColor,
-					cornerRadius = barCornerRadius,
-				)
-
-				// Buffer bar
-				if (buffer > 0f) {
-					drawRoundRect(
-						color = colors.bufferColor,
-						size = size.copy(
-							width = buffer * size.width,
-						),
-						cornerRadius = barCornerRadius,
-					)
-				}
-
-				// Progress bar
-				if (visibleProgress > 0f) {
-					drawRoundRect(
-						color = colors.progressColor,
-						size = size.copy(
-							width = visibleProgress * size.width,
-						),
-						cornerRadius = barCornerRadius,
-					)
-				}
-
-				// Progress knob
-				drawCircle(
-					color = colors.knobColor,
-					alpha = knobAlpha,
-					center = center.copy(
-						x = visibleProgress * size.width,
-					),
-					radius = size.minDimension * 2,
-				)
+				drawSeekbar(colors, state.buffer, visibleProgress, knobAlpha)
 			}
+	)
+}
+
+private fun nextProgress(
+	current: Float,
+	state: SeekbarBarState,
+	isKeyDown: Boolean,
+	isForward: Boolean,
+	isRewind: Boolean,
+) = when {
+	isKeyDown && isForward -> (current + state.seekForwardAmount).coerceAtMost(1f)
+	isKeyDown && isRewind -> (current - state.seekRewindAmount).coerceAtLeast(0f)
+	else -> current
+}
+
+private fun DrawScope.drawSeekbar(
+	colors: SeekbarColors,
+	buffer: Float,
+	visibleProgress: Float,
+	knobAlpha: Float,
+) {
+	val barCornerRadius = CornerRadius(size.minDimension, size.minDimension)
+
+	// Background bar
+	drawRoundRect(
+		color = colors.backgroundColor,
+		cornerRadius = barCornerRadius,
+	)
+
+	// Buffer bar
+	if (buffer > 0f) {
+		drawRoundRect(
+			color = colors.bufferColor,
+			size = size.copy(
+				width = buffer * size.width,
+			),
+			cornerRadius = barCornerRadius,
+		)
+	}
+
+	// Progress bar
+	if (visibleProgress > 0f) {
+		drawRoundRect(
+			color = colors.progressColor,
+			size = size.copy(
+				width = visibleProgress * size.width,
+			),
+			cornerRadius = barCornerRadius,
+		)
+	}
+
+	// Progress knob
+	drawCircle(
+		color = colors.knobColor,
+		alpha = knobAlpha,
+		center = center.copy(
+			x = visibleProgress * size.width,
+		),
+		radius = size.minDimension * 2,
 	)
 }

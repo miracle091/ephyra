@@ -152,6 +152,8 @@ private fun WatchIndicator(
 	}
 }
 
+private const val PERCENT_SCALE = 100f
+
 // Media types that need to show a user progress bar (based on playedPercentage in userData)
 private val progressMediaTypes = setOf(MediaType.VIDEO, MediaType.BOOK)
 
@@ -166,7 +168,7 @@ private fun ProgressIndicator(
 
 	val playedPercentage = when {
 		playState == PlayState.PLAYING && currentQueueEntry?.baseItem?.id == item.id -> rememberPlayerProgress(playbackManager).value
-		item.mediaType in progressMediaTypes -> item.userData?.playedPercentage?.toFloat()?.div(100f)?.coerceIn(0f, 1f)
+		item.mediaType in progressMediaTypes -> item.userData?.playedPercentage?.toFloat()?.div(PERCENT_SCALE)?.coerceIn(0f, 1f)
 
 		else -> null
 	}

@@ -14,6 +14,7 @@ import org.jellyfin.androidtv.ui.navigation.Destinations;
 import org.jellyfin.androidtv.ui.navigation.NavigationRepository;
 import org.jellyfin.androidtv.ui.playback.MediaManager;
 import org.jellyfin.androidtv.ui.playback.PlaybackLauncher;
+import org.jellyfin.androidtv.ui.playback.QueueStart;
 import org.jellyfin.androidtv.ui.presentation.MutableObjectAdapter;
 import org.jellyfin.androidtv.util.PlaybackHelper;
 import org.jellyfin.androidtv.util.Utils;
@@ -113,7 +114,7 @@ public class ItemLauncher {
                                     audioItemsAsList.add(((BaseRowItem) item).getBaseItem());
                             }
 
-                            playbackLauncher.getValue().launch(context, audioItemsAsList, 0, false, adapter.indexOf(rowItem));
+                            playbackLauncher.getValue().launch(context, audioItemsAsList, 0, false, new QueueStart(adapter.indexOf(rowItem)));
                         }
 
                         return;

@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.focusGroup
@@ -48,10 +49,12 @@ import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.base.button.Button
 import org.jellyfin.androidtv.ui.base.button.ProgressButton
 import org.jellyfin.androidtv.ui.composable.AsyncImage
+import org.jellyfin.androidtv.ui.composable.AsyncImageSource
 import org.jellyfin.androidtv.ui.composable.FixedMotionDurationScale
 import org.jellyfin.androidtv.ui.composable.modifier.overscan
 import org.jellyfin.androidtv.ui.navigation.Destinations
 import org.jellyfin.androidtv.ui.navigation.NavigationRepository
+import org.jellyfin.androidtv.util.apiclient.JellyfinImage
 import org.jellyfin.androidtv.util.apiclient.getUrl
 import org.jellyfin.sdk.api.client.ApiClient
 import org.jellyfin.sdk.model.serializer.toUUIDOrNull
@@ -107,8 +110,7 @@ fun StillWatchingScreen(
 					.align(Alignment.TopStart)
 					.overscan()
 					.height(75.dp),
-				url = logo.getUrl(api),
-				blurHash = logo.blurHash,
+				source = AsyncImageSource(url = logo.getUrl(api), blurHash = logo.blurHash),
 				aspectRatio = logo.aspectRatio ?: 1f,
 			)
 		}
@@ -130,13 +132,7 @@ fun StillWatchingScreen(
 }
 
 @Composable
-fun StillWatchingOverlay(
-	modifier: Modifier = Modifier,
-	item: StillWatchingItemData,
-	onConfirm: () -> Unit,
-	onCancel: () -> Unit,
-) = ProvideTextStyle(JellyfinTheme.typography.default.copy(color = Color.White)) {
-	val api = koinInject<ApiClient>()
+private fun rememberEndWatchingTimer(item: StillWatchingItemData, onCancel: () -> Unit): Animatable<Float, AnimationVector1D> {
 	val endWatchingTimer = remember { Animatable(0f) }
 	LaunchedEffect(item) {
 		withContext(FixedMotionDurationScale) {
@@ -150,6 +146,71 @@ fun StillWatchingOverlay(
 		}
 		onCancel()
 	}
+
+	return endWatchingTimer
+}
+
+@Composable
+private fun StillWatchingThumbnail(thumbnail: JellyfinImage, api: ApiClient) {
+	Spacer(Modifier.height(16.dp))
+
+	AsyncImage(
+		modifier = Modifier
+			.height(145.dp)
+			.aspectRatio(thumbnail.aspectRatio ?: 1f)
+			.clip(JellyfinTheme.shapes.extraSmall),
+		source = AsyncImageSource(url = thumbnail.getUrl(api), blurHash = thumbnail.blurHash),
+		aspectRatio = thumbnail.aspectRatio ?: 1f,
+	)
+}
+
+@Composable
+private fun StillWatchingButtons(
+	onCancel: () -> Unit,
+	onConfirm: () -> Unit,
+	endWatchingTimer: Animatable<Float, AnimationVector1D>,
+	focusRequester: FocusRequester,
+) {
+	Row(
+		modifier = Modifier
+			.focusGroup()
+			.focusRestorer(focusRequester)
+	) {
+		val coroutineScope = rememberCoroutineScope()
+		ProgressButton(
+			progress = endWatchingTimer.value,
+			onClick = onCancel,
+			modifier = Modifier
+				.focusRequester(focusRequester)
+				.onFocusChanged { state ->
+					// Cancel timer if focus is moved away from the button
+					if (!state.isFocused) {
+						coroutineScope.launch {
+							endWatchingTimer.snapTo(0f)
+						}
+					}
+				},
+		) {
+			Text(stringResource(R.string.lbl_exit))
+		}
+
+		Spacer(Modifier.width(8.dp))
+
+		Button(onClick = onConfirm) {
+			Text(stringResource(R.string.lbl_continue_watching))
+		}
+	}
+}
+
+@Composable
+fun StillWatchingOverlay(
+	modifier: Modifier = Modifier,
+	item: StillWatchingItemData,
+	onConfirm: () -> Unit,
+	onCancel: () -> Unit,
+) = ProvideTextStyle(JellyfinTheme.typography.default.copy(color = Color.White)) {
+	val api = koinInject<ApiClient>()
+	val endWatchingTimer = rememberEndWatchingTimer(item, onCancel)
 
 	val focusRequester = remember { FocusRequester() }
 	Row(
@@ -177,19 +238,7 @@ fun StillWatchingOverlay(
 				maxLines = 1,
 			)
 
-			item.thumbnail?.let { thumbnail ->
-				Spacer(Modifier.height(16.dp))
-
-				AsyncImage(
-					modifier = Modifier
-						.height(145.dp)
-						.aspectRatio(thumbnail.aspectRatio ?: 1f)
-						.clip(JellyfinTheme.shapes.extraSmall),
-					url = thumbnail.getUrl(api),
-					blurHash = thumbnail.blurHash,
-					aspectRatio = thumbnail.aspectRatio ?: 1f,
-				)
-			}
+			item.thumbnail?.let { thumbnail -> StillWatchingThumbnail(thumbnail, api) }
 		}
 
 		Spacer(
@@ -209,35 +258,7 @@ fun StillWatchingOverlay(
 
 			Spacer(Modifier.height(16.dp))
 
-			Row(
-				modifier = Modifier
-					.focusGroup()
-					.focusRestorer(focusRequester)
-			) {
-				val coroutineScope = rememberCoroutineScope()
-				ProgressButton(
-					progress = endWatchingTimer.value,
-					onClick = onCancel,
-					modifier = Modifier
-						.focusRequester(focusRequester)
-						.onFocusChanged { state ->
-							// Cancel timer if focus is moved away from the button
-							if (!state.isFocused) {
-								coroutineScope.launch {
-									endWatchingTimer.snapTo(0f)
-								}
-							}
-						},
-				) {
-					Text(stringResource(R.string.lbl_exit))
-				}
-
-				Spacer(Modifier.width(8.dp))
-
-				Button(onClick = onConfirm) {
-					Text(stringResource(R.string.lbl_continue_watching))
-				}
-			}
+			StillWatchingButtons(onCancel, onConfirm, endWatchingTimer, focusRequester)
 		}
 	}
 }

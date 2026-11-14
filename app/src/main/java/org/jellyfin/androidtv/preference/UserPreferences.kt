@@ -28,6 +28,9 @@ import org.jellyfin.preference.stringPreference
 import org.jellyfin.sdk.model.api.MediaSegmentType
 import kotlin.time.Duration.Companion.minutes
 
+private const val COLOR_BLACK = 0XFF000000L
+private const val COLOR_TRANSPARENT_WHITE = 0X00FFFFFFL
+
 /**
  * User preferences are configurable by the user and change behavior of the application.
  * When changing preferences migration should be added to the init function.
@@ -323,11 +326,11 @@ class UserPreferences(context: Context) : SharedPreferenceStore(
 			migration(toVersion = 8) {
 				// Set subtitle background color to black if it was enabled in a previous version
 				val subtitlesBackgroundEnabled = it.getBoolean("subtitles_background_enabled", true)
-				putLong("subtitles_background_color", if (subtitlesBackgroundEnabled) 0XFF000000L else 0X00FFFFFFL)
+				putLong("subtitles_background_color", if (subtitlesBackgroundEnabled) COLOR_BLACK else COLOR_TRANSPARENT_WHITE)
 
 				// Set subtitle text stroke color to black if it was enabled in a previous version
 				val subtitleStrokeSize = it.getInt("subtitles_stroke_size", 0)
-				putLong("subtitles_text_stroke_color", if (subtitleStrokeSize > 0) 0XFF000000L else 0X00FFFFFFL)
+				putLong("subtitles_text_stroke_color", if (subtitleStrokeSize > 0) COLOR_BLACK else COLOR_TRANSPARENT_WHITE)
 			}
 
 			// v0.19.0 to v0.20.0

@@ -49,6 +49,7 @@ import org.jellyfin.androidtv.integration.dream.pausedVideoProgress
 import org.jellyfin.androidtv.ui.base.EphyraTheme
 import org.jellyfin.androidtv.ui.base.Icon
 import org.jellyfin.androidtv.ui.base.LocalEphyraPalette
+import org.jellyfin.androidtv.ui.base.LocalTextStyle
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.composable.modifier.BackdropPanSpec
 import org.jellyfin.androidtv.ui.composable.modifier.backdropPan
@@ -143,9 +144,7 @@ fun DreamContentPaused(content: DreamContent.VideoPaused) = EphyraTheme {
 		// The way back, centred on the screen on the times' line (same type and bottom margin), between the position and the duration
 		Text(
 			text = stringResource(R.string.ephyra_paused_hint),
-			style = TimeStyle,
-			color = palette.inkFaint,
-			textAlign = TextAlign.Center,
+			style = TimeStyle.merge(color = palette.inkFaint, textAlign = TextAlign.Center),
 			maxLines = 1,
 			modifier = Modifier
 				.align(Alignment.BottomCenter)
@@ -181,19 +180,19 @@ private fun PausedHeader(item: BaseItemDto, endsAt: String, modifier: Modifier) 
 		if (overline.isNotBlank()) {
 			Text(
 				text = overline.uppercase(),
-				fontSize = 11.sp,
-				fontWeight = FontWeight.Bold,
-				letterSpacing = 0.08.em,
-				color = palette.inkMuted,
+				style = LocalTextStyle.current.merge(
+					color = palette.inkMuted,
+					fontSize = 11.sp,
+					fontWeight = FontWeight.Bold,
+					letterSpacing = 0.08.em,
+				),
 				maxLines = 1,
 				overflow = TextOverflow.Ellipsis,
 			)
 		}
 		Text(
 			text = item.name.orEmpty(),
-			fontSize = 28.sp,
-			fontWeight = FontWeight.Bold,
-			color = palette.ink,
+			style = LocalTextStyle.current.merge(color = palette.ink, fontSize = 28.sp, fontWeight = FontWeight.Bold),
 			maxLines = 1,
 			overflow = TextOverflow.Ellipsis,
 			modifier = Modifier.padding(top = 4.dp),
@@ -204,7 +203,7 @@ private fun PausedHeader(item: BaseItemDto, endsAt: String, modifier: Modifier) 
 			modifier = Modifier.padding(top = 4.dp),
 		) {
 			Icon(painterResource(R.drawable.ic_pause), contentDescription = null, tint = palette.accent, modifier = Modifier.size(14.dp))
-			Text(text = stringResource(R.string.ephyra_paused), fontSize = 14.sp, color = palette.accent)
+			Text(text = stringResource(R.string.ephyra_paused), style = LocalTextStyle.current.merge(color = palette.accent, fontSize = 14.sp))
 		}
 		Row(
 			horizontalArrangement = Arrangement.spacedBy(6.dp),
@@ -212,7 +211,10 @@ private fun PausedHeader(item: BaseItemDto, endsAt: String, modifier: Modifier) 
 			modifier = Modifier.padding(top = 4.dp),
 		) {
 			Icon(painterResource(R.drawable.ic_time), contentDescription = null, tint = palette.inkMuted, modifier = Modifier.size(14.dp))
-			Text(text = stringResource(R.string.lbl_playback_control_ends, endsAt), fontSize = 14.sp, color = palette.inkMuted)
+			Text(
+				text = stringResource(R.string.lbl_playback_control_ends, endsAt),
+				style = LocalTextStyle.current.merge(color = palette.inkMuted, fontSize = 14.sp),
+			)
 		}
 	}
 }
@@ -229,9 +231,9 @@ private fun PausedProgress(content: DreamContent.VideoPaused, fraction: Float, m
 				.fillMaxWidth()
 				.padding(top = 8.dp),
 		) {
-			Text(formatPlaybackTime(content.positionMs), style = TimeStyle, color = palette.inkMuted)
+			Text(formatPlaybackTime(content.positionMs), style = TimeStyle.merge(color = palette.inkMuted))
 			Spacer(Modifier.weight(1f))
-			Text(formatPlaybackTime(content.durationMs), style = TimeStyle, color = palette.inkMuted)
+			Text(formatPlaybackTime(content.durationMs), style = TimeStyle.merge(color = palette.inkMuted))
 		}
 	}
 }

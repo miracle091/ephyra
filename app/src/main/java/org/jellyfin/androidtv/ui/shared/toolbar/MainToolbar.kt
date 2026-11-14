@@ -5,8 +5,10 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -34,7 +36,10 @@ import org.jellyfin.androidtv.ui.base.JellyfinTheme
 import org.jellyfin.androidtv.ui.base.LocalEphyraPalette
 import org.jellyfin.androidtv.ui.base.ProfilePicture
 import org.jellyfin.androidtv.ui.base.ProvideTextStyle
+import org.jellyfin.androidtv.ui.base.button.ButtonBase
+import org.jellyfin.androidtv.ui.base.button.ButtonColors
 import org.jellyfin.androidtv.ui.base.button.ButtonDefaults
+import org.jellyfin.androidtv.ui.base.button.ButtonStyle
 import org.jellyfin.androidtv.ui.base.button.IconButton
 import org.jellyfin.androidtv.ui.base.button.IconButtonDefaults
 import org.jellyfin.androidtv.ui.composable.item.cardFocusRing
@@ -83,11 +88,6 @@ private fun MainToolbar(
 	activeButton: MainToolbarActiveButton,
 ) {
 	val focusRequester = remember { FocusRequester() }
-	val navigationRepository = koinInject<NavigationRepository>()
-	val mediaManager = koinInject<MediaManager>()
-	val sessionRepository = koinInject<SessionRepository>()
-	val settingsViewModel = koinActivityViewModel<SettingsViewModel>()
-	val activity = LocalActivity.current
 	val activeButtonColors = ButtonDefaults.colors(
 		containerColor = JellyfinTheme.colorScheme.buttonActive,
 		contentColor = JellyfinTheme.colorScheme.onButtonActive,
@@ -99,44 +99,7 @@ private fun MainToolbar(
 			.focusGroup(),
 		start = {
 			ToolbarButtons {
-				val userImagePainter = rememberAsyncImagePainter(userImage)
-				val userImageState by userImagePainter.state.collectAsState()
-				val userImageVisible = userImageState is AsyncImagePainter.State.Success
-				// Ephyra: focus shows like on the covers, the accent ring and zoom over the picture, not a solid fill hiding it
-				val userInteractionSource = remember { MutableInteractionSource() }
-				val userFocused by userInteractionSource.collectIsFocusedAsState()
-				val userScale by animateFloatAsState(if (userFocused) USER_FOCUS_SCALE else 1f, label = "UserButtonFocusScale")
-				val userColors = if (activeButton == MainToolbarActiveButton.User) activeButtonColors else ButtonDefaults.colors()
-
-				IconButton(
-					modifier = Modifier
-						.scale(userScale)
-						.cardFocusRing(userFocused, LocalEphyraPalette.current.accent, IconButtonDefaults.Shape),
-					interactionSource = userInteractionSource,
-					onClick = {
-						if (activeButton != MainToolbarActiveButton.User) {
-							mediaManager.clearAudioQueue()
-							sessionRepository.destroyCurrentSession()
-
-							// Open login activity
-							activity?.startActivity(ActivityDestinations.startup(activity))
-							activity?.finishAfterTransition()
-						}
-					},
-					colors = userColors.copy(
-						focusedContainerColor = userColors.containerColor,
-						focusedContentColor = userColors.contentColor,
-					),
-					contentPadding = if (userImageVisible) PaddingValues(3.dp) else IconButtonDefaults.ContentPadding,
-				) {
-					ProfilePicture(
-						url = userImage,
-						contentDescription = stringResource(R.string.lbl_switch_user),
-						modifier = Modifier
-							.aspectRatio(1f)
-							.clip(IconButtonDefaults.Shape)
-					)
-				}
+				ToolbarUserButton(userImage, activeButton, activeButtonColors)
 
 				NowPlayingComposable(
 					onFocusableChange = {},
@@ -148,53 +111,125 @@ private fun MainToolbar(
 				modifier = Modifier
 					.focusRequester(focusRequester)
 			) {
-				ProvideTextStyle(JellyfinTheme.typography.default.copy(fontWeight = FontWeight.Bold)) {
-					// Ephyra: icons instead of the Home and Search labels
-					IconButton(
-						onClick = {
-							if (activeButton != MainToolbarActiveButton.Home) {
-								navigationRepository.navigate(
-									Destinations.home,
-									replace = true,
-								)
-							}
-						},
-						colors = if (activeButton == MainToolbarActiveButton.Home) activeButtonColors else ButtonDefaults.colors(),
-					) {
-						Icon(
-							imageVector = ImageVector.vectorResource(R.drawable.ic_house),
-							contentDescription = stringResource(R.string.lbl_home),
-						)
-					}
-					IconButton(
-						onClick = {
-							if (activeButton != MainToolbarActiveButton.Search) {
-								navigationRepository.navigate(Destinations.search())
-							}
-						},
-						colors = if (activeButton == MainToolbarActiveButton.Search) activeButtonColors else ButtonDefaults.colors(),
-					) {
-						Icon(
-							imageVector = ImageVector.vectorResource(R.drawable.ic_search),
-							contentDescription = stringResource(R.string.lbl_search),
-						)
-					}
-				}
+				ToolbarNavigationButtons(activeButton, activeButtonColors)
 			}
 		},
 		end = {
 			ToolbarButtons {
-				IconButton(
-					onClick = { settingsViewModel.show() },
-				) {
-					Icon(
-						imageVector = ImageVector.vectorResource(R.drawable.ic_settings),
-						contentDescription = stringResource(R.string.lbl_settings),
-					)
-				}
-
-				ToolbarClock()
+				ToolbarEndButtons()
 			}
 		}
 	)
+}
+
+@Composable
+private fun ToolbarUserButton(
+	userImage: String?,
+	activeButton: MainToolbarActiveButton,
+	activeButtonColors: ButtonColors,
+) {
+	val mediaManager = koinInject<MediaManager>()
+	val sessionRepository = koinInject<SessionRepository>()
+	val activity = LocalActivity.current
+	val userImagePainter = rememberAsyncImagePainter(userImage)
+	val userImageState by userImagePainter.state.collectAsState()
+	val userImageVisible = userImageState is AsyncImagePainter.State.Success
+	// Ephyra: focus shows like on the covers, the accent ring and zoom over the picture, not a solid fill hiding it
+	val userInteractionSource = remember { MutableInteractionSource() }
+	val userFocused by userInteractionSource.collectIsFocusedAsState()
+	val userScale by animateFloatAsState(if (userFocused) USER_FOCUS_SCALE else 1f, label = "UserButtonFocusScale")
+	val userColors = if (activeButton == MainToolbarActiveButton.User) activeButtonColors else ButtonDefaults.colors()
+
+	val userContentPadding = if (userImageVisible) PaddingValues(3.dp) else IconButtonDefaults.ContentPadding
+
+	ButtonBase(
+		modifier = Modifier
+			.scale(userScale)
+			.cardFocusRing(userFocused, LocalEphyraPalette.current.accent, IconButtonDefaults.Shape),
+		interactionSource = userInteractionSource,
+		onClick = {
+			if (activeButton != MainToolbarActiveButton.User) {
+				mediaManager.clearAudioQueue()
+				sessionRepository.destroyCurrentSession()
+
+				// Open login activity
+				activity?.startActivity(ActivityDestinations.startup(activity))
+				activity?.finishAfterTransition()
+			}
+		},
+		style = ButtonStyle(
+			shape = IconButtonDefaults.Shape,
+			colors = userColors.copy(
+				focusedContainerColor = userColors.containerColor,
+				focusedContentColor = userColors.contentColor,
+			),
+		),
+	) {
+		Box(modifier = Modifier.padding(userContentPadding)) {
+			ProfilePicture(
+				url = userImage,
+				contentDescription = stringResource(R.string.lbl_switch_user),
+				modifier = Modifier
+					.aspectRatio(1f)
+					.clip(IconButtonDefaults.Shape)
+			)
+		}
+	}
+}
+
+@Composable
+private fun ToolbarNavigationButtons(
+	activeButton: MainToolbarActiveButton,
+	activeButtonColors: ButtonColors,
+) {
+	val navigationRepository = koinInject<NavigationRepository>()
+
+	ProvideTextStyle(JellyfinTheme.typography.default.copy(fontWeight = FontWeight.Bold)) {
+		// Ephyra: icons instead of the Home and Search labels
+		IconButton(
+			onClick = {
+				if (activeButton != MainToolbarActiveButton.Home) {
+					navigationRepository.navigate(
+						Destinations.home,
+						replace = true,
+					)
+				}
+			},
+			colors = if (activeButton == MainToolbarActiveButton.Home) activeButtonColors else ButtonDefaults.colors(),
+		) {
+			Icon(
+				imageVector = ImageVector.vectorResource(R.drawable.ic_house),
+				contentDescription = stringResource(R.string.lbl_home),
+			)
+		}
+		IconButton(
+			onClick = {
+				if (activeButton != MainToolbarActiveButton.Search) {
+					navigationRepository.navigate(Destinations.search())
+				}
+			},
+			colors = if (activeButton == MainToolbarActiveButton.Search) activeButtonColors else ButtonDefaults.colors(),
+		) {
+			Icon(
+				imageVector = ImageVector.vectorResource(R.drawable.ic_search),
+				contentDescription = stringResource(R.string.lbl_search),
+			)
+		}
+	}
+}
+
+@Composable
+private fun ToolbarEndButtons() {
+	val settingsViewModel = koinActivityViewModel<SettingsViewModel>()
+
+	IconButton(
+		onClick = { settingsViewModel.show() },
+	) {
+		Icon(
+			imageVector = ImageVector.vectorResource(R.drawable.ic_settings),
+			contentDescription = stringResource(R.string.lbl_settings),
+		)
+	}
+
+	ToolbarClock()
 }

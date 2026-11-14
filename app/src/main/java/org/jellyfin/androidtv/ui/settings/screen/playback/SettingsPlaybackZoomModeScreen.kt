@@ -12,6 +12,7 @@ import org.jellyfin.androidtv.preference.constant.ZoomMode
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.base.form.RadioButton
 import org.jellyfin.androidtv.ui.base.list.ListButton
+import org.jellyfin.androidtv.ui.base.list.ListItemSlots
 import org.jellyfin.androidtv.ui.base.list.ListSection
 import org.jellyfin.androidtv.ui.navigation.LocalRouter
 import org.jellyfin.androidtv.ui.navigation.focus.focusKey
@@ -36,7 +37,9 @@ fun SettingsPlaybackZoomModeScreen() {
 		items(ZoomMode.entries) { entry ->
 			ListButton(
 				headingContent = { Text(stringResource(entry.nameRes)) },
-				trailingContent = { RadioButton(checked = playerZoomMode == entry) },
+				slots = ListItemSlots(
+					trailingContent = { RadioButton(checked = playerZoomMode == entry) },
+				),
 				onClick = {
 					playerZoomMode = entry
 					router.back()

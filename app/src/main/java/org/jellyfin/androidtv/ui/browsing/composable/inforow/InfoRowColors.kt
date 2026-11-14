@@ -7,7 +7,7 @@ import androidx.compose.ui.graphics.Color
  */
 object InfoRowColors {
 	val Transparent = Color.Transparent to Color.White
-	val Default = Color(0xB3FFFFFF) to Color.Black
-	val Green = Color(0xB3089562) to Color.White
-	val Red = Color(0xB3F2364D) to Color.White
+	val Default = Color(color = 0xB3FFFFFF) to Color.Black
+	val Green = Color(color = 0xB3089562) to Color.White
+	val Red = Color(color = 0xB3F2364D) to Color.White
 }

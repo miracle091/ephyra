@@ -12,6 +12,7 @@ import org.jellyfin.androidtv.preference.constant.AVCLevel
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.base.form.RadioButton
 import org.jellyfin.androidtv.ui.base.list.ListButton
+import org.jellyfin.androidtv.ui.base.list.ListItemSlots
 import org.jellyfin.androidtv.ui.base.list.ListSection
 import org.jellyfin.androidtv.ui.navigation.LocalRouter
 import org.jellyfin.androidtv.ui.navigation.focus.focusKey
@@ -39,7 +40,9 @@ fun SettingsPlaybackAVCLevelScreen() {
 		item {
 			ListButton(
 				headingContent = { Text(stringResource(AVCLevel.AUTO.nameRes)) },
-				trailingContent = { RadioButton(checked = userAVCLevel == AVCLevel.AUTO) },
+				slots = ListItemSlots(
+					trailingContent = { RadioButton(checked = userAVCLevel == AVCLevel.AUTO) },
+				),
 				onClick = {
 					userAVCLevel = AVCLevel.AUTO
 					router.back()
@@ -54,7 +57,9 @@ fun SettingsPlaybackAVCLevelScreen() {
 		items(manualOptions) { level ->
 			ListButton(
 				headingContent = { Text(stringResource(level.nameRes)) },
-				trailingContent = { RadioButton(checked = userAVCLevel == level) },
+				slots = ListItemSlots(
+					trailingContent = { RadioButton(checked = userAVCLevel == level) },
+				),
 				onClick = {
 					userAVCLevel = level
 					router.back()

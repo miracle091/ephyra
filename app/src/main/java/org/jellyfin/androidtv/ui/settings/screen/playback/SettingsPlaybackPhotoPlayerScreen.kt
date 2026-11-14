@@ -19,7 +19,9 @@ import org.jellyfin.androidtv.R
 import org.jellyfin.androidtv.preference.UserPreferences
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.base.form.RangeControl
+import org.jellyfin.androidtv.ui.base.form.RangeControlState
 import org.jellyfin.androidtv.ui.base.list.ListControl
+import org.jellyfin.androidtv.ui.base.list.ListItemSlots
 import org.jellyfin.androidtv.ui.base.list.ListSection
 import org.jellyfin.androidtv.ui.navigation.focus.focusKey
 import org.jellyfin.androidtv.ui.settings.compat.rememberPreference
@@ -46,37 +48,42 @@ fun SettingsPlaybackPhotoPlayerScreen() {
 
 			ListControl(
 				headingContent = { Text(stringResource(R.string.photo_display_duration)) },
-				captionContent = { Text(stringResource(R.string.photo_display_duration_description)) },
+				slots = ListItemSlots(
+					captionContent = { Text(stringResource(R.string.photo_display_duration_description)) },
+					footerContent = {
+						Row(
+							verticalAlignment = Alignment.CenterVertically,
+						) {
+							RangeControl(
+								modifier = Modifier
+									.height(4.dp)
+									.weight(1f),
+								interactionSource = interactionSource,
+								// 4 - 120 seconds with 2 second increment
+								state = RangeControlState(
+									value = photoPlayerPresentationDelay.toFloat(),
+									min = 4_000f,
+									max = 120_000f,
+									step = 2_000f,
+									markers = listOf(UserPreferences.photoPlayerPresentationDelay.defaultValue.toFloat()),
+								),
+								onValueChange = { photoPlayerPresentationDelay = it.toLong() }
+							)
+
+							Spacer(Modifier.width(Tokens.Space.spaceSm))
+
+							Box(
+								modifier = Modifier.sizeIn(minWidth = 32.dp),
+								contentAlignment = Alignment.CenterEnd
+							) {
+								Text("${photoPlayerPresentationDelay.milliseconds.inWholeSeconds}s")
+							}
+						}
+					},
+				),
 				interactionSource = interactionSource,
 				modifier = Modifier.focusKey("photo_display_duration")
-			) {
-				Row(
-					verticalAlignment = Alignment.CenterVertically,
-				) {
-					RangeControl(
-						modifier = Modifier
-							.height(4.dp)
-							.weight(1f),
-						interactionSource = interactionSource,
-						// 4 - 120 seconds with 2 second increment
-						min = 4_000f,
-						max = 120_000f,
-						markers = listOf(UserPreferences.photoPlayerPresentationDelay.defaultValue.toFloat()),
-						stepForward = 2_000f,
-						value = photoPlayerPresentationDelay.toFloat(),
-						onValueChange = { photoPlayerPresentationDelay = it.toLong() }
-					)
-
-					Spacer(Modifier.width(Tokens.Space.spaceSm))
-
-					Box(
-						modifier = Modifier.sizeIn(minWidth = 32.dp),
-						contentAlignment = Alignment.CenterEnd
-					) {
-						Text("${photoPlayerPresentationDelay.milliseconds.inWholeSeconds}s")
-					}
-				}
-			}
+			)
 		}
 	}
 }

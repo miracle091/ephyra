@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -39,6 +40,17 @@ import org.jellyfin.androidtv.ui.base.ProvideTextStyle
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.base.button.Button
 import org.jellyfin.androidtv.ui.composable.modifier.overscan
+
+@Composable
+private fun RowScope.ConnectHelpQrCode() {
+	Image(
+		painter = painterResource(R.drawable.qr_jellyfin_docs),
+		contentDescription = stringResource(R.string.app_name),
+		modifier = Modifier
+			.width(200.dp)
+			.align(Alignment.CenterVertically),
+	)
+}
 
 @Composable
 private fun ConnectHelpAlert(
@@ -91,13 +103,7 @@ private fun ConnectHelpAlert(
 					}
 				}
 
-				Image(
-					painter = painterResource(R.drawable.qr_jellyfin_docs),
-					contentDescription = stringResource(R.string.app_name),
-					modifier = Modifier
-						.width(200.dp)
-						.align(Alignment.CenterVertically),
-				)
+				ConnectHelpQrCode()
 			}
 		}
 	}

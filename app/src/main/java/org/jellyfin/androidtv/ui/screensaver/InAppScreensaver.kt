@@ -18,8 +18,11 @@ import androidx.compose.ui.input.key.type
 import org.jellyfin.androidtv.integration.dream.composable.DreamHost
 import org.jellyfin.androidtv.ui.InteractionTrackerViewModel
 import org.jellyfin.androidtv.ui.base.dialog.DialogBase
+import org.jellyfin.androidtv.ui.base.dialog.DialogDefaults
 import org.jellyfin.androidtv.util.isMediaSessionKeyEvent
 import org.koin.androidx.compose.koinViewModel
+
+private const val FADE_MILLIS = 1_000
 
 @Composable
 fun InAppScreensaver() {
@@ -31,9 +34,11 @@ fun InAppScreensaver() {
 		onDismissRequest = {
 			interactionTrackerViewModel.notifyInteraction(canCancel = true, userInitiated = false)
 		},
-		scrimColor = Color.Black,
-		enterTransition = fadeIn(tween(1_000)),
-		exitTransition = fadeOut(tween(1_000)),
+		style = DialogDefaults.style(
+			scrimColor = Color.Black,
+			enterTransition = fadeIn(tween(FADE_MILLIS)),
+			exitTransition = fadeOut(tween(FADE_MILLIS)),
+		),
 		modifier = Modifier
 			.fillMaxSize()
 			.clickable(

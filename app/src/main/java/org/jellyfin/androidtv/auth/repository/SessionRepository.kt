@@ -46,16 +46,34 @@ interface SessionRepository {
 	fun destroyCurrentSession()
 }
 
+/**
+ * The persisted authentication data used by [SessionRepositoryImpl].
+ */
+class SessionAuthStorage(
+	val preferences: AuthenticationPreferences,
+	val store: AuthenticationStore,
+)
+
+/**
+ * The repositories holding the current user and server, updated by [SessionRepositoryImpl].
+ */
+class SessionRepositories(
+	val user: UserRepository,
+	val server: ServerRepository,
+)
+
 class SessionRepositoryImpl(
-	private val authenticationPreferences: AuthenticationPreferences,
-	private val authenticationStore: AuthenticationStore,
+	authStorage: SessionAuthStorage,
+	repositories: SessionRepositories,
 	private val userApiClient: ApiClient,
 	private val preferencesRepository: PreferencesRepository,
 	private val defaultDeviceInfo: DeviceInfo,
-	private val userRepository: UserRepository,
-	private val serverRepository: ServerRepository,
 	private val telemetryPreferences: TelemetryPreferences,
 ) : SessionRepository {
+	private val authenticationPreferences = authStorage.preferences
+	private val authenticationStore = authStorage.store
+	private val userRepository = repositories.user
+	private val serverRepository = repositories.server
 	private val currentSessionMutex = Mutex()
 	private val _currentSession = MutableStateFlow<Session?>(null)
 	override val currentSession = _currentSession.asStateFlow()

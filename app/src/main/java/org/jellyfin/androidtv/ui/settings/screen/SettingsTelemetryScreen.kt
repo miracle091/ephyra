@@ -10,6 +10,7 @@ import org.jellyfin.androidtv.preference.TelemetryPreferences
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.base.form.Checkbox
 import org.jellyfin.androidtv.ui.base.list.ListButton
+import org.jellyfin.androidtv.ui.base.list.ListItemSlots
 import org.jellyfin.androidtv.ui.base.list.ListSection
 import org.jellyfin.androidtv.ui.navigation.focus.focusKey
 import org.jellyfin.androidtv.ui.settings.compat.rememberPreference
@@ -32,11 +33,13 @@ fun SettingsTelemetryScreen() {
 			var crashReportEnabled by rememberPreference(telemetryPreferences, TelemetryPreferences.crashReportEnabled)
 			ListButton(
 				headingContent = { Text(stringResource(R.string.pref_crash_reports)) },
-				trailingContent = { Checkbox(checked = crashReportEnabled) },
-				captionContent = {
-					if (crashReportEnabled) Text(stringResource(R.string.pref_crash_reports_enabled))
-					else Text(stringResource(R.string.pref_crash_reports_disabled))
-				},
+				slots = ListItemSlots(
+					trailingContent = { Checkbox(checked = crashReportEnabled) },
+					captionContent = {
+						if (crashReportEnabled) Text(stringResource(R.string.pref_crash_reports_enabled))
+						else Text(stringResource(R.string.pref_crash_reports_disabled))
+					},
+				),
 				onClick = { crashReportEnabled = !crashReportEnabled },
 				modifier = Modifier.focusKey("crash_report_enabled")
 			)
@@ -46,11 +49,13 @@ fun SettingsTelemetryScreen() {
 			var crashReportIncludeLogs by rememberPreference(telemetryPreferences, TelemetryPreferences.crashReportIncludeLogs)
 			ListButton(
 				headingContent = { Text(stringResource(R.string.pref_crash_report_logs)) },
-				trailingContent = { Checkbox(checked = crashReportIncludeLogs) },
-				captionContent = {
-					if (crashReportIncludeLogs) Text(stringResource(R.string.pref_crash_report_logs_enabled))
-					else Text(stringResource(R.string.pref_crash_report_logs_disabled))
-				},
+				slots = ListItemSlots(
+					trailingContent = { Checkbox(checked = crashReportIncludeLogs) },
+					captionContent = {
+						if (crashReportIncludeLogs) Text(stringResource(R.string.pref_crash_report_logs_enabled))
+						else Text(stringResource(R.string.pref_crash_report_logs_disabled))
+					},
+				),
 				onClick = { crashReportIncludeLogs = !crashReportIncludeLogs },
 				modifier = Modifier.focusKey("crash_report_logs")
 			)

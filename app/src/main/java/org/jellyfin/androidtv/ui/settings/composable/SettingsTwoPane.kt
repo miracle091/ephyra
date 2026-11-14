@@ -6,7 +6,6 @@ import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.focusable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -25,6 +24,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
@@ -55,9 +55,11 @@ import androidx.compose.ui.unit.sp
 import org.jellyfin.androidtv.R
 import org.jellyfin.androidtv.ui.base.Icon
 import org.jellyfin.androidtv.ui.base.LocalEphyraPalette
+import org.jellyfin.androidtv.ui.base.LocalTextStyle
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.base.dialog.DialogBase
 import org.jellyfin.androidtv.ui.base.list.ListButton
+import org.jellyfin.androidtv.ui.base.list.ListItemSlots
 import org.jellyfin.androidtv.ui.base.list.ListControlDefaults
 import org.jellyfin.androidtv.ui.navigation.LocalRouter
 import org.jellyfin.androidtv.ui.navigation.ProvideRouter
@@ -70,6 +72,10 @@ private data class SettingsSection(
 	@DrawableRes val icon: Int,
 	@StringRes val label: Int,
 )
+
+/** The zero-height focus target above the right pane content, and whether it may take focus right now. */
+@Immutable
+private class EntryAnchor(val requester: FocusRequester, val isOpen: () -> Boolean)
 
 /** The top-level entries of the settings, shown in the left pane. Each one is the root route of the right pane. */
 private val sections = listOf(
@@ -138,8 +144,7 @@ private fun BoxScope.SettingsTwoPane() {
 		SettingsRightPane(
 			selected = selected,
 			sectionRequesters = sectionRequesters,
-			entryAnchor = entryAnchor,
-			isEntryAnchorOpen = { entryAnchorOpen },
+			entryAnchor = EntryAnchor(requester = entryAnchor, isOpen = { entryAnchorOpen }),
 			rightHasFocus = rightHasFocus,
 			onRightFocusChanged = { rightHasFocus = it },
 		)
@@ -165,10 +170,12 @@ private fun SettingsLeftPane(
 	) {
 		Text(
 			text = stringResource(R.string.settings),
-			color = palette.ink,
-			fontSize = 28.sp,
-			lineHeight = 34.sp,
-			fontWeight = FontWeight.Bold,
+			style = LocalTextStyle.current.merge(
+				color = palette.ink,
+				fontSize = 28.sp,
+				fontWeight = FontWeight.Bold,
+				lineHeight = 34.sp,
+			),
 		)
 
 		LazyColumn(
@@ -205,8 +212,7 @@ private fun SettingsLeftPane(
 private fun RowScope.SettingsRightPane(
 	selected: String,
 	sectionRequesters: Map<String, FocusRequester>,
-	entryAnchor: FocusRequester,
-	isEntryAnchorOpen: () -> Boolean,
+	entryAnchor: EntryAnchor,
 	rightHasFocus: Boolean,
 	onRightFocusChanged: (Boolean) -> Unit,
 ) {
@@ -226,8 +232,8 @@ private fun RowScope.SettingsRightPane(
 			Modifier
 				.fillMaxWidth()
 				.height(0.dp)
-				.focusProperties { canFocus = isEntryAnchorOpen() }
-				.focusRequester(entryAnchor)
+				.focusProperties { canFocus = entryAnchor.isOpen() }
+				.focusRequester(entryAnchor.requester)
 				.focusable()
 		)
 
@@ -254,18 +260,25 @@ private fun SectionButton(
 	onClick: () -> Unit,
 ) {
 	val palette = LocalEphyraPalette.current
-	val interactionSource = remember { MutableInteractionSource() }
 
 	ListButton(
 		onClick = onClick,
-		interactionSource = interactionSource,
-		colors = ListControlDefaults.colors(
-			// The open section stays marked while focus is in the right pane
-			containerColor = if (selected) palette.surface1 else Color.Transparent,
-			focusedContainerColor = palette.surface3,
+		style = ListControlDefaults.style(
+			colors = ListControlDefaults.colors(
+				// The open section stays marked while focus is in the right pane
+				containerColor = if (selected) palette.surface1 else Color.Transparent,
+				focusedContainerColor = palette.surface3,
+			),
 		),
-		leadingContent = { Icon(painterResource(section.icon), contentDescription = null) },
-		headingContent = { Text(stringResource(section.label), fontWeight = FontWeight.Bold, fontSize = 14.sp) },
+		slots = ListItemSlots(
+			leadingContent = { Icon(painterResource(section.icon), contentDescription = null) },
+		),
+		headingContent = {
+			Text(
+				stringResource(section.label),
+				style = LocalTextStyle.current.merge(fontSize = 14.sp, fontWeight = FontWeight.Bold),
+			)
+		},
 		modifier = Modifier
 			.focusRequester(focusRequester)
 			.onFocusChanged { if (it.isFocused) onFocused() }

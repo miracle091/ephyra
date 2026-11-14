@@ -13,6 +13,7 @@ import com.mikepenz.aboutlibraries.util.withJson
 import org.jellyfin.androidtv.R
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.base.list.ListButton
+import org.jellyfin.androidtv.ui.base.list.ListItemSlots
 import org.jellyfin.androidtv.ui.base.list.ListMessage
 import org.jellyfin.androidtv.ui.base.list.ListSection
 import org.jellyfin.androidtv.ui.navigation.focus.focusKey
@@ -62,7 +63,9 @@ fun SettingsLicenseScreen(artifactId: String) {
 		items(metadata) { (title, value) ->
 			ListButton(
 				headingContent = { Text(title) },
-				captionContent = { Text(value.orEmpty()) },
+				slots = ListItemSlots(
+					captionContent = { Text(value.orEmpty()) },
+				),
 				onClick = copyAction(ClipData.newPlainText(title, value)),
 				modifier = Modifier.focusKey("license_info_$title")
 			)

@@ -15,33 +15,31 @@ import org.jellyfin.androidtv.ui.navigation.RouterContent
  */
 @Composable
 fun SettingsRouterContent() {
-	val duration = 400 // milliseconds
-
 	val transitionIn = slideInHorizontally(
 		initialOffsetX = { it },
-		animationSpec = tween(duration, easing = FastOutSlowInEasing)
+		animationSpec = tween(SETTINGS_TRANSITION_DURATION_MILLIS, easing = FastOutSlowInEasing)
 	) + fadeIn(
-		animationSpec = tween(duration)
+		animationSpec = tween(SETTINGS_TRANSITION_DURATION_MILLIS)
 	)
 	val transitionOut = slideOutHorizontally(
 		targetOffsetX = { -it / 3 },
-		animationSpec = tween(duration, easing = FastOutSlowInEasing)
+		animationSpec = tween(SETTINGS_TRANSITION_DURATION_MILLIS, easing = FastOutSlowInEasing)
 	) + fadeOut(
-		animationSpec = tween(duration)
+		animationSpec = tween(SETTINGS_TRANSITION_DURATION_MILLIS)
 	)
 
 	val popIn = slideInHorizontally(
 		initialOffsetX = { -it / 3 },
-		animationSpec = tween(duration, easing = FastOutSlowInEasing)
+		animationSpec = tween(SETTINGS_TRANSITION_DURATION_MILLIS, easing = FastOutSlowInEasing)
 	) + fadeIn(
-		animationSpec = tween(duration)
+		animationSpec = tween(SETTINGS_TRANSITION_DURATION_MILLIS)
 	)
 
 	val popOut = slideOutHorizontally(
 		targetOffsetX = { it },
-		animationSpec = tween(duration, easing = FastOutSlowInEasing)
+		animationSpec = tween(SETTINGS_TRANSITION_DURATION_MILLIS, easing = FastOutSlowInEasing)
 	) + fadeOut(
-		animationSpec = tween(duration)
+		animationSpec = tween(SETTINGS_TRANSITION_DURATION_MILLIS)
 	)
 
 	RouterContent(

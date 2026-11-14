@@ -45,17 +45,22 @@ android {
 	}
 
 	signingConfigs {
-		val keystoreFile = getProperty("keystore.file")
-		val keystorePassword = getProperty("keystore.password")
-		val signingKeyAlias = getProperty("signing.key.alias")
-		val signingKeyPassword = getProperty("signing.key.password")
+		val signingProperties = listOfNotNull(
+			getProperty("keystore.file"),
+			getProperty("keystore.password"),
+			getProperty("signing.key.alias"),
+			getProperty("signing.key.password"),
+		)
 
-		if (keystoreFile != null && keystorePassword != null && signingKeyAlias != null && signingKeyPassword != null) {
+		val signingPropertyCount = 4
+
+		// Only create the release config when all four properties are set
+		if (signingProperties.size == signingPropertyCount) {
 			create("release") {
-				storeFile = file(keystoreFile)
-				storePassword = keystorePassword
-				keyAlias = signingKeyAlias
-				keyPassword = signingKeyPassword
+				storeFile = file(signingProperties[0])
+				storePassword = signingProperties[1]
+				keyAlias = signingProperties[2]
+				keyPassword = signingProperties[3]
 			}
 		}
 	}

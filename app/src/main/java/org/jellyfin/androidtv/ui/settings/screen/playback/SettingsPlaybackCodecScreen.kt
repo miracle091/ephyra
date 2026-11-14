@@ -1,5 +1,6 @@
 package org.jellyfin.androidtv.ui.settings.screen.playback
 
+import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
@@ -11,6 +12,7 @@ import org.jellyfin.androidtv.preference.constant.BitstreamAudioFormat
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.base.form.Checkbox
 import org.jellyfin.androidtv.ui.base.list.ListButton
+import org.jellyfin.androidtv.ui.base.list.ListItemSlots
 import org.jellyfin.androidtv.ui.base.list.ListSection
 import org.jellyfin.androidtv.ui.navigation.LocalRouter
 import org.jellyfin.androidtv.ui.navigation.focus.focusKey
@@ -35,25 +37,13 @@ fun SettingsPlaybackCodecScreen() {
 		}
 
 		item {
-			var userAVCLevel by rememberPreference(userPreferences, UserPreferences.userAVCLevel)
-
-			ListButton(
-				headingContent = { Text(stringResource(R.string.user_avc_level)) },
-				captionContent = { Text(stringResource(userAVCLevel.nameRes)) },
-				onClick = { router.push(Routes.PLAYBACK_AVC_LEVEL) },
-				modifier = Modifier.focusKey(Routes.PLAYBACK_AVC_LEVEL)
-			)
+			val userAVCLevel by rememberPreference(userPreferences, UserPreferences.userAVCLevel)
+			CodecLevelButton(R.string.user_avc_level, userAVCLevel.nameRes, Routes.PLAYBACK_AVC_LEVEL)
 		}
 
 		item {
-			var userHEVCLevel by rememberPreference(userPreferences, UserPreferences.userHEVCLevel)
-
-			ListButton(
-				headingContent = { Text(stringResource(R.string.user_hevc_level)) },
-				captionContent = { Text(stringResource(userHEVCLevel.nameRes)) },
-				onClick = { router.push(Routes.PLAYBACK_HEVC_LEVEL) },
-				modifier = Modifier.focusKey(Routes.PLAYBACK_HEVC_LEVEL)
-			)
+			val userHEVCLevel by rememberPreference(userPreferences, UserPreferences.userHEVCLevel)
+			CodecLevelButton(R.string.user_hevc_level, userHEVCLevel.nameRes, Routes.PLAYBACK_HEVC_LEVEL)
 		}
 
 		items(BitstreamAudioFormat.entries.size) { index ->
@@ -62,7 +52,9 @@ fun SettingsPlaybackCodecScreen() {
 
 			ListButton(
 				headingContent = { Text(stringResource(format.nameRes)) },
-				captionContent = { Text(stringResource(mode.nameRes)) },
+				slots = ListItemSlots(
+					captionContent = { Text(stringResource(mode.nameRes)) },
+				),
 				onClick = {
 					router.push(
 						route = Routes.PLAYBACK_BITSTREAM_AUDIO,
@@ -79,12 +71,29 @@ fun SettingsPlaybackCodecScreen() {
 
 				ListButton(
 					headingContent = { Text(stringResource(R.string.pref_software_codecs_enabled)) },
-					captionContent = { Text(stringResource(R.string.pref_software_codecs_enabled_description)) },
-					trailingContent = { Checkbox(checked = softwareCodecsEnabled) },
+					slots = ListItemSlots(
+						captionContent = { Text(stringResource(R.string.pref_software_codecs_enabled_description)) },
+						trailingContent = { Checkbox(checked = softwareCodecsEnabled) },
+					),
 					onClick = { softwareCodecsEnabled = !softwareCodecsEnabled },
 					modifier = Modifier.focusKey("software_codecs_enabled")
 				)
 			}
 		}
 	}
+}
+
+/** A list button that shows a codec level [value] and opens its [route] to change it. */
+@Composable
+private fun CodecLevelButton(@StringRes heading: Int, @StringRes value: Int, route: String) {
+	val router = LocalRouter.current
+
+	ListButton(
+		headingContent = { Text(stringResource(heading)) },
+		slots = ListItemSlots(
+			captionContent = { Text(stringResource(value)) },
+		),
+		onClick = { router.push(route) },
+		modifier = Modifier.focusKey(route)
+	)
 }

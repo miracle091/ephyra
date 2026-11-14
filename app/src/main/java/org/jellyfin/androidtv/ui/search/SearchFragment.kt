@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -80,71 +81,101 @@ class SearchFragment : Fragment() {
 		Column {
 			MainToolbar(MainToolbarActiveButton.Search)
 
-			Row(
-				horizontalArrangement = Arrangement.spacedBy(12.dp),
-				verticalAlignment = Alignment.CenterVertically,
-				modifier = Modifier
-					.focusRestorer()
-					.focusGroup()
-					.padding(horizontal = 32.dp)
-			) {
-				if (speechRecognizerAvailability) {
-					SearchVoiceInput(
-						onQueryChange = { query = query.copy(text = it) },
-						onQuerySubmit = {
-							viewModel.searchImmediately(query.text)
-							resultFocusRequester.requestFocus()
-						}
-					)
-				}
-
-				SearchTextInput(
-					query = query.text,
-					onQueryChange = {
-						query = query.copy(text = it)
-						viewModel.searchDebounced(query.text)
-					},
-					onQuerySubmit = {
-						viewModel.searchImmediately(query.text)
-						// Note: We MUST change the focus to somewhere else when the keyboard is submitted because some vendors (like Amazon)
-						// will otherwise just keep showing a (fullscreen) keyboard, soft-locking the app.
-						resultFocusRequester.requestFocus()
-					},
-					modifier = Modifier
-						.weight(1f)
-						.focusRequester(textInputFocusRequester),
-				)
-			}
-
-			// The leanback code has its own awful focus handling that doesn't work properly with Compose view inteop to workaround this
-			// issue we add custom behavior that only allows focus exit when the current selected row is the first one. Additionally when
-			// we do switch the focus, we reset the leanback state so it won't cause weird behavior when focus is regained
-			var rowsSupportFragment by remember { mutableStateOf<RowsSupportFragment?>(null) }
-
-			AndroidFragment<RowsSupportFragment>(
-				modifier = Modifier
-					.focusGroup()
-					.focusRequester(resultFocusRequester)
-					.focusProperties {
-						onExit = {
-							val isFirstRowSelected = rowsSupportFragment?.selectedPosition?.let { it <= 0 } ?: false
-							if (requestedFocusDirection != FocusDirection.Up || !isFirstRowSelected) {
-								cancelFocusChange()
-							} else {
-								rowsSupportFragment?.selectedPosition = 0
-								rowsSupportFragment?.verticalGridView?.clearFocus()
+			SearchInputRow(
+				query = query.text,
+				textInputFocusRequester = textInputFocusRequester,
+				onQueryChange = {
+					query = query.copy(text = it)
+					viewModel.searchDebounced(query.text)
+				},
+				onQuerySubmit = {
+					viewModel.searchImmediately(query.text)
+					// Note: We MUST change the focus to somewhere else when the keyboard is submitted because some vendors (like Amazon)
+					// will otherwise just keep showing a (fullscreen) keyboard, soft-locking the app.
+					resultFocusRequester.requestFocus()
+				},
+				voiceInput = {
+					if (speechRecognizerAvailability) {
+						SearchVoiceInput(
+							onQueryChange = { query = query.copy(text = it) },
+							onQuerySubmit = {
+								viewModel.searchImmediately(query.text)
+								resultFocusRequester.requestFocus()
 							}
-						}
+						)
 					}
-					.padding(top = 5.dp)
-					.fillMaxSize(),
-				maxLifecycle = Lifecycle.State.RESUMED,
-				onUpdate = { fragment ->
-					rowsSupportFragment = fragment
-					fragment.adapter = searchFragmentDelegate.rowsAdapter
-					fragment.onItemViewClickedListener = searchFragmentDelegate.onItemViewClickedListener
-				}
+				},
+			)
+
+			SearchResults(
+				searchFragmentDelegate = searchFragmentDelegate,
+				resultFocusRequester = resultFocusRequester,
 			)
 		}
 	}
+}
+
+@Composable
+private fun SearchInputRow(
+	query: String,
+	textInputFocusRequester: FocusRequester,
+	onQueryChange: (query: String) -> Unit,
+	onQuerySubmit: () -> Unit,
+	voiceInput: @Composable () -> Unit,
+) {
+	Row(
+		horizontalArrangement = Arrangement.spacedBy(12.dp),
+		verticalAlignment = Alignment.CenterVertically,
+		modifier = Modifier
+			.focusRestorer()
+			.focusGroup()
+			.padding(horizontal = 32.dp)
+	) {
+		voiceInput()
+
+		SearchTextInput(
+			query = query,
+			onQueryChange = onQueryChange,
+			onQuerySubmit = onQuerySubmit,
+			modifier = Modifier
+				.weight(1f)
+				.focusRequester(textInputFocusRequester),
+		)
+	}
+}
+
+@Composable
+private fun SearchResults(
+	searchFragmentDelegate: SearchFragmentDelegate,
+	resultFocusRequester: FocusRequester,
+) {
+	// The leanback code has its own awful focus handling that doesn't work properly with Compose view inteop to workaround this
+	// issue we add custom behavior that only allows focus exit when the current selected row is the first one. Additionally when
+	// we do switch the focus, we reset the leanback state so it won't cause weird behavior when focus is regained
+	var rowsSupportFragment by remember { mutableStateOf<RowsSupportFragment?>(null) }
+
+	AndroidFragment<RowsSupportFragment>(
+		modifier = Modifier
+			.focusGroup()
+			.focusRequester(resultFocusRequester)
+			.focusProperties {
+				onExit = {
+					val isFirstRowSelected = rowsSupportFragment?.selectedPosition?.let { it <= 0 } ?: false
+					if (requestedFocusDirection != FocusDirection.Up || !isFirstRowSelected) {
+						cancelFocusChange()
+					} else {
+						rowsSupportFragment?.selectedPosition = 0
+						rowsSupportFragment?.verticalGridView?.clearFocus()
+					}
+				}
+			}
+			.padding(top = 5.dp)
+			.fillMaxSize(),
+		maxLifecycle = Lifecycle.State.RESUMED,
+		onUpdate = { fragment ->
+			rowsSupportFragment = fragment
+			fragment.adapter = searchFragmentDelegate.rowsAdapter
+			fragment.onItemViewClickedListener = searchFragmentDelegate.onItemViewClickedListener
+		}
+	)
 }

@@ -1,5 +1,6 @@
 package org.jellyfin.androidtv.ui.settings.screen.livetv
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -12,12 +13,14 @@ import org.jellyfin.androidtv.preference.constant.LiveTvChannelOrder
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.base.form.Checkbox
 import org.jellyfin.androidtv.ui.base.list.ListButton
+import org.jellyfin.androidtv.ui.base.list.ListItemSlots
 import org.jellyfin.androidtv.ui.base.list.ListSection
 import org.jellyfin.androidtv.ui.navigation.LocalRouter
 import org.jellyfin.androidtv.ui.navigation.focus.focusKey
 import org.jellyfin.androidtv.ui.settings.Routes
 import org.jellyfin.androidtv.ui.settings.compat.rememberPreference
 import org.jellyfin.androidtv.ui.settings.composable.SettingsColumn
+import org.jellyfin.preference.Preference
 import org.koin.compose.koinInject
 
 @Composable
@@ -41,50 +44,18 @@ fun SettingsLiveTvGuideOptionsScreen() {
 			)
 		}
 
-		item {
-			var channelOrder by rememberPreference(liveTvPreferences, LiveTvPreferences.channelOrder)
+		item { ChannelOrderButton(onClick = { router.push(Routes.LIVETV_GUIDE_CHANNEL_ORDER) }) }
 
-			ListButton(
-				headingContent = { Text(stringResource(R.string.lbl_sort_by)) },
-				captionContent = { Text(stringResource(LiveTvChannelOrder.fromString(channelOrder).nameRes)) },
-				onClick = { router.push(Routes.LIVETV_GUIDE_CHANNEL_ORDER) },
-				modifier = Modifier.focusKey(Routes.LIVETV_GUIDE_CHANNEL_ORDER)
-			)
-		}
-
-		item {
-			var favsAtTop by rememberPreference(liveTvPreferences, LiveTvPreferences.favsAtTop)
-
-			ListButton(
-				headingContent = { Text(stringResource(R.string.lbl_start_favorites)) },
-				trailingContent = { Checkbox(checked = favsAtTop) },
-				onClick = { favsAtTop = !favsAtTop },
-				modifier = Modifier.focusKey("favs_at_top")
-			)
-		}
-
-		item {
-			// Ephyra
-			var restoreLastChannel by rememberPreference(liveTvPreferences, LiveTvPreferences.restoreLastChannel)
-
-			ListButton(
-				headingContent = { Text(stringResource(R.string.ephyra_pref_guide_restore_last_channel)) },
-				captionContent = { Text(stringResource(R.string.ephyra_pref_guide_restore_last_channel_description)) },
-				trailingContent = { Checkbox(checked = restoreLastChannel) },
-				onClick = { restoreLastChannel = !restoreLastChannel },
-				modifier = Modifier.focusKey("restore_last_channel")
-			)
-		}
-
-		item {
-			var colorCodeGuide by rememberPreference(liveTvPreferences, LiveTvPreferences.colorCodeGuide)
-
-			ListButton(
-				headingContent = { Text(stringResource(R.string.lbl_colored_backgrounds)) },
-				trailingContent = { Checkbox(checked = colorCodeGuide) },
-				onClick = { colorCodeGuide = !colorCodeGuide },
-				modifier = Modifier.focusKey("color_code_guide")
-			)
+		for (option in guideCheckboxes) {
+			item {
+				GuideCheckbox(
+					store = liveTvPreferences,
+					preference = option.preference,
+					heading = option.heading,
+					key = option.key,
+					caption = option.caption,
+				)
+			}
 		}
 
 		item { ListSection(headingContent = { Text(stringResource(R.string.lbl_show_indicators)) }) }
@@ -94,10 +65,69 @@ fun SettingsLiveTvGuideOptionsScreen() {
 
 			ListButton(
 				headingContent = { Text(label) },
-				trailingContent = { Checkbox(checked = enabled) },
+				slots = ListItemSlots(
+					trailingContent = { Checkbox(checked = enabled) },
+				),
 				onClick = { enabled = !enabled },
 				modifier = Modifier.focusKey("indicator_$label")
 			)
 		}
 	}
+}
+
+/** One of the checkboxes of the guide options: the [preference] it changes, its [heading] and optional [caption]. */
+private data class GuideCheckboxOption(
+	val preference: Preference<Boolean>,
+	@StringRes val heading: Int,
+	val key: String,
+	@StringRes val caption: Int? = null,
+)
+
+private val guideCheckboxes = listOf(
+	GuideCheckboxOption(LiveTvPreferences.favsAtTop, R.string.lbl_start_favorites, "favs_at_top"),
+	// Ephyra
+	GuideCheckboxOption(
+		preference = LiveTvPreferences.restoreLastChannel,
+		heading = R.string.ephyra_pref_guide_restore_last_channel,
+		key = "restore_last_channel",
+		caption = R.string.ephyra_pref_guide_restore_last_channel_description,
+	),
+	GuideCheckboxOption(LiveTvPreferences.colorCodeGuide, R.string.lbl_colored_backgrounds, "color_code_guide"),
+)
+
+@Composable
+private fun ChannelOrderButton(onClick: () -> Unit) {
+	val liveTvPreferences = koinInject<LiveTvPreferences>()
+	val channelOrder by rememberPreference(liveTvPreferences, LiveTvPreferences.channelOrder)
+
+	ListButton(
+		headingContent = { Text(stringResource(R.string.lbl_sort_by)) },
+		slots = ListItemSlots(
+			captionContent = { Text(stringResource(LiveTvChannelOrder.fromString(channelOrder).nameRes)) },
+		),
+		onClick = onClick,
+		modifier = Modifier.focusKey(Routes.LIVETV_GUIDE_CHANNEL_ORDER)
+	)
+}
+
+/** A checkbox for a boolean live TV preference, with an optional caption. */
+@Composable
+private fun GuideCheckbox(
+	store: LiveTvPreferences,
+	preference: Preference<Boolean>,
+	@StringRes heading: Int,
+	key: String,
+	@StringRes caption: Int? = null,
+) {
+	var checked by rememberPreference(store, preference)
+
+	ListButton(
+		headingContent = { Text(stringResource(heading)) },
+		slots = ListItemSlots(
+			captionContent = if (caption != null) ({ Text(stringResource(caption)) }) else null,
+			trailingContent = { Checkbox(checked = checked) },
+		),
+		onClick = { checked = !checked },
+		modifier = Modifier.focusKey(key)
+	)
 }

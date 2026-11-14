@@ -11,6 +11,7 @@ import org.jellyfin.androidtv.preference.SystemPreferences
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.base.form.Checkbox
 import org.jellyfin.androidtv.ui.base.list.ListButton
+import org.jellyfin.androidtv.ui.base.list.ListItemSlots
 import org.jellyfin.androidtv.ui.base.list.ListSection
 import org.jellyfin.androidtv.ui.navigation.focus.focusKey
 import org.jellyfin.androidtv.ui.settings.compat.rememberPreference
@@ -43,7 +44,9 @@ fun SettingsLiveTvGuideFiltersScreen() {
 
 			ListButton(
 				headingContent = { Text(label) },
-				trailingContent = { Checkbox(checked = enabled) },
+				slots = ListItemSlots(
+					trailingContent = { Checkbox(checked = enabled) },
+				),
 				onClick = { enabled = !enabled },
 				modifier = Modifier.focusKey("filter_$label")
 			)

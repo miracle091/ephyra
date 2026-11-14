@@ -40,6 +40,7 @@ import org.jellyfin.androidtv.ui.playback.AudioEventListener;
 import org.jellyfin.androidtv.ui.playback.MediaManager;
 import org.jellyfin.androidtv.ui.playback.PlaybackController;
 import org.jellyfin.androidtv.ui.playback.PlaybackLauncher;
+import org.jellyfin.androidtv.ui.playback.QueueStart;
 import org.jellyfin.androidtv.util.ImageHelper;
 import org.jellyfin.androidtv.util.InfoLayoutHelper;
 import org.jellyfin.androidtv.util.PlaybackHelper;
@@ -355,7 +356,7 @@ public class ItemListFragment extends Fragment implements View.OnKeyListener {
         if (item != null && item.getUserData() != null) {
             pos = Math.toIntExact(item.getUserData().getPlaybackPositionTicks() / 10000);
         }
-        KoinJavaComponent.<PlaybackLauncher>get(PlaybackLauncher.class).launch(getContext(), items, pos, false, ndx, shuffle);
+        KoinJavaComponent.<PlaybackLauncher>get(PlaybackLauncher.class).launch(getContext(), items, pos, false, new QueueStart(ndx, shuffle));
     }
 
     private void addButtons(int buttonSize) {

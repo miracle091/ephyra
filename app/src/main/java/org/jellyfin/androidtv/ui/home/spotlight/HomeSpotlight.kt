@@ -230,17 +230,21 @@ private fun SpotlightTexts(item: BaseItemDto) {
 
 	Text(
 		text = spotlightOverline(stringResource(R.string.ephyra_spotlight), item).uppercase(),
-		fontSize = 11.sp,
-		fontWeight = FontWeight.Bold,
-		letterSpacing = 1.sp,
-		color = LocalEphyraPalette.current.accent,
+		style = LocalTextStyle.current.merge(
+			color = LocalEphyraPalette.current.accent,
+			fontSize = 11.sp,
+			fontWeight = FontWeight.Bold,
+			letterSpacing = 1.sp,
+		),
 	)
 	Text(
 		text = item.name.orEmpty(),
-		fontSize = 28.sp,
-		lineHeight = 34.sp,
-		fontWeight = FontWeight.Bold,
-		color = LocalEphyraPalette.current.ink,
+		style = LocalTextStyle.current.merge(
+			color = LocalEphyraPalette.current.ink,
+			fontSize = 28.sp,
+			fontWeight = FontWeight.Bold,
+			lineHeight = 34.sp,
+		),
 		maxLines = 1,
 		overflow = TextOverflow.Ellipsis,
 	)
@@ -248,8 +252,7 @@ private fun SpotlightTexts(item: BaseItemDto) {
 	spotlightTagline(item)?.let { tagline ->
 		Text(
 			text = tagline,
-			fontSize = 14.sp,
-			color = LocalEphyraPalette.current.inkMuted,
+			style = LocalTextStyle.current.merge(color = LocalEphyraPalette.current.inkMuted, fontSize = 14.sp),
 			maxLines = 1,
 			overflow = TextOverflow.Ellipsis,
 		)
@@ -328,7 +331,15 @@ private fun SpotlightButtons(item: BaseItemDto, playFocusRequester: FocusRequest
 
 @Composable
 private fun SpotlightMetaText(text: String) {
-	Text(text = text, fontSize = 14.sp, fontWeight = FontWeight.Medium, color = LocalEphyraPalette.current.inkMuted, maxLines = 1)
+	Text(
+		text = text,
+		style = LocalTextStyle.current.merge(
+			color = LocalEphyraPalette.current.inkMuted,
+			fontSize = 14.sp,
+			fontWeight = FontWeight.Medium,
+		),
+		maxLines = 1,
+	)
 }
 
 /** Whether the first row of [rowsFragment] is selected, watched through focus changes (Leanback has no Compose state). */

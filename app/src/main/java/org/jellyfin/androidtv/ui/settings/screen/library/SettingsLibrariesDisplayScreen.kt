@@ -1,5 +1,6 @@
 package org.jellyfin.androidtv.ui.settings.screen.library
 
+import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -13,6 +14,7 @@ import org.jellyfin.androidtv.preference.PreferencesRepository
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.base.form.Checkbox
 import org.jellyfin.androidtv.ui.base.list.ListButton
+import org.jellyfin.androidtv.ui.base.list.ListItemSlots
 import org.jellyfin.androidtv.ui.base.list.ListSection
 import org.jellyfin.androidtv.ui.navigation.LocalRouter
 import org.jellyfin.androidtv.ui.navigation.focus.focusKey
@@ -24,7 +26,6 @@ import java.util.UUID
 
 @Composable
 fun SettingsLibrariesDisplayScreen(itemId: UUID, displayPreferencesId: String) {
-	val router = LocalRouter.current
 	val userViewsRepository = koinInject<UserViewsRepository>()
 	val preferencesRepository = koinInject<PreferencesRepository>()
 	val userView = rememberUserView(itemId)
@@ -41,50 +42,38 @@ fun SettingsLibrariesDisplayScreen(itemId: UUID, displayPreferencesId: String) {
 		}
 
 		item {
-			var posterSize by rememberPreference(libraryPreferences, LibraryPreferences.posterSize)
+			val posterSize by rememberPreference(libraryPreferences, LibraryPreferences.posterSize)
 
-			ListButton(
-				headingContent = { Text(stringResource(R.string.lbl_image_size)) },
-				captionContent = { Text(stringResource(posterSize.nameRes)) },
-				onClick = {
-					router.push(
-						Routes.LIBRARIES_DISPLAY_IMAGE_SIZE,
-						mapOf("itemId" to itemId.toString(), "displayPreferencesId" to displayPreferencesId)
-					)
-				},
-				modifier = Modifier.focusKey(Routes.LIBRARIES_DISPLAY_IMAGE_SIZE)
+			LibraryDisplayButton(
+				heading = R.string.lbl_image_size,
+				caption = posterSize.nameRes,
+				route = Routes.LIBRARIES_DISPLAY_IMAGE_SIZE,
+				itemId = itemId,
+				displayPreferencesId = displayPreferencesId,
 			)
 		}
 
 		item {
-			var imageType by rememberPreference(libraryPreferences, LibraryPreferences.imageType)
+			val imageType by rememberPreference(libraryPreferences, LibraryPreferences.imageType)
 
-			ListButton(
-				headingContent = { Text(stringResource(R.string.lbl_image_type)) },
-				captionContent = { Text(stringResource(imageType.nameRes)) },
-				onClick = {
-					router.push(
-						Routes.LIBRARIES_DISPLAY_IMAGE_TYPE,
-						mapOf("itemId" to itemId.toString(), "displayPreferencesId" to displayPreferencesId)
-					)
-				},
-				modifier = Modifier.focusKey(Routes.LIBRARIES_DISPLAY_IMAGE_TYPE)
+			LibraryDisplayButton(
+				heading = R.string.lbl_image_type,
+				caption = imageType.nameRes,
+				route = Routes.LIBRARIES_DISPLAY_IMAGE_TYPE,
+				itemId = itemId,
+				displayPreferencesId = displayPreferencesId,
 			)
 		}
 
 		item {
-			var gridDirection by rememberPreference(libraryPreferences, LibraryPreferences.gridDirection)
+			val gridDirection by rememberPreference(libraryPreferences, LibraryPreferences.gridDirection)
 
-			ListButton(
-				headingContent = { Text(stringResource(R.string.grid_direction)) },
-				captionContent = { Text(stringResource(gridDirection.nameRes)) },
-				onClick = {
-					router.push(
-						Routes.LIBRARIES_DISPLAY_GRID,
-						mapOf("itemId" to itemId.toString(), "displayPreferencesId" to displayPreferencesId)
-					)
-				},
-				modifier = Modifier.focusKey(Routes.LIBRARIES_DISPLAY_GRID)
+			LibraryDisplayButton(
+				heading = R.string.grid_direction,
+				caption = gridDirection.nameRes,
+				route = Routes.LIBRARIES_DISPLAY_GRID,
+				itemId = itemId,
+				displayPreferencesId = displayPreferencesId,
 			)
 		}
 
@@ -93,11 +82,39 @@ fun SettingsLibrariesDisplayScreen(itemId: UUID, displayPreferencesId: String) {
 
 			ListButton(
 				headingContent = { Text(stringResource(R.string.enable_smart_view)) },
-				trailingContent = { Checkbox(checked = enableSmartScreen) },
-				captionContent = { Text(stringResource(R.string.enable_smart_view_description)) },
+				slots = ListItemSlots(
+					trailingContent = { Checkbox(checked = enableSmartScreen) },
+					captionContent = { Text(stringResource(R.string.enable_smart_view_description)) },
+				),
 				onClick = { enableSmartScreen = !enableSmartScreen },
 				modifier = Modifier.focusKey("enable_smart_view")
 			)
 		}
 	}
+}
+
+/** A button that shows the current value of a library display preference and opens the screen that changes it. */
+@Composable
+private fun LibraryDisplayButton(
+	@StringRes heading: Int,
+	@StringRes caption: Int,
+	route: String,
+	itemId: UUID,
+	displayPreferencesId: String,
+) {
+	val router = LocalRouter.current
+
+	ListButton(
+		headingContent = { Text(stringResource(heading)) },
+		slots = ListItemSlots(
+			captionContent = { Text(stringResource(caption)) },
+		),
+		onClick = {
+			router.push(
+				route,
+				mapOf("itemId" to itemId.toString(), "displayPreferencesId" to displayPreferencesId)
+			)
+		},
+		modifier = Modifier.focusKey(route)
+	)
 }

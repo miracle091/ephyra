@@ -17,6 +17,7 @@ import org.jellyfin.androidtv.preference.UserPreferences
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.base.form.Checkbox
 import org.jellyfin.androidtv.ui.base.list.ListButton
+import org.jellyfin.androidtv.ui.base.list.ListItemSlots
 import org.jellyfin.androidtv.ui.base.list.ListSection
 import org.jellyfin.androidtv.ui.navigation.focus.focusKey
 import org.jellyfin.androidtv.ui.settings.compat.rememberPreference
@@ -45,8 +46,10 @@ fun SettingsDeveloperScreen() {
 			var debuggingEnabled by rememberPreference(userPreferences, UserPreferences.debuggingEnabled)
 			ListButton(
 				headingContent = { Text(stringResource(R.string.lbl_enable_debug)) },
-				trailingContent = { Checkbox(checked = debuggingEnabled) },
-				captionContent = { Text(stringResource(R.string.desc_debug)) },
+				slots = ListItemSlots(
+					trailingContent = { Checkbox(checked = debuggingEnabled) },
+					captionContent = { Text(stringResource(R.string.desc_debug)) },
+				),
 				onClick = { debuggingEnabled = !debuggingEnabled },
 				modifier = Modifier.focusKey("debugging_enabled")
 			)
@@ -57,36 +60,43 @@ fun SettingsDeveloperScreen() {
 			var disableUiModeWarning by rememberPreference(systemPreferences, SystemPreferences.disableUiModeWarning)
 			ListButton(
 				headingContent = { Text(stringResource(R.string.disable_ui_mode_warning)) },
-				trailingContent = { Checkbox(checked = disableUiModeWarning) },
+				slots = ListItemSlots(
+					trailingContent = { Checkbox(checked = disableUiModeWarning) },
+				),
 				onClick = { disableUiModeWarning = !disableUiModeWarning },
 				modifier = Modifier.focusKey("disable_ui_mode_warning")
 			)
 		}
 
-		item {
-			// Image cache
-			val imageLoader = koinInject<ImageLoader>()
-			var imageCacheSize by remember { mutableLongStateOf(imageLoader.diskCache?.size ?: 0L) }
-			ListButton(
-				headingContent = { Text(stringResource(R.string.clear_image_cache)) },
-				captionContent = {
-					Text(
-						stringResource(
-							R.string.clear_image_cache_content,
-							Formatter.formatFileSize(context, imageCacheSize)
-						)
-					)
-				},
-				onClick = {
-					imageLoader.memoryCache?.clear()
-					imageLoader.diskCache?.clear()
-					imageCacheSize = imageLoader.diskCache?.size ?: 0L
-				},
-				modifier = Modifier.focusKey("clear_image_cache")
-			)
-		}
+		item { ClearImageCacheButton() }
 
 		// Ephyra: codec benchmark, debug builds only
 		if (BuildConfig.DEBUG) item { CodecBenchmarkListButton() }
 	}
+}
+
+@Composable
+private fun ClearImageCacheButton() {
+	val context = LocalContext.current
+	val imageLoader = koinInject<ImageLoader>()
+	var imageCacheSize by remember { mutableLongStateOf(imageLoader.diskCache?.size ?: 0L) }
+	ListButton(
+		headingContent = { Text(stringResource(R.string.clear_image_cache)) },
+		slots = ListItemSlots(
+			captionContent = {
+				Text(
+					stringResource(
+						R.string.clear_image_cache_content,
+						Formatter.formatFileSize(context, imageCacheSize)
+					)
+				)
+			},
+		),
+		onClick = {
+			imageLoader.memoryCache?.clear()
+			imageLoader.diskCache?.clear()
+			imageCacheSize = imageLoader.diskCache?.size ?: 0L
+		},
+		modifier = Modifier.focusKey("clear_image_cache")
+	)
 }

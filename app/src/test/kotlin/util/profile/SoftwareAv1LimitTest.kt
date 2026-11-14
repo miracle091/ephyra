@@ -22,18 +22,19 @@ private fun av1Limits(hardwareAv1: Boolean): Pair<String?, String?> {
 
 	val profile = createDeviceProfile(
 		mediaTest = mediaTest,
-		maxBitrate = 100_000_000,
-		isAC3PrefEnabled = false,
-		isEAC3PrefEnabled = false,
-		isDTSPrefEnabled = false,
-		isTrueHDPrefEnabled = false,
-		downMixAudio = false,
-		assDirectPlay = false,
-		pgsDirectPlay = false,
-		userAVCLevel = null,
-		userHEVCLevel = null,
-		forceEnabledHdr = emptySet(),
-		forceDisabledHdr = emptySet(),
+		options = DeviceProfileOptions(
+			maxBitrate = 100_000_000,
+			audio = AudioProfileOptions(
+				isAC3PrefEnabled = false,
+				isEAC3PrefEnabled = false,
+				isDTSPrefEnabled = false,
+				isTrueHDPrefEnabled = false,
+				downMixAudio = false,
+			),
+			subtitles = SubtitleProfileOptions(assDirectPlay = false, pgsDirectPlay = false),
+			codecLevels = CodecLevelOverrides(userAVCLevel = null, userHEVCLevel = null),
+			hdr = HdrProfileOptions(forceEnabledHdr = emptySet(), forceDisabledHdr = emptySet()),
+		),
 	)
 
 	val conditions = profile.codecProfiles.orEmpty().filter { it.codec == Codec.Video.AV1 }.flatMap { it.conditions.orEmpty() }

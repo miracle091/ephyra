@@ -43,44 +43,38 @@ object RangeControlDefaults {
 	)
 }
 
+private const val FOCUSED_KNOB_SCALE = 1.75f
+private const val MARKER_WIDTH = 3f
+
+/** What a [RangeControl] shows: the current [value] between [min] and [max], moved by [step] with [markers] drawn on the bar. */
+@Immutable
+data class RangeControlState(
+	val value: Float = 0f,
+	val min: Float = 0f,
+	val max: Float = 1f,
+	val step: Float = 0.01f,
+	val markers: List<Float> = emptyList(),
+)
+
 @Composable
 fun RangeControl(
+	state: RangeControlState,
 	modifier: Modifier = Modifier,
 	interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-	min: Float = 0f,
-	max: Float = 1f,
-	value: Float = 0f,
-	markers: List<Float> = emptyList(),
-	stepForward: Float = 0.01f,
-	stepBackward: Float = stepForward,
-	onValueChange: ((vakye: Float) -> Unit)? = null,
-	enabled: Boolean = true,
+	onValueChange: ((value: Float) -> Unit)? = null,
 	colors: RangeControlColors = RangeControlDefaults.colors(),
 ) {
+	val value = state.value
+	val min = state.min
+	val max = state.max
+	val markers = state.markers
 	val focused by interactionSource.collectIsFocusedAsState()
-	val knobSize by animateFloatAsState(if (focused) 1.75f else 1f)
+	val knobSize by animateFloatAsState(if (focused) FOCUSED_KNOB_SCALE else 1f)
 
 	Box(
 		modifier = modifier
-			.onKeyEvent {
-				if (!enabled) return@onKeyEvent false
-
-				val isForward = it.key == Key.DirectionRight
-				val isRewind = it.key == Key.DirectionLeft
-				val isScrubbing = isForward || isRewind
-				val isKeyDown = it.type == KeyEventType.KeyDown
-
-				val newValue = when {
-					isKeyDown && isForward -> (value + stepForward).coerceAtMost(max)
-					isKeyDown && isRewind -> (value - stepBackward).coerceAtLeast(min)
-					else -> value
-				}
-
-				if (value != newValue && onValueChange != null) onValueChange(newValue)
-
-				return@onKeyEvent isScrubbing
-			}
-			.focusable(interactionSource = interactionSource, enabled = enabled)
+			.rangeKeyEvents(state, onValueChange)
+			.focusable(interactionSource = interactionSource)
 			.drawWithContent {
 				val barCornerRadius = CornerRadius(size.minDimension, size.minDimension)
 
@@ -108,11 +102,10 @@ fun RangeControl(
 				for (marker in markers) {
 					val markerPercentage = (marker - min) / (max - min)
 					if (markerPercentage in 0f..1f) {
-						val markerWidth = 3f
 						drawRect(
 							color = colors.knobColor,
-							topLeft = Offset(x = markerPercentage * size.width - markerWidth / 2, y = 0f),
-							size = size.copy(width = markerWidth),
+							topLeft = Offset(x = markerPercentage * size.width - MARKER_WIDTH / 2, y = 0f),
+							size = size.copy(width = MARKER_WIDTH),
 						)
 					}
 				}
@@ -127,4 +120,22 @@ fun RangeControl(
 				)
 			}
 	)
+}
+
+/** Moves the value of [state] by its step with the left and right keys, consuming them. */
+private fun Modifier.rangeKeyEvents(state: RangeControlState, onValueChange: ((value: Float) -> Unit)?) = onKeyEvent {
+	val isForward = it.key == Key.DirectionRight
+	val isRewind = it.key == Key.DirectionLeft
+	val isScrubbing = isForward || isRewind
+	val isKeyDown = it.type == KeyEventType.KeyDown
+
+	val newValue = when {
+		isKeyDown && isForward -> (state.value + state.step).coerceAtMost(state.max)
+		isKeyDown && isRewind -> (state.value - state.step).coerceAtLeast(state.min)
+		else -> state.value
+	}
+
+	if (state.value != newValue && onValueChange != null) onValueChange(newValue)
+
+	isScrubbing
 }

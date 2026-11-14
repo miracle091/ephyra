@@ -15,4 +15,11 @@ object ListControlDefaults {
 		containerColor = containerColor,
 		focusedContainerColor = focusedContainerColor,
 	)
+
+	@ReadOnlyComposable
+	@Composable
+	fun style(
+		colors: ListControlColors = colors(),
+		enabled: Boolean = true,
+	) = ListControlStyle(colors = colors, enabled = enabled)
 }

@@ -11,6 +11,8 @@ import org.jellyfin.sdk.model.api.MediaStream
 import org.jellyfin.sdk.model.api.MediaStreamType
 import java.text.NumberFormat
 
+private const val BITS_PER_KILOBIT = 1024
+
 class MediaInfoCardView @JvmOverloads constructor(
 	context: Context,
 	attrs: AttributeSet? = null,
@@ -28,25 +30,32 @@ class MediaInfoCardView @JvmOverloads constructor(
 			mediaStream.level?.let { addRow("Level", it.toString()) }
 			mediaStream.channelLayout?.let { addRow("Layout", it) }
 
-			if (mediaStream.type == MediaStreamType.VIDEO) {
-				if (mediaStream.width != null && mediaStream.height != null) addRow("Resolution", "${mediaStream.width}x${mediaStream.height}")
-				if (mediaStream.isAnamorphic == true) addRow("Anamorphic")
-				if (mediaStream.isInterlaced) addRow("Interlaced")
-				mediaStream.aspectRatio?.let { addRow("Aspect", it) }
-				mediaStream.realFrameRate?.let { addRow("Framerate", it.toString()) }
-			}
+			addVideoRows(mediaStream)
+			addAudioRows(mediaStream)
 
-			if (mediaStream.type == MediaStreamType.AUDIO) {
-				mediaStream.channels?.let { addRow("Channels", it.toString()) }
-				mediaStream.sampleRate?.let { addRow("Sample rate", it.toString()) }
-				mediaStream.bitDepth?.let { addRow("Bit depth", it.toString()) }
-			}
-
-			mediaStream.bitRate?.let { addRow("Bitrate", NumberFormat.getInstance().format((it / 1024).toLong()) + " kbps") }
+			mediaStream.bitRate?.let { addRow("Bitrate", NumberFormat.getInstance().format((it / BITS_PER_KILOBIT).toLong()) + " kbps") }
 			if (mediaStream.isDefault) addRow("Default")
 			if (mediaStream.isForced) addRow("Forced")
 			if (mediaStream.isExternal) addRow("External")
 		}
+	}
+
+	private fun SpannableStringBuilder.addVideoRows(mediaStream: MediaStream) {
+		if (mediaStream.type != MediaStreamType.VIDEO) return
+
+		if (mediaStream.width != null && mediaStream.height != null) addRow("Resolution", "${mediaStream.width}x${mediaStream.height}")
+		if (mediaStream.isAnamorphic == true) addRow("Anamorphic")
+		if (mediaStream.isInterlaced) addRow("Interlaced")
+		mediaStream.aspectRatio?.let { addRow("Aspect", it) }
+		mediaStream.realFrameRate?.let { addRow("Framerate", it.toString()) }
+	}
+
+	private fun SpannableStringBuilder.addAudioRows(mediaStream: MediaStream) {
+		if (mediaStream.type != MediaStreamType.AUDIO) return
+
+		mediaStream.channels?.let { addRow("Channels", it.toString()) }
+		mediaStream.sampleRate?.let { addRow("Sample rate", it.toString()) }
+		mediaStream.bitDepth?.let { addRow("Bit depth", it.toString()) }
 	}
 
 	private fun SpannableStringBuilder.addRow(

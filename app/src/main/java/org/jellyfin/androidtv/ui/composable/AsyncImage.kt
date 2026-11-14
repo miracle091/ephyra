@@ -16,23 +16,24 @@ import androidx.compose.ui.viewinterop.AndroidView
 import org.jellyfin.androidtv.ui.AsyncImageView
 import org.jellyfin.androidtv.util.BlurHashDecoder
 
-private data class AsyncImageState(
-	val url: String?,
-	val blurHash: String?,
+private const val BLUR_HASH_RESOLUTION = 32
+
+/** The image an [AsyncImage] shows: loaded from [url] while the [blurHash] is shown as a placeholder. */
+data class AsyncImageSource(
+	val url: String? = null,
+	val blurHash: String? = null,
 )
 
 @Composable
 fun AsyncImage(
+	source: AsyncImageSource,
 	modifier: Modifier = Modifier,
-	url: String? = null,
-	blurHash: String? = null,
 	placeholder: Drawable? = null,
 	aspectRatio: Float = 1f,
-	blurHashResolution: Int = 32,
 	scaleType: ImageView.ScaleType? = null,
 ) {
-	// Only the important properties are added to AsyncImageState
-	var state by remember { mutableStateOf<AsyncImageState?>(null) }
+	// Only the important properties are added to the state
+	var state by remember { mutableStateOf<AsyncImageSource?>(null) }
 
 	AndroidView(
 		modifier = modifier,
@@ -43,7 +44,7 @@ fun AsyncImage(
 			}
 		},
 		update = { view ->
-			val compositionState = AsyncImageState(url, blurHash)
+			val compositionState = source
 			if (state != compositionState) {
 				state = compositionState
 
@@ -52,7 +53,7 @@ fun AsyncImage(
 					blurHash = compositionState.blurHash,
 					placeholder = placeholder,
 					aspectRatio = aspectRatio.toDouble(),
-					blurHashResolution = blurHashResolution,
+					blurHashResolution = BLUR_HASH_RESOLUTION,
 				)
 			}
 		},

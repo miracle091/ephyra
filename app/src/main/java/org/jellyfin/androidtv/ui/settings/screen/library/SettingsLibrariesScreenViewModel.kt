@@ -8,6 +8,8 @@ import kotlinx.coroutines.flow.stateIn
 import org.jellyfin.androidtv.data.repository.UserViewsRepository
 import org.jellyfin.sdk.model.api.CollectionType
 
+private const val STOP_TIMEOUT_MILLIS = 5_000L
+
 class SettingsLibrariesScreenViewModel(
 	private val userViewsRepository: UserViewsRepository,
 ) : ViewModel() {
@@ -15,7 +17,7 @@ class SettingsLibrariesScreenViewModel(
 		.map { it.toList() }
 		.stateIn(
 			viewModelScope,
-			SharingStarted.WhileSubscribed(5_000),
+			SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS),
 			emptyList()
 		)
 

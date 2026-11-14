@@ -12,6 +12,7 @@ import org.jellyfin.androidtv.preference.UserPreferences
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.base.form.RadioButton
 import org.jellyfin.androidtv.ui.base.list.ListButton
+import org.jellyfin.androidtv.ui.base.list.ListItemSlots
 import org.jellyfin.androidtv.ui.base.list.ListSection
 import org.jellyfin.androidtv.ui.navigation.LocalRouter
 import org.jellyfin.androidtv.ui.navigation.focus.focusKey
@@ -52,7 +53,9 @@ fun SettingsHomeNextUpCutoffScreen() {
 		items(options) { (days, label) ->
 			ListButton(
 				headingContent = { Text(label) },
-				trailingContent = { RadioButton(checked = homeNextUpMaxDays == days) },
+				slots = ListItemSlots(
+					trailingContent = { RadioButton(checked = homeNextUpMaxDays == days) },
+				),
 				onClick = {
 					homeNextUpMaxDays = days
 					router.back()

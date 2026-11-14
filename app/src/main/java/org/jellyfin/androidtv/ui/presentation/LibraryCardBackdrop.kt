@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.DpSize
 import org.jellyfin.androidtv.R
 import org.jellyfin.androidtv.auth.repository.UserRepository
 import org.jellyfin.androidtv.ui.composable.AsyncImage
+import org.jellyfin.androidtv.ui.composable.AsyncImageSource
 import org.jellyfin.androidtv.ui.composable.item.ArtToneCover
 import org.jellyfin.androidtv.ui.composable.item.artToneFor
 import org.jellyfin.androidtv.util.apiclient.JellyfinImage
@@ -110,12 +111,14 @@ fun LibraryCardImage(library: BaseItemDto, title: String?, iconRes: Int, size: D
 				val api = koinInject<ApiClient>()
 				val density = LocalDensity.current
 				AsyncImage(
-					url = image.getUrl(
-						api,
-						maxWidth = with(density) { size.width.roundToPx() },
-						maxHeight = with(density) { size.height.roundToPx() },
+					source = AsyncImageSource(
+						url = image.getUrl(
+							api,
+							maxWidth = with(density) { size.width.roundToPx() },
+							maxHeight = with(density) { size.height.roundToPx() },
+						),
+						blurHash = image.blurHash,
 					),
-					blurHash = image.blurHash,
 					aspectRatio = aspectRatio,
 					scaleType = ImageView.ScaleType.CENTER_CROP,
 					modifier = Modifier.fillMaxSize(),
@@ -140,7 +143,9 @@ private fun LiveTvCardLogo(logo: JellyfinImage, title: String?, size: DpSize) {
 			.background(artToneFor(title)),
 	) {
 		AsyncImage(
-			url = logo.getUrl(api, maxWidth = with(density) { (size.width * LOGO_SCALE).roundToPx() }),
+			source = AsyncImageSource(
+				url = logo.getUrl(api, maxWidth = with(density) { (size.width * LOGO_SCALE).roundToPx() }),
+			),
 			scaleType = ImageView.ScaleType.FIT_CENTER,
 			modifier = Modifier.fillMaxSize(LOGO_SCALE),
 		)

@@ -11,6 +11,7 @@ import org.jellyfin.androidtv.preference.UserPreferences
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.base.form.RadioButton
 import org.jellyfin.androidtv.ui.base.list.ListButton
+import org.jellyfin.androidtv.ui.base.list.ListItemSlots
 import org.jellyfin.androidtv.ui.base.list.ListSection
 import org.jellyfin.androidtv.ui.navigation.LocalRouter
 import org.jellyfin.androidtv.ui.navigation.focus.focusKey
@@ -36,7 +37,9 @@ fun SettingsPlaybackResumeSubtractDurationScreen() {
 		items(options.toList()) { (value, label) ->
 			ListButton(
 				headingContent = { Text(label) },
-				trailingContent = { RadioButton(checked = resumeSubtractDuration == value) },
+				slots = ListItemSlots(
+					trailingContent = { RadioButton(checked = resumeSubtractDuration == value) },
+				),
 				onClick = {
 					resumeSubtractDuration = value
 					router.back()

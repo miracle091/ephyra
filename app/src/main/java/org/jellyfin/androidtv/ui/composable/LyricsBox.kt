@@ -7,6 +7,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -16,13 +17,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Measured
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import org.jellyfin.androidtv.ui.base.LocalTextStyle
 import org.jellyfin.androidtv.ui.base.Text
@@ -37,16 +37,24 @@ private data class LyricsBoxContentMeasurements(
 
 private fun Collection<TimedLine>.indexAtTimestamp(timestamp: Duration) = indexOfLast { it.timestamp <= timestamp }.takeIf { it != -1 }
 
+/** Where the playback is, for lyrics that are not timed: the [timestamp] in the [duration], and whether it is [paused]. */
+@Immutable
+data class LyricsPosition(
+	val timestamp: Duration = Duration.ZERO,
+	val duration: Duration = Duration.ZERO,
+	val paused: Boolean = false,
+)
+
 @Composable
 private fun LyricsLine(
 	text: String,
-	fontSize: TextUnit,
-	color: Color,
+	textStyle: TextStyle,
 	active: Boolean = false,
 	gap: Dp = 15.dp,
 ) {
+	val lineColor = textStyle.color
 	val color by animateColorAsState(
-		targetValue = if (active) color else color.copy(alpha = 0.5f),
+		targetValue = if (active) lineColor else lineColor.copy(alpha = 0.5f),
 		animationSpec = tween(),
 		label = "LyricsLineColor",
 	)
@@ -59,9 +67,7 @@ private fun LyricsLine(
 
 	Text(
 		text = text,
-		textAlign = TextAlign.Center,
-		fontSize = fontSize,
-		color = color,
+		style = textStyle.merge(color = color, textAlign = TextAlign.Center),
 		modifier = Modifier
 			.padding(bottom = gap)
 			.scale(scale)
@@ -111,8 +117,7 @@ private fun <T> LyricsBoxContent(
 fun LyricsBox(
 	lines: List<TimedLine>,
 	currentTimestamp: Duration = Duration.ZERO,
-	fontSize: TextUnit = LocalTextStyle.current.fontSize,
-	color: Color = LocalTextStyle.current.color,
+	textStyle: TextStyle = LocalTextStyle.current,
 ) {
 	var lineMeasurements by remember { mutableStateOf<List<Measured>>(emptyList()) }
 	val activeLine = lines.indexAtTimestamp(currentTimestamp)
@@ -141,8 +146,7 @@ fun LyricsBox(
 		LyricsLine(
 			text = line.text,
 			active = index == activeLine,
-			fontSize = fontSize,
-			color = color,
+			textStyle = textStyle,
 		)
 	}
 }
@@ -151,14 +155,11 @@ fun LyricsBox(
 fun LyricsBox(
 	lines: List<String>,
 	modifier: Modifier = Modifier,
-	currentTimestamp: Duration = Duration.ZERO,
-	duration: Duration = Duration.ZERO,
-	paused: Boolean = false,
-	fontSize: TextUnit = LocalTextStyle.current.fontSize,
-	color: Color = LocalTextStyle.current.color,
+	position: LyricsPosition = LyricsPosition(),
+	textStyle: TextStyle = LocalTextStyle.current,
 ) = Box(modifier) {
 	var totalHeight by remember { mutableFloatStateOf(0f) }
-	val progress by rememberPlayerProgress(!paused, currentTimestamp, duration)
+	val progress by rememberPlayerProgress(!position.paused, position.timestamp, position.duration)
 
 	LyricsBoxContent(
 		items = lines,
@@ -169,8 +170,7 @@ fun LyricsBox(
 	) { line, index ->
 		LyricsLine(
 			text = line,
-			fontSize = fontSize,
-			color = color,
+			textStyle = textStyle,
 		)
 	}
 }
@@ -179,11 +179,8 @@ fun LyricsBox(
 fun LyricsDtoBox(
 	lyricDto: LyricDto,
 	modifier: Modifier = Modifier,
-	currentTimestamp: Duration = Duration.ZERO,
-	duration: Duration = Duration.ZERO,
-	paused: Boolean = false,
-	fontSize: TextUnit = LocalTextStyle.current.fontSize,
-	color: Color = LocalTextStyle.current.color,
+	position: LyricsPosition = LyricsPosition(),
+	textStyle: TextStyle = LocalTextStyle.current,
 ) = Box(modifier) {
 	val lyrics = lyricDto.lyrics
 	val isTimed = lyrics.firstOrNull()?.start != null
@@ -192,18 +189,14 @@ fun LyricsDtoBox(
 			lines = lyrics.map {
 				TimedLine(it.start?.ticks ?: Duration.ZERO, it.text)
 			},
-			currentTimestamp = currentTimestamp,
-			fontSize = fontSize,
-			color = color,
+			currentTimestamp = position.timestamp,
+			textStyle = textStyle,
 		)
 	} else {
 		LyricsBox(
 			lines = lyrics.map { it.text },
-			currentTimestamp = currentTimestamp,
-			duration = duration,
-			paused = paused,
-			fontSize = fontSize,
-			color = color,
+			position = position,
+			textStyle = textStyle,
 		)
 	}
 }

@@ -38,6 +38,7 @@ import org.jellyfin.androidtv.constant.ImageType
 import org.jellyfin.androidtv.ui.base.EphyraTheme
 import org.jellyfin.androidtv.ui.base.JellyfinTheme
 import org.jellyfin.androidtv.ui.base.LocalEphyraPalette
+import org.jellyfin.androidtv.ui.base.LocalTextStyle
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.composable.item.ArtToneCover
 import org.jellyfin.androidtv.ui.composable.item.cardFocusRing
@@ -153,9 +154,7 @@ private fun CastCard(item: BaseRowItem, focused: Boolean) {
 			text = name.orEmpty(),
 			maxLines = 1,
 			overflow = TextOverflow.Ellipsis,
-			color = palette.ink,
-			fontSize = 14.sp,
-			fontWeight = FontWeight.Bold,
+			style = LocalTextStyle.current.merge(color = palette.ink, fontSize = 14.sp, fontWeight = FontWeight.Bold),
 			modifier = marquee,
 		)
 
@@ -164,8 +163,7 @@ private fun CastCard(item: BaseRowItem, focused: Boolean) {
 				text = role,
 				maxLines = 1,
 				overflow = TextOverflow.Ellipsis,
-				color = palette.inkMuted,
-				fontSize = 12.sp,
+				style = LocalTextStyle.current.merge(color = palette.inkMuted, fontSize = 12.sp),
 				modifier = marquee,
 			)
 		}

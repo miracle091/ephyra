@@ -96,47 +96,7 @@ class HomeRowsFragment : RowsSupportFragment(), AudioEventListener, View.OnKeyLi
 
 		adapter = MutableObjectAdapter<Row>(PositionableListRowPresenter())
 
-		lifecycleScope.launch(Dispatchers.IO) {
-			val currentUser = withTimeout(30.seconds) {
-				userRepository.currentUser.filterNotNull().first()
-			}
-
-			// Start out with default sections
-			val homesections = userSettingPreferences.activeHomesections
-
-			// Make sure the rows are empty
-			val rows = mutableListOf<HomeFragmentRow>()
-
-			// Check for coroutine cancellation
-			if (!isActive) return@launch
-
-			// Actually add the sections
-			for (section in homesections) when (section) {
-				HomeSectionType.LATEST_MEDIA -> rows.add(helper.loadRecentlyAdded(userViewsRepository.views.first()))
-				HomeSectionType.LIBRARY_TILES_SMALL -> rows.add(HomeFragmentViewsRow(small = false))
-				HomeSectionType.LIBRARY_BUTTONS -> rows.add(HomeFragmentViewsRow(small = true))
-				HomeSectionType.RESUME -> rows.add(helper.loadResumeVideo())
-				HomeSectionType.RESUME_AUDIO -> rows.add(helper.loadResumeAudio())
-				HomeSectionType.ACTIVE_RECORDINGS -> rows.add(helper.loadLatestLiveTvRecordings())
-				HomeSectionType.NEXT_UP -> rows.add(helper.loadNextUp())
-				// Ephyra: only what is on now; the guide and recordings buttons live in the Live TV library
-				HomeSectionType.LIVE_TV -> if (currentUser.policy?.enableLiveTvAccess == true) rows.add(helper.loadOnNow())
-
-				HomeSectionType.NONE -> Unit
-			}
-
-			// Add sections to layout
-			withContext(Dispatchers.Main) {
-				// Ephyra: a whole number of posters fills the row (upstream 150dp)
-				val screenWidth = resources.configuration.screenWidthDp.dp
-				val cardPresenter = CardPresenter(true, rowCardHeight(screenWidth, ROW_CARDS_POSTER, POSTER_ASPECT_RATIO).value.toInt())
-
-				// Add rows in order
-				notificationsRow.addToRowsAdapter(requireContext(), cardPresenter, adapter as MutableObjectAdapter<Row>)
-				nowPlaying.addToRowsAdapter(requireContext(), cardPresenter, adapter as MutableObjectAdapter<Row>)
-				for (row in rows) row.addToRowsAdapter(requireContext(), cardPresenter, adapter as MutableObjectAdapter<Row>)
-			}
-		}
+		loadHomeRows()
 
 		onItemViewClickedListener = CompositeClickedListener().apply {
 			registerListener(ItemViewClickedListener())
@@ -156,6 +116,43 @@ class HomeRowsFragment : RowsSupportFragment(), AudioEventListener, View.OnKeyLi
 				}
 			}.launchIn(lifecycleScope)
 
+		refreshOnServerChanges()
+
+		// Subscribe to Audio messages
+		mediaManager.addAudioEventListener(this)
+	}
+
+	private fun loadHomeRows() {
+		lifecycleScope.launch(Dispatchers.IO) {
+			val currentUser = withTimeout(30.seconds) {
+				userRepository.currentUser.filterNotNull().first()
+			}
+
+			// Start out with default sections
+			val homesections = userSettingPreferences.activeHomesections
+
+			// Check for coroutine cancellation
+			if (!isActive) return@launch
+
+			// Actually add the sections
+			val liveTvAccess = currentUser.policy?.enableLiveTvAccess == true
+			val rows = homesections.mapNotNull { section -> createSectionRow(helper, userViewsRepository, section, liveTvAccess) }
+
+			// Add sections to layout
+			withContext(Dispatchers.Main) {
+				// Ephyra: a whole number of posters fills the row (upstream 150dp)
+				val screenWidth = resources.configuration.screenWidthDp.dp
+				val cardPresenter = CardPresenter(true, rowCardHeight(screenWidth, ROW_CARDS_POSTER, POSTER_ASPECT_RATIO).value.toInt())
+
+				// Add rows in order
+				notificationsRow.addToRowsAdapter(requireContext(), cardPresenter, adapter as MutableObjectAdapter<Row>)
+				nowPlaying.addToRowsAdapter(requireContext(), cardPresenter, adapter as MutableObjectAdapter<Row>)
+				for (row in rows) row.addToRowsAdapter(requireContext(), cardPresenter, adapter as MutableObjectAdapter<Row>)
+			}
+		}
+	}
+
+	private fun refreshOnServerChanges() {
 		lifecycleScope.launch {
 			lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
 				api.webSocket.subscribe<UserDataChangedMessage>()
@@ -167,9 +164,6 @@ class HomeRowsFragment : RowsSupportFragment(), AudioEventListener, View.OnKeyLi
 					.launchIn(this)
 			}
 		}
-
-		// Subscribe to Audio messages
-		mediaManager.addAudioEventListener(this)
 	}
 
 	override fun onKey(v: View?, keyCode: Int, event: KeyEvent?): Boolean {
@@ -181,9 +175,8 @@ class HomeRowsFragment : RowsSupportFragment(), AudioEventListener, View.OnKeyLi
 		super.onResume()
 
 		//React to deletion
-		if (currentRow != null && currentItem != null && currentItem?.baseItem != null &&
-			currentItem!!.baseItem!!.id == dataRefreshService.lastDeletedItemId
-		) {
+		val currentItemId = currentItem?.baseItem?.id
+		if (currentRow != null && currentItemId != null && currentItemId == dataRefreshService.lastDeletedItemId) {
 			(currentRow!!.adapter as ItemRowAdapter).remove(currentItem)
 			currentItem = null
 			dataRefreshService.lastDeletedItemId = null
@@ -271,4 +264,22 @@ class HomeRowsFragment : RowsSupportFragment(), AudioEventListener, View.OnKeyLi
 			}
 		}
 	}
+}
+
+private suspend fun createSectionRow(
+	helper: HomeFragmentHelper,
+	userViewsRepository: UserViewsRepository,
+	section: HomeSectionType,
+	liveTvAccess: Boolean,
+): HomeFragmentRow? = when (section) {
+	HomeSectionType.LATEST_MEDIA -> helper.loadRecentlyAdded(userViewsRepository.views.first())
+	HomeSectionType.LIBRARY_TILES_SMALL -> HomeFragmentViewsRow(small = false)
+	HomeSectionType.LIBRARY_BUTTONS -> HomeFragmentViewsRow(small = true)
+	HomeSectionType.RESUME -> helper.loadResumeVideo()
+	HomeSectionType.RESUME_AUDIO -> helper.loadResumeAudio()
+	HomeSectionType.ACTIVE_RECORDINGS -> helper.loadLatestLiveTvRecordings()
+	HomeSectionType.NEXT_UP -> helper.loadNextUp()
+	// Ephyra: only what is on now; the guide and recordings buttons live in the Live TV library
+	HomeSectionType.LIVE_TV -> if (liveTvAccess) helper.loadOnNow() else null
+	HomeSectionType.NONE -> null
 }

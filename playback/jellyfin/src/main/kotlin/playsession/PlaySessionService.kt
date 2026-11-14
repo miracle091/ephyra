@@ -25,6 +25,8 @@ import timber.log.Timber
 import kotlin.math.roundToInt
 import org.jellyfin.sdk.model.api.RepeatMode as SdkRepeatMode
 
+private const val QUEUE_PEEK_COUNT = 15
+
 class PlaySessionService(
 	private val api: ApiClient,
 ) : PlayerService() {
@@ -61,7 +63,7 @@ class PlaySessionService(
 		// The queues are lazy loaded so we only load a small amount of items to set as queue on the
 		// backend.
 		return manager.queue
-			.peekNext(15)
+			.peekNext(QUEUE_PEEK_COUNT)
 			.mapNotNull { it.baseItem }
 			.map { QueueItem(id = it.id, playlistItemId = it.playlistItemId) }
 	}

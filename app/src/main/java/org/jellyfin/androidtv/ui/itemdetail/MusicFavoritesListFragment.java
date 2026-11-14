@@ -29,6 +29,7 @@ import org.jellyfin.androidtv.ui.playback.AudioEventListener;
 import org.jellyfin.androidtv.ui.playback.MediaManager;
 import org.jellyfin.androidtv.ui.playback.PlaybackController;
 import org.jellyfin.androidtv.ui.playback.PlaybackLauncher;
+import org.jellyfin.androidtv.ui.playback.QueueStart;
 import org.jellyfin.androidtv.util.PlaybackHelper;
 import org.jellyfin.androidtv.util.Utils;
 import org.jellyfin.sdk.model.api.BaseItemDto;
@@ -284,6 +285,6 @@ public class MusicFavoritesListFragment extends Fragment implements View.OnKeyLi
     private void play(List<BaseItemDto> items, int ndx, boolean shuffle) {
         Timber.i("play items: %d, ndx: %d, shuffle: %b", items.size(), ndx, shuffle);
 
-        playbackLauncher.getValue().launch(requireContext(), items, 0, false, ndx, shuffle);
+        playbackLauncher.getValue().launch(requireContext(), items, 0, false, new QueueStart(ndx, shuffle));
     }
 }

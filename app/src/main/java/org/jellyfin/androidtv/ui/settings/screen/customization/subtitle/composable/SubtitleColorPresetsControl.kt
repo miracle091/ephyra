@@ -24,6 +24,8 @@ import org.jellyfin.androidtv.ui.base.form.ColorSwatch
 import org.jellyfin.androidtv.ui.navigation.focus.focusKey
 import org.jellyfin.design.Tokens
 
+private const val FOCUSED_SWATCH_SCALE = 1.25f
+
 @Composable
 fun SubtitleColorPresetsControl(
 	presets: Collection<Color>,
@@ -36,7 +38,7 @@ fun SubtitleColorPresetsControl(
 		for (color in presets) {
 			val interactionSource = remember { MutableInteractionSource() }
 			val focused by interactionSource.collectIsFocusedAsState()
-			val scale by animateFloatAsState(if (focused) 1.25f else 1f)
+			val scale by animateFloatAsState(if (focused) FOCUSED_SWATCH_SCALE else 1f)
 
 			ColorSwatch(
 				color = color,

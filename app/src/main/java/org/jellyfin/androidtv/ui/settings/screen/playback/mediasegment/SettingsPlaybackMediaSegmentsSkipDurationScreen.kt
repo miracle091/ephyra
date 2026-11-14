@@ -11,6 +11,7 @@ import org.jellyfin.androidtv.preference.EphyraPreferences
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.base.form.RadioButton
 import org.jellyfin.androidtv.ui.base.list.ListButton
+import org.jellyfin.androidtv.ui.base.list.ListItemSlots
 import org.jellyfin.androidtv.ui.base.list.ListSection
 import org.jellyfin.androidtv.ui.navigation.LocalRouter
 import org.jellyfin.androidtv.ui.navigation.focus.focusKey
@@ -43,7 +44,9 @@ fun SettingsPlaybackMediaSegmentsSkipDurationScreen() {
 		items(SkipAutoHideChoices) { seconds ->
 			ListButton(
 				headingContent = { Text(skipAutoHideLabel(seconds)) },
-				trailingContent = { RadioButton(checked = skipAutoHideSeconds == seconds) },
+				slots = ListItemSlots(
+					trailingContent = { RadioButton(checked = skipAutoHideSeconds == seconds) },
+				),
 				onClick = {
 					skipAutoHideSeconds = seconds
 					router.back()

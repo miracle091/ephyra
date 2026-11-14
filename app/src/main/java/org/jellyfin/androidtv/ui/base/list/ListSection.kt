@@ -23,9 +23,6 @@ fun ListSection(
 	headingContent: @Composable () -> Unit,
 	overlineContent: (@Composable () -> Unit)? = null,
 	captionContent: (@Composable () -> Unit)? = null,
-	leadingContent: (@Composable () -> Unit)? = null,
-	trailingContent: (@Composable () -> Unit)? = null,
-	footerContent: (@Composable () -> Unit)? = null,
 ) {
 	val colors = JellyfinTheme.colorScheme
 	val isGroup = overlineContent == null && captionContent == null
@@ -36,16 +33,15 @@ fun ListSection(
 	}
 	ListItemContent(
 		headingContent = headingContent,
-		overlineContent = overlineContent?.let { content ->
-			{ ProvideTextStyle(SectionOverline.copy(color = colors.badge), content) }
-		},
-		captionContent = captionContent?.let { content ->
-			{ ProvideTextStyle(SectionCaption.copy(color = colors.listCaption), content) }
-		},
-		leadingContent = leadingContent,
-		trailingContent = trailingContent,
-		footerContent = footerContent,
 		headingStyle = headingStyle,
 		modifier = modifier,
+		slots = ListItemSlots(
+			overlineContent = overlineContent?.let { content ->
+				{ ProvideTextStyle(SectionOverline.copy(color = colors.badge), content) }
+			},
+			captionContent = captionContent?.let { content ->
+				{ ProvideTextStyle(SectionCaption.copy(color = colors.listCaption), content) }
+			},
+		),
 	)
 }

@@ -108,8 +108,8 @@ open class BaseItemDtoBaseRowItem @JvmOverloads constructor(
 		else -> baseItem?.getSubName(context)
 	}
 
-	override fun getImage(imageType: BaseRowImageType): JellyfinImage? {
-		val primaryImage = when {
+	private fun getPrimaryImage(): JellyfinImage? {
+		return when {
 			preferSeriesPoster && baseItem?.type == BaseItemKind.EPISODE -> baseItem.parentImages[ImageType.PRIMARY]
 				?: baseItem.seriesPrimaryImage
 
@@ -123,6 +123,10 @@ open class BaseItemDtoBaseRowItem @JvmOverloads constructor(
 			baseItem?.type == BaseItemKind.AUDIO -> baseItem.albumPrimaryImage
 			else -> null
 		} ?: baseItem?.itemImages[ImageType.PRIMARY]
+	}
+
+	override fun getImage(imageType: BaseRowImageType): JellyfinImage? {
+		val primaryImage = getPrimaryImage()
 
 		return when (imageType) {
 			BaseRowImageType.BANNER -> baseItem?.itemImages[ImageType.BANNER] ?: primaryImage

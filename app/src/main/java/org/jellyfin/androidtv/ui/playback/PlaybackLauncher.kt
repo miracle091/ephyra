@@ -12,6 +12,14 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
 /**
+ * Where the playback queue starts and whether it is shuffled.
+ */
+data class QueueStart @JvmOverloads constructor(
+	val itemsPosition: Int = 0,
+	val shuffle: Boolean = false,
+)
+
+/**
  * Utility class to launch the playback UI for an item.
  */
 class PlaybackLauncher(
@@ -41,9 +49,10 @@ class PlaybackLauncher(
 		items: List<BaseItemDto>,
 		position: Int? = null,
 		replace: Boolean = false,
-		itemsPosition: Int = 0,
-		shuffle: Boolean = false,
+		queueStart: QueueStart = QueueStart(),
 	) {
+		val itemsPosition = queueStart.itemsPosition
+		val shuffle = queueStart.shuffle
 		val isAudio = items.any { it.mediaType == MediaType.AUDIO }
 
 		if (isAudio) {

@@ -12,6 +12,7 @@ import org.jellyfin.androidtv.preference.constant.RefreshRateSwitchingBehavior
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.base.form.RadioButton
 import org.jellyfin.androidtv.ui.base.list.ListButton
+import org.jellyfin.androidtv.ui.base.list.ListItemSlots
 import org.jellyfin.androidtv.ui.base.list.ListSection
 import org.jellyfin.androidtv.ui.navigation.LocalRouter
 import org.jellyfin.androidtv.ui.navigation.focus.focusKey
@@ -36,7 +37,9 @@ fun SettingsPlaybackRefreshRateSwitchingBehaviorScreen() {
 		items(RefreshRateSwitchingBehavior.entries) { entry ->
 			ListButton(
 				headingContent = { Text(stringResource(entry.nameRes)) },
-				trailingContent = { RadioButton(checked = refreshRateSwitchingBehavior == entry) },
+				slots = ListItemSlots(
+					trailingContent = { RadioButton(checked = refreshRateSwitchingBehavior == entry) },
+				),
 				onClick = {
 					refreshRateSwitchingBehavior = entry
 					router.back()

@@ -40,17 +40,25 @@ import org.jellyfin.androidtv.ui.base.ProvideTextStyle
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.base.button.ButtonBase
 import org.jellyfin.androidtv.ui.base.button.ButtonDefaults
+import org.jellyfin.androidtv.ui.base.button.ButtonStyle
 import org.jellyfin.androidtv.util.MenuBuilder
 import org.jellyfin.androidtv.util.popupMenu
 import org.jellyfin.androidtv.util.AndroidVersion
 import org.jellyfin.androidtv.util.showIfNotEmpty
 
+/**
+ * The slots of a [ServerButton].
+ */
+class ServerButtonContent(
+	val icon: @Composable () -> Unit,
+	val name: @Composable () -> Unit,
+	val address: @Composable () -> Unit,
+	val version: @Composable () -> Unit,
+)
+
 @Composable
 fun ServerButton(
-	icon: @Composable () -> Unit,
-	name: @Composable () -> Unit,
-	address: @Composable () -> Unit,
-	version: @Composable () -> Unit,
+	content: ServerButtonContent,
 	onClick: () -> Unit,
 	modifier: Modifier = Modifier,
 	interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
@@ -59,8 +67,8 @@ fun ServerButton(
 	ButtonBase(
 		onClick = onClick,
 		modifier = modifier,
+		style = ButtonStyle(shape = shape, colors = ButtonDefaults.colors()),
 		interactionSource = interactionSource,
-		shape = shape,
 	) {
 		Row(
 			horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -69,7 +77,7 @@ fun ServerButton(
 				.fillMaxSize()
 				.padding(horizontal = 16.dp, vertical = 8.dp)
 		) {
-			icon()
+			content.icon()
 
 			Column(
 				modifier = Modifier
@@ -78,17 +86,17 @@ fun ServerButton(
 				verticalArrangement = Arrangement.spacedBy(2.dp, Alignment.CenterVertically),
 			) {
 				ProvideTextStyle(LocalTextStyle.current.copy(fontSize = 14.sp)) {
-					name()
+					content.name()
 				}
 
 				ProvideTextStyle(LocalTextStyle.current.copy(fontSize = 12.sp)) {
-					address()
+					content.address()
 				}
 			}
 
 			Box(modifier = Modifier.align(Alignment.CenterVertically)) {
 				ProvideTextStyle(LocalTextStyle.current.copy(fontSize = 12.sp)) {
-					version()
+					content.version()
 				}
 			}
 		}
@@ -146,31 +154,33 @@ class ServerButtonView @JvmOverloads constructor(
 
 		// Ephyra: the theme's colours (the startup screens have no EphyraTheme around them) and a 64dp row with radius-md
 		EphyraTheme { ServerButton(
-			icon = {
-				when (state) {
-					State.DEFAULT -> Icon(
-						imageVector = ImageVector.vectorResource(R.drawable.ic_house),
-						contentDescription = null,
-					)
+			content = ServerButtonContent(
+				icon = {
+					when (state) {
+						State.DEFAULT -> Icon(
+							imageVector = ImageVector.vectorResource(R.drawable.ic_house),
+							contentDescription = null,
+						)
 
-					State.EDIT -> Icon(
-						imageVector = ImageVector.vectorResource(R.drawable.ic_house_edit),
-						contentDescription = null,
-					)
+						State.EDIT -> Icon(
+							imageVector = ImageVector.vectorResource(R.drawable.ic_house_edit),
+							contentDescription = null,
+						)
 
-					State.CONNECTING -> CircularProgressIndicator(
-						modifier = Modifier.size(24.dp)
-					)
+						State.CONNECTING -> CircularProgressIndicator(
+							modifier = Modifier.size(24.dp)
+						)
 
-					State.ERROR -> Icon(
-						imageVector = ImageVector.vectorResource(R.drawable.ic_error),
-						contentDescription = null,
-					)
-				}
-			},
-			name = { Text(name, fontSize = 16.sp, fontWeight = FontWeight.Bold, maxLines = 1) },
-			address = { Text(address, fontSize = 14.sp, maxLines = 1) },
-			version = { Text(version.orEmpty()) },
+						State.ERROR -> Icon(
+							imageVector = ImageVector.vectorResource(R.drawable.ic_error),
+							contentDescription = null,
+						)
+					}
+				},
+				name = { Text(name, style = LocalTextStyle.current.merge(fontSize = 16.sp, fontWeight = FontWeight.Bold), maxLines = 1) },
+				address = { Text(address, style = LocalTextStyle.current.merge(fontSize = 14.sp), maxLines = 1) },
+				version = { Text(version.orEmpty()) },
+			),
 			interactionSource = interactionSource,
 			shape = RoundedCornerShape(12.dp),
 			modifier = Modifier.height(64.dp),

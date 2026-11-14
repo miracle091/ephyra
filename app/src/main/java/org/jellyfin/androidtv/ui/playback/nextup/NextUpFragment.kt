@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.focusGroup
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -50,10 +52,12 @@ import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.base.button.Button
 import org.jellyfin.androidtv.ui.base.button.ProgressButton
 import org.jellyfin.androidtv.ui.composable.AsyncImage
+import org.jellyfin.androidtv.ui.composable.AsyncImageSource
 import org.jellyfin.androidtv.ui.composable.FixedMotionDurationScale
 import org.jellyfin.androidtv.ui.composable.modifier.overscan
 import org.jellyfin.androidtv.ui.navigation.Destinations
 import org.jellyfin.androidtv.ui.navigation.NavigationRepository
+import org.jellyfin.androidtv.util.apiclient.JellyfinImage
 import org.jellyfin.androidtv.util.apiclient.getUrl
 import org.jellyfin.sdk.api.client.ApiClient
 import org.jellyfin.sdk.model.serializer.toUUIDOrNull
@@ -106,8 +110,7 @@ fun NextUpScreen(
 					.align(Alignment.TopStart)
 					.overscan()
 					.height(75.dp),
-				url = logo.getUrl(api),
-				blurHash = logo.blurHash,
+				source = AsyncImageSource(url = logo.getUrl(api), blurHash = logo.blurHash),
 				aspectRatio = logo.aspectRatio ?: 1f,
 			)
 		}
@@ -129,13 +132,7 @@ fun NextUpScreen(
 }
 
 @Composable
-fun NextUpOverlay(
-	modifier: Modifier = Modifier,
-	item: NextUpItemData,
-	onConfirm: () -> Unit,
-	onCancel: () -> Unit,
-) = ProvideTextStyle(JellyfinTheme.typography.default.copy(color = Color.White)) {
-	val api = koinInject<ApiClient>()
+private fun rememberConfirmTimer(item: NextUpItemData, onConfirm: () -> Unit): Animatable<Float, AnimationVector1D> {
 	val userPreferences = koinInject<UserPreferences>()
 	val confirmTimer = remember { Animatable(0f) }
 	LaunchedEffect(item) {
@@ -157,6 +154,70 @@ fun NextUpOverlay(
 		}
 	}
 
+	return confirmTimer
+}
+
+@Composable
+private fun RowScope.NextUpThumbnail(thumbnail: JellyfinImage, api: ApiClient) {
+	AsyncImage(
+		modifier = Modifier
+			.align(Alignment.CenterVertically)
+			.height(145.dp)
+			.aspectRatio(thumbnail.aspectRatio ?: 1f)
+			.clip(JellyfinTheme.shapes.extraSmall),
+		source = AsyncImageSource(url = thumbnail.getUrl(api), blurHash = thumbnail.blurHash),
+		aspectRatio = thumbnail.aspectRatio ?: 1f,
+	)
+}
+
+@Composable
+private fun NextUpButtons(
+	onCancel: () -> Unit,
+	onConfirm: () -> Unit,
+	confirmTimer: Animatable<Float, AnimationVector1D>,
+	focusRequester: FocusRequester,
+) {
+	Row(
+		modifier = Modifier
+			.focusGroup()
+			.focusRestorer(focusRequester)
+	) {
+		Button(onClick = onCancel) {
+			Text(stringResource(R.string.btn_cancel))
+		}
+
+		Spacer(Modifier.width(8.dp))
+
+		val coroutineScope = rememberCoroutineScope()
+		ProgressButton(
+			progress = confirmTimer.value,
+			onClick = onConfirm,
+			modifier = Modifier
+				.focusRequester(focusRequester)
+				.onFocusChanged { state ->
+					// Cancel timer if focus is moved away from the button
+					if (!state.isFocused) {
+						coroutineScope.launch {
+							confirmTimer.snapTo(0f)
+						}
+					}
+				},
+		) {
+			Text(stringResource(R.string.watch_now))
+		}
+	}
+}
+
+@Composable
+fun NextUpOverlay(
+	modifier: Modifier = Modifier,
+	item: NextUpItemData,
+	onConfirm: () -> Unit,
+	onCancel: () -> Unit,
+) = ProvideTextStyle(JellyfinTheme.typography.default.copy(color = Color.White)) {
+	val api = koinInject<ApiClient>()
+	val confirmTimer = rememberConfirmTimer(item, onConfirm)
+
 	val focusRequester = remember { FocusRequester() }
 	Row(
 		horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -165,18 +226,7 @@ fun NextUpOverlay(
 			.fillMaxWidth()
 			.focusRestorer(focusRequester)
 	) {
-		item.thumbnail?.let { thumbnail ->
-			AsyncImage(
-				modifier = Modifier
-					.align(Alignment.CenterVertically)
-					.height(145.dp)
-					.aspectRatio(thumbnail.aspectRatio ?: 1f)
-					.clip(JellyfinTheme.shapes.extraSmall),
-				url = thumbnail.getUrl(api),
-				blurHash = thumbnail.blurHash,
-				aspectRatio = thumbnail.aspectRatio ?: 1f,
-			)
-		}
+		item.thumbnail?.let { thumbnail -> NextUpThumbnail(thumbnail, api) }
 
 		Spacer(
 			Modifier
@@ -202,35 +252,7 @@ fun NextUpOverlay(
 			)
 			Spacer(Modifier.height(16.dp))
 
-			Row(
-				modifier = Modifier
-					.focusGroup()
-					.focusRestorer(focusRequester)
-			) {
-				Button(onClick = onCancel) {
-					Text(stringResource(R.string.btn_cancel))
-				}
-
-				Spacer(Modifier.width(8.dp))
-
-				val coroutineScope = rememberCoroutineScope()
-				ProgressButton(
-					progress = confirmTimer.value,
-					onClick = onConfirm,
-					modifier = Modifier
-						.focusRequester(focusRequester)
-						.onFocusChanged { state ->
-							// Cancel timer if focus is moved away from the button
-							if (!state.isFocused) {
-								coroutineScope.launch {
-									confirmTimer.snapTo(0f)
-								}
-							}
-						},
-				) {
-					Text(stringResource(R.string.watch_now))
-				}
-			}
+			NextUpButtons(onCancel, onConfirm, confirmTimer, focusRequester)
 		}
 	}
 }

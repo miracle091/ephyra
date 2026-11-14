@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.jellyfin.androidtv.R
 import org.jellyfin.androidtv.ui.base.JellyfinTheme
+import org.jellyfin.androidtv.ui.base.LocalTextStyle
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.composable.rememberCurrentTime
 
@@ -59,8 +60,7 @@ fun ToolbarClock(
 	val currentTime by rememberCurrentTime()
 	Text(
 		text = currentTime,
-		fontSize = 20.sp,
-		color = Color.White,
+		style = LocalTextStyle.current.merge(color = Color.White, fontSize = 20.sp),
 		// Ephyra: with the toolbar's 24dp the clock ends 32dp from the edge, like the clock of the library and details screens
 		modifier = modifier.padding(end = 8.dp),
 	)

@@ -35,6 +35,7 @@ import org.jellyfin.androidtv.R
 import org.jellyfin.androidtv.ui.base.EphyraTheme
 import org.jellyfin.androidtv.ui.base.JellyfinTheme
 import org.jellyfin.androidtv.ui.base.LocalEphyraPalette
+import org.jellyfin.androidtv.ui.base.LocalTextStyle
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.composable.item.ArtToneCover
 import org.jellyfin.androidtv.ui.composable.item.CardProgressBar
@@ -141,9 +142,11 @@ private fun NextUpCard(item: BaseItemDto, focused: Boolean) {
 				text = caption,
 				maxLines = 1,
 				overflow = TextOverflow.Ellipsis,
-				color = palette.ink,
-				fontSize = 14.sp,
-				fontWeight = FontWeight.Bold,
+				style = LocalTextStyle.current.merge(
+					color = palette.ink,
+					fontSize = 14.sp,
+					fontWeight = FontWeight.Bold,
+				),
 				modifier = Modifier
 					.align(Alignment.BottomStart)
 					.fillMaxWidth()

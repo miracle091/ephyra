@@ -25,13 +25,13 @@ class ReportingHelper(
 	private val api: ApiClient,
 ) {
 	fun reportStart(
-		lifecycleOwner: LifecycleOwner,
-		playbackController: PlaybackController?,
+		playbackController: PlaybackController,
 		item: BaseItemDto,
 		streamInfo: StreamInfo,
 		position: Long,
 		paused: Boolean
 	) {
+		val lifecycleOwner = playbackController.fragment ?: return
 		val info = PlaybackStartInfo(
 			itemId = item.id,
 			positionTicks = position,
@@ -40,8 +40,8 @@ class ReportingHelper(
 			liveStreamId = streamInfo.mediaSource?.liveStreamId,
 			playSessionId = streamInfo.playSessionId,
 			playMethod = streamInfo.playMethod,
-			audioStreamIndex = playbackController?.audioStreamIndex,
-			subtitleStreamIndex = playbackController?.subtitleStreamIndex,
+			audioStreamIndex = playbackController.audioStreamIndex,
+			subtitleStreamIndex = playbackController.subtitleStreamIndex,
 			isMuted = false,
 			repeatMode = RepeatMode.REPEAT_NONE,
 			playbackOrder = PlaybackOrder.DEFAULT,
@@ -57,13 +57,13 @@ class ReportingHelper(
 	}
 
 	fun reportProgress(
-		lifecycleOwner: LifecycleOwner,
-		playbackController: PlaybackController?,
+		playbackController: PlaybackController,
 		item: BaseItemDto,
 		streamInfo: StreamInfo,
 		position: Long,
 		paused: Boolean
 	) {
+		val lifecycleOwner = playbackController.fragment ?: return
 		val info = PlaybackProgressInfo(
 			itemId = item.id,
 			positionTicks = position,
@@ -72,8 +72,8 @@ class ReportingHelper(
 			liveStreamId = streamInfo.mediaSource?.liveStreamId,
 			playSessionId = streamInfo.playSessionId,
 			playMethod = streamInfo.playMethod,
-			audioStreamIndex = playbackController?.audioStreamIndex,
-			subtitleStreamIndex = playbackController?.subtitleStreamIndex,
+			audioStreamIndex = playbackController.audioStreamIndex,
+			subtitleStreamIndex = playbackController.subtitleStreamIndex,
 			isMuted = false,
 			repeatMode = RepeatMode.REPEAT_NONE,
 			playbackOrder = PlaybackOrder.DEFAULT,

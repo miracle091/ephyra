@@ -44,18 +44,39 @@ import timber.log.Timber
 import java.time.Instant
 import java.util.UUID
 
+/**
+ * The playback related collaborators of [SocketHandler].
+ */
+class SocketPlaybackDependencies(
+	val mediaManager: MediaManager,
+	val playbackControllerContainer: PlaybackControllerContainer,
+	val playbackHelper: PlaybackHelper,
+)
+
+/**
+ * The browsing related collaborators of [SocketHandler].
+ */
+class SocketBrowsingDependencies(
+	val dataRefreshService: DataRefreshService,
+	val navigationRepository: NavigationRepository,
+	val itemLauncher: ItemLauncher,
+)
+
 class SocketHandler(
 	private val context: Context,
 	private val api: ApiClient,
-	private val dataRefreshService: DataRefreshService,
-	private val mediaManager: MediaManager,
-	private val playbackControllerContainer: PlaybackControllerContainer,
-	private val navigationRepository: NavigationRepository,
+	playback: SocketPlaybackDependencies,
+	browsing: SocketBrowsingDependencies,
 	private val audioManager: AudioManager,
-	private val itemLauncher: ItemLauncher,
-	private val playbackHelper: PlaybackHelper,
 	private val lifecycle: Lifecycle,
 ) {
+	private val mediaManager = playback.mediaManager
+	private val playbackControllerContainer = playback.playbackControllerContainer
+	private val playbackHelper = playback.playbackHelper
+	private val dataRefreshService = browsing.dataRefreshService
+	private val navigationRepository = browsing.navigationRepository
+	private val itemLauncher = browsing.itemLauncher
+
 	init {
 		lifecycle.coroutineScope.launch(Dispatchers.IO) {
 			lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {

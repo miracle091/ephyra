@@ -12,6 +12,8 @@ import androidx.compose.ui.graphics.RadialGradientShader
 import androidx.compose.ui.graphics.Shader
 import androidx.compose.ui.graphics.ShaderBrush
 
+private const val VIGNETTE_END_STOP = 0.95f
+
 private val vignetteBrush = object : ShaderBrush() {
 	override fun createShader(size: Size): Shader = RadialGradientShader(
 		colors = listOf(
@@ -20,7 +22,7 @@ private val vignetteBrush = object : ShaderBrush() {
 		),
 		center = size.center,
 		radius = maxOf(size.width, size.height) / 2f,
-		colorStops = listOf(0f, 0.95f)
+		colorStops = listOf(0f, VIGNETTE_END_STOP)
 	)
 }
 

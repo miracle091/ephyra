@@ -9,6 +9,7 @@ import org.jellyfin.androidtv.R
 import org.jellyfin.androidtv.preference.EphyraPreferences
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.base.list.ListButton
+import org.jellyfin.androidtv.ui.base.list.ListItemSlots
 import org.jellyfin.androidtv.ui.base.list.ListSection
 import org.jellyfin.androidtv.ui.navigation.LocalRouter
 import org.jellyfin.androidtv.ui.navigation.focus.focusKey
@@ -38,7 +39,9 @@ fun SettingsPlaybackMediaSegmentsScreen() {
 
 			ListButton(
 				headingContent = { Text(stringResource(R.string.ephyra_pref_skip_auto_hide)) },
-				captionContent = { Text(skipAutoHideLabel(skipAutoHideSeconds)) },
+				slots = ListItemSlots(
+					captionContent = { Text(skipAutoHideLabel(skipAutoHideSeconds)) },
+				),
 				onClick = { router.push(Routes.PLAYBACK_MEDIA_SEGMENTS_SKIP_DURATION) },
 				modifier = Modifier.focusKey(Routes.PLAYBACK_MEDIA_SEGMENTS_SKIP_DURATION)
 			)
@@ -49,7 +52,9 @@ fun SettingsPlaybackMediaSegmentsScreen() {
 
 			ListButton(
 				headingContent = { Text(stringResource(segmentType.nameRes)) },
-				captionContent = { Text(stringResource(action.nameRes)) },
+				slots = ListItemSlots(
+					captionContent = { Text(stringResource(action.nameRes)) },
+				),
 				onClick = {
 					router.push(
 						route = Routes.PLAYBACK_MEDIA_SEGMENT,

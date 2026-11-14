@@ -1,6 +1,5 @@
 package org.jellyfin.androidtv.ui.base.button
 
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -17,27 +16,16 @@ import androidx.compose.ui.unit.dp
 fun Button(
 	onClick: () -> Unit,
 	modifier: Modifier = Modifier,
-	onLongClick: (() -> Unit)? = null,
-	enabled: Boolean = true,
 	shape: Shape = ButtonDefaults.Shape,
 	colors: ButtonColors = ButtonDefaults.colors(),
-	contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
-	interactionSource: MutableInteractionSource? = null,
 	content: @Composable RowScope.() -> Unit
 ) {
 	ButtonBase(
 		onClick = onClick,
 		modifier = modifier,
-		onLongClick = onLongClick,
-		enabled = enabled,
-		shape = shape,
-		colors = colors,
-		interactionSource = interactionSource,
+		style = ButtonStyle(shape = shape, colors = colors),
 	) {
-		ButtonRow(
-			contentPadding = contentPadding,
-			content = content,
-		)
+		ButtonRow(content = content)
 	}
 }
 
@@ -46,28 +34,16 @@ fun ProgressButton(
 	progress: Float,
 	onClick: () -> Unit,
 	modifier: Modifier = Modifier,
-	onLongClick: (() -> Unit)? = null,
-	enabled: Boolean = true,
-	shape: Shape = ButtonDefaults.Shape,
 	colors: ButtonColors = ButtonDefaults.colors(),
-	contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
-	interactionSource: MutableInteractionSource? = null,
 	content: @Composable RowScope.() -> Unit
 ) {
 	ProgressButtonBase(
 		progress = progress,
 		onClick = onClick,
 		modifier = modifier,
-		onLongClick = onLongClick,
-		enabled = enabled,
-		shape = shape,
-		colors = colors,
-		interactionSource = interactionSource,
+		style = ButtonStyle(shape = ButtonDefaults.Shape, colors = colors),
 	) {
-		ButtonRow(
-			contentPadding = contentPadding,
-			content = content,
-		)
+		ButtonRow(content = content)
 	}
 }
 

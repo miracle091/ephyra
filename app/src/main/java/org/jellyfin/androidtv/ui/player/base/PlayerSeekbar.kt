@@ -6,8 +6,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import org.jellyfin.androidtv.ui.base.Seekbar
+import org.jellyfin.androidtv.ui.base.SeekbarCallbacks
 import org.jellyfin.androidtv.ui.base.SeekbarColors
 import org.jellyfin.androidtv.ui.base.SeekbarDefaults
+import org.jellyfin.androidtv.ui.base.SeekbarPosition
 import org.jellyfin.androidtv.ui.composable.rememberPlayerProgress
 import org.jellyfin.playback.core.PlaybackManager
 import org.jellyfin.playback.core.model.PlayState
@@ -32,13 +34,17 @@ fun PlayerSeekbar(
 	val seekRewindAmount = remember { playbackManager.options.defaultRewindAmount() }
 
 	Seekbar(
-		progress = progress.toDouble() * positionInfo.duration,
-		buffer = positionInfo.buffer,
-		duration = positionInfo.duration,
-		seekForwardAmount = seekForwardAmount,
-		seekRewindAmount = seekRewindAmount,
-		onScrubbing = { scrubbing -> playbackManager.state.setScrubbing(scrubbing) },
-		onSeek = { progress -> playbackManager.state.seek(progress) },
+		position = SeekbarPosition(
+			progress = progress.toDouble() * positionInfo.duration,
+			buffer = positionInfo.buffer,
+			duration = positionInfo.duration,
+			seekForwardAmount = seekForwardAmount,
+			seekRewindAmount = seekRewindAmount,
+		),
+		callbacks = SeekbarCallbacks(
+			onScrubbing = { scrubbing -> playbackManager.state.setScrubbing(scrubbing) },
+			onSeek = { progress -> playbackManager.state.seek(progress) },
+		),
 		modifier = modifier,
 		colors = colors,
 		enabled = positionInfo.duration > Duration.ZERO,

@@ -3,7 +3,6 @@ package org.jellyfin.androidtv.ui.settings.screen.customization.subtitle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.colorspace.ColorSpaces
 import androidx.compose.ui.graphics.toArgb
@@ -12,12 +11,12 @@ import org.jellyfin.androidtv.R
 import org.jellyfin.androidtv.preference.UserPreferences
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.base.list.ListSection
-import org.jellyfin.androidtv.ui.navigation.focus.focusKey
 import org.jellyfin.androidtv.ui.settings.compat.rememberPreference
 import org.jellyfin.androidtv.ui.settings.composable.SettingsColumn
 import org.jellyfin.androidtv.ui.settings.screen.customization.subtitle.composable.SubtitleColorPresetsControl
+import org.jellyfin.androidtv.ui.settings.screen.customization.subtitle.composable.SubtitleStyle
 import org.jellyfin.androidtv.ui.settings.screen.customization.subtitle.composable.SubtitleStylePreview
-import org.jellyfin.androidtv.ui.settings.util.ListColorChannelRangeControl
+import org.jellyfin.androidtv.ui.settings.screen.customization.subtitle.composable.subtitleColorChannelItems
 import org.koin.compose.koinInject
 
 @Composable
@@ -36,10 +35,7 @@ fun SettingsSubtitleTextStrokeColorScreen() {
 		}
 
 		item {
-			SubtitleStylePreview(
-				userPreferences = userPreferences,
-				subtitleTextStrokeColor = subtitleTextStrokeColor,
-			)
+			SubtitleStylePreview(SubtitleStyle.from(userPreferences).copy(strokeColor = subtitleTextStrokeColor))
 		}
 
 		// Presets
@@ -52,48 +48,9 @@ fun SettingsSubtitleTextStrokeColorScreen() {
 			)
 		}
 
-		// Color channels
-
-		item { ListSection(headingContent = { Text(stringResource(R.string.color_custom)) }) }
-
-		item {
-			ListColorChannelRangeControl(
-				headingContent = { Text(stringResource(R.string.color_red)) },
-				channel = Color.Red,
-				value = colorValue,
-				onValueChange = { subtitleTextStrokeColor = it.toArgb().toLong() },
-				modifier = Modifier.focusKey("custom_red")
-			)
-		}
-
-		item {
-			ListColorChannelRangeControl(
-				headingContent = { Text(stringResource(R.string.color_green)) },
-				channel = Color.Green,
-				value = colorValue,
-				onValueChange = { subtitleTextStrokeColor = it.toArgb().toLong() },
-				modifier = Modifier.focusKey("custom_green")
-			)
-		}
-
-		item {
-			ListColorChannelRangeControl(
-				headingContent = { Text(stringResource(R.string.color_blue)) },
-				channel = Color.Blue,
-				value = colorValue,
-				onValueChange = { subtitleTextStrokeColor = it.toArgb().toLong() },
-				modifier = Modifier.focusKey("custom_blue")
-			)
-		}
-
-		item {
-			ListColorChannelRangeControl(
-				headingContent = { Text(stringResource(R.string.color_alpha)) },
-				channel = Color.Transparent,
-				value = colorValue,
-				onValueChange = { subtitleTextStrokeColor = it.toArgb().toLong() },
-				modifier = Modifier.focusKey("custom_alpha")
-			)
-		}
+		subtitleColorChannelItems(
+			value = colorValue,
+			onValueChange = { subtitleTextStrokeColor = it.toArgb().toLong() },
+		)
 	}
 }

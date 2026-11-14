@@ -39,9 +39,11 @@ import androidx.core.content.ContextCompat
 import org.jellyfin.androidtv.R
 import org.jellyfin.androidtv.ui.base.JellyfinTheme
 import org.jellyfin.androidtv.ui.base.ProvideTextStyle
+import org.jellyfin.androidtv.ui.base.LocalTextStyle
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.base.button.ButtonBase
 import org.jellyfin.androidtv.ui.composable.AsyncImage
+import org.jellyfin.androidtv.ui.composable.AsyncImageSource
 import org.jellyfin.androidtv.ui.composable.rememberPlayerProgress
 import org.jellyfin.androidtv.ui.composable.rememberQueueEntry
 import org.jellyfin.androidtv.ui.navigation.Destinations
@@ -54,6 +56,7 @@ import org.jellyfin.playback.core.PlaybackManager
 import org.jellyfin.playback.jellyfin.queue.baseItem
 import org.jellyfin.playback.jellyfin.queue.baseItemFlow
 import org.jellyfin.sdk.api.client.ApiClient
+import org.jellyfin.sdk.model.api.BaseItemDto
 import org.jellyfin.sdk.model.api.ImageType
 import org.koin.compose.koinInject
 
@@ -94,46 +97,7 @@ fun NowPlayingComposable(
 						modifier = Modifier
 							.padding(3.dp)
 					) {
-						val image = item.itemImages[ImageType.PRIMARY] ?: item.albumPrimaryImage ?: item.parentImages[ImageType.PRIMARY]
-						val progressFillColor = JellyfinTheme.colorScheme.rangeControlFill
-
-						AsyncImage(
-							url = image?.getUrl(api),
-							blurHash = image?.blurHash,
-							placeholder = ContextCompat.getDrawable(LocalContext.current, R.drawable.ic_album),
-							aspectRatio = image?.aspectRatio ?: 1f,
-							modifier = Modifier
-								.size(35.dp)
-								// Ephyra: the progress ring goes around the cover instead of over its edge, where the clip cut half of it
-								.drawWithContent {
-									val width = 3.dp.toPx()
-									val inset = width / 2
-
-									// The cover inside the ring
-									clipPath(Path().apply { addOval(Rect(Offset.Zero, size).deflate(width + 1.dp.toPx())) }) {
-										this@drawWithContent.drawContent()
-									}
-
-									// Background
-									drawCircle(
-										style = Stroke(width),
-										color = Color.Black,
-										alpha = 0.4f,
-										radius = size.minDimension / 2 - inset,
-									)
-									// Foreground
-									drawArc(
-										style = Stroke(width, cap = StrokeCap.Round),
-										color = progressFillColor,
-										useCenter = false,
-										startAngle = -90f,
-										sweepAngle = 360f * progress,
-										topLeft = Offset(inset, inset),
-										size = Size(size.width - width, size.height - width),
-									)
-								},
-							scaleType = ImageView.ScaleType.CENTER_CROP,
-						)
+						NowPlayingCover(item, api) { progress }
 
 						Column(
 							verticalArrangement = Arrangement.SpaceAround,
@@ -141,7 +105,12 @@ fun NowPlayingComposable(
 								.padding(start = 2.dp, end = 8.dp)
 						) {
 							// Name
-							Text(text = item.name.orEmpty(), maxLines = 1, overflow = TextOverflow.Ellipsis, fontWeight = FontWeight.Bold)
+							Text(
+								text = item.name.orEmpty(),
+								maxLines = 1,
+								overflow = TextOverflow.Ellipsis,
+								style = LocalTextStyle.current.merge(fontWeight = FontWeight.Bold),
+							)
 							val artists = item.artists ?: item.albumArtists ?: item.albumArtist?.let(::listOf)
 							Text(text = artists?.joinToString(", ").orEmpty(), maxLines = 1, overflow = TextOverflow.Ellipsis)
 						}
@@ -150,6 +119,51 @@ fun NowPlayingComposable(
 			}
 		}
 	}
+}
+
+@Composable
+private fun NowPlayingCover(item: BaseItemDto, api: ApiClient, progress: () -> Float) {
+	val image = item.itemImages[ImageType.PRIMARY] ?: item.albumPrimaryImage ?: item.parentImages[ImageType.PRIMARY]
+	val progressFillColor = JellyfinTheme.colorScheme.rangeControlFill
+
+	AsyncImage(
+		source = AsyncImageSource(url = image?.getUrl(api), blurHash = image?.blurHash),
+		placeholder = ContextCompat.getDrawable(LocalContext.current, R.drawable.ic_album),
+		aspectRatio = image?.aspectRatio ?: 1f,
+		modifier = Modifier
+			.size(35.dp)
+			.progressRing(progressFillColor, progress),
+		scaleType = ImageView.ScaleType.CENTER_CROP,
+	)
+}
+
+// Ephyra: the progress ring goes around the cover instead of over its edge, where the clip cut half of it
+private fun Modifier.progressRing(fillColor: Color, progress: () -> Float) = drawWithContent {
+	val width = 3.dp.toPx()
+	val inset = width / 2
+
+	// The cover inside the ring
+	clipPath(Path().apply { addOval(Rect(Offset.Zero, size).deflate(width + 1.dp.toPx())) }) {
+		this@drawWithContent.drawContent()
+	}
+
+	// Background
+	drawCircle(
+		style = Stroke(width),
+		color = Color.Black,
+		alpha = 0.4f,
+		radius = size.minDimension / 2 - inset,
+	)
+	// Foreground
+	drawArc(
+		style = Stroke(width, cap = StrokeCap.Round),
+		color = fillColor,
+		useCenter = false,
+		startAngle = -90f,
+		sweepAngle = 360f * progress(),
+		topLeft = Offset(inset, inset),
+		size = Size(size.width - width, size.height - width),
+	)
 }
 
 class NowPlayingView @JvmOverloads constructor(

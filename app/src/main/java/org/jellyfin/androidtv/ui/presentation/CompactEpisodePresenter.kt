@@ -40,8 +40,10 @@ import org.jellyfin.androidtv.R
 import org.jellyfin.androidtv.constant.ImageType
 import org.jellyfin.androidtv.ui.base.JellyfinTheme
 import org.jellyfin.androidtv.ui.base.LocalEphyraPalette
+import org.jellyfin.androidtv.ui.base.LocalTextStyle
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.composable.AsyncImage
+import org.jellyfin.androidtv.ui.composable.AsyncImageSource
 import org.jellyfin.androidtv.ui.composable.item.ArtToneCover
 import org.jellyfin.androidtv.ui.composable.item.CardPlaceholder
 import org.jellyfin.androidtv.ui.composable.item.ItemCard
@@ -174,12 +176,14 @@ private fun CompactEpisodeThumbnail(baseItem: BaseItemDto, image: JellyfinImage?
 			} else if (image != null) {
 				val api = koinInject<ApiClient>()
 				AsyncImage(
-					url = image.getUrl(
-						api,
-						maxWidth = with(density) { ThumbnailWidth.roundToPx() },
-						maxHeight = with(density) { ThumbnailHeight.roundToPx() },
+					source = AsyncImageSource(
+						url = image.getUrl(
+							api,
+							maxWidth = with(density) { ThumbnailWidth.roundToPx() },
+							maxHeight = with(density) { ThumbnailHeight.roundToPx() },
+						),
+						blurHash = image.blurHash,
 					),
-					blurHash = image.blurHash,
 					aspectRatio = WIDE_ASPECT_RATIO,
 					scaleType = ImageView.ScaleType.CENTER_CROP,
 					modifier = Modifier.fillMaxSize(),
@@ -205,9 +209,7 @@ private fun CompactEpisodeTexts(title: String, meta: String?, overview: String?,
 			text = title,
 			maxLines = 1,
 			overflow = TextOverflow.Ellipsis,
-			color = palette.ink,
-			fontSize = 20.sp,
-			fontWeight = FontWeight.Bold,
+			style = LocalTextStyle.current.merge(color = palette.ink, fontSize = 20.sp, fontWeight = FontWeight.Bold),
 		)
 
 		if (meta != null) {
@@ -215,8 +217,7 @@ private fun CompactEpisodeTexts(title: String, meta: String?, overview: String?,
 				text = meta,
 				maxLines = 1,
 				overflow = TextOverflow.Ellipsis,
-				color = palette.inkMuted,
-				fontSize = 14.sp,
+				style = LocalTextStyle.current.merge(color = palette.inkMuted, fontSize = 14.sp),
 			)
 		}
 
@@ -225,9 +226,7 @@ private fun CompactEpisodeTexts(title: String, meta: String?, overview: String?,
 				text = overview,
 				maxLines = OVERVIEW_MAX_LINES,
 				overflow = TextOverflow.Ellipsis,
-				color = palette.ink,
-				fontSize = 14.sp,
-				lineHeight = 20.sp,
+				style = LocalTextStyle.current.merge(color = palette.ink, fontSize = 14.sp, lineHeight = 20.sp),
 			)
 		}
 	}

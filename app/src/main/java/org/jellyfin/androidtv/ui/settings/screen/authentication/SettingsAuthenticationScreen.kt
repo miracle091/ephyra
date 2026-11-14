@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import org.jellyfin.androidtv.R
+import org.jellyfin.androidtv.auth.model.Server
 import org.jellyfin.androidtv.auth.repository.ServerRepository
 import org.jellyfin.androidtv.auth.repository.ServerUserRepository
 import org.jellyfin.androidtv.auth.store.AuthenticationPreferences
@@ -19,6 +20,7 @@ import org.jellyfin.androidtv.ui.base.Icon
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.base.form.Checkbox
 import org.jellyfin.androidtv.ui.base.list.ListButton
+import org.jellyfin.androidtv.ui.base.list.ListItemSlots
 import org.jellyfin.androidtv.ui.base.list.ListSection
 import org.jellyfin.androidtv.ui.navigation.LocalRouter
 import org.jellyfin.androidtv.ui.navigation.focus.focusKey
@@ -32,70 +34,36 @@ import org.koin.compose.koinInject
 fun SettingsAuthenticationScreen(launchedFromLogin: Boolean = false) {
 	val router = LocalRouter.current
 	val serverRepository = koinInject<ServerRepository>()
-	val serverUserRepository = koinInject<ServerUserRepository>()
-	val authenticationPreferences = koinInject<AuthenticationPreferences>()
 
 	LaunchedEffect(serverRepository) { serverRepository.loadStoredServers() }
 
 	val storedServers by serverRepository.storedServers.collectAsState()
 
 	SettingsColumn {
-		if (launchedFromLogin) item {
-			ListSection(
-				overlineContent = { Text(stringResource(R.string.app_name).uppercase()) },
-				headingContent = { Text(stringResource(R.string.pref_login)) },
-			)
-		} else item {
-			ListSection(
-				overlineContent = { Text(stringResource(R.string.settings).uppercase()) },
-				headingContent = { Text(stringResource(R.string.pref_login)) },
-			)
-		}
-
 		item {
-			var autoLoginUserBehavior by rememberPreference(authenticationPreferences, AuthenticationPreferences.autoLoginUserBehavior)
-			var autoLoginServerId by rememberPreference(authenticationPreferences, AuthenticationPreferences.autoLoginServerId)
-			var autoLoginUserId by rememberPreference(authenticationPreferences, AuthenticationPreferences.autoLoginUserId)
-			val autoLoginServer = remember(storedServers, autoLoginServerId) {
-				storedServers.find { server -> server.id == autoLoginServerId.toUUIDOrNull() }
-			}
-			val autoLoginUser = remember(autoLoginServer, autoLoginUserId) {
-				val users = autoLoginServer?.let(serverUserRepository::getStoredServerUsers)
-				users?.find { user -> user.id == autoLoginUserId.toUUIDOrNull() }
-			}
-
-			ListButton(
-				headingContent = { Text(stringResource(R.string.auto_sign_in)) },
-				captionContent = {
-					when (autoLoginUserBehavior) {
-						UserSelectBehavior.DISABLED -> Text(stringResource(R.string.user_picker_disable_title))
-						UserSelectBehavior.LAST_USER -> Text(stringResource(R.string.user_picker_last_user_title))
-						UserSelectBehavior.SPECIFIC_USER -> Text(autoLoginUser?.name ?: stringResource(R.string.loading))
-					}
+			ListSection(
+				overlineContent = {
+					Text(stringResource(if (launchedFromLogin) R.string.app_name else R.string.settings).uppercase())
 				},
-				onClick = { router.push(Routes.AUTHENTICATION_AUTO_SIGN_IN) },
-				modifier = Modifier.focusKey(Routes.AUTHENTICATION_AUTO_SIGN_IN)
+				headingContent = { Text(stringResource(R.string.pref_login)) },
 			)
 		}
 
 		item {
-			var sortBy by rememberPreference(authenticationPreferences, AuthenticationPreferences.sortBy)
-			ListButton(
-				headingContent = { Text(stringResource(R.string.sort_accounts_by)) },
-				captionContent = { Text(stringResource(sortBy.nameRes)) },
-				onClick = { router.push(Routes.AUTHENTICATION_SORT_BY) },
-				modifier = Modifier.focusKey(Routes.AUTHENTICATION_SORT_BY)
+			AutoSignInButton(
+				storedServers = storedServers,
+				onClick = { router.push(Routes.AUTHENTICATION_AUTO_SIGN_IN) },
 			)
 		}
+
+		item { SortAccountsButton(onClick = { router.push(Routes.AUTHENTICATION_SORT_BY) }) }
 
 		if (storedServers.isNotEmpty()) {
 			item { ListSection(headingContent = { Text(stringResource(R.string.lbl_manage_servers)) }) }
 
 			items(storedServers) { server ->
-				ListButton(
-					leadingContent = { Icon(painterResource(R.drawable.ic_house), contentDescription = null) },
-					headingContent = { Text(server.name) },
-					captionContent = { Text(server.address) },
+				ManagedServerButton(
+					server = server,
 					onClick = {
 						router.push(
 							route = Routes.AUTHENTICATION_SERVER,
@@ -104,7 +72,6 @@ fun SettingsAuthenticationScreen(launchedFromLogin: Boolean = false) {
 							),
 						)
 					},
-					modifier = Modifier.focusKey("server_${server.id}")
 				)
 			}
 		}
@@ -114,25 +81,93 @@ fun SettingsAuthenticationScreen(launchedFromLogin: Boolean = false) {
 		if (!launchedFromLogin) {
 			item { ListSection(headingContent = { Text(stringResource(R.string.advanced_settings)) }) }
 
-			item {
-				var alwaysAuthenticate by rememberPreference(authenticationPreferences, AuthenticationPreferences.alwaysAuthenticate)
-				ListButton(
-					headingContent = { Text(stringResource(R.string.always_authenticate)) },
-					trailingContent = { Checkbox(checked = alwaysAuthenticate) },
-					captionContent = { Text(stringResource(R.string.always_authenticate_description)) },
-					onClick = { alwaysAuthenticate = !alwaysAuthenticate },
-					modifier = Modifier.focusKey("always_authenticate")
-				)
-			}
+			item { AlwaysAuthenticateButton() }
 		}
 
 		if (launchedFromLogin) item {
 			ListButton(
-				leadingContent = { Icon(painterResource(R.drawable.ic_jellyfin), contentDescription = null) },
+				slots = ListItemSlots(
+					leadingContent = { Icon(painterResource(R.drawable.ic_jellyfin), contentDescription = null) },
+				),
 				headingContent = { Text(stringResource(R.string.pref_about_title)) },
 				onClick = { router.push(Routes.ABOUT, mapOf("fromLogin" to "true")) },
 				modifier = Modifier.focusKey(Routes.ABOUT)
 			)
 		}
 	}
+}
+
+@Composable
+private fun SortAccountsButton(onClick: () -> Unit) {
+	val authenticationPreferences = koinInject<AuthenticationPreferences>()
+	val sortBy by rememberPreference(authenticationPreferences, AuthenticationPreferences.sortBy)
+
+	ListButton(
+		headingContent = { Text(stringResource(R.string.sort_accounts_by)) },
+		slots = ListItemSlots(
+			captionContent = { Text(stringResource(sortBy.nameRes)) },
+		),
+		onClick = onClick,
+		modifier = Modifier.focusKey(Routes.AUTHENTICATION_SORT_BY)
+	)
+}
+
+@Composable
+private fun ManagedServerButton(server: Server, onClick: () -> Unit) {
+	ListButton(
+		headingContent = { Text(server.name) },
+		slots = ListItemSlots(
+			leadingContent = { Icon(painterResource(R.drawable.ic_house), contentDescription = null) },
+			captionContent = { Text(server.address) },
+		),
+		onClick = onClick,
+		modifier = Modifier.focusKey("server_${server.id}")
+	)
+}
+
+@Composable
+private fun AlwaysAuthenticateButton() {
+	val authenticationPreferences = koinInject<AuthenticationPreferences>()
+	var alwaysAuthenticate by rememberPreference(authenticationPreferences, AuthenticationPreferences.alwaysAuthenticate)
+
+	ListButton(
+		headingContent = { Text(stringResource(R.string.always_authenticate)) },
+		slots = ListItemSlots(
+			trailingContent = { Checkbox(checked = alwaysAuthenticate) },
+			captionContent = { Text(stringResource(R.string.always_authenticate_description)) },
+		),
+		onClick = { alwaysAuthenticate = !alwaysAuthenticate },
+		modifier = Modifier.focusKey("always_authenticate")
+	)
+}
+
+@Composable
+private fun AutoSignInButton(storedServers: List<Server>, onClick: () -> Unit) {
+	val serverUserRepository = koinInject<ServerUserRepository>()
+	val authenticationPreferences = koinInject<AuthenticationPreferences>()
+	val autoLoginUserBehavior by rememberPreference(authenticationPreferences, AuthenticationPreferences.autoLoginUserBehavior)
+	val autoLoginServerId by rememberPreference(authenticationPreferences, AuthenticationPreferences.autoLoginServerId)
+	val autoLoginUserId by rememberPreference(authenticationPreferences, AuthenticationPreferences.autoLoginUserId)
+	val autoLoginServer = remember(storedServers, autoLoginServerId) {
+		storedServers.find { server -> server.id == autoLoginServerId.toUUIDOrNull() }
+	}
+	val autoLoginUser = remember(autoLoginServer, autoLoginUserId) {
+		val users = autoLoginServer?.let(serverUserRepository::getStoredServerUsers)
+		users?.find { user -> user.id == autoLoginUserId.toUUIDOrNull() }
+	}
+
+	ListButton(
+		headingContent = { Text(stringResource(R.string.auto_sign_in)) },
+		slots = ListItemSlots(
+			captionContent = {
+				when (autoLoginUserBehavior) {
+					UserSelectBehavior.DISABLED -> Text(stringResource(R.string.user_picker_disable_title))
+					UserSelectBehavior.LAST_USER -> Text(stringResource(R.string.user_picker_last_user_title))
+					UserSelectBehavior.SPECIFIC_USER -> Text(autoLoginUser?.name ?: stringResource(R.string.loading))
+				}
+			},
+		),
+		onClick = onClick,
+		modifier = Modifier.focusKey(Routes.AUTHENTICATION_AUTO_SIGN_IN)
+	)
 }

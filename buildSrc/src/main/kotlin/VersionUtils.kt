@@ -1,5 +1,11 @@
 import org.gradle.api.Project
 
+private const val CORE_PARTS = 3
+private const val MAJOR_MULTIPLIER = 1_000_000
+private const val MINOR_MULTIPLIER = 10_000
+private const val PATCH_MULTIPLIER = 100
+private const val DEFAULT_PRE_RELEASE = 99
+
 /**
  * Get the version name from the current environment or use the fallback.
  * It will look for a environment variable called JELLYFIN_VERSION first.
@@ -46,7 +52,7 @@ fun getVersionCode(versionName: String): Int {
 	val (major, minor, patch) = versionCore
 		.splitToSequence('.')
 		.mapNotNull(String::toIntOrNull)
-		.take(3)
+		.take(CORE_PARTS)
 		.toList()
 
 	// Parse pre release part (ignore type, only get the number)
@@ -56,10 +62,10 @@ fun getVersionCode(versionName: String): Int {
 
 	// Build code
 	var code = 0
-	code += major * 1000000 // Major (0-99)
-	code += minor * 10000 // Minor (0-99)
-	code += patch * 100 // Patch (0-99)
-	code += buildVersion ?: 99 // Pre release (0-99)
+	code += major * MAJOR_MULTIPLIER // Major (0-99)
+	code += minor * MINOR_MULTIPLIER // Minor (0-99)
+	code += patch * PATCH_MULTIPLIER // Patch (0-99)
+	code += buildVersion ?: DEFAULT_PRE_RELEASE // Pre release (0-99)
 
 	return code
 }

@@ -41,8 +41,10 @@ import org.jellyfin.androidtv.R
 import org.jellyfin.androidtv.constant.ImageType
 import org.jellyfin.androidtv.ui.base.JellyfinTheme
 import org.jellyfin.androidtv.ui.base.LocalEphyraPalette
+import org.jellyfin.androidtv.ui.base.LocalTextStyle
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.composable.AsyncImage
+import org.jellyfin.androidtv.ui.composable.AsyncImageSource
 import org.jellyfin.androidtv.ui.composable.item.ArtToneCover
 import org.jellyfin.androidtv.ui.composable.item.CardPlaceholder
 import org.jellyfin.androidtv.ui.composable.item.ItemCard
@@ -64,12 +66,7 @@ import org.koin.compose.koinInject
 // Ephyra: the design system's card overlay shade, rgba(5, 8, 20)
 private val CARD_SHADE = Color(red = 5, green = 8, blue = 20)
 
-// Ephyra: a landscape card is 130dp tall where a portrait one is 150dp
-private const val LANDSCAPE_HEIGHT_RATIO = 130f / 150f
 private const val DEFAULT_CARD_HEIGHT_DP = 150
-
-// Ephyra: aspect ratios below this are treated as missing
-private const val MIN_ASPECT_RATIO = 0.1f
 
 // Ephyra: where the card overlay shade starts and how opaque it is at the bottom
 private const val SHADE_START = 0.4f
@@ -164,117 +161,38 @@ private data class BaseRowItemDisplayConfig(
 	val scaleType: ImageView.ScaleType? = null,
 )
 
+private fun BaseRowItem.getBaseItemDisplayConfig(imageType: ImageType, uniformAspect: Boolean): BaseRowItemDisplayConfig {
+	val preferSeriesPoster = this is BaseItemDtoBaseRowItem && preferSeriesPoster
+	val kind = baseItem?.type
+	val imageTypeAspectRatio = imageTypeAspectRatio(imageType, baseItemDefaultAspectRatio(baseItem, preferParentThumb))
+
+	return BaseRowItemDisplayConfig(
+		aspectRatio = itemKindAspectRatio(kind, imageTypeAspectRatio, imageType, uniformAspect, preferSeriesPoster),
+		image = getImage(imageType),
+		iconRes = itemKindIcon(kind),
+		overrideShowInfo = if (kind == BaseItemKind.EPISODE && !preferSeriesPoster) true else null,
+	)
+}
+
 private fun BaseRowItem.getDisplayConfig(imageType: ImageType, uniformAspect: Boolean): BaseRowItemDisplayConfig = when (baseRowType) {
-	BaseRowType.BaseItem -> {
-		val preferSeriesPoster = this is BaseItemDtoBaseRowItem && preferSeriesPoster
-		val primaryAspectRatio = baseItem?.primaryImageAspectRatio?.toFloat()
-		val aspectRatio16x9 = ImageHelper.ASPECT_RATIO_16_9.toFloat()
-		val defaultAspectRatio = when {
-			preferParentThumb && (baseItem?.parentThumbItemId != null || baseItem?.seriesThumbImageTag != null) -> aspectRatio16x9
-			baseItem?.type == BaseItemKind.EPISODE && primaryAspectRatio != null -> primaryAspectRatio
-			baseItem?.type == BaseItemKind.EPISODE && (baseItem.parentThumbItemId != null || baseItem.seriesThumbImageTag != null) ->
-				aspectRatio16x9
-			baseItem?.type == BaseItemKind.USER_VIEW -> aspectRatio16x9
-			else -> primaryAspectRatio ?: ImageHelper.ASPECT_RATIO_7_9.toFloat()
-		}
-
-		val base = BaseRowItemDisplayConfig(
-			aspectRatio = when (imageType) {
-				ImageType.BANNER -> ImageHelper.ASPECT_RATIO_BANNER.toFloat()
-				ImageType.THUMB -> ImageHelper.ASPECT_RATIO_16_9.toFloat()
-				else -> defaultAspectRatio
-			},
-			image = getImage(imageType),
-			iconRes = R.drawable.ic_clapperboard,
-		)
-
-		when (baseItem?.type) {
-			BaseItemKind.AUDIO, BaseItemKind.MUSIC_ALBUM -> base.copy(
-				iconRes = R.drawable.ic_music_album,
-				aspectRatio = if (uniformAspect || base.aspectRatio < 0.8f) 1f else base.aspectRatio,
-			)
-
-			BaseItemKind.PERSON,
-			BaseItemKind.MUSIC_ARTIST -> base.copy(
-				iconRes = R.drawable.ic_user,
-				aspectRatio = if (uniformAspect || base.aspectRatio < 0.8f) 1f else base.aspectRatio,
-			)
-
-			BaseItemKind.SEASON, BaseItemKind.SERIES -> base.copy(
-				aspectRatio = if (imageType == ImageType.POSTER) ImageHelper.ASPECT_RATIO_2_3.toFloat() else base.aspectRatio,
-				iconRes = R.drawable.ic_tv
-			)
-
-			BaseItemKind.EPISODE -> when (preferSeriesPoster) {
-				true -> base.copy(
-					aspectRatio = ImageHelper.ASPECT_RATIO_2_3.toFloat(),
-					iconRes = R.drawable.ic_tv
-				)
-
-				false -> base.copy(
-					aspectRatio = ImageHelper.ASPECT_RATIO_16_9.toFloat(),
-					iconRes = R.drawable.ic_tv,
-					overrideShowInfo = true,
-				)
-			}
-
-			BaseItemKind.COLLECTION_FOLDER, BaseItemKind.USER_VIEW -> base.copy(
-				aspectRatio = ImageHelper.ASPECT_RATIO_16_9.toFloat(),
-				iconRes = R.drawable.ic_folder,
-			)
-
-			BaseItemKind.FOLDER, BaseItemKind.GENRE, BaseItemKind.MUSIC_GENRE -> base.copy(
-				iconRes = R.drawable.ic_folder,
-			)
-
-			BaseItemKind.PHOTO -> base.copy(
-				iconRes = R.drawable.ic_photo
-			)
-
-			BaseItemKind.PHOTO_ALBUM, BaseItemKind.PLAYLIST -> base.copy(
-				iconRes = R.drawable.ic_folder
-			)
-
-			BaseItemKind.MOVIE, BaseItemKind.VIDEO -> base.copy(
-				aspectRatio = when (imageType) {
-					ImageType.POSTER -> ImageHelper.ASPECT_RATIO_2_3.toFloat()
-					else -> base.aspectRatio
-				},
-				iconRes = R.drawable.ic_clapperboard,
-			)
-
-			else -> base
-		}
-	}
+	BaseRowType.BaseItem -> getBaseItemDisplayConfig(imageType, uniformAspect)
 
 	BaseRowType.LiveTvChannel -> BaseRowItemDisplayConfig(
-		aspectRatio = when (imageType) {
-			ImageType.BANNER -> ImageHelper.ASPECT_RATIO_BANNER.toFloat()
-			ImageType.THUMB -> ImageHelper.ASPECT_RATIO_16_9.toFloat()
-			else -> baseItem?.primaryImageAspectRatio?.toFloat() ?: 1f
-		},
+		aspectRatio = imageTypeAspectRatio(imageType, baseItem?.primaryImageAspectRatio?.toFloat() ?: 1f),
 		image = getImage(imageType),
 		scaleType = ImageView.ScaleType.FIT_CENTER,
 		iconRes = R.drawable.ic_tv,
 	)
 
 	BaseRowType.LiveTvProgram -> BaseRowItemDisplayConfig(
-		aspectRatio = when (imageType) {
-			ImageType.BANNER -> ImageHelper.ASPECT_RATIO_BANNER.toFloat()
-			ImageType.THUMB -> ImageHelper.ASPECT_RATIO_16_9.toFloat()
-			else -> baseItem?.primaryImageAspectRatio?.toFloat() ?: ImageHelper.ASPECT_RATIO_7_9.toFloat()
-		},
+		aspectRatio = imageTypeAspectRatio(imageType, baseItem?.primaryImageAspectRatio?.toFloat() ?: ImageHelper.ASPECT_RATIO_7_9.toFloat()),
 		image = getImage(imageType),
 		iconRes = R.drawable.ic_tv,
 		overrideShowInfo = true,
 	)
 
 	BaseRowType.LiveTvRecording -> BaseRowItemDisplayConfig(
-		aspectRatio = when (imageType) {
-			ImageType.BANNER -> ImageHelper.ASPECT_RATIO_BANNER.toFloat()
-			ImageType.THUMB -> ImageHelper.ASPECT_RATIO_16_9.toFloat()
-			else -> baseItem?.primaryImageAspectRatio?.toFloat() ?: ImageHelper.ASPECT_RATIO_7_9.toFloat()
-		},
+		aspectRatio = imageTypeAspectRatio(imageType, baseItem?.primaryImageAspectRatio?.toFloat() ?: ImageHelper.ASPECT_RATIO_7_9.toFloat()),
 		image = getImage(imageType),
 		iconRes = R.drawable.ic_tv,
 	)
@@ -313,14 +231,10 @@ private fun CardViewHolderContent(
 	// Ephyra: the presenter carries the card options (info, image type, heights, episode timing)
 	presenter: CardPresenter,
 ) {
-	val showInfo = presenter.showInfo
 	val imageType = presenter.imageType
-	val staticHeight = presenter.staticHeight
 	val uniformAspect = presenter.uniformAspect
 	val episodeTiming = presenter.episodeTiming
-	val cardHeight = presenter.cardHeight
 	val context = LocalContext.current
-	val localDensity = LocalDensity.current
 
 	val title = remember(item, context) { item?.getCardName(context) }
 	val subtitle = remember(item, context) { item?.getSubText(context) }
@@ -331,94 +245,14 @@ private fun CardViewHolderContent(
 	val displayConfig = remember(item, imageType, uniformAspect) { item?.getDisplayConfig(imageType, uniformAspect) }
 	if (item == null || displayConfig == null) return
 
-	val image = displayConfig.image
-	val aspectRatio = displayConfig.aspectRatio.takeIf { it >= MIN_ASPECT_RATIO }
-		?: image?.aspectRatio?.takeIf { it >= MIN_ASPECT_RATIO } ?: 1f
-
-	val fixedHeight = cardHeight?.dp?.let { if (aspectRatio > 1f) it * LANDSCAPE_HEIGHT_RATIO else it }
-	val size = when (item.staticHeight) {
-		false if fixedHeight != null -> DpSize(fixedHeight * aspectRatio, fixedHeight)
-		true -> DpSize(staticHeight.dp * aspectRatio, staticHeight.dp)
-		false if (aspectRatio > 1f) -> DpSize(130.dp * aspectRatio, 130.dp)
-		else -> DpSize(150.dp * aspectRatio, 150.dp)
-	}
-
-	val usePreview = displayConfig.overrideShowInfo ?: showInfo
+	val aspectRatio = resolveAspectRatio(displayConfig.aspectRatio, displayConfig.image?.aspectRatio)
+	val size = cardSize(aspectRatio, item.staticHeight, presenter.staticHeight, presenter.cardHeight)
+	val usePreview = displayConfig.overrideShowInfo ?: presenter.showInfo
 
 	val card = @Composable {
 		ItemCard(
-			image = {
-				CardPlaceholder() // Ephyra
-				val library = item.baseItem?.takeIf(::isLibraryCard) // Ephyra
-				if (library != null) {
-					// Ephyra: Live TV shows a programme on air, with the TV icon when none has a picture
-					val iconRes = if (isLiveTvLibraryCard(library)) R.drawable.ic_tv else displayConfig.iconRes
-					LibraryCardImage(library, title, iconRes, size, aspectRatio)
-				} else if (image != null && hidesEpisodeSpoiler(item.baseItem, image)) {
-					EpisodeSpoilerImage(image, aspectRatio, Modifier.fillMaxSize()) // Ephyra
-				} else if (image != null) {
-					val api = koinInject<ApiClient>()
-					AsyncImage(
-						url = image.getUrl(
-							api,
-							maxWidth = with(localDensity) { size.width.roundToPx() },
-							maxHeight = with(localDensity) { size.height.roundToPx() },
-						),
-						blurHash = image.blurHash,
-						aspectRatio = aspectRatio,
-						scaleType = displayConfig.scaleType ?: ImageView.ScaleType.CENTER_CROP,
-						modifier = Modifier
-							.fillMaxSize()
-					)
-				} else if (item is GridButtonBaseRowItem && item.gridButton.imageRes != null) {
-					Image(
-						painter = painterResource(item.gridButton.imageRes),
-						contentDescription = null,
-						modifier = Modifier
-							.fillMaxSize()
-					)
-				} else {
-					ArtToneCover(title, displayConfig.iconRes) // Ephyra
-				}
-			},
-			overlay = {
-				val showInfo = !usePreview && item.showCardInfoOverlay
-				// Ephyra: the design system's card overlay, a bottom shade under the bold title, instead of a grey box
-				if (showInfo && title != null) {
-					Box(
-						modifier = Modifier
-							.fillMaxSize()
-							.background(Brush.verticalGradient(SHADE_START to CARD_SHADE.copy(alpha = 0f), 1f to CARD_SHADE.copy(alpha = SHADE_END_ALPHA))),
-					)
-				}
-				item.baseItem?.let { baseItem ->
-					ItemCardBaseItemOverlay(
-						item = baseItem,
-						footer = {
-							if (showInfo && title != null) {
-								val focusModifier = if (focused) Modifier.basicMarquee(
-									iterations = Int.MAX_VALUE,
-									initialDelayMillis = 0,
-								) else Modifier
-
-								Text(
-									text = title,
-									maxLines = 1,
-									overflow = TextOverflow.Ellipsis,
-									color = LocalEphyraPalette.current.ink,
-									fontSize = 18.sp,
-									fontWeight = FontWeight.Bold,
-									lineHeight = 22.sp,
-									modifier = Modifier
-										.fillMaxWidth()
-										.then(focusModifier)
-										.padding(start = 8.dp, end = 8.dp, bottom = 8.dp),
-								)
-							}
-						}
-					)
-				}
-			},
+			image = { CardImage(item, title, displayConfig, size, aspectRatio) },
+			overlay = { CardOverlay(item, title, !usePreview && item.showCardInfoOverlay, focused) },
 			modifier = Modifier
 				.size(size)
 				.cardFocusRing( // Ephyra
@@ -429,45 +263,140 @@ private fun CardViewHolderContent(
 		)
 	}
 
-	if (usePreview) {
-		val focusModifier = if (focused) Modifier.basicMarquee(
-			iterations = Int.MAX_VALUE,
-			initialDelayMillis = 0,
-		) else Modifier
+	if (usePreview) CardPreview(card, title, subtitle, meta, focused) else card()
+}
 
-		ItemPreview(
-			card = { card() },
-			title = title?.let { text ->
-				{
-					Text(
-						text = text,
-						maxLines = 1,
-						overflow = TextOverflow.Ellipsis,
-						textAlign = TextAlign.Center,
-						modifier = Modifier.then(focusModifier),
-					)
-				}
-			},
-			subtitle = if (subtitle == null && meta == null) null else {
-				{
-					// Ephyra: the episode's meta line goes under its name
-					Column {
-						listOfNotNull(subtitle, meta).forEach { text ->
-							Text(
-								text = text,
-								maxLines = 1,
-								overflow = TextOverflow.Ellipsis,
-								textAlign = TextAlign.Center,
-								modifier = Modifier
-									.fillMaxWidth()
-									.then(focusModifier),
-							)
-						}
-					}
-				}
-			},
+private fun focusedMarquee(focused: Boolean): Modifier = if (focused) Modifier.basicMarquee(
+	iterations = Int.MAX_VALUE,
+	initialDelayMillis = 0,
+) else Modifier
+
+@Composable
+private fun CardImage(
+	item: BaseRowItem,
+	title: String?,
+	displayConfig: BaseRowItemDisplayConfig,
+	size: DpSize,
+	aspectRatio: Float,
+) {
+	val image = displayConfig.image
+
+	CardPlaceholder() // Ephyra
+	val library = item.baseItem?.takeIf(::isLibraryCard) // Ephyra
+	if (library != null) {
+		// Ephyra: Live TV shows a programme on air, with the TV icon when none has a picture
+		val iconRes = if (isLiveTvLibraryCard(library)) R.drawable.ic_tv else displayConfig.iconRes
+		LibraryCardImage(library, title, iconRes, size, aspectRatio)
+	} else if (image != null && hidesEpisodeSpoiler(item.baseItem, image)) {
+		EpisodeSpoilerImage(image, aspectRatio, Modifier.fillMaxSize()) // Ephyra
+	} else if (image != null) {
+		val api = koinInject<ApiClient>()
+		val localDensity = LocalDensity.current
+		AsyncImage(
+			source = AsyncImageSource(
+				url = image.getUrl(
+					api,
+					maxWidth = with(localDensity) { size.width.roundToPx() },
+					maxHeight = with(localDensity) { size.height.roundToPx() },
+				),
+				blurHash = image.blurHash,
+			),
+			aspectRatio = aspectRatio,
+			scaleType = displayConfig.scaleType ?: ImageView.ScaleType.CENTER_CROP,
+			modifier = Modifier
+				.fillMaxSize()
+		)
+	} else if (item is GridButtonBaseRowItem && item.gridButton.imageRes != null) {
+		Image(
+			painter = painterResource(item.gridButton.imageRes),
+			contentDescription = null,
+			modifier = Modifier
+				.fillMaxSize()
 		)
 	} else {
-		card()
+		ArtToneCover(title, displayConfig.iconRes) // Ephyra
 	}
+}
+
+@Composable
+private fun CardOverlay(item: BaseRowItem, title: String?, showInfo: Boolean, focused: Boolean) {
+	// Ephyra: the design system's card overlay, a bottom shade under the bold title, instead of a grey box
+	if (showInfo && title != null) {
+		Box(
+			modifier = Modifier
+				.fillMaxSize()
+				.background(Brush.verticalGradient(SHADE_START to CARD_SHADE.copy(alpha = 0f), 1f to CARD_SHADE.copy(alpha = SHADE_END_ALPHA))),
+		)
+	}
+	item.baseItem?.let { baseItem ->
+		ItemCardBaseItemOverlay(
+			item = baseItem,
+			footer = {
+				if (showInfo && title != null) CardFooterTitle(title, focused)
+			}
+		)
+	}
+}
+
+@Composable
+private fun CardFooterTitle(title: String, focused: Boolean) {
+	Text(
+		text = title,
+		maxLines = 1,
+		overflow = TextOverflow.Ellipsis,
+		style = LocalTextStyle.current.merge(
+			color = LocalEphyraPalette.current.ink,
+			fontSize = 18.sp,
+			fontWeight = FontWeight.Bold,
+			lineHeight = 22.sp,
+		),
+		modifier = Modifier
+			.fillMaxWidth()
+			.then(focusedMarquee(focused))
+			.padding(start = 8.dp, end = 8.dp, bottom = 8.dp),
+	)
+}
+
+@Composable
+private fun CardPreview(
+	card: @Composable () -> Unit,
+	title: String?,
+	subtitle: String?,
+	meta: String?,
+	focused: Boolean,
+) {
+	val focusModifier = focusedMarquee(focused)
+
+	ItemPreview(
+		card = { card() },
+		title = title?.let { text ->
+			{
+				Text(
+					text = text,
+					maxLines = 1,
+					overflow = TextOverflow.Ellipsis,
+					style = LocalTextStyle.current.merge(textAlign = TextAlign.Center),
+					modifier = Modifier.then(focusModifier),
+				)
+			}
+		},
+		subtitle = if (subtitle == null && meta == null) null else {
+			{
+				// Ephyra: the episode's meta line goes under its name
+				Column {
+					listOfNotNull(subtitle, meta).forEach { text ->
+						Text(
+							text = text,
+							maxLines = 1,
+							overflow = TextOverflow.Ellipsis,
+							style = LocalTextStyle.current.merge(textAlign = TextAlign.Center),
+							modifier = Modifier
+								.fillMaxWidth()
+								.then(focusModifier),
+						)
+					}
+				}
+			}
+		},
+	)
 }

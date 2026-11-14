@@ -13,6 +13,7 @@ import org.jellyfin.androidtv.preference.constant.HdrOverrideMode
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.base.form.RadioButton
 import org.jellyfin.androidtv.ui.base.list.ListButton
+import org.jellyfin.androidtv.ui.base.list.ListItemSlots
 import org.jellyfin.androidtv.ui.base.list.ListSection
 import org.jellyfin.androidtv.ui.navigation.LocalRouter
 import org.jellyfin.androidtv.ui.navigation.focus.focusKey
@@ -40,7 +41,9 @@ fun SettingsPlaybackHdrOverrideScreen(
 		items(HdrOverrideMode.entries) { entry ->
 			ListButton(
 				headingContent = { Text(stringResource(entry.nameRes)) },
-				trailingContent = { RadioButton(checked = mode == entry) },
+				slots = ListItemSlots(
+					trailingContent = { RadioButton(checked = mode == entry) },
+				),
 				onClick = {
 					mode = entry
 					router.back()

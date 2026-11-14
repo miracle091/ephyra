@@ -10,6 +10,7 @@ import org.jellyfin.androidtv.preference.EphyraPreferences
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.base.form.Checkbox
 import org.jellyfin.androidtv.ui.base.list.ListButton
+import org.jellyfin.androidtv.ui.base.list.ListItemSlots
 import org.jellyfin.androidtv.ui.navigation.focus.focusKey
 import org.jellyfin.androidtv.ui.settings.compat.rememberPreference
 import org.koin.compose.koinInject
@@ -22,8 +23,10 @@ fun HomeSpotlightListButton() {
 
 	ListButton(
 		headingContent = { Text(stringResource(R.string.ephyra_pref_home_spotlight)) },
-		captionContent = { Text(stringResource(R.string.ephyra_pref_home_spotlight_description)) },
-		trailingContent = { Checkbox(checked = homeSpotlight) },
+		slots = ListItemSlots(
+			captionContent = { Text(stringResource(R.string.ephyra_pref_home_spotlight_description)) },
+			trailingContent = { Checkbox(checked = homeSpotlight) },
+		),
 		onClick = { homeSpotlight = !homeSpotlight },
 		modifier = Modifier.focusKey("ephyra_home_spotlight"),
 	)
@@ -37,8 +40,10 @@ fun HomePlaylistsListButton() {
 
 	ListButton(
 		headingContent = { Text(stringResource(R.string.ephyra_pref_home_playlists)) },
-		captionContent = { Text(stringResource(R.string.ephyra_pref_home_playlists_description)) },
-		trailingContent = { Checkbox(checked = homePlaylists) },
+		slots = ListItemSlots(
+			captionContent = { Text(stringResource(R.string.ephyra_pref_home_playlists_description)) },
+			trailingContent = { Checkbox(checked = homePlaylists) },
+		),
 		onClick = { homePlaylists = !homePlaylists },
 		modifier = Modifier.focusKey("ephyra_home_playlists"),
 	)
@@ -52,8 +57,10 @@ fun SpoilerBlurListButton() {
 
 	ListButton(
 		headingContent = { Text(stringResource(R.string.ephyra_pref_spoiler_blur)) },
-		captionContent = { Text(stringResource(R.string.ephyra_pref_spoiler_blur_description)) },
-		trailingContent = { Checkbox(checked = spoilerBlur) },
+		slots = ListItemSlots(
+			captionContent = { Text(stringResource(R.string.ephyra_pref_spoiler_blur_description)) },
+			trailingContent = { Checkbox(checked = spoilerBlur) },
+		),
 		onClick = { spoilerBlur = !spoilerBlur },
 		modifier = Modifier.focusKey("ephyra_spoiler_blur"),
 	)
@@ -67,8 +74,10 @@ fun StopAtSeasonEndListButton() {
 
 	ListButton(
 		headingContent = { Text(stringResource(R.string.ephyra_pref_stop_at_season_end)) },
-		captionContent = { Text(stringResource(R.string.ephyra_pref_stop_at_season_end_description)) },
-		trailingContent = { Checkbox(checked = stopAtSeasonEnd) },
+		slots = ListItemSlots(
+			captionContent = { Text(stringResource(R.string.ephyra_pref_stop_at_season_end_description)) },
+			trailingContent = { Checkbox(checked = stopAtSeasonEnd) },
+		),
 		onClick = { stopAtSeasonEnd = !stopAtSeasonEnd },
 		modifier = Modifier.focusKey("ephyra_stop_at_season_end"),
 	)
@@ -82,8 +91,10 @@ fun CompactEpisodesListButton() {
 
 	ListButton(
 		headingContent = { Text(stringResource(R.string.ephyra_pref_compact_episodes)) },
-		captionContent = { Text(stringResource(R.string.ephyra_pref_compact_episodes_description)) },
-		trailingContent = { Checkbox(checked = compactEpisodes) },
+		slots = ListItemSlots(
+			captionContent = { Text(stringResource(R.string.ephyra_pref_compact_episodes_description)) },
+			trailingContent = { Checkbox(checked = compactEpisodes) },
+		),
 		onClick = { compactEpisodes = !compactEpisodes },
 		modifier = Modifier.focusKey("ephyra_compact_episodes"),
 	)

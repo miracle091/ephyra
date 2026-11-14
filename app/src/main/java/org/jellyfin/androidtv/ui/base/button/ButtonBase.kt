@@ -13,7 +13,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.sp
 import org.jellyfin.androidtv.ui.base.JellyfinTheme
@@ -24,10 +23,7 @@ import org.jellyfin.androidtv.ui.base.ProvideTextStyle
 fun ButtonBase(
 	onClick: () -> Unit,
 	modifier: Modifier = Modifier,
-	onLongClick: (() -> Unit)? = null,
-	enabled: Boolean = true,
-	shape: Shape = ButtonDefaults.Shape,
-	colors: ButtonColors = ButtonDefaults.colors(),
+	style: ButtonStyle = ButtonDefaults.style(),
 	interactionSource: MutableInteractionSource? = null,
 	content: @Composable BoxScope.() -> Unit
 ) {
@@ -36,11 +32,13 @@ fun ButtonBase(
 	val focused by interactionSource.collectIsFocusedAsState()
 	val pressed by interactionSource.collectIsPressedAsState()
 
-	val colors = when {
-		!enabled -> colors.disabledContainerColor to colors.disabledContentColor
-		pressed -> colors.focusedContainerColor to colors.focusedContentColor
-		focused -> colors.focusedContainerColor to colors.focusedContentColor
-		else -> colors.containerColor to colors.contentColor
+	val colors = style.colors.let {
+		when {
+			!style.enabled -> it.disabledContainerColor to it.disabledContentColor
+			pressed -> it.focusedContainerColor to it.focusedContentColor
+			focused -> it.focusedContainerColor to it.focusedContentColor
+			else -> it.containerColor to it.contentColor
+		}
 	}
 
 	ProvideTextStyle(value = JellyfinTheme.typography.default.copy(fontSize = 14.sp, color = colors.second)) {
@@ -49,13 +47,12 @@ fun ButtonBase(
 				.combinedClickable(
 					interactionSource = interactionSource,
 					indication = null,
-					enabled = enabled,
+					enabled = style.enabled,
 					role = Role.Button,
 					onClick = onClick,
-					onLongClick = onLongClick,
 				)
-				.background(colors.first, shape)
-				.clip(shape),
+				.background(colors.first, style.shape)
+				.clip(style.shape),
 			content = content,
 		)
 	}

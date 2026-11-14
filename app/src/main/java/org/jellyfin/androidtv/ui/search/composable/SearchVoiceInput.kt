@@ -1,6 +1,7 @@
 package org.jellyfin.androidtv.ui.search.composable
 
 import android.widget.Toast
+import androidx.annotation.StringRes
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -9,6 +10,7 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.Composable
@@ -47,19 +49,7 @@ fun SearchVoiceInput(
 			onQueryChange(query)
 		},
 		onError = { status ->
-			val string = when (status) {
-				is SpeechRecognizerStatus.Error -> R.string.speech_error_unknown
-				is SpeechRecognizerStatus.PermissionDenied -> when {
-					!status.canRequest -> R.string.speech_error_no_permission
-					else -> null
-				}
-
-				SpeechRecognizerStatus.Unavailable -> R.string.speech_error_unavailable
-
-				SpeechRecognizerStatus.Idle,
-				is SpeechRecognizerStatus.Listening,
-				SpeechRecognizerStatus.RequestingPermission -> null
-			}
+			val string = speechErrorMessage(status)
 
 			if (string != null) {
 				Toast.makeText(context, resources.getString(string), Toast.LENGTH_LONG).show()
@@ -69,24 +59,7 @@ fun SearchVoiceInput(
 
 	Box(modifier = modifier.wrapContentSize(), contentAlignment = Alignment.Center) {
 		// Draw pulsing background
-		if (recognizer.status is SpeechRecognizerStatus.Listening) {
-			val infiniteTransition = rememberInfiniteTransition()
-			val scale by infiniteTransition.animateFloat(
-				initialValue = 1f,
-				targetValue = 1.4f,
-				animationSpec = infiniteRepeatable(
-					animation = tween(durationMillis = 800, easing = LinearEasing),
-					repeatMode = RepeatMode.Reverse
-				)
-			)
-
-			Box(
-				modifier = Modifier
-					.matchParentSize()
-					.scale(scale)
-					.background(JellyfinTheme.colorScheme.recording.copy(alpha = 0.2f), shape = IconButtonDefaults.Shape)
-			)
-		}
+		if (recognizer.status is SpeechRecognizerStatus.Listening) PulsingBackground()
 
 		val colors = IconButtonDefaults.colors().let {
 			if (recognizer.status is SpeechRecognizerStatus.Listening) it.copy(
@@ -117,4 +90,39 @@ fun SearchVoiceInput(
 			)
 		}
 	}
+}
+
+@StringRes
+private fun speechErrorMessage(status: SpeechRecognizerStatus): Int? = when (status) {
+	is SpeechRecognizerStatus.Error -> R.string.speech_error_unknown
+	is SpeechRecognizerStatus.PermissionDenied -> when {
+		!status.canRequest -> R.string.speech_error_no_permission
+		else -> null
+	}
+
+	SpeechRecognizerStatus.Unavailable -> R.string.speech_error_unavailable
+
+	SpeechRecognizerStatus.Idle,
+	is SpeechRecognizerStatus.Listening,
+	SpeechRecognizerStatus.RequestingPermission -> null
+}
+
+@Composable
+private fun BoxScope.PulsingBackground() {
+	val infiniteTransition = rememberInfiniteTransition()
+	val scale by infiniteTransition.animateFloat(
+		initialValue = 1f,
+		targetValue = 1.4f,
+		animationSpec = infiniteRepeatable(
+			animation = tween(durationMillis = 800, easing = LinearEasing),
+			repeatMode = RepeatMode.Reverse
+		)
+	)
+
+	Box(
+		modifier = Modifier
+			.matchParentSize()
+			.scale(scale)
+			.background(JellyfinTheme.colorScheme.recording.copy(alpha = 0.2f), shape = IconButtonDefaults.Shape)
+	)
 }

@@ -16,19 +16,18 @@ import androidx.compose.ui.draw.clip
 import org.jellyfin.androidtv.ui.base.JellyfinTheme
 import org.jellyfin.androidtv.ui.base.LocalShapes
 
+private const val DISABLED_ALPHA = 0.4f
+
 @Composable
 fun ListControl(
 	headingContent: @Composable () -> Unit,
 	modifier: Modifier = Modifier,
-	enabled: Boolean = true,
 	interactionSource: InteractionSource? = null,
-	colors: ListControlColors = ListControlDefaults.colors(),
-	overlineContent: (@Composable () -> Unit)? = null,
-	captionContent: (@Composable () -> Unit)? = null,
-	leadingContent: (@Composable () -> Unit)? = null,
-	trailingContent: (@Composable () -> Unit)? = null,
-	footerContent: (@Composable () -> Unit)? = null,
+	style: ListControlStyle = ListControlDefaults.style(),
+	slots: ListItemSlots = ListItemSlots(),
 ) {
+	val colors = style.colors
+	val enabled = style.enabled
 	@Suppress("NAME_SHADOWING")
 	val interactionSource = interactionSource ?: remember { MutableInteractionSource() }
 	val focused by interactionSource.collectIsFocusedAsState()
@@ -46,17 +45,13 @@ fun ListControl(
 			.fillMaxWidth()
 			.background(backgroundColor, LocalShapes.current.medium)
 			.clip(LocalShapes.current.medium)
-			.alpha(if (enabled) 1f else 0.4f),
+			.alpha(if (enabled) 1f else DISABLED_ALPHA),
 	) {
 		ListItemContent(
 			headingContent = headingContent,
-			overlineContent = overlineContent,
-			captionContent = captionContent,
-			leadingContent = leadingContent,
-			trailingContent = trailingContent,
-			footerContent = footerContent,
 			headingStyle = JellyfinTheme.typography.listHeadline
 				.copy(color = JellyfinTheme.colorScheme.listHeadline),
+			slots = slots,
 		)
 	}
 }

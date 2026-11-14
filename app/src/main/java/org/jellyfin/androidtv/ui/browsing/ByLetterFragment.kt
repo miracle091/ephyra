@@ -6,6 +6,8 @@ import org.jellyfin.sdk.model.api.BaseItemKind
 import org.jellyfin.sdk.model.api.ItemSortBy
 import org.jellyfin.sdk.model.api.request.GetItemsRequest
 
+private const val LETTER_ROW_CHUNK_SIZE = 40
+
 class ByLetterFragment : BrowseFolderFragment() {
 	override suspend fun setupQueries(rowLoader: RowLoader) {
 		val childCount = folder?.childCount ?: 0
@@ -23,7 +25,7 @@ class ByLetterFragment : BrowseFolderFragment() {
 			fields = ItemRepository.itemFields,
 		)
 
-		rows.add(BrowseRowDef("#", numbersItemsRequest, 40))
+		rows.add(BrowseRowDef("#", numbersItemsRequest, LETTER_ROW_CHUNK_SIZE))
 
 		// Add all the defined letters
 		for (letter in letters.toCharArray()) {
@@ -36,7 +38,7 @@ class ByLetterFragment : BrowseFolderFragment() {
 				fields = ItemRepository.itemFields,
 			)
 
-			rows.add(BrowseRowDef(letter.toString(), letterItemsRequest, 40))
+			rows.add(BrowseRowDef(letter.toString(), letterItemsRequest, LETTER_ROW_CHUNK_SIZE))
 		}
 
 		rowLoader.loadRows(rows)

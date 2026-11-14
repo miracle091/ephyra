@@ -18,10 +18,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.base.form.RangeControl
+import org.jellyfin.androidtv.ui.base.form.RangeControlState
 import org.jellyfin.androidtv.ui.base.form.RangeControlDefaults
 import org.jellyfin.androidtv.ui.base.list.ListControl
+import org.jellyfin.androidtv.ui.base.list.ListItemSlots
 import org.jellyfin.design.Tokens
 import kotlin.math.roundToInt
+
+private const val PERCENT_FACTOR = 100f
 
 @Composable
 fun ListColorChannelRangeControl(
@@ -33,69 +37,65 @@ fun ListColorChannelRangeControl(
 ) {
 	val interactionSource = remember { MutableInteractionSource() }
 
-	val channelValue = when (channel) {
-		Color.Red -> value.red
-		Color.Green -> value.green
-		Color.Blue -> value.blue
-		Color.Transparent -> value.alpha
-		else -> error("Unknown color channel $channel")
-	}
-
-	val backgroundStart = Color(
-		red = if (channel == Color.Red) 0f else value.red,
-		green = if (channel == Color.Green) 0f else value.green,
-		blue = if (channel == Color.Blue) 0f else value.blue,
-		alpha = if (channel == Color.Transparent) 0f else 1f,
+	val channelValue = value.channelValue(channel)
+	val opaqueValue = value.copy(alpha = 1f)
+	val backgroundBrush = Brush.horizontalGradient(
+		listOf(
+			opaqueValue.withChannel(channel, 0f),
+			opaqueValue.withChannel(channel, 1f),
+		)
 	)
-	val backgroundEnd = Color(
-		red = if (channel == Color.Red) 1f else value.red,
-		green = if (channel == Color.Green) 1f else value.green,
-		blue = if (channel == Color.Blue) 1f else value.blue,
-		alpha = 1f,
-	)
-	val backgroundBrush = Brush.horizontalGradient(listOf(backgroundStart, backgroundEnd))
 
 	ListControl(
 		headingContent = headingContent,
 		interactionSource = interactionSource,
 		modifier = modifier,
-	) {
-		Row(
-			verticalAlignment = Alignment.CenterVertically,
-		) {
-			RangeControl(
-				modifier = Modifier
-					.height(4.dp)
-					.weight(1f)
-					.background(backgroundBrush, RoundedCornerShape(2.dp)),
-				interactionSource = interactionSource,
-				min = 0f,
-				max = 1f,
-				stepForward = 0.01f,
-				value = channelValue,
-				onValueChange = {
-					val newValue = Color(
-						red = if (channel == Color.Red) it else value.red,
-						green = if (channel == Color.Green) it else value.green,
-						blue = if (channel == Color.Blue) it else value.blue,
-						alpha = if (channel == Color.Transparent) it else value.alpha,
+		slots = ListItemSlots(
+			footerContent = {
+				Row(
+					verticalAlignment = Alignment.CenterVertically,
+				) {
+					RangeControl(
+						modifier = Modifier
+							.height(4.dp)
+							.weight(1f)
+							.background(backgroundBrush, RoundedCornerShape(2.dp)),
+						interactionSource = interactionSource,
+						state = RangeControlState(value = channelValue),
+						onValueChange = { onValueChange(value.withChannel(channel, it)) },
+						colors = RangeControlDefaults.colors(
+							backgroundColor = Color.Transparent,
+							fillColor = Color.Transparent
+						)
 					)
-					onValueChange(newValue)
-				},
-				colors = RangeControlDefaults.colors(
-					backgroundColor = Color.Transparent,
-					fillColor = Color.Transparent
-				)
-			)
 
-			Spacer(Modifier.width(Tokens.Space.spaceSm))
+					Spacer(Modifier.width(Tokens.Space.spaceSm))
 
-			Box(
-				modifier = Modifier.sizeIn(minWidth = 32.dp),
-				contentAlignment = Alignment.CenterEnd
-			) {
-				Text("${(channelValue * 100f).roundToInt()}%")
-			}
-		}
-	}
+					Box(
+						modifier = Modifier.sizeIn(minWidth = 32.dp),
+						contentAlignment = Alignment.CenterEnd
+					) {
+						Text("${(channelValue * PERCENT_FACTOR).roundToInt()}%")
+					}
+				}
+			},
+		),
+	)
 }
+
+/** The value of one channel of this colour; [channel] is [Color.Red], [Color.Green], [Color.Blue] or [Color.Transparent] for alpha. */
+private fun Color.channelValue(channel: Color) = when (channel) {
+	Color.Red -> red
+	Color.Green -> green
+	Color.Blue -> blue
+	Color.Transparent -> alpha
+	else -> error("Unknown color channel $channel")
+}
+
+/** This colour with one channel replaced, see [channelValue] for how the channel is identified. */
+private fun Color.withChannel(channel: Color, newValue: Float) = Color(
+	red = if (channel == Color.Red) newValue else red,
+	green = if (channel == Color.Green) newValue else green,
+	blue = if (channel == Color.Blue) newValue else blue,
+	alpha = if (channel == Color.Transparent) newValue else alpha,
+)

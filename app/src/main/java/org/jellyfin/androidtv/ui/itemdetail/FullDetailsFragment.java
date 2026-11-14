@@ -63,6 +63,7 @@ import org.jellyfin.androidtv.ui.navigation.Destinations;
 import org.jellyfin.androidtv.ui.navigation.NavigationRepository;
 import org.jellyfin.androidtv.ui.playback.MediaManager;
 import org.jellyfin.androidtv.ui.playback.PlaybackLauncher;
+import org.jellyfin.androidtv.ui.playback.QueueStart;
 import org.jellyfin.androidtv.ui.presentation.CardPresenter;
 import org.jellyfin.androidtv.ui.presentation.CastCardPresenter;
 import org.jellyfin.androidtv.ui.presentation.CustomListRowPresenter;
@@ -1233,7 +1234,7 @@ public class FullDetailsFragment extends Fragment implements RecordingIndicatorV
                 }
 
                 interactionTracker.getValue().notifyStartSession(item, response);
-                KoinJavaComponent.<PlaybackLauncher>get(PlaybackLauncher.class).launch(getContext(), response, pos, false, 0, shuffle);
+                KoinJavaComponent.<PlaybackLauncher>get(PlaybackLauncher.class).launch(getContext(), response, pos, false, new QueueStart(0, shuffle));
             }
         });
     }

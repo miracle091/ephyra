@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import org.jellyfin.androidtv.ui.base.EphyraTheme
 import org.jellyfin.androidtv.ui.base.LocalEphyraPalette
+import org.jellyfin.androidtv.ui.base.LocalTextStyle
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.composable.rememberCurrentTime
 import org.jellyfin.androidtv.util.locale
@@ -91,16 +92,20 @@ fun DreamContentClock() = EphyraTheme {
 		) {
 			Text(
 				text = time,
-				fontSize = 128.sp,
-				lineHeight = 132.sp,
-				fontWeight = FontWeight.Light,
-				color = palette.ink,
+				style = LocalTextStyle.current.merge(
+					color = palette.ink,
+					fontSize = 128.sp,
+					fontWeight = FontWeight.Light,
+					lineHeight = 132.sp,
+				),
 			)
 			Text(
 				text = date,
-				fontSize = 24.sp,
-				fontWeight = FontWeight.Medium,
-				color = palette.inkMuted,
+				style = LocalTextStyle.current.merge(
+					color = palette.inkMuted,
+					fontSize = 24.sp,
+					fontWeight = FontWeight.Medium,
+				),
 			)
 		}
 	}

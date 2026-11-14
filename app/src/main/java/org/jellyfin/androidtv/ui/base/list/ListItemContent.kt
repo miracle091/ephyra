@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import org.jellyfin.androidtv.ui.base.JellyfinTheme
@@ -20,15 +21,17 @@ import org.jellyfin.design.Tokens
 
 @Composable
 fun ListItemContent(
-	modifier: Modifier = Modifier,
 	headingContent: @Composable () -> Unit,
-	overlineContent: (@Composable () -> Unit)? = null,
-	captionContent: (@Composable () -> Unit)? = null,
-	leadingContent: (@Composable () -> Unit)? = null,
-	trailingContent: (@Composable () -> Unit)? = null,
-	footerContent: (@Composable () -> Unit)? = null,
 	headingStyle: TextStyle,
+	modifier: Modifier = Modifier,
+	slots: ListItemSlots = ListItemSlots(),
 ) {
+	val overlineContent = slots.overlineContent
+	val captionContent = slots.captionContent
+	val leadingContent = slots.leadingContent
+	val trailingContent = slots.trailingContent
+	val footerContent = slots.footerContent
+
 	Column(
 		modifier = modifier
 			// TODO: Add suitable space token for this padding
@@ -38,16 +41,7 @@ fun ListItemContent(
 			verticalAlignment = Alignment.CenterVertically,
 		) {
 			leadingContent?.let { content ->
-				Box(
-					modifier = Modifier
-						.sizeIn(minWidth = 24.dp),
-					contentAlignment = Alignment.Center,
-					content = {
-						ProvideTextStyle(LocalTextStyle.current.copy(color = JellyfinTheme.colorScheme.listHeadline)) {
-							content()
-						}
-					}
-				)
+				ListItemAccessory(color = JellyfinTheme.colorScheme.listHeadline, content = content)
 				Spacer(Modifier.width(Tokens.Space.spaceMd))
 			}
 
@@ -77,17 +71,8 @@ fun ListItemContent(
 			trailingContent?.let { content ->
 				Spacer(Modifier.width(Tokens.Space.spaceMd))
 
-				Box(
-					modifier = Modifier
-						.sizeIn(minWidth = 24.dp),
-					contentAlignment = Alignment.Center,
-					content = {
-						// Trailing values are secondary text, like the caption
-						ProvideTextStyle(LocalTextStyle.current.copy(color = JellyfinTheme.colorScheme.listCaption)) {
-							content()
-						}
-					}
-				)
+				// Trailing values are secondary text, like the caption
+				ListItemAccessory(color = JellyfinTheme.colorScheme.listCaption, content = content)
 			}
 		}
 
@@ -99,4 +84,21 @@ fun ListItemContent(
 			}
 		}
 	}
+}
+
+@Composable
+private fun ListItemAccessory(
+	color: Color,
+	content: @Composable () -> Unit,
+) {
+	Box(
+		modifier = Modifier
+			.sizeIn(minWidth = 24.dp),
+		contentAlignment = Alignment.Center,
+		content = {
+			ProvideTextStyle(LocalTextStyle.current.copy(color = color)) {
+				content()
+			}
+		}
+	)
 }

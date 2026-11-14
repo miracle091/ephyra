@@ -19,8 +19,7 @@ import org.jellyfin.androidtv.R
 import org.jellyfin.androidtv.ui.base.CircularProgressIndicator
 import org.jellyfin.androidtv.ui.base.Icon
 import org.jellyfin.androidtv.ui.base.list.ListButton
-import org.jellyfin.androidtv.ui.base.list.ListControlColors
-import org.jellyfin.androidtv.ui.base.list.ListControlDefaults
+import org.jellyfin.androidtv.ui.base.list.ListItemSlots
 import org.jellyfin.design.Tokens
 import timber.log.Timber
 
@@ -29,9 +28,7 @@ fun <T> SettingsAsyncActionListButton(
 	action: suspend CoroutineScope.() -> T,
 	headingContent: @Composable () -> Unit,
 	modifier: Modifier = Modifier,
-	onSuccess: (result: T) -> Unit = {},
-	onFailure: (error: Throwable) -> Unit = {},
-	colors: ListControlColors = ListControlDefaults.colors(),
+	onResult: (result: Result<T>) -> Unit = {},
 	captionContent: (@Composable () -> Unit)? = null,
 ) {
 	val lifecycleScope = LocalLifecycleOwner.current.lifecycleScope
@@ -40,32 +37,33 @@ fun <T> SettingsAsyncActionListButton(
 	ListButton(
 		modifier = modifier,
 		headingContent = headingContent,
-		captionContent = captionContent,
-		colors = colors,
-		leadingContent = {
-			when (state) {
-				SettingsAsyncActionListButtonState.PENDING -> Icon(
-					painter = painterResource(R.drawable.ic_upload),
-					contentDescription = null
-				)
+		slots = ListItemSlots(
+			captionContent = captionContent,
+			leadingContent = {
+				when (state) {
+					SettingsAsyncActionListButtonState.PENDING -> Icon(
+						painter = painterResource(R.drawable.ic_upload),
+						contentDescription = null
+					)
 
-				SettingsAsyncActionListButtonState.WORKING -> CircularProgressIndicator(
-					modifier = Modifier.size(20.dp),
-				)
+					SettingsAsyncActionListButtonState.WORKING -> CircularProgressIndicator(
+						modifier = Modifier.size(20.dp),
+					)
 
-				SettingsAsyncActionListButtonState.SUCCESS -> Icon(
-					painter = painterResource(R.drawable.ic_check),
-					tint = Tokens.Color.colorLime300,
-					contentDescription = null
-				)
+					SettingsAsyncActionListButtonState.SUCCESS -> Icon(
+						painter = painterResource(R.drawable.ic_check),
+						tint = Tokens.Color.colorLime300,
+						contentDescription = null
+					)
 
-				SettingsAsyncActionListButtonState.FAILED -> Icon(
-					painter = painterResource(R.drawable.ic_error),
-					tint = Tokens.Color.colorRed300,
-					contentDescription = null
-				)
-			}
-		},
+					SettingsAsyncActionListButtonState.FAILED -> Icon(
+						painter = painterResource(R.drawable.ic_error),
+						tint = Tokens.Color.colorRed300,
+						contentDescription = null
+					)
+				}
+			},
+		),
 		onClick = {
 			if (state == SettingsAsyncActionListButtonState.PENDING || state == SettingsAsyncActionListButtonState.FAILED) lifecycleScope.launch {
 				state = SettingsAsyncActionListButtonState.WORKING
@@ -74,17 +72,11 @@ fun <T> SettingsAsyncActionListButton(
 					withContext(Dispatchers.IO) {
 						action()
 					}
-				}.fold(
-					onSuccess = { result ->
-						state = SettingsAsyncActionListButtonState.SUCCESS
-						onSuccess(result)
-					},
-					onFailure = { error ->
-						state = SettingsAsyncActionListButtonState.FAILED
-						Timber.e(error, "Failed to execute reporting action")
-						onFailure(error)
-					}
-				)
+				}.also { result ->
+					state = if (result.isSuccess) SettingsAsyncActionListButtonState.SUCCESS else SettingsAsyncActionListButtonState.FAILED
+					result.exceptionOrNull()?.let { error -> Timber.e(error, "Failed to execute reporting action") }
+					onResult(result)
+				}
 			}
 		}
 	)

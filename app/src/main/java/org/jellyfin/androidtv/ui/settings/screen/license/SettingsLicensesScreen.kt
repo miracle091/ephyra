@@ -11,6 +11,7 @@ import com.mikepenz.aboutlibraries.util.withJson
 import org.jellyfin.androidtv.R
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.base.list.ListButton
+import org.jellyfin.androidtv.ui.base.list.ListItemSlots
 import org.jellyfin.androidtv.ui.base.list.ListSection
 import org.jellyfin.androidtv.ui.navigation.LocalRouter
 import org.jellyfin.androidtv.ui.navigation.focus.focusKey
@@ -41,7 +42,9 @@ fun SettingsLicensesScreen() {
 		items(libraries) { library ->
 			ListButton(
 				headingContent = { Text("${library.name} ${library.artifactVersion}") },
-				captionContent = { Text(library.licenses.joinToString(", ") { license -> license.name }) },
+				slots = ListItemSlots(
+					captionContent = { Text(library.licenses.joinToString(", ") { license -> license.name }) },
+				),
 				onClick = { router.push(Routes.LICENSE, mapOf("artifactId" to library.artifactId)) },
 				modifier = Modifier.focusKey("library_${library.artifactId}")
 			)

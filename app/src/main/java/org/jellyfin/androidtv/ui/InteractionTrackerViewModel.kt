@@ -106,7 +106,8 @@ class InteractionTrackerViewModel(
 		}
 
 		// Hide screensaver when interacted with allowed cancellation or when disabled
-		if (_screensaverVisible.value && (canCancel || !inAppEnabled || activityPaused)) {
+		val canHideScreensaver = canCancel || !inAppEnabled || activityPaused
+		if (_screensaverVisible.value && canHideScreensaver) {
 			_screensaverVisible.value = false
 		}
 

@@ -266,21 +266,6 @@ class ExoPlayerBackend(
 			.build()
 	}
 
-	/** The position in [audioGroups] of the player track for the server audio stream [wantedIndex], or null (logged) if there is none. */
-	private fun findSupportedAudioGroupPosition(stream: PlayableMediaStream, wantedIndex: Int, audioGroups: List<Tracks.Group>): Int? {
-		val position = findAudioGroupPosition(stream.tracks, wantedIndex, audioGroups.size)
-		if (position == null) {
-			Timber.w("Cannot map server audio stream $wantedIndex to a player track (${audioGroups.size} player audio tracks)")
-			return null
-		}
-
-		if (!audioGroups[position].isSupported) {
-			Timber.w("Server audio stream $wantedIndex is not supported by the player, keeping its own choice")
-			return null
-		}
-		return position
-	}
-
 	override fun supportsStream(
 		stream: MediaStream
 	): PlaySupportReport = exoPlayer.getPlaySupportReport(stream.toFormats())
@@ -290,20 +275,19 @@ class ExoPlayerBackend(
 	}
 
 	override fun setSubtitleView(surfaceView: PlayerSubtitleView?) {
-		if (surfaceView != null) {
-			if (subtitleView == null) {
-				subtitleView = SubtitleView(surfaceView.context).apply {
-					if (exoPlayerOptions.enableLibass) {
-						addView(AssSubtitleView(surfaceView.context, assHandler))
-					}
-				}
-			}
-
-			surfaceView.addView(subtitleView)
-		} else {
+		if (surfaceView == null) {
 			(subtitleView?.parent as? ViewGroup)?.removeView(subtitleView)
 			subtitleView = null
+			return
 		}
+
+		val view = subtitleView ?: SubtitleView(surfaceView.context).apply {
+			if (exoPlayerOptions.enableLibass) {
+				addView(AssSubtitleView(surfaceView.context, assHandler))
+			}
+		}.also { subtitleView = it }
+
+		surfaceView.addView(view)
 	}
 
 	override fun prepareItem(item: QueueEntry) {
@@ -415,4 +399,19 @@ class ExoPlayerBackend(
 	override fun setTimedEvents(timedEvents: List<TimedEvent>) {
 		timedEventState.setTimedEvents(exoPlayer, timedEvents)
 	}
+}
+
+/** The position in [audioGroups] of the player track for the server audio stream [wantedIndex], or null (logged) if there is none. */
+private fun findSupportedAudioGroupPosition(stream: PlayableMediaStream, wantedIndex: Int, audioGroups: List<Tracks.Group>): Int? {
+	val position = findAudioGroupPosition(stream.tracks, wantedIndex, audioGroups.size)
+	if (position == null) {
+		Timber.w("Cannot map server audio stream $wantedIndex to a player track (${audioGroups.size} player audio tracks)")
+		return null
+	}
+
+	if (!audioGroups[position].isSupported) {
+		Timber.w("Server audio stream $wantedIndex is not supported by the player, keeping its own choice")
+		return null
+	}
+	return position
 }

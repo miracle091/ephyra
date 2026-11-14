@@ -14,6 +14,7 @@ import org.jellyfin.androidtv.preference.UserPreferences
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.base.form.RadioButton
 import org.jellyfin.androidtv.ui.base.list.ListButton
+import org.jellyfin.androidtv.ui.base.list.ListItemSlots
 import org.jellyfin.androidtv.ui.base.list.ListSection
 import org.jellyfin.androidtv.ui.navigation.LocalRouter
 import org.jellyfin.androidtv.ui.navigation.focus.focusKey
@@ -40,7 +41,9 @@ fun SettingsPlaybackMaxBitrateScreen() {
 		items(options) { (value, label) ->
 			ListButton(
 				headingContent = { Text(label) },
-				trailingContent = { RadioButton(checked = maxBitrate == value) },
+				slots = ListItemSlots(
+					trailingContent = { RadioButton(checked = maxBitrate == value) },
+				),
 				onClick = {
 					maxBitrate = value
 					router.back()

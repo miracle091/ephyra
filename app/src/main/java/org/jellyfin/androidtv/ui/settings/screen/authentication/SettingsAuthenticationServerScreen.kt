@@ -17,6 +17,8 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import org.jellyfin.androidtv.R
+import org.jellyfin.androidtv.auth.model.PrivateUser
+import org.jellyfin.androidtv.auth.model.Server
 import org.jellyfin.androidtv.auth.repository.AuthenticationRepository
 import org.jellyfin.androidtv.auth.repository.ServerRepository
 import org.jellyfin.androidtv.auth.repository.ServerUserRepository
@@ -25,6 +27,7 @@ import org.jellyfin.androidtv.ui.base.ProfilePicture
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.base.button.IconButtonDefaults
 import org.jellyfin.androidtv.ui.base.list.ListButton
+import org.jellyfin.androidtv.ui.base.list.ListItemSlots
 import org.jellyfin.androidtv.ui.base.list.ListSection
 import org.jellyfin.androidtv.ui.navigation.LocalRouter
 import org.jellyfin.androidtv.ui.navigation.focus.focusKey
@@ -44,7 +47,6 @@ fun SettingsAuthenticationServerScreen(serverId: UUID) {
 	val lifecycleScope = LocalLifecycleOwner.current.lifecycleScope
 	val serverRepository = koinInject<ServerRepository>()
 	val serverUserRepository = koinInject<ServerUserRepository>()
-	val authenticationRepository = koinInject<AuthenticationRepository>()
 
 	LaunchedEffect(serverRepository) { serverRepository.loadStoredServers() }
 
@@ -67,29 +69,9 @@ fun SettingsAuthenticationServerScreen(serverId: UUID) {
 			item { ListSection(headingContent = { Text(stringResource(R.string.pref_accounts)) }) }
 
 			items(users) { user ->
-				ListButton(
-					leadingContent = {
-						ProfilePicture(
-							url = authenticationRepository.getUserImageUrl(requireNotNull(server), user),
-							modifier = Modifier
-								.size(24.dp)
-								.clip(IconButtonDefaults.Shape)
-						)
-					},
-					headingContent = { Text(user.name) },
-					captionContent = {
-						val lastUsedDate = LocalDateTime.ofInstant(
-							Instant.ofEpochMilli(user.lastUsed),
-							ZoneId.systemDefault()
-						)
-						Text(
-							stringResource(
-								R.string.lbl_user_last_used,
-								lastUsedDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)),
-								lastUsedDate.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)),
-							)
-						)
-					},
+				ServerUserButton(
+					server = requireNotNull(server),
+					user = user,
 					onClick = {
 						router.push(
 							route = Routes.AUTHENTICATION_SERVER_USER,
@@ -99,7 +81,6 @@ fun SettingsAuthenticationServerScreen(serverId: UUID) {
 							),
 						)
 					},
-					modifier = Modifier.focusKey("user_${user.id}")
 				)
 			}
 		}
@@ -108,9 +89,11 @@ fun SettingsAuthenticationServerScreen(serverId: UUID) {
 
 		item {
 			ListButton(
-				leadingContent = { Icon(painterResource(R.drawable.ic_delete), contentDescription = null) },
 				headingContent = { Text(stringResource(R.string.lbl_remove_server)) },
-				captionContent = { Text(stringResource(R.string.lbl_remove_users)) },
+				slots = ListItemSlots(
+					leadingContent = { Icon(painterResource(R.drawable.ic_delete), contentDescription = null) },
+					captionContent = { Text(stringResource(R.string.lbl_remove_users)) },
+				),
 				onClick = {
 					lifecycleScope.launch {
 						serverRepository.deleteServer(server?.id ?: serverId)
@@ -121,4 +104,38 @@ fun SettingsAuthenticationServerScreen(serverId: UUID) {
 			)
 		}
 	}
+}
+
+@Composable
+private fun ServerUserButton(server: Server, user: PrivateUser, onClick: () -> Unit) {
+	val authenticationRepository = koinInject<AuthenticationRepository>()
+
+	ListButton(
+		headingContent = { Text(user.name) },
+		slots = ListItemSlots(
+			leadingContent = {
+				ProfilePicture(
+					url = authenticationRepository.getUserImageUrl(server, user),
+					modifier = Modifier
+						.size(24.dp)
+						.clip(IconButtonDefaults.Shape)
+				)
+			},
+			captionContent = {
+				val lastUsedDate = LocalDateTime.ofInstant(
+					Instant.ofEpochMilli(user.lastUsed),
+					ZoneId.systemDefault()
+				)
+				Text(
+					stringResource(
+						R.string.lbl_user_last_used,
+						lastUsedDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)),
+						lastUsedDate.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)),
+					)
+				)
+			},
+		),
+		onClick = onClick,
+		modifier = Modifier.focusKey("user_${user.id}")
+	)
 }

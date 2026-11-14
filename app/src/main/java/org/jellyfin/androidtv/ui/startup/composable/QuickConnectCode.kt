@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.jellyfin.androidtv.ui.base.EphyraMonoFontFamily
 import org.jellyfin.androidtv.ui.base.LocalEphyraPalette
+import org.jellyfin.androidtv.ui.base.LocalTextStyle
 import org.jellyfin.androidtv.ui.base.Text
 
 private const val GROUP_SIZE = 3
@@ -47,10 +48,12 @@ fun QuickConnectCode(code: String, modifier: Modifier = Modifier) {
 					) {
 						Text(
 							text = character.toString(),
-							color = palette.ink,
-							fontSize = 36.sp,
-							fontWeight = FontWeight.Bold,
-							fontFamily = EphyraMonoFontFamily, // Ephyra
+							style = LocalTextStyle.current.merge(
+								color = palette.ink,
+								fontSize = 36.sp,
+								fontWeight = FontWeight.Bold,
+								fontFamily = EphyraMonoFontFamily, // Ephyra
+							),
 						)
 					}
 				}

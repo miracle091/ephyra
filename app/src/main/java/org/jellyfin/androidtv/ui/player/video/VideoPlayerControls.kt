@@ -37,6 +37,7 @@ import org.jellyfin.androidtv.ui.base.LocalTextStyle
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.base.button.IconButton
 import org.jellyfin.androidtv.ui.base.popover.Popover
+import org.jellyfin.androidtv.ui.base.popover.PopoverPlacement
 import org.jellyfin.androidtv.ui.composable.rememberPlayerPositionInfo
 import org.jellyfin.androidtv.ui.player.base.PlayerSeekbar
 import org.jellyfin.playback.core.PlaybackManager
@@ -208,11 +209,16 @@ private fun NextEntryButton(
 	}
 }
 
+private const val SECONDS_PER_MINUTE = 60
+private const val MINUTES_PER_HOUR = 60
+private const val SECONDS_PER_HOUR = SECONDS_PER_MINUTE * MINUTES_PER_HOUR
+private const val MORE_OPTIONS_POPOVER_OFFSET_Y = -5
+
 private fun Duration.formatted(includeHours: Boolean): String {
 	val totalSeconds = toInt(DurationUnit.SECONDS)
-	val hours = totalSeconds / 3600
-	val minutes = (totalSeconds % 3600) / 60
-	val seconds = totalSeconds % 60
+	val hours = totalSeconds / SECONDS_PER_HOUR
+	val minutes = (totalSeconds % SECONDS_PER_HOUR) / SECONDS_PER_MINUTE
+	val seconds = totalSeconds % SECONDS_PER_MINUTE
 
 	return if (includeHours) "%02d:%02d:%02d".format(hours, minutes, seconds)
 	else "%02d:%02d".format(minutes, seconds)
@@ -227,7 +233,7 @@ private fun PositionText(
 
 	val text by remember {
 		derivedStateOf {
-			val includeHours = positionInfo.duration.inWholeMinutes >= 60
+			val includeHours = positionInfo.duration.inWholeMinutes >= MINUTES_PER_HOUR
 			val activeFormatted = positionInfo.active.formatted(includeHours)
 			val durationFormatted = positionInfo.duration.formatted(includeHours)
 
@@ -258,8 +264,10 @@ private fun MoreOptionsButton(
 	Popover(
 		expanded = expanded,
 		onDismissRequest = { expanded = false },
-		alignment = Alignment.TopCenter,
-		offset = DpOffset(0.dp, (-5).dp)
+		placement = PopoverPlacement(
+			alignment = Alignment.TopCenter,
+			offset = DpOffset(0.dp, MORE_OPTIONS_POPOVER_OFFSET_Y.dp),
+		),
 	) {
 		Row(
 			horizontalArrangement = Arrangement.spacedBy(12.dp),

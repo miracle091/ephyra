@@ -11,6 +11,8 @@ import org.jellyfin.androidtv.R
 import org.jellyfin.androidtv.ui.base.Icon
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.base.list.ListButton
+import org.jellyfin.androidtv.ui.base.list.ListControlDefaults
+import org.jellyfin.androidtv.ui.base.list.ListItemSlots
 import org.jellyfin.androidtv.ui.base.list.ListSection
 import org.jellyfin.androidtv.ui.navigation.LocalRouter
 import org.jellyfin.androidtv.ui.navigation.focus.focusKey
@@ -39,7 +41,9 @@ fun SettingsLibrariesScreen() {
 
 			if (userView.collectionType == CollectionType.LIVETV) {
 				ListButton(
-					leadingContent = { Icon(painterResource(R.drawable.ic_guide), contentDescription = null) },
+					slots = ListItemSlots(
+						leadingContent = { Icon(painterResource(R.drawable.ic_guide), contentDescription = null) },
+					),
 					headingContent = { Text(userView.name.orEmpty()) },
 					onClick = { router.push(Routes.LIVETV_GUIDE_OPTIONS) },
 					modifier = Modifier.focusKey(Routes.LIVETV_GUIDE_OPTIONS)
@@ -48,9 +52,11 @@ fun SettingsLibrariesScreen() {
 				val canOpen = allowGridView && displayPreferencesId != null
 
 				ListButton(
-					leadingContent = { Icon(painterResource(R.drawable.ic_folder), contentDescription = null) },
+					slots = ListItemSlots(
+						leadingContent = { Icon(painterResource(R.drawable.ic_folder), contentDescription = null) },
+					),
 					headingContent = { Text(userView.name.orEmpty()) },
-					enabled = canOpen,
+					style = ListControlDefaults.style(enabled = canOpen),
 					onClick = {
 						if (canOpen) {
 							router.push(

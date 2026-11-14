@@ -13,6 +13,7 @@ import org.jellyfin.androidtv.preference.UpdatePreferences
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.base.form.Checkbox
 import org.jellyfin.androidtv.ui.base.list.ListButton
+import org.jellyfin.androidtv.ui.base.list.ListItemSlots
 import org.jellyfin.androidtv.ui.navigation.focus.focusKey
 import org.jellyfin.androidtv.ui.settings.compat.rememberPreference
 import org.jellyfin.androidtv.update.AppUpdateState
@@ -39,9 +40,11 @@ fun AppUpdateListButton() {
 	}
 
 	ListButton(
-		leadingContent = { Icon(painterResource(R.drawable.ic_loop), contentDescription = null) },
 		headingContent = { Text(heading) },
-		captionContent = { Text(caption) },
+		slots = ListItemSlots(
+			leadingContent = { Icon(painterResource(R.drawable.ic_loop), contentDescription = null) },
+			captionContent = { Text(caption) },
+		),
 		// Stays enabled while busy so it keeps the D-pad focus; AppUpdater ignores clicks until it is done
 		onClick = {
 			when (val current = state) {
@@ -61,11 +64,13 @@ fun DailyUpdateCheckListButton() {
 
 	ListButton(
 		headingContent = { Text(stringResource(R.string.ephyra_update_daily_check)) },
-		trailingContent = { Checkbox(checked = enabled) },
-		captionContent = {
-			if (enabled) Text(stringResource(R.string.ephyra_update_daily_check_enabled))
-			else Text(stringResource(R.string.ephyra_update_daily_check_disabled))
-		},
+		slots = ListItemSlots(
+			trailingContent = { Checkbox(checked = enabled) },
+			captionContent = {
+				if (enabled) Text(stringResource(R.string.ephyra_update_daily_check_enabled))
+				else Text(stringResource(R.string.ephyra_update_daily_check_disabled))
+			},
+		),
 		onClick = { enabled = !enabled },
 		modifier = Modifier.focusKey("daily_update_check"),
 	)

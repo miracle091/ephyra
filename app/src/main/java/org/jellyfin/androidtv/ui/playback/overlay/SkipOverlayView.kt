@@ -37,6 +37,7 @@ import org.jellyfin.androidtv.preference.EphyraPreferences
 import org.jellyfin.androidtv.ui.base.EphyraTheme
 import org.jellyfin.androidtv.ui.base.Icon
 import org.jellyfin.androidtv.ui.base.LocalEphyraPalette
+import org.jellyfin.androidtv.ui.base.LocalTextStyle
 import org.jellyfin.androidtv.ui.base.Text
 import org.koin.compose.koinInject
 import kotlin.time.Duration
@@ -74,9 +75,11 @@ fun SkipOverlayComposable(
 
 				Text(
 					text = stringResource(R.string.segment_action_skip),
-					color = palette.ink,
-					fontSize = 14.sp,
-					fontWeight = FontWeight.Bold,
+					style = LocalTextStyle.current.merge(
+						color = palette.ink,
+						fontSize = 14.sp,
+						fontWeight = FontWeight.Bold,
+					),
 					maxLines = 1,
 				)
 			}

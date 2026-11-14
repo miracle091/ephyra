@@ -3,6 +3,8 @@ package org.jellyfin.playback.media3.exoplayer
 import android.media.audiofx.LoudnessEnhancer
 import timber.log.Timber
 
+private const val MILLIBELS_PER_DECIBEL = 100f
+
 class ExoPlayerAudioPipeline {
 	private var loudnessEnhancer: LoudnessEnhancer? = null
 	var normalizationGain: Float? = null
@@ -33,7 +35,7 @@ class ExoPlayerAudioPipeline {
 
 		val targetGain = normalizationGain
 			// Convert to millibels
-			?.times(100f)
+			?.times(MILLIBELS_PER_DECIBEL)
 			// Round to integer
 			?.toInt()
 			// Ignore if zero (so the enhancer will be disabled)

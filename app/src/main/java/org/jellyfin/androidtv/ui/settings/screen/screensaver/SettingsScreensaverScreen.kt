@@ -10,6 +10,7 @@ import org.jellyfin.androidtv.preference.UserPreferences
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.base.form.Checkbox
 import org.jellyfin.androidtv.ui.base.list.ListButton
+import org.jellyfin.androidtv.ui.base.list.ListItemSlots
 import org.jellyfin.androidtv.ui.base.list.ListSection
 import org.jellyfin.androidtv.ui.navigation.LocalRouter
 import org.jellyfin.androidtv.ui.navigation.focus.focusKey
@@ -36,8 +37,10 @@ fun SettingsScreensaverScreen() {
 
 			ListButton(
 				headingContent = { Text(stringResource(R.string.pref_screensaver_inapp_enabled)) },
-				trailingContent = { Checkbox(checked = screensaverInAppEnabled) },
-				captionContent = { Text(stringResource(R.string.ephyra_screensaver_inapp_enabled_description)) },
+				slots = ListItemSlots(
+					trailingContent = { Checkbox(checked = screensaverInAppEnabled) },
+					captionContent = { Text(stringResource(R.string.ephyra_screensaver_inapp_enabled_description)) },
+				),
 				onClick = { screensaverInAppEnabled = !screensaverInAppEnabled },
 				modifier = Modifier.focusKey("screensaver_in_app_enabled")
 			)
@@ -51,7 +54,9 @@ fun SettingsScreensaverScreen() {
 
 			ListButton(
 				headingContent = { Text(stringResource(R.string.pref_screensaver_inapp_timeout)) },
-				captionContent = { Text(caption) },
+				slots = ListItemSlots(
+					captionContent = { Text(caption) },
+				),
 				onClick = { router.push(Routes.CUSTOMIZATION_SCREENSAVER_TIMEOUT) },
 				modifier = Modifier.focusKey(Routes.CUSTOMIZATION_SCREENSAVER_TIMEOUT)
 			)

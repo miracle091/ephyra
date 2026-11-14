@@ -58,6 +58,8 @@ interface ServerRepository {
 	}
 }
 
+private const val SERVER_REFRESH_INTERVAL_MS = 600_000L
+
 class ServerRepositoryImpl(
 	private val jellyfin: Jellyfin,
 	private val authenticationStore: AuthenticationStore,
@@ -128,16 +130,7 @@ class ServerRepositoryImpl(
 			}
 		}
 
-		Timber.i(buildString {
-			append("Recommendations: ")
-			if (greatRecommendation == null) append(0)
-			else append(1)
-			append(" great, ")
-			append(goodRecommendations.size)
-			append(" good, ")
-			append(badRecommendations.size)
-			append(" bad")
-		})
+		logRecommendations(greatRecommendation, goodRecommendations, badRecommendations)
 
 		val chosenRecommendation = greatRecommendation ?: goodRecommendations.firstOrNull()
 		if (chosenRecommendation != null && chosenRecommendation.systemInfo.isSuccess) {
@@ -210,6 +203,23 @@ class ServerRepositoryImpl(
 		}
 	}
 
+	private fun logRecommendations(
+		greatRecommendation: RecommendedServerInfo?,
+		goodRecommendations: List<RecommendedServerInfo>,
+		badRecommendations: List<RecommendedServerInfo>,
+	) {
+		Timber.i(buildString {
+			append("Recommendations: ")
+			if (greatRecommendation == null) append(0)
+			else append(1)
+			append(" great, ")
+			append(goodRecommendations.size)
+			append(" good, ")
+			append(badRecommendations.size)
+			append(" bad")
+		})
+	}
+
 	private suspend fun updateServerInternal(
 		id: UUID,
 		server: AuthenticationStoreServer,
@@ -218,7 +228,7 @@ class ServerRepositoryImpl(
 		val now = Instant.now().toEpochMilli()
 
 		// Only update every 10 minutes
-		if (now - server.lastRefreshed < 600000 && server.version != null && !forceUpdate) return null
+		if (now - server.lastRefreshed < SERVER_REFRESH_INTERVAL_MS && server.version != null && !forceUpdate) return null
 
 		val newServer = withContext(Dispatchers.IO) {
 			val api = jellyfin.createApi(server.address)

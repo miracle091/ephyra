@@ -12,34 +12,22 @@ fun ListButton(
 	onClick: () -> Unit,
 	headingContent: @Composable () -> Unit,
 	modifier: Modifier = Modifier,
-	enabled: Boolean = true,
-	interactionSource: MutableInteractionSource? = null,
-	colors: ListControlColors = ListControlDefaults.colors(),
-	overlineContent: (@Composable () -> Unit)? = null,
-	captionContent: (@Composable () -> Unit)? = null,
-	leadingContent: (@Composable () -> Unit)? = null,
-	trailingContent: (@Composable () -> Unit)? = null,
-	footerContent: (@Composable () -> Unit)? = null,
+	style: ListControlStyle = ListControlDefaults.style(),
+	slots: ListItemSlots = ListItemSlots(),
 ) {
-	@Suppress("NAME_SHADOWING")
-	val interactionSource = interactionSource ?: remember { MutableInteractionSource() }
+	val interactionSource = remember { MutableInteractionSource() }
 
 	ListControl(
 		headingContent = headingContent,
 		modifier = modifier.combinedClickable(
 			interactionSource = interactionSource,
 			indication = null,
-			enabled = enabled,
+			enabled = style.enabled,
 			role = Role.Button,
 			onClick = onClick,
 		),
-		enabled = enabled,
 		interactionSource = interactionSource,
-		colors = colors,
-		overlineContent = overlineContent,
-		captionContent = captionContent,
-		leadingContent = leadingContent,
-		trailingContent = trailingContent,
-		footerContent = footerContent,
+		style = style,
+		slots = slots,
 	)
 }
