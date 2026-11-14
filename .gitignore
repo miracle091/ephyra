@@ -1,9 +1,26 @@
-*.iml
-.DS_Store
-local.properties
-
-/.idea
+# Build output and Gradle state
 .gradle
 .kotlin/
 build/
 captures/
+*.apk
+*.aab
+*.hprof
+
+# IDE and machine-specific files
+*.iml
+/.idea
+/.vscode
+local.properties
+
+# Operating system files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor backups and merge leftovers
+*~
+*.bak
+*.orig
+*.rej
+*.swp
