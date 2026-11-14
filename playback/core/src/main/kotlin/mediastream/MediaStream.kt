@@ -9,25 +9,6 @@ interface MediaStream {
 	val tracks: Collection<MediaStreamTrack>
 }
 
-data class BasicMediaStream(
-	override val identifier: String,
-	override val conversionMethod: MediaConversionMethod,
-	override val container: MediaStreamContainer,
-	override val tracks: Collection<MediaStreamTrack>,
-) : MediaStream {
-	fun toPlayableMediaStream(
-		queueEntry: QueueEntry,
-		url: String,
-	) = PlayableMediaStream(
-		identifier = identifier,
-		conversionMethod = conversionMethod,
-		container = container,
-		tracks = tracks,
-		queueEntry = queueEntry,
-		url = url,
-	)
-}
-
 data class PlayableMediaStream(
 	override val identifier: String,
 	override val conversionMethod: MediaConversionMethod,

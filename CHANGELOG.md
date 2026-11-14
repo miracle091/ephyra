@@ -36,6 +36,9 @@ section 2(a) of the GPL-2.0.
 - Dead code: functions and members with no caller (`PopoverMenu.kt`, `ItemRowAdapter.setSiblingRow`,
   `GuideFilters.isMovies`, `HorizontalGridPresenter.enableChildRoundedCorners`, `DisplayPreferencesStore.clearCache`,
   `ImageHelper.getLogoImageUrl`, `MenuBuilder.subMenu`, `toHtmlSpanned`, `createSeriesGetNextUpRequest`).
+- Playback classes never instantiated: the album, instant mix, track and episode queue suppliers of
+  `playback:jellyfin` with their `PagedQueueSupplier` and `SequenceQueueSupplier` bases, `BasicMediaStream` and
+  `NoOpPlayerVolumeState`; three unused audio effect fields of `VideoManager` and seven unused imports.
 - Resources reported unused by Android lint: 46 drawables, 2 animations, a layout, the old logo colours and unused
   colours, styles and values.
 - Upstream repository leftovers: `CODEOWNERS`, `renovate.json`, the stale, triage and merge-conflict workflows (they

@@ -7,7 +7,6 @@ import androidx.core.content.ContextCompat
 import androidx.leanback.widget.PlaybackControlsRow
 import org.jellyfin.androidtv.ui.playback.PlaybackController
 import org.jellyfin.androidtv.ui.playback.overlay.CustomPlaybackTransportControlGlue
-import org.jellyfin.androidtv.ui.playback.overlay.LeanbackOverlayFragment
 import org.jellyfin.androidtv.ui.playback.overlay.VideoPlayerAdapter
 
 abstract class CustomAction(

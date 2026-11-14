@@ -51,23 +51,6 @@ interface PlayerVolumeState {
 	fun setVolume(volume: Float)
 }
 
-/**
- * Implementation of [PlayerVolumeState] that does nothing. Useful for platforms that do not
- * support changing the volume properties.
- */
-class NoOpPlayerVolumeState : PlayerVolumeState {
-	override val muted = false
-	override val volume = 1f
-	override val modifiable = false
-
-	override fun mute() = Unit
-	override fun unmute() = Unit
-
-	override fun increaseVolume() = Unit
-	override fun decreaseVolume() = Unit
-	override fun setVolume(volume: Float) = Unit
-}
-
 class AndroidPlayerVolumeState(
 	private val audioManager: AudioManager,
 ) : PlayerVolumeState {

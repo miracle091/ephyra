@@ -26,7 +26,6 @@ import org.jellyfin.sdk.model.api.BaseItemDto
 import org.jellyfin.sdk.model.api.BaseItemKind
 import org.jellyfin.sdk.model.api.MediaSourceInfo
 import org.jellyfin.sdk.model.api.SeriesStatus
-import org.jellyfin.sdk.model.api.Video3dFormat
 import org.jellyfin.sdk.model.extensions.ticks
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
