@@ -1,14 +1,8 @@
 package org.jellyfin.androidtv.util
 
 import android.content.Context
-import android.text.Spanned
 import androidx.core.text.HtmlCompat
 import org.jellyfin.androidtv.R
-
-/**
- * Convert string with HTML to a [Spanned]. Uses the [HtmlCompat.FROM_HTML_MODE_COMPACT] flag.
- */
-fun String.toHtmlSpanned(): Spanned = HtmlCompat.fromHtml(this, HtmlCompat.FROM_HTML_MODE_COMPACT)
 
 /**
  * Remove HTML tags from string and return the plain representation.

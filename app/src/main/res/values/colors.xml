@@ -6,26 +6,19 @@
     <color name="indigo_dye">#033860</color>
     <color name="spanish_blue">#1E76BA</color>
     <color name="grey">#303030</color>
-    <color name="grey_light">#4b4b4b</color>
     <color name="not_quite_black">#101010</color>
     <color name="black">#000000</color>
     <color name="white">#FFFFFF</color>
-    <color name="red">#CC3333</color>
     <color name="transparent">#00000000</color>
 
     <!-- Semi-Transparent Blacks -->
     <color name="black_transparent_dark">#E6000000</color>
-    <color name="black_opaque">#AA000000</color>
     <color name="black_transparent">#97000000</color>
     <color name="black_transparent_light">#74000000</color>
 
     <!-- Progressbar Background -->
     <color name="grey_transparent">#CC4b4b4b</color>
 
-    <!-- Gradients -->
-    <color name="green_gradient_start">#044b13</color>
-    <color name="green_gradient_end">#085c04</color>
-    <color name="red_gradient_start">#7c0b09</color>
     <color name="red_gradient_end">#900d10</color>
 
     <!-- Live TV Colors -->
@@ -57,8 +50,6 @@
 
     <!-- Card Background Color -->
     <color name="lb_basic_card_info_bg_color">@color/grey</color>
-
-    <color name="background_filter">#94101010</color>
 
     <!-- Ephyra: track of the progress bar on cards, black at 38% so it reads on any picture and in every theme -->
     <color name="ephyra_card_progress_track">#61000000</color>

@@ -12,7 +12,6 @@
     <dimen name="ephyra_details_toolbar_room">160dp</dimen><!-- Ephyra: room kept free for the home button and clock at the top right of the details -->
     <dimen name="ephyra_card_gap">8dp</dimen><!-- Ephyra: gap between cards, as in the home rows -->
 
-    <fraction name="card_scale_default">100%</fraction>
     <fraction name="card_scale_focus">106%</fraction><!-- Ephyra: scale-focus of the design system (upstream 115%) -->
 
     <!-- Set leanback card scale values -->

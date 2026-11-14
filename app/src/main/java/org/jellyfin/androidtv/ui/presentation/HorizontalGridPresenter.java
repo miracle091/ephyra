@@ -105,14 +105,6 @@ public class HorizontalGridPresenter extends Presenter {
     }
 
     /**
-     * Enables or disabled rounded corners on children of this row.
-     * Supported on Android SDK >= L.
-     */
-    public final void enableChildRoundedCorners(boolean enable) {
-        mRoundedCornersEnabled = enable;
-    }
-
-    /**
      * Returns true if rounded corners are enabled for children of this row.
      */
     public final boolean areChildRoundedCornersEnabled() {

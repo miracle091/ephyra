@@ -92,11 +92,6 @@ fun createGetNextUpRequest(parentId: UUID) = GetNextUpRequest(
 	fields = ItemRepository.itemFields
 )
 
-fun createSeriesGetNextUpRequest(parentId: UUID) = GetNextUpRequest(
-	seriesId = parentId,
-	fields = ItemRepository.itemFields
-)
-
 @JvmOverloads
 fun createLatestMediaRequest(
 	parentId: UUID,

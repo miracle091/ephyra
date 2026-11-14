@@ -78,10 +78,6 @@ public class GuideFilters {
 
     private String getSeparator(String original) {return !original.isEmpty() ? ", " : "";}
 
-    public boolean isMovies() {
-        return movies;
-    }
-
     public void setMovies(boolean movies) {
         this.movies = movies;
         systemPreferences.getValue().set(SystemPreferences.Companion.getLiveTvGuideFilterMovies(), movies);

@@ -69,14 +69,6 @@ class ImageHelper(
 		)
 	}
 
-	fun getLogoImageUrl(
-		item: BaseItemDto?,
-		maxWidth: Int? = null
-	): String? {
-		val image = item?.itemImages[ImageType.LOGO] ?: item?.parentImages[ImageType.LOGO]
-		return image?.getUrl(api, maxWidth = maxWidth)
-	}
-
 	/**
 	 * A utility to return a URL reference to an image resource
 	 *

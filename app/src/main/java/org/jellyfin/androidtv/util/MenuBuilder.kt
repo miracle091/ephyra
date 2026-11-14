@@ -4,7 +4,6 @@ import android.content.Context
 import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
-import android.view.SubMenu
 import android.view.View
 import android.widget.PopupMenu
 import androidx.annotation.GravityInt
@@ -20,10 +19,6 @@ class MenuBuilder(
 			onClick()
 			true
 		}
-	}
-
-	fun subMenu(title: String, init: MenuBuilder.() -> Unit): SubMenu = menu.addSubMenu(title).apply {
-		MenuBuilder(this).init()
 	}
 }
 
