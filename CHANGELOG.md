@@ -11,6 +11,11 @@ section 2(a) of the GPL-2.0.
 
 ## [Unreleased]
 
+### Added
+
+- Release notes are written from this changelog: the release workflow fills `.github/release-template.md` with the
+  version's section and a link to it.
+
 ### Changed
 
 - The detekt and Android lint configurations live in `config/` (`config/detekt.yaml`, `config/android-lint.xml`).
