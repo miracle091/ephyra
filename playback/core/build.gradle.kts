@@ -15,7 +15,7 @@ android {
 	}
 
 	lint {
-		lintConfig = file("$rootDir/android-lint.xml")
+		lintConfig = file("$rootDir/config/android-lint.xml")
 		abortOnError = false
 	}
 

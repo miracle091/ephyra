@@ -23,7 +23,7 @@ java {
 detekt {
 	buildUponDefaultConfig = true
 	ignoreFailures = true
-	config.setFrom(files("$rootDir/detekt.yaml"))
+	config.setFrom(files("$rootDir/config/detekt.yaml"))
 	basePath = rootDir.absolutePath
 	parallel = true
 
