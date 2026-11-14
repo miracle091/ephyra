@@ -1,0 +1,233 @@
+# Changelog
+
+All notable changes to Ephyra are listed here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
+and the versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html). While the version is 0.x, a minor
+release may change behaviour or settings.
+
+Ephyra is a fork of [Jellyfin for Android TV](https://github.com/jellyfin/jellyfin-androidtv). This file lists only
+the fork's own changes, the commits prefixed `ephyra:`; upstream's history up to the fork point (tag
+`upstream-fork-point`) is in the git log. Together with [`FORK.md`](FORK.md) it is the change notice required by
+section 2(a) of the GPL-2.0.
+
+## [Unreleased]
+
+### Changed
+
+- The detekt and Android lint configurations live in `config/` (`config/detekt.yaml`, `config/android-lint.xml`).
+- `FORK.md` keeps the origin, the license and the change notice; the per-change table moved to this changelog and
+  the user documentation to the [wiki](https://github.com/miracle091/ephyra/wiki).
+- detekt warnings cut from 574 to 0: Ephyra's own code fixed (named constants, split helpers and files, shorter
+  parameter lists), upstream's mechanical warnings fixed (hashCode next to equals, explicit locale, unused
+  parameters, long lines, file names matching their declaration).
+- Upstream's long and complex functions split without behaviour changes (device profile, legacy subtitle switch,
+  playback queries, Leanback channels, card presenter, info row, settings screens, home rows); Compose components take
+  style and slot classes and Koin constructors take dependency groups. `detekt.yaml` uses the `comments` key of
+  `ForbiddenComment`, so only `STOPSHIP:` is forbidden as intended.
+
+### Removed
+
+- Dead code: functions and members with no caller (`PopoverMenu.kt`, `ItemRowAdapter.setSiblingRow`,
+  `GuideFilters.isMovies`, `HorizontalGridPresenter.enableChildRoundedCorners`, `DisplayPreferencesStore.clearCache`,
+  `ImageHelper.getLogoImageUrl`, `MenuBuilder.subMenu`, `toHtmlSpanned`, `createSeriesGetNextUpRequest`).
+- Resources reported unused by Android lint: 46 drawables, 2 animations, a layout, the old logo colours and unused
+  colours, styles and values.
+- Upstream repository leftovers: `CODEOWNERS`, `renovate.json`, the stale, triage and merge-conflict workflows (they
+  only run in repositories owned by Jellyfin) and `fastlane/` (store texts of the official app).
+
+## [0.5.0] - 2026-11-09
+
+### Added
+
+- Settings → Playback → Media segments: duration of the skip button (5–30 s or until the segment ends, default 15 s).
+- Live TV guide option "Restore last channel" (on by default).
+- Accent colour setting apart from the theme (Settings → Customization): theme default or one of seven presets.
+- "Playlists in My media" (Settings → Home, off by default).
+- Details screen: the tagline under the title; info row groups divided by thin lines, the official rating as an
+  outlined badge.
+- Series details: a "Next: S1:E3 · Title" card beside the buttons that plays the next up episode.
+- Cast and guest star rows with compact cards (88dp picture, name and role scrolling when too long).
+- Season screen: runtime, community rating and end time under each episode's title.
+- "Compact episode list" (Settings → Customization, off by default): episodes as rows with picture, title, meta
+  line and plot, opening on the first episode.
+- Home: the Live TV library card shows a channel logo, photo library cards show one of the library's photos.
+- The home spotlight and the long pause screen pan their backdrop slowly (off when system animations are off); the
+  spotlight shows the tagline and an info row.
+- "Out-of-spec Dolby Vision" override (off by default).
+- A person without a photo gets a poster-shaped cover in the art tone of their name.
+
+### Changed
+
+- Jellyfin Kotlin SDK 1.9.4 (server API 12): **Jellyfin server 12.0 or newer is required**. The play method's
+  transcode reasons include "rotated video not supported".
+- No backdrops of films, shows or music behind the screens; the "Backdrop" setting is removed. The spotlight, the
+  library cards and the long pause screen keep their pictures.
+- Lighter default home: libraries, Continue watching, Live TV, Next up and Latest.
+- The skip button stays 15 s instead of 8; once hidden, centre, up or down call it back while the segment lasts.
+- The skip button is a solid pill in the theme's colours; the player's bottom controls reach the screen's edge.
+- One progress bar style on every card (bottom edge, full width, 4dp, theme accent).
+- One header line on every screen: clock and first element on the same line, 32dp from the edges.
+- Details and album screens use 168dp covers; the first row under the cover uses 120dp posters.
+- The next episode picks the same audio and subtitle track as the last one (language, forced flag, title, codec).
+- Rotated videos in containers whose rotation Media3 cannot read (MKV, TS, WebM) are transcoded upright.
+- DTS core follows the DTS setting; in Auto, formats with a hardware decoder count as supported; audio offload is off.
+- "Prefer FFmpeg for audio" keeps bitstreaming every format the output can pass through; the server prefers AC3/E-AC3
+  over AAC when it converts audio. MLP is no longer direct played, TrueHD in MPEG-TS/M2TS goes through the server.
+- The new player keeps the pixel aspect ratio of anamorphic video and asks the server for the chosen audio track.
+- About → Licenses lists the Media3 FFmpeg decoder as Apache-2.0 and LGPL-2.1-or-later.
+- Search: the text field is filled like the sign-in fields and follows the 32dp margin.
+
+### Removed
+
+- Books: the "Continue reading" section; book libraries and audiobooks stay hidden.
+- The "update your server to 10.11" notice (servers below 12.0 cannot connect anymore).
+
+### Fixed
+
+- A late "playing" event after stop no longer crashes playback (upstream #5938).
+- "Scale on device" keeps the native resolution even when a lower mode has a closer refresh rate (upstream #5893).
+- Switching between two audio tracks of the same language works when burned-in subtitles force a transcode, and a
+  subtitle change keeps the audio track (upstream #5798); a burned-in subtitle stays on after an audio switch.
+- An alternate version of an episode chosen in details is the one played (upstream #5931).
+- The Dolby Vision profile 7 workaround applies only on displays that report Dolby Vision, so HDR10 TVs get HDR10
+  instead of SDR (upstream #5794).
+- Blu-ray transport streams (`.m2ts`, `.mts`) go to the server at once instead of failing a direct play first.
+- A live channel still buffering 20 s after its stream is set goes through the live retries instead of waiting forever.
+- Programme details opened for a channel load the programme on air when the one shown has ended.
+- The Live TV guide gets its channel list on first use too.
+- A server discovered with an unreachable IPv4 address (for example a Docker address) is listed with the address its
+  reply came from.
+- The chosen theme survives when Android recreates the activity.
+- Search: the D-pad leaves the text field, the cursor is visible, and Back keeps the focus on the results.
+- The Settings overline is shown on the Subtitles, Home and Screensaver sections.
+
+### Security
+
+- Stream and subtitle URLs are logged without the access token.
+
+## [0.4.0] - 2026-11-08
+
+### Added
+
+- Ephyra design system in the Dark and Black themes, for Compose and Leanback screens: night blue, one cyan accent,
+  solid white focus, pill-shaped buttons, rounder cards.
+- Three coloured themes: Abyss, Coral and Medusa.
+- The Atkinson Hyperlegible Next font (and Atkinson Hyperlegible Mono for Quick Connect codes) across the interface.
+- Long pause screen: a video paused for 2 minutes shows the dimmed backdrop, the header and progress instead of the
+  screensaver, shifting against burn-in after 10 minutes.
+- The home spotlight shows the community and critics' ratings and the title's logo.
+- Library cards show the backdrop of the title added most recently (per user).
+- Live TV player: "LIVE" badge, "number · channel", a seek bar spanning the programme on air, a "Next:" line, Guide,
+  Record and Channels as pill buttons; a failed live stream is retried twice.
+- Live TV guide: a red dot and a progress bar on the programme on air.
+- Deleting live TV recordings, after a confirmation, when the server allows it; library media can never be deleted.
+- The REC icon on the server's Recordings library card.
+
+### Changed
+
+- Covers grow by 6% on focus (upstream 15%) with a thin accent ring; a cover without a picture shows a colour tone.
+- Home: 32dp side margins, cards sized to fill a row, 12dp gap between cards, no row backdrops, a fading bottom edge,
+  rows aligned on a fixed line; the live TV buttons row is gone and card labels are larger.
+- Library screens: 32dp margins, an 8dp grid gap, no item counter; the startup and sign-in screens drop the server's
+  splashscreen.
+- Home toolbar and spotlight use icons without labels; the favorite mark is a round badge.
+- User selection, sign in (with a tiled Quick Connect code) and server selection follow the design system's boards.
+- Music libraries open as album grids; the music player, album, playlist, film, series and person screens follow the
+  design system's layouts.
+- The video player's controls follow the design system's "Player" board (legacy playback path, look only).
+- Cards with the name over the image use a bottom shade instead of a grey box.
+- The screensaver is a minimal clock that moves every minute against burn-in.
+- The startup window shows the Dark theme's background from the first frame.
+- Active state icons (shuffle, repeat, filters, favourites, checkboxes) use the theme's accent.
+- Settings open as a two-pane panel with the spotlight's type scale; focus lands on the first item of the right pane.
+- The live TV guide uses rounded cells with the cards' focus ring; the Live TV library buttons are cards.
+- Programme details: REC icons for set recordings and a "Live" badge.
+
+### Removed
+
+- The Emerald and Muted purple themes; a device set to one opens in Dark.
+- The screensaver's age rating options.
+
+### Fixed
+
+- The live TV guide turns its background back on after the player.
+- "In N hours" in programme and record popups counts from the device's time zone instead of UTC.
+- Library cards without art and the Recordings, Schedule and Series buttons show icons.
+
+## [0.3.0] - 2026-11-05
+
+### Fixed
+
+- The menu names in the Shield HDR hint.
+- The codec benchmark runs its server calls off the main thread.
+- The settings panel is black in the black theme.
+
+## [0.2.0] - 2026-11-04
+
+### Added
+
+- Support for every Shield TV model: armeabi-v7a next to arm64-v8a for the 32-bit Shield TV 2019 tube.
+- The player's top panel shows how the server delivers the stream and, when it converts, why.
+- "Audio" and "Subtitles" buttons on the details screen; the picked tracks go with the first playback request.
+- "Reset progress" and "Go to series" in the card menu.
+- On a Shield TV with an HDR display, a one-time hint about the Shield's content matching.
+- "Black (OLED)" theme.
+- "Blur unwatched episodes" (off by default) and "Stop at the end of the season" (off by default).
+- Spotlight at the top of the home screen with the five newest unwatched films and series.
+- Codec benchmark in debug builds (Developer options).
+- The licenses screen lists the native libraries bundled inside other packages (FFmpeg, libass and its dependencies).
+
+### Changed
+
+- The audio and subtitle menus list tracks in the user's preferred languages first.
+- The skip button dims after 3 seconds; the player's controls are dimmed during HDR and Dolby Vision playback.
+- Opening a stream (PlaybackInfo) waits up to 2 minutes, so a live channel the server is still tuning opens.
+- The live TV guides and the item details tie their work to the screen's view lifecycle instead of an AsyncTask.
+- The lint workflow runs only detekt; Android lint runs locally and in the release workflow.
+- The README links the upstream project; Ephyra's own changes are licensed GPL-2.0-or-later.
+
+### Removed
+
+- The Delete button on item details.
+- Checks made obsolete by minSdk 30 (Android 6 volume fallback, `-v26` launcher icon folder).
+- Unused VLC codes.
+
+### Fixed
+
+- Android lint errors (Media3 opt-ins, restricted Leanback class, configuration-aware strings, notification lint id).
+- The codec benchmark on Android 11; its strings fall back to English.
+
+## [0.1.0] - 2026-11-03
+
+### Added
+
+- Name Ephyra, application id `com.ephyra.app`, own logo, launcher icon and TV banner; installs next to the official
+  app.
+- Built-in updater from GitHub Releases (Settings → About) and a daily update check, both without Google Play.
+- Baseline profile, so ART compiles startup code ahead of time, sideloaded APKs included.
+- Release workflow that checks, signs and publishes the APK, `version.txt`, the R8 mapping and checksums.
+- A build check that fails if Google Play Services, Firebase, Play Core or the Cast SDK enter the dependencies.
+
+### Changed
+
+- minSdk 30 (Android 11), ARM only; R8 strips debug logging.
+- Hardware video decoders come first; for H.264, HEVC, VP9 and Dolby Vision software decoders are skipped when a
+  hardware one exists. The playback buffer is capped at a quarter of the app's heap.
+- Software decoders are off by default, so AV1 is transcoded by the server; with them on, software AV1 is capped at
+  1080p.
+- Refresh-rate switching is on by default ("Scale on device").
+- Coil's caches are bounded and images are requested at display size.
+- Home-screen channels and Watch Next are off by default.
+- Per-library view settings are saved on the server under the client id `ephyra`.
+- Accompanist permissions are replaced with AndroidX Activity Result APIs.
+- README rewritten for Ephyra.
+
+### Removed
+
+- Upstream's publish jobs (repo.jellyfin.org).
+
+[Unreleased]: https://github.com/miracle091/ephyra/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/miracle091/ephyra/compare/v0.4.0...v0.5.0
+[0.4.0]: https://github.com/miracle091/ephyra/compare/v0.3.0...v0.4.0
+[0.3.0]: https://github.com/miracle091/ephyra/compare/v0.2.0...v0.3.0
+[0.2.0]: https://github.com/miracle091/ephyra/compare/v0.1.0...v0.2.0
+[0.1.0]: https://github.com/miracle091/ephyra/compare/upstream-fork-point...v0.1.0

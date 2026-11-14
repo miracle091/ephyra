@@ -32,7 +32,8 @@ The name comes from the ephyra, the small, light, young stage of a jellyfish.
 - **Its own identity:** the app is called Ephyra and installs next to the official Jellyfin app instead of replacing
   it.
 
-The full list of changes, with their status, is in [FORK.md](FORK.md).
+The changes of every release are in the [changelog](CHANGELOG.md); the [wiki](https://github.com/miracle091/ephyra/wiki)
+describes the features, installation, building and contributing.
 
 ## Status
 
