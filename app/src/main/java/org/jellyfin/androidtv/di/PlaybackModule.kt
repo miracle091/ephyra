@@ -17,6 +17,8 @@ import org.jellyfin.androidtv.ui.playback.PlaybackLauncher
 import org.jellyfin.androidtv.ui.playback.TrackPreselection
 import org.jellyfin.androidtv.ui.playback.VideoQueueManager
 import org.jellyfin.androidtv.ui.playback.rewrite.RewriteMediaManager
+import org.jellyfin.androidtv.ui.playback.segment.MediaSegmentAction
+import org.jellyfin.androidtv.ui.playback.segment.MediaSegmentRepository
 import org.jellyfin.androidtv.ui.player.base.subtitleStyle
 import org.jellyfin.androidtv.ui.player.display.videoChangeFrameRateStrategy
 import org.jellyfin.androidtv.util.AndroidVersion
@@ -29,7 +31,6 @@ import org.jellyfin.playback.media3.session.MediaSessionOptions
 import org.jellyfin.playback.media3.session.media3SessionPlugin
 import org.jellyfin.sdk.api.client.HttpClientOptions
 import org.jellyfin.sdk.api.okhttp.OkHttpFactory
-import org.jellyfin.sdk.model.api.MediaSegmentType
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.scope.Scope
 import org.koin.dsl.module
@@ -87,12 +88,14 @@ fun Scope.createPlaybackManager() = playbackManager(androidContext()) {
 	install(media3SessionPlugin(get(), mediaSessionOptions))
 
 	val deviceProfileBuilder = { createDeviceProfile(androidContext(), userPreferences) }
+	// Ephyra: segments skipped as the user set them up (was: intros always); "ask to skip" waits for the new player's skip button
+	val mediaSegmentRepository = get<MediaSegmentRepository>()
 	install(
 		jellyfinPlugin(
 			get(),
 			deviceProfileBuilder,
-			setOf(MediaSegmentType.INTRO),
-			ProcessLifecycleOwner.get().lifecycle,
+			skipMediaSegment = { segment -> mediaSegmentRepository.getMediaSegmentAction(segment) == MediaSegmentAction.SKIP },
+			lifecycle = ProcessLifecycleOwner.get().lifecycle,
 			alwaysBurnInSubtitles = { userPreferences[UserPreferences.subtitlesBurnDuringTranscode] },
 		)
 	)

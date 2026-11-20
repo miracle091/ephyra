@@ -9,12 +9,13 @@ import org.jellyfin.playback.jellyfin.playsession.PlaySessionService
 import org.jellyfin.playback.jellyfin.playsession.PlaySessionSocketService
 import org.jellyfin.sdk.api.client.ApiClient
 import org.jellyfin.sdk.model.api.DeviceProfile
-import org.jellyfin.sdk.model.api.MediaSegmentType
+import org.jellyfin.sdk.model.api.MediaSegmentDto
 
 fun jellyfinPlugin(
 	api: ApiClient,
 	deviceProfileBuilder: () -> DeviceProfile,
-	mediaSegmentSkipTypes: Set<MediaSegmentType> = emptySet(),
+	// Ephyra: whether to skip a segment, from the user's segment settings; null for no skipping
+	skipMediaSegment: ((MediaSegmentDto) -> Boolean)? = null,
 	lifecycle: Lifecycle? = null,
 	// Ephyra: the user's "burn in subtitles when transcoding" setting
 	alwaysBurnInSubtitles: () -> Boolean = { false },
@@ -27,5 +28,5 @@ fun jellyfinPlugin(
 
 	provide(LyricsPlayerService(api))
 
-	if (mediaSegmentSkipTypes.isNotEmpty()) provide(MediaSegmentService(api, mediaSegmentSkipTypes))
+	if (skipMediaSegment != null) provide(MediaSegmentService(api, skipMediaSegment))
 }

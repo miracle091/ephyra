@@ -76,6 +76,9 @@ section 2(a) of the GPL-2.0.
 
 ### Fixed
 
+- The new player skips media segments as set in Settings (intro, outro, recap, preview, commercial) instead of always
+  skipping intros; "ask to skip" comes with its skip button. A failed segment request no longer stops segment skipping
+  for the rest of the queue.
 - The new player's audio night mode really turns on: it was decided before the first video was known, so it never
   applied.
 - When the server burns a subtitle into a converted stream, the new player no longer shows a side-loaded subtitle

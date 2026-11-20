@@ -1,5 +1,6 @@
 package org.jellyfin.playback.jellyfin.mediasegment
 
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
@@ -15,12 +16,14 @@ import org.jellyfin.playback.jellyfin.queue.baseItem
 import org.jellyfin.sdk.api.client.ApiClient
 import org.jellyfin.sdk.api.client.extensions.mediaSegmentApi
 import org.jellyfin.sdk.model.api.MediaSegmentDto
-import org.jellyfin.sdk.model.api.MediaSegmentType
 import org.jellyfin.sdk.model.extensions.ticks
+import timber.log.Timber
+import kotlin.time.Duration
 
 class MediaSegmentService(
 	private val api: ApiClient,
-	private val skipTypes: Set<MediaSegmentType>,
+	// Ephyra: the user's action for each segment (Settings, media segments) decides, not a fixed set of types
+	private val shouldSkip: (MediaSegmentDto) -> Boolean,
 ) : PlayerService() {
 	companion object {
 		const val TIMED_EVENT_PREFIX = "MediaSegment:"
@@ -42,9 +45,13 @@ class MediaSegmentService(
 		// BaseItem doesn't exist
 		val baseItem = entry.baseItem ?: return
 
-		// Get via API
-		val mediaSegments by api.mediaSegmentApi.getItemSegments(baseItem.id)
-		entry.mediaSegments = mediaSegments.items
+		// Get via API; Ephyra: a failed request no longer ends the collection, so later entries still get their segments
+		runCatching { api.mediaSegmentApi.getItemSegments(baseItem.id).content.items }
+			.onSuccess { entry.mediaSegments = it }
+			.onFailure { error ->
+				if (error is CancellationException) throw error
+				Timber.w(error, "Failed to load the media segments of ${baseItem.id}")
+			}
 	}
 
 	private fun createTimedEvents(entry: QueueEntry) {
@@ -67,22 +74,29 @@ class MediaSegmentService(
 		entry.timedEvents = events.ifEmpty { null }
 	}
 
-	private fun MediaSegmentDto.asTimedEvents(): List<TimedEvent> {
-		if (!skipTypes.contains(type)) return emptyList()
-
-		return listOf(
-			TimedEvent.Block(
-				key = "$TIMED_EVENT_PREFIX$id",
-				start = startTicks.ticks,
-				end = endTicks.ticks,
-				onActivate = { metadata ->
-					if (metadata !is BlockActivation.Natural) return@Block
-
-					coroutineScope.launch(Dispatchers.Main) {
-						manager.state.seek(endTicks.ticks)
-					}
-				}
-			)
-		)
+	private fun MediaSegmentDto.asTimedEvents(): List<TimedEvent> = skipEvents(shouldSkip) { end ->
+		coroutineScope.launch(Dispatchers.Main) {
+			manager.state.seek(end)
+		}
 	}
+}
+
+/**
+ * The timed events that skip this segment when [shouldSkip] says so: reaching its start while playing calls [skipTo] with its
+ * end; seeking into it does not (the user went there on purpose).
+ */
+internal fun MediaSegmentDto.skipEvents(shouldSkip: (MediaSegmentDto) -> Boolean, skipTo: (Duration) -> Unit): List<TimedEvent> {
+	if (!shouldSkip(this)) return emptyList()
+
+	return listOf(
+		TimedEvent.Block(
+			key = "${MediaSegmentService.TIMED_EVENT_PREFIX}$id",
+			start = startTicks.ticks,
+			end = endTicks.ticks,
+			onActivate = { metadata ->
+				if (metadata !is BlockActivation.Natural) return@Block
+				skipTo(endTicks.ticks)
+			}
+		)
+	)
 }
