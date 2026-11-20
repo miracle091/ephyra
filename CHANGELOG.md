@@ -34,6 +34,8 @@ section 2(a) of the GPL-2.0.
   paths, overviews, taglines), their size follows the cards on screen instead of a fixed 100, and each new page is
   appended instead of diffing the whole list on the main thread.
 - Cast and crew cards on the details screens are larger (120dp pictures instead of 88dp).
+- The new player frees its decoders and buffers when playback stops and builds a fresh player for the next one, so
+  changes to the FFmpeg, libass and buffer settings apply without restarting the app.
 
 ### Removed
 

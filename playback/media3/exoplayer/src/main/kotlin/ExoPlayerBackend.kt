@@ -65,7 +65,8 @@ import kotlin.time.Duration.Companion.milliseconds
 @OptIn(UnstableApi::class)
 class ExoPlayerBackend(
 	private val context: Context,
-	private val exoPlayerOptions: ExoPlayerOptions,
+	// Ephyra: read each time a player is built, so a changed setting applies from the next playback
+	private val exoPlayerOptions: () -> ExoPlayerOptions,
 ) : BasePlayerBackend() {
 	companion object {
 		const val TS_SEARCH_BYTES_LM = TsExtractor.TS_PACKET_SIZE * 1800
@@ -73,19 +74,35 @@ class ExoPlayerBackend(
 		const val MEDIA_ITEM_COUNT_MAX = 10
 	}
 
+	private class PlayerInstance(val player: ExoPlayer, val assHandler: AssHandler?)
+
 	private var currentStream: PlayableMediaStream? = null
 	private var subtitleView: SubtitleView? = null
 	private val audioPipeline = ExoPlayerAudioPipeline()
-	private val audioAttributeState = AudioAttributeState()
-	private val timedEventState = TimedEventState()
+	private var audioAttributeState = AudioAttributeState()
+	private var timedEventState = TimedEventState()
 	private var lastKnownDuration: Duration? = null
 	private var audioSelectionDone: PlayableMediaStream? = null
 
-	private val assHandler by lazy {
-		AssHandler(AssRenderType.OVERLAY_OPEN_GL)
+	// Ephyra: the player lives from first use to stop(), which releases it (decoders, buffers, libass); the views outlive it
+	private var instance: PlayerInstance? = null
+	private var surfaceView: PlayerSurfaceView? = null
+	private var subtitleContainer: PlayerSubtitleView? = null
+
+	private val exoPlayer: ExoPlayer
+		get() = instance?.player ?: buildInstance().player
+
+	private fun buildInstance(): PlayerInstance {
+		val options = exoPlayerOptions()
+		val assHandler = if (options.enableLibass) AssHandler(AssRenderType.OVERLAY_OPEN_GL) else null
+		val instance = PlayerInstance(createPlayer(options, assHandler), assHandler)
+		this.instance = instance
+		instance.player.setVideoSurfaceView(surfaceView?.surface)
+		subtitleContainer?.let(::attachSubtitleView)
+		return instance
 	}
 
-	private val exoPlayer by lazy {
+	private fun createPlayer(exoPlayerOptions: ExoPlayerOptions, assHandler: AssHandler?): ExoPlayer {
 		val dataSourceFactory = DefaultDataSource.Factory(
 			context,
 			exoPlayerOptions.baseDataSourceFactory,
@@ -102,7 +119,7 @@ class ExoPlayerBackend(
 			setConstantBitrateSeekingAlwaysEnabled(true)
 		}
 
-		val mediaSourceFactory = if (exoPlayerOptions.enableLibass) {
+		val mediaSourceFactory = if (assHandler != null) {
 			val assSubtitleParserFactory = AssSubtitleParserFactory(assHandler)
 			val assExtractorsFactory = extractorsFactory.withAssMkvSupport(assSubtitleParserFactory, assHandler)
 			DefaultMediaSourceFactory(dataSourceFactory, assExtractorsFactory).apply {
@@ -132,7 +149,7 @@ class ExoPlayerBackend(
 				}
 			)
 		}.let { renderersFactory ->
-			if (exoPlayerOptions.enableLibass) AssRenderersFactory(assHandler, renderersFactory)
+			if (assHandler != null) AssRenderersFactory(assHandler, renderersFactory)
 			else renderersFactory
 		}
 
@@ -145,7 +162,7 @@ class ExoPlayerBackend(
 				?: DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS,
 		)
 
-		ExoPlayer.Builder(context)
+		return ExoPlayer.Builder(context)
 			.setLoadControl(loadControl)
 			.setRenderersFactory(renderersFactory)
 			.setTrackSelector(DefaultTrackSelector(context).apply {
@@ -164,19 +181,18 @@ class ExoPlayerBackend(
 			.setPauseAtEndOfMediaItems(true)
 			.build()
 			.also { player ->
-				player.addListener(PlayerListener())
+				player.addListener(PlayerListener(player))
 
 				if (exoPlayerOptions.enableDebugLogging) {
 					player.addAnalyticsListener(EventLogger())
 				}
 
-				if (exoPlayerOptions.enableLibass) {
-					assHandler.init(player)
-				}
+				assHandler?.init(player)
 			}
 	}
 
-	inner class PlayerListener : Player.Listener {
+	// Ephyra: bound to its own player, so a late callback never builds a new one
+	inner class PlayerListener(private val exoPlayer: ExoPlayer) : Player.Listener {
 		override fun onIsPlayingChanged(isPlaying: Boolean) {
 			val state = when {
 				isPlaying -> PlayState.PLAYING
@@ -272,23 +288,29 @@ class ExoPlayerBackend(
 	): PlaySupportReport = exoPlayer.getPlaySupportReport(stream.toFormats())
 
 	override fun setSurfaceView(surfaceView: PlayerSurfaceView?) {
-		exoPlayer.setVideoSurfaceView(surfaceView?.surface)
+		this.surfaceView = surfaceView
+		instance?.player?.setVideoSurfaceView(surfaceView?.surface)
 	}
 
 	override fun setSubtitleView(surfaceView: PlayerSubtitleView?) {
-		if (surfaceView == null) {
-			(subtitleView?.parent as? ViewGroup)?.removeView(subtitleView)
-			subtitleView = null
-			return
+		detachSubtitleView()
+		subtitleContainer = surfaceView
+		if (surfaceView != null) attachSubtitleView(surfaceView)
+	}
+
+	/** Ephyra: a subtitle view for the current player (its libass handler), added once a player exists. */
+	private fun attachSubtitleView(container: PlayerSubtitleView) {
+		val current = instance ?: return
+		val view = SubtitleView(container.context).apply {
+			current.assHandler?.let { addView(AssSubtitleView(container.context, it)) }
 		}
+		subtitleView = view
+		container.addView(view)
+	}
 
-		val view = subtitleView ?: SubtitleView(surfaceView.context).apply {
-			if (exoPlayerOptions.enableLibass) {
-				addView(AssSubtitleView(surfaceView.context, assHandler))
-			}
-		}.also { subtitleView = it }
-
-		surfaceView.addView(view)
+	private fun detachSubtitleView() {
+		(subtitleView?.parent as? ViewGroup)?.removeView(subtitleView)
+		subtitleView = null
 	}
 
 	override fun prepareItem(item: QueueEntry) {
@@ -365,16 +387,26 @@ class ExoPlayerBackend(
 	}
 
 	override fun pause() {
-		exoPlayer.pause()
+		instance?.player?.pause()
 	}
 
 	override fun stop() {
-		exoPlayer.stop()
+		// Ephyra: stop first so the listeners hear STOPPED, then release; the next item builds a player with the current options
+		instance?.let { current ->
+			current.player.stop()
+			detachSubtitleView()
+			current.player.release()
+		}
+		instance = null
 		currentStream = null
 		audioSelectionDone = null
+		lastKnownDuration = null
+		audioAttributeState = AudioAttributeState()
+		timedEventState = TimedEventState()
 	}
 
 	override fun seekTo(position: Duration) {
+		val exoPlayer = instance?.player ?: return
 		if (!exoPlayer.isCommandAvailable(Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM) || !exoPlayer.isCurrentMediaItemSeekable) {
 			Timber.w("Trying to seek but ExoPlayer doesn't support it for the current item")
 		}
@@ -383,7 +415,7 @@ class ExoPlayerBackend(
 	}
 
 	override fun setScrubbing(scrubbing: Boolean) {
-		exoPlayer.isScrubbingModeEnabled = scrubbing
+		instance?.player?.isScrubbingModeEnabled = scrubbing
 	}
 
 	override fun setSpeed(speed: Float) {
@@ -394,11 +426,15 @@ class ExoPlayerBackend(
 		exoPlayer.setPlaybackSpeed(speed)
 	}
 
-	override fun getPositionInfo(): PositionInfo = PositionInfo(
-		active = exoPlayer.currentPosition.milliseconds,
-		buffer = exoPlayer.bufferedPosition.milliseconds,
-		duration = lastKnownDuration ?: Duration.ZERO,
-	)
+	// Ephyra: polled often (UI, play session); without a player there is nothing to report, so don't build one
+	override fun getPositionInfo(): PositionInfo {
+		val exoPlayer = instance?.player ?: return PositionInfo(Duration.ZERO, Duration.ZERO, Duration.ZERO)
+		return PositionInfo(
+			active = exoPlayer.currentPosition.milliseconds,
+			buffer = exoPlayer.bufferedPosition.milliseconds,
+			duration = lastKnownDuration ?: Duration.ZERO,
+		)
+	}
 
 	override fun setTimedEvents(timedEvents: List<TimedEvent>) {
 		timedEventState.setTimedEvents(exoPlayer, timedEvents)

@@ -72,18 +72,9 @@ fun Scope.createPlaybackManager() = playbackManager(androidContext()) {
 	}
 
 	val userPreferences = get<UserPreferences>()
-	val bufferLength = userPreferences[UserPreferences.bufferLength]
-	val exoPlayerOptions = ExoPlayerOptions(
-		preferFfmpeg = userPreferences[UserPreferences.preferExoPlayerFfmpeg],
-		enableLibass = userPreferences[UserPreferences.assDirectPlay],
-		enableDebugLogging = userPreferences[UserPreferences.debuggingEnabled],
-		baseDataSourceFactory = get<HttpDataSource.Factory>(),
-		minBufferDuration = bufferLength.minBufferDuration,
-		maxBufferDuration = bufferLength.maxBufferDuration,
-		bufferForPlaybackDuration = bufferLength.bufferForPlaybackDuration,
-		bufferForPlaybackAfterRebufferDuration = bufferLength.bufferForPlaybackAfterRebufferDuration,
-	)
-	install(exoPlayerPlugin(get(), exoPlayerOptions))
+	// Ephyra: read per player, so a setting changed after the first playback still applies
+	val httpDataSourceFactory = get<HttpDataSource.Factory>()
+	install(exoPlayerPlugin(get()) { createExoPlayerOptions(userPreferences, httpDataSourceFactory) })
 
 	val mediaSessionOptions = MediaSessionOptions(
 		channelId = notificationChannelId,
@@ -100,4 +91,19 @@ fun Scope.createPlaybackManager() = playbackManager(androidContext()) {
 	val userSettingPreferences = get<UserSettingPreferences>()
 	defaultRewindAmount = { userSettingPreferences[UserSettingPreferences.skipBackLength].milliseconds }
 	defaultFastForwardAmount = { userSettingPreferences[UserSettingPreferences.skipForwardLength].milliseconds }
+}
+
+/** Ephyra: the ExoPlayer options from the user's current settings; called for every new player. */
+internal fun createExoPlayerOptions(userPreferences: UserPreferences, httpDataSourceFactory: HttpDataSource.Factory): ExoPlayerOptions {
+	val bufferLength = userPreferences[UserPreferences.bufferLength]
+	return ExoPlayerOptions(
+		preferFfmpeg = userPreferences[UserPreferences.preferExoPlayerFfmpeg],
+		enableLibass = userPreferences[UserPreferences.assDirectPlay],
+		enableDebugLogging = userPreferences[UserPreferences.debuggingEnabled],
+		baseDataSourceFactory = httpDataSourceFactory,
+		minBufferDuration = bufferLength.minBufferDuration,
+		maxBufferDuration = bufferLength.maxBufferDuration,
+		bufferForPlaybackDuration = bufferLength.bufferForPlaybackDuration,
+		bufferForPlaybackAfterRebufferDuration = bufferLength.bufferForPlaybackAfterRebufferDuration,
+	)
 }
