@@ -91,13 +91,13 @@ class TrackPreselectionTest : FunSpec({
 	}
 
 	test("the details screen offers audio with several audio tracks and subtitles with any subtitle track") {
-		DetailsTrackButtons.trackTypesFor(movie(main), builtInLegacyPlayer = true) shouldBe
+		DetailsTrackButtons.trackTypesFor(movie(main), builtInPlayer = true) shouldBe
 			listOf(MediaStreamType.AUDIO, MediaStreamType.SUBTITLE)
-		DetailsTrackButtons.trackTypesFor(movie(other), builtInLegacyPlayer = true) shouldBe emptyList()
-		DetailsTrackButtons.trackTypesFor(movie(main), builtInLegacyPlayer = false) shouldBe emptyList()
+		DetailsTrackButtons.trackTypesFor(movie(other), builtInPlayer = true) shouldBe emptyList()
+		DetailsTrackButtons.trackTypesFor(movie(main), builtInPlayer = false) shouldBe emptyList()
 		DetailsTrackButtons.trackTypesFor(
 			BaseItemDto(id = itemId, type = BaseItemKind.SERIES, mediaSources = listOf(main)),
-			builtInLegacyPlayer = true,
+			builtInPlayer = true,
 		) shouldBe emptyList()
 	}
 })

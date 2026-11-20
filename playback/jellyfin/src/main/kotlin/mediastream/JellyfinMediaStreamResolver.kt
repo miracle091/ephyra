@@ -7,6 +7,7 @@ import org.jellyfin.playback.core.queue.QueueEntry
 import org.jellyfin.playback.jellyfin.queue.audioStreamIndex
 import org.jellyfin.playback.jellyfin.queue.baseItem
 import org.jellyfin.playback.jellyfin.queue.mediaSourceId
+import org.jellyfin.playback.jellyfin.queue.subtitleStreamIndex
 import org.jellyfin.sdk.api.client.ApiClient
 import org.jellyfin.sdk.api.client.extensions.videoApi
 import org.jellyfin.sdk.api.client.extensions.audioApi
@@ -29,10 +30,16 @@ class JellyfinMediaStreamResolver(
 		val baseItem = queueEntry.baseItem
 		if (baseItem == null || !supportedMediaTypes.contains(baseItem.mediaType)) return null
 
-		var mediaInfo = getPlaybackInfo(baseItem, queueEntry.mediaSourceId, queueEntry.audioStreamIndex)
+		var mediaInfo = getPlaybackInfo(baseItem, queueEntry.mediaSourceId, queueEntry.audioStreamIndex, queueEntry.subtitleStreamIndex)
 		// Ephyra: Media3 can't read Blu-ray transport streams, and the path is only known from the answer: ask again without direct play
 		if (mediaInfo.mediaSource.supportsDirectPlay && isBluRayTransportStream(mediaInfo.mediaSource.path)) {
-			mediaInfo = getPlaybackInfo(baseItem, mediaInfo.mediaSource.id, queueEntry.audioStreamIndex, enableDirectPlay = false)
+			mediaInfo = getPlaybackInfo(
+				baseItem,
+				mediaInfo.mediaSource.id,
+				queueEntry.audioStreamIndex,
+				queueEntry.subtitleStreamIndex,
+				enableDirectPlay = false,
+			)
 		}
 
 		return when {
@@ -87,6 +94,7 @@ class JellyfinMediaStreamResolver(
 		item: BaseItemDto,
 		mediaSourceId: String? = null,
 		audioStreamIndex: Int? = null,
+		subtitleStreamIndex: Int? = null,
 		enableDirectPlay: Boolean = true,
 	): MediaInfo {
 		val profile = deviceProfileBuilder()
@@ -96,6 +104,8 @@ class JellyfinMediaStreamResolver(
 				mediaSourceId = mediaSourceId,
 				// Ephyra: the requested audio track; without one the server picks from the user's language preferences
 				audioStreamIndex = audioStreamIndex,
+				// Ephyra: the requested subtitle (-1 for none), so the server picks its delivery (file, manifest or burnt in)
+				subtitleStreamIndex = subtitleStreamIndex,
 				deviceProfile = profile,
 				enableDirectPlay = enableDirectPlay,
 				enableDirectStream = true,

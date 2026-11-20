@@ -52,6 +52,8 @@ section 2(a) of the GPL-2.0.
   tracks of the stream.
 - The new player loads subtitles the server hands out as separate files and shows the subtitle the server picks
   from the user's settings (or none), instead of ExoPlayer's own choice; the reports carry the subtitle track.
+- The Audio and Subtitles buttons on the details screen work with the new player too: the picked tracks (and
+  version) are requested from the server, which then streams, side-loads or burns in the subtitle as needed.
 
 ### Removed
 

@@ -19,14 +19,15 @@ import org.koin.java.KoinJavaComponent
 
 /**
  * Ephyra: "Audio" and "Subtitles" buttons on the details screen of a video, so the tracks are picked before playback and the
- * server builds the right stream at once (see [TrackPreselection]). Only for the built-in legacy player, which reads the pick.
+ * server builds the right stream at once (see [TrackPreselection]). Only for the built-in players (legacy and new), which read the
+ * pick; an external player chooses its own tracks.
  */
 object DetailsTrackButtons {
 	private val videoTypes = setOf(BaseItemKind.MOVIE, BaseItemKind.EPISODE, BaseItemKind.VIDEO, BaseItemKind.MUSIC_VIDEO)
 
 	/** Which buttons [item] gets: audio with more than one audio track, subtitles with at least one subtitle track. */
-	fun trackTypesFor(item: BaseItemDto, builtInLegacyPlayer: Boolean): List<MediaStreamType> {
-		if (!builtInLegacyPlayer || item.type !in videoTypes) return emptyList()
+	fun trackTypesFor(item: BaseItemDto, builtInPlayer: Boolean): List<MediaStreamType> {
+		if (!builtInPlayer || item.type !in videoTypes) return emptyList()
 		val streams = item.playedMediaSource?.mediaStreams.orEmpty()
 		return buildList {
 			if (streams.count { it.type == MediaStreamType.AUDIO } > 1) add(MediaStreamType.AUDIO)
@@ -38,10 +39,9 @@ object DetailsTrackButtons {
 	@JvmStatic
 	fun create(context: Context, currentItem: () -> BaseItemDto, buttonSize: Int): List<TextUnderButton> {
 		val preferences = KoinJavaComponent.get<UserPreferences>(UserPreferences::class.java)
-		val builtInLegacyPlayer = !preferences[UserPreferences.useExternalPlayer] &&
-			!preferences[UserPreferences.playbackRewriteVideoEnabled]
+		val builtInPlayer = !preferences[UserPreferences.useExternalPlayer]
 
-		return trackTypesFor(currentItem(), builtInLegacyPlayer).map { type ->
+		return trackTypesFor(currentItem(), builtInPlayer).map { type ->
 			val (icon, label) = if (type == MediaStreamType.AUDIO) R.drawable.ic_select_audio to R.string.pref_audio
 			else R.drawable.ic_select_subtitle to R.string.pref_subtitles
 			TextUnderButton.create(context, icon, buttonSize, 0, context.getString(label)) { view ->

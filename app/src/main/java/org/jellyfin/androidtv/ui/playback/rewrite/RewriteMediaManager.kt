@@ -14,6 +14,7 @@ import org.jellyfin.androidtv.integration.dream.visibleInScreensaver
 import org.jellyfin.androidtv.ui.playback.AudioEventListener
 import org.jellyfin.androidtv.ui.playback.MediaManager
 import org.jellyfin.androidtv.ui.playback.PlaybackController
+import org.jellyfin.androidtv.ui.playback.TrackChoice
 import org.jellyfin.playback.core.PlaybackManager
 import org.jellyfin.playback.core.model.PlayState
 import org.jellyfin.playback.core.model.PlaybackOrder
@@ -22,8 +23,11 @@ import org.jellyfin.playback.core.queue.QueueEntry
 import org.jellyfin.playback.core.queue.queue
 import org.jellyfin.playback.core.queue.startPosition
 import org.jellyfin.playback.core.queue.supplier.QueueSupplier
+import org.jellyfin.playback.jellyfin.queue.audioStreamIndex
 import org.jellyfin.playback.jellyfin.queue.baseItem
 import org.jellyfin.playback.jellyfin.queue.createBaseItemQueueEntry
+import org.jellyfin.playback.jellyfin.queue.mediaSourceId
+import org.jellyfin.playback.jellyfin.queue.subtitleStreamIndex
 import org.jellyfin.sdk.api.client.ApiClient
 import org.jellyfin.sdk.model.api.BaseItemDto
 import org.jellyfin.sdk.model.api.MediaType
@@ -235,6 +239,8 @@ class RewriteMediaManager(
 		// Ephyra: the resume point of the item playback starts with
 		private val startIndex: Int = 0,
 		private val startPosition: Duration? = null,
+		// Ephyra: the tracks picked on the details screen for the item playback starts with
+		private val startTracks: TrackChoice? = null,
 	) : QueueSupplier {
 		override val size: Int
 			get() = items.size
@@ -244,6 +250,12 @@ class RewriteMediaManager(
 			return createBaseItemQueueEntry(api, item).also {
 				it.visibleInScreensaver = visibleInScreensaver
 				if (index == startIndex && startPosition != null && startPosition > Duration.ZERO) it.startPosition = startPosition
+				if (index == startIndex && startTracks != null && startTracks.itemId == item.id) {
+					// The indexes belong to the picked version
+					startTracks.mediaSourceId?.let { id -> it.mediaSourceId = id }
+					it.audioStreamIndex = startTracks.audioIndex
+					it.subtitleStreamIndex = startTracks.subtitleIndex
+				}
 			}
 		}
 	}

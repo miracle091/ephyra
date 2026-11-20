@@ -17,7 +17,9 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import org.jellyfin.androidtv.preference.UserPreferences
 import org.jellyfin.androidtv.ui.base.BaseScreen
+import org.jellyfin.androidtv.ui.playback.TrackPreselection
 import org.jellyfin.androidtv.ui.playback.VideoQueueManager
+import org.jellyfin.androidtv.ui.playback.playedMediaSource
 import org.jellyfin.androidtv.ui.playback.rewrite.RewriteMediaManager
 import org.jellyfin.androidtv.ui.player.display.VideoModeRequest
 import org.jellyfin.androidtv.ui.player.display.resetDisplayMode
@@ -41,6 +43,7 @@ class VideoPlayerFragment : Fragment() {
 	private val playbackManager by inject<PlaybackManager>()
 	private val api by inject<ApiClient>()
 	private val userPreferences by inject<UserPreferences>()
+	private val trackPreselection by inject<TrackPreselection>()
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -49,12 +52,16 @@ class VideoPlayerFragment : Fragment() {
 		// applied when that entry's stream starts (a seek here would land before the stream is known)
 		val startIndex = videoQueueManager.getCurrentMediaPosition().coerceAtLeast(0)
 		val startPosition = arguments?.getInt(EXTRA_POSITION)?.milliseconds
+		// Ephyra: the tracks picked on the details screen, used once
+		val items = videoQueueManager.getCurrentVideoQueue()
+		val startTracks = items.getOrNull(startIndex)?.let { item -> trackPreselection.take(item.id, item.playedMediaSource?.id) }
 		val queueSupplier = RewriteMediaManager.BaseItemQueueSupplier(
 			api,
-			videoQueueManager.getCurrentVideoQueue(),
+			items,
 			false,
 			startIndex,
 			startPosition,
+			startTracks,
 		)
 		Timber.i("Created a queue with ${queueSupplier.items.size} items, starting at $startIndex")
 		playbackManager.queue.clear()
