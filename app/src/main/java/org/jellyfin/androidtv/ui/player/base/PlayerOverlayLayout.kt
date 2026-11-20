@@ -24,6 +24,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusTarget
 import androidx.compose.ui.graphics.Brush
@@ -55,6 +57,24 @@ fun PlayerOverlayLayout(
 	controls: (@Composable () -> Unit)? = null,
 	// Ephyra: the video player keeps the legacy player's margins, the other players the default overscan
 	contentPadding: PaddingValues = overscanPaddingValues,
+) {
+	// Ephyra: the layout takes the focus when it opens and whenever the controls hide (their focused button leaves); with no focus
+	// the first key press only gave it the focus and did nothing else
+	val rootFocus = remember { FocusRequester() }
+	LaunchedEffect(visibilityState.visible) {
+		if (!visibilityState.visible) rootFocus.requestFocus()
+	}
+
+	PlayerOverlayLayoutContent(modifier.focusRequester(rootFocus), visibilityState, header, controls, contentPadding)
+}
+
+@Composable
+private fun PlayerOverlayLayoutContent(
+	modifier: Modifier,
+	visibilityState: PlayerOverlayVisibilityState,
+	header: (@Composable () -> Unit)?,
+	controls: (@Composable () -> Unit)?,
+	contentPadding: PaddingValues,
 ) = Box(
 	modifier = modifier
 		.fillMaxSize()

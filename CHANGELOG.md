@@ -61,6 +61,8 @@ section 2(a) of the GPL-2.0.
 - The new player answers the remote like the legacy one: centre plays or pauses while the controls are hidden, R1/R2
   and L1/L2 fast forward and rewind, Stop closes the player, and the Captions and Audio track keys open those menus.
   Its playback info panel shows the audio track playing instead of the first one.
+- The first key pressed in the new video and photo players works: it used to only give the player the focus, when
+  playback started and each time the controls hid.
 - The new player tells the server which version (media source) and audio track it plays, and knows the subtitle
   tracks of the stream.
 - The new player loads subtitles the server hands out as separate files and shows the subtitle the server picks
