@@ -10,7 +10,9 @@ import kotlin.math.roundToInt
  * overflow is cut off), [ZoomMode.STRETCH] fills the screen ignoring the shape.
  */
 fun videoFrameSize(container: IntSize, aspectRatio: Float, mode: ZoomMode): IntSize {
-	if (container.width <= 0 || container.height <= 0 || aspectRatio.isNaN() || aspectRatio <= 0f) return container
+	// NaN fails every comparison, so "not above zero" also catches it
+	val hasRatio = aspectRatio > 0f
+	if (container.width <= 0 || container.height <= 0 || !hasRatio) return container
 	val containerRatio = container.width.toFloat() / container.height
 	val matchWidth = when (mode) {
 		ZoomMode.FIT -> aspectRatio >= containerRatio

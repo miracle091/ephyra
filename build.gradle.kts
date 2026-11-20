@@ -22,7 +22,8 @@ java {
 
 detekt {
 	buildUponDefaultConfig = true
-	ignoreFailures = true
+	// Ephyra: fail the build on any issue (maxIssues: 0 in config/detekt.yaml); upstream only reported them to code scanning
+	ignoreFailures = false
 	config.setFrom(files("$rootDir/config/detekt.yaml"))
 	basePath = rootDir.absolutePath
 	parallel = true

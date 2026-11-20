@@ -13,7 +13,7 @@ import kotlin.time.Duration
  * Implementation for a media player backend. A backend is unaware of queues and can only play or
  * preload items.
  */
-interface PlayerBackend {
+interface PlayerBackend : PlayerTrackSelector {
 	// Testing
 	fun supportsStream(stream: MediaStream): PlaySupportReport
 
@@ -40,18 +40,21 @@ interface PlayerBackend {
 
 	fun setSpeed(speed: Float)
 
+	fun setTimedEvents(timedEvents: List<TimedEvent>)
+}
+
+/** Ephyra: switching the tracks of the playing stream, inside the player when it can. */
+interface PlayerTrackSelector {
 	/**
-	 * Ephyra: show the audio track with the source index [index] if the playing stream carries it. Returns false when it doesn't
+	 * Show the audio track with the source index [index] if the playing stream carries it. Returns false when it doesn't
 	 * (a converted stream holds only the requested track): the server must build a new stream then.
 	 */
 	fun selectAudioTrack(index: Int): Boolean
 
 	/**
-	 * Ephyra: show the subtitle with the source index [index], or none for null, if the playing stream allows it. Returns false
+	 * Show the subtitle with the source index [index], or none for null, if the playing stream allows it. Returns false
 	 * when it doesn't (the subtitle is burnt in, or a converted stream doesn't carry it): the server must build a new stream then.
 	 */
 	fun selectSubtitleTrack(index: Int?): Boolean
-
-	fun setTimedEvents(timedEvents: List<TimedEvent>)
 }
 

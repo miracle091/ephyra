@@ -38,26 +38,38 @@ class PlaySessionTracker<T : Any> {
 		val started = active
 		if (started != null && current == started && position != null) lastPosition = position
 
-		val ended = playState == PlayState.STOPPED || playState == PlayState.ERROR
-		// A new stream replacing a started one while paused (a track switch reload) starts at once, so the server keeps the session
-		val replacedWhilePaused = started != null && current != null && current != started && playState == PlayState.PAUSED
-		if (started != null && (current != started || ended)) {
-			reports += PlaySessionReport.Stop(started, lastPosition, failed = playState == PlayState.ERROR)
-			active = null
-		}
+		stop(started, current, playState)?.let { reports += it }
 
 		val running = active
 		when {
-			running == null && current != null && (playState == PlayState.PLAYING || replacedWhilePaused) -> {
+			// Pause, unpause and ticks: the server learns the position and the paused flag
+			running != null -> reports += PlaySessionReport.Progress(running)
+
+			current != null && shouldStart(started, current, playState) -> {
 				reports += PlaySessionReport.Start(current)
 				active = current
 				lastPosition = position ?: Duration.ZERO
 			}
-
-			// Pause, unpause and ticks: the server learns the position and the paused flag
-			running != null -> reports += PlaySessionReport.Progress(running)
 		}
 
 		return reports
+	}
+
+	/** The stop of the [started] session when another entry replaced it or playback ended or failed. */
+	private fun stop(started: T?, current: T?, playState: PlayState): PlaySessionReport.Stop<T>? {
+		val ended = playState == PlayState.STOPPED || playState == PlayState.ERROR
+		if (started == null || (current == started && !ended)) return null
+		active = null
+		return PlaySessionReport.Stop(started, lastPosition, failed = playState == PlayState.ERROR)
+	}
+
+	/**
+	 * Whether [current] starts a session: when it plays, or when it replaced the [started] one while paused (a track switch reload),
+	 * so the server keeps the session.
+	 */
+	private fun shouldStart(started: T?, current: T, playState: PlayState): Boolean = when (playState) {
+		PlayState.PLAYING -> true
+		PlayState.PAUSED -> started != null && current != started
+		PlayState.STOPPED, PlayState.ERROR -> false
 	}
 }

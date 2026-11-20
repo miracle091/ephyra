@@ -39,7 +39,8 @@ class FindBestDisplayModeTest : FunSpec({
 	}
 
 	test("a mode smaller than the video is never picked") {
-		findBestDisplayMode(listOf(fhd23976), fhd23976, VideoModeRequest(3840, 2160, 23.976f), RefreshRateSwitchingBehavior.SCALE_ON_TV) shouldBe null
+		val uhdVideo = VideoModeRequest(3840, 2160, 23.976f)
+		findBestDisplayMode(listOf(fhd23976), fhd23976, uhdVideo, RefreshRateSwitchingBehavior.SCALE_ON_TV) shouldBe null
 	}
 
 	test("modes below HD are skipped") {

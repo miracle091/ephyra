@@ -40,7 +40,10 @@ data class DisplayModeInfo(val id: Int, val size: DisplaySize, val refreshRate: 
 /** Ephyra: the video a display mode is picked for, from the source's video stream. */
 data class VideoModeRequest(val width: Int, val height: Int, val frameRate: Float)
 
-private val MIN_MODE_SIZE = DisplaySize(1280, 720)
+// 720p: smaller modes are never picked
+private const val MIN_MODE_WIDTH = 1280
+private const val MIN_MODE_HEIGHT = 720
+private val MIN_MODE_SIZE = DisplaySize(MIN_MODE_WIDTH, MIN_MODE_HEIGHT)
 
 // Rates are compared in hundredths of a hertz; the weight base leaves room for rates of 120 Hz and more (12 000)
 private const val RATE_SCALE = 100

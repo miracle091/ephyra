@@ -1,10 +1,8 @@
 package org.jellyfin.playback.media3.exoplayer
 
-import android.app.ActivityManager
 import android.content.Context
 import android.view.ViewGroup
 import androidx.annotation.OptIn
-import androidx.core.content.getSystemService
 import androidx.core.net.toUri
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
@@ -12,28 +10,15 @@ import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.common.Timeline
 import androidx.media3.common.TrackSelectionOverride
-import androidx.media3.common.TrackSelectionParameters
 import androidx.media3.common.Tracks
 import androidx.media3.common.VideoSize
 import androidx.media3.common.text.CueGroup
 import androidx.media3.common.util.UnstableApi
-import androidx.media3.datasource.DefaultDataSource
-import androidx.media3.exoplayer.DefaultLoadControl
-import androidx.media3.exoplayer.DefaultRenderersFactory
 import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.exoplayer.audio.AudioSink
-import androidx.media3.exoplayer.audio.DefaultAudioSink
-import androidx.media3.exoplayer.audio.TeeAudioProcessor
-import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
-import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.media3.exoplayer.util.EventLogger
-import androidx.media3.extractor.DefaultExtractorsFactory
 import androidx.media3.extractor.ts.TsExtractor
 import androidx.media3.ui.SubtitleView
 import io.github.peerless2012.ass.media.AssHandler
-import io.github.peerless2012.ass.media.factory.AssRenderersFactory
-import io.github.peerless2012.ass.media.kt.withAssMkvSupport
-import io.github.peerless2012.ass.media.parser.AssSubtitleParserFactory
 import io.github.peerless2012.ass.media.type.AssRenderType
 import io.github.peerless2012.ass.media.widget.AssSubtitleView
 import org.jellyfin.playback.core.backend.BasePlayerBackend
@@ -61,9 +46,6 @@ import org.jellyfin.playback.media3.exoplayer.mapping.findAudioGroupPosition
 import org.jellyfin.playback.media3.exoplayer.mapping.findSubtitleSelection
 import org.jellyfin.playback.media3.exoplayer.mapping.subtitleMimeType
 import org.jellyfin.playback.media3.exoplayer.mapping.toPlaybackError
-import org.jellyfin.playback.media3.exoplayer.shield.BitstreamFirstRenderersFactory
-import org.jellyfin.playback.media3.exoplayer.shield.ShieldLoadControl
-import org.jellyfin.playback.media3.exoplayer.shield.ShieldMediaCodecSelector
 import org.jellyfin.playback.media3.exoplayer.support.getPlaySupportReport
 import org.jellyfin.playback.media3.exoplayer.support.toFormats
 import timber.log.Timber
@@ -71,6 +53,8 @@ import kotlin.math.roundToInt
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
+// Ephyra: it implements every function of PlayerBackend (16), more than the class threshold allows
+@Suppress("TooManyFunctions")
 @OptIn(UnstableApi::class)
 class ExoPlayerBackend(
 	private val context: Context,
@@ -117,82 +101,12 @@ class ExoPlayerBackend(
 		return instance
 	}
 
-	private fun createPlayer(exoPlayerOptions: ExoPlayerOptions, assHandler: AssHandler?): ExoPlayer {
-		val dataSourceFactory = DefaultDataSource.Factory(
-			context,
-			exoPlayerOptions.baseDataSourceFactory,
-		)
-		val extractorsFactory = DefaultExtractorsFactory().apply {
-			val isLowRamDevice = context.getSystemService<ActivityManager>()?.isLowRamDevice == true
-			setTsExtractorTimestampSearchBytes(
-				when (isLowRamDevice) {
-					true -> TS_SEARCH_BYTES_LM
-					false -> TS_SEARCH_BYTES_HM
-				}
-			)
-			setConstantBitrateSeekingEnabled(true)
-			setConstantBitrateSeekingAlwaysEnabled(true)
-		}
-
-		val mediaSourceFactory = if (assHandler != null) {
-			val assSubtitleParserFactory = AssSubtitleParserFactory(assHandler)
-			val assExtractorsFactory = extractorsFactory.withAssMkvSupport(assSubtitleParserFactory, assHandler)
-			DefaultMediaSourceFactory(dataSourceFactory, assExtractorsFactory).apply {
-				setSubtitleParserFactory(assSubtitleParserFactory)
-			}
-		} else DefaultMediaSourceFactory(dataSourceFactory, extractorsFactory)
-
-		// Ephyra: the default audio sink plus a tee that measures the loudness for the music player's backdrop (AudioLevel)
-		// Ephyra: when FFmpeg is preferred it still steps aside for formats the sink can pass through as bitstream
-		val renderersFactory = object : BitstreamFirstRenderersFactory(context, exoPlayerOptions.preferFfmpeg) {
-			override fun buildAudioSink(
-				context: Context,
-				enableFloatOutput: Boolean,
-				enableAudioOutputPlaybackParameters: Boolean,
-			): AudioSink = DefaultAudioSink.Builder(context)
-				.setEnableFloatOutput(enableFloatOutput)
-				.setEnableAudioOutputPlaybackParameters(enableAudioOutputPlaybackParameters)
-				.setAudioProcessors(arrayOf(TeeAudioProcessor(AudioLevelSink())))
-				.build()
-		}.apply {
-			setMediaCodecSelector(ShieldMediaCodecSelector())
-			setEnableDecoderFallback(true)
-			setExtensionRendererMode(
-				when (exoPlayerOptions.preferFfmpeg) {
-					true -> DefaultRenderersFactory.EXTENSION_RENDERER_MODE_PREFER
-					false -> DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON
-				}
-			)
-		}.let { renderersFactory ->
-			if (assHandler != null) AssRenderersFactory(assHandler, renderersFactory)
-			else renderersFactory
-		}
-
-		val loadControl = ShieldLoadControl.build(
-			context,
-			exoPlayerOptions.minBufferDuration?.inWholeMilliseconds?.toInt() ?: DefaultLoadControl.DEFAULT_MIN_BUFFER_MS,
-			exoPlayerOptions.maxBufferDuration?.inWholeMilliseconds?.toInt() ?: DefaultLoadControl.DEFAULT_MAX_BUFFER_MS,
-			exoPlayerOptions.bufferForPlaybackDuration?.inWholeMilliseconds?.toInt() ?: DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_MS,
-			exoPlayerOptions.bufferForPlaybackAfterRebufferDuration?.inWholeMilliseconds?.toInt()
-				?: DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS,
-		)
-
-		return ExoPlayer.Builder(context)
-			.setLoadControl(loadControl)
-			.setRenderersFactory(renderersFactory)
-			.setTrackSelector(DefaultTrackSelector(context).apply {
-				setParameters(buildUponParameters().apply {
-					setAudioOffloadPreferences(
-						TrackSelectionParameters.AudioOffloadPreferences.DEFAULT.buildUpon().apply {
-							// Ephyra: a mains-powered TV box gains nothing from DSP offload, and offload is preferred over HDMI bitstream
-							// passthrough when the platform offers both (DefaultAudioSink.getFormatSupport), so keep it off
-							setAudioOffloadMode(TrackSelectionParameters.AudioOffloadPreferences.AUDIO_OFFLOAD_MODE_DISABLED)
-						}.build()
-					)
-					setAllowInvalidateSelectionsOnRendererCapabilitiesChange(true)
-				})
-			})
-			.setMediaSourceFactory(mediaSourceFactory)
+	private fun createPlayer(exoPlayerOptions: ExoPlayerOptions, assHandler: AssHandler?): ExoPlayer =
+		ExoPlayer.Builder(context)
+			.setLoadControl(buildLoadControl(context, exoPlayerOptions))
+			.setRenderersFactory(buildRenderersFactory(context, exoPlayerOptions, assHandler))
+			.setTrackSelector(buildTrackSelector(context))
+			.setMediaSourceFactory(buildMediaSourceFactory(context, exoPlayerOptions, assHandler))
 			.setPauseAtEndOfMediaItems(true)
 			.build()
 			.also { player ->
@@ -205,7 +119,6 @@ class ExoPlayerBackend(
 
 				assHandler?.init(player)
 			}
-	}
 
 	// Ephyra: bound to its own player, so a late callback never builds a new one
 	inner class PlayerListener(private val exoPlayer: ExoPlayer) : Player.Listener {
