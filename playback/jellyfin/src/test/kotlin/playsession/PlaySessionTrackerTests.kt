@@ -66,6 +66,20 @@ class PlaySessionTrackerTests : FunSpec({
 		tracker.update("episode 2", PlayState.PLAYING, 0.seconds) shouldContainExactly listOf(PlaySessionReport.Start("episode 2"))
 	}
 
+	test("a new stream while paused (a track switch reload) starts its session at once, so the server keeps seeing it") {
+		val tracker = PlaySessionTracker<String>()
+		tracker.update("film, stream 1", PlayState.PLAYING, 0.seconds)
+		tracker.update("film, stream 1", PlayState.PAUSED, 600.seconds)
+
+		tracker.update("film, stream 2", PlayState.PAUSED, 600.seconds) shouldContainExactly listOf(
+			PlaySessionReport.Stop("film, stream 1", 600.seconds, failed = false),
+			PlaySessionReport.Start("film, stream 2"),
+		)
+		tracker.update("film, stream 2", PlayState.PAUSED, 600.seconds) shouldContainExactly listOf(
+			PlaySessionReport.Progress("film, stream 2"),
+		)
+	}
+
 	test("an error stops the session as failed, and the stop that follows reports nothing more") {
 		val tracker = PlaySessionTracker<String>()
 		tracker.update("film", PlayState.PLAYING, 5.seconds)

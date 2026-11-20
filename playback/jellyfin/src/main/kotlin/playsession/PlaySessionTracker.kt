@@ -38,14 +38,17 @@ class PlaySessionTracker<T : Any> {
 		val started = active
 		if (started != null && current == started && position != null) lastPosition = position
 
-		if (started != null && (current != started || playState == PlayState.STOPPED || playState == PlayState.ERROR)) {
+		val ended = playState == PlayState.STOPPED || playState == PlayState.ERROR
+		// A new stream replacing a started one while paused (a track switch reload) starts at once, so the server keeps the session
+		val replacedWhilePaused = started != null && current != null && current != started && playState == PlayState.PAUSED
+		if (started != null && (current != started || ended)) {
 			reports += PlaySessionReport.Stop(started, lastPosition, failed = playState == PlayState.ERROR)
 			active = null
 		}
 
 		val running = active
 		when {
-			running == null && current != null && playState == PlayState.PLAYING -> {
+			running == null && current != null && (playState == PlayState.PLAYING || replacedWhilePaused) -> {
 				reports += PlaySessionReport.Start(current)
 				active = current
 				lastPosition = position ?: Duration.ZERO

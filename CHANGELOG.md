@@ -87,6 +87,8 @@ section 2(a) of the GPL-2.0.
   applied.
 - When the server burns a subtitle into a converted stream, the new player no longer shows a side-loaded subtitle
   flagged as default on top of it.
+- After a track switch that needs a new stream while a video is paused in the new player, the server sees the new
+  session at once instead of losing it until playback resumes.
 - The skip button's icon shows again: it was tinted into a solid light disc; it keeps its own theme colours now.
 - The new player (development option, also used for music) reports playback to the server reliably: the stop report
   was lost because the queue was cleared before it was sent, moving to the next episode reported neither the stop of
