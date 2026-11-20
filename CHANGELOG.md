@@ -42,6 +42,8 @@ section 2(a) of the GPL-2.0.
   output was at fault, instead of a bare error state.
 - The new player draws subtitles with the colours, outline, weight, size and position set in the subtitle settings,
   like the legacy one, which now shares the same code.
+- The new player applies audio night mode to videos like the legacy one. Both players now free the effect when
+  playback ends and never apply it to the device's whole audio output.
 
 ### Removed
 

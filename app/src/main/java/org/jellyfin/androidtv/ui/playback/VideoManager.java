@@ -45,6 +45,7 @@ import org.jellyfin.androidtv.preference.constant.BufferLength;
 import org.jellyfin.androidtv.preference.constant.ZoomMode;
 import org.jellyfin.androidtv.ui.player.base.SubtitleStylePreferenceKt;
 import org.jellyfin.androidtv.ui.player.display.FrameRateStrategyKt;
+import org.jellyfin.playback.media3.exoplayer.AudioNightMode;
 import org.jellyfin.playback.media3.exoplayer.SubtitleStyleKt;
 import org.jellyfin.playback.media3.exoplayer.UrlRedactionKt;
 import org.jellyfin.playback.media3.exoplayer.shield.BitstreamFirstRenderersFactory;
@@ -83,6 +84,7 @@ public class VideoManager {
     private long mMetaDuration = -1;
     private long lastExoPlayerPosition = -1;
     private boolean nightModeEnabled;
+    private final AudioNightMode audioNightMode = new AudioNightMode();
 
     public boolean isContracted = false;
 
@@ -110,7 +112,7 @@ public class VideoManager {
             mExoPlayer.addAnalyticsListener(new AnalyticsListener() {
                 @Override
                 public void onAudioSessionIdChanged(AnalyticsListener.EventTime eventTime, int audioSessionId) {
-                    VideoManagerHelperKt.applyAudioNightmode(audioSessionId);
+                    audioNightMode.apply(audioSessionId);
                 }
             });
         }
@@ -602,6 +604,8 @@ public class VideoManager {
             mExoPlayer.release();
             mExoPlayer = null;
         }
+        // Ephyra: the night mode effect goes with its player
+        audioNightMode.release();
     }
 
     int normalWidth;

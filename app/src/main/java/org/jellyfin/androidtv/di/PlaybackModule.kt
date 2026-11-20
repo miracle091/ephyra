@@ -109,5 +109,6 @@ internal fun createExoPlayerOptions(userPreferences: UserPreferences, httpDataSo
 		bufferForPlaybackAfterRebufferDuration = bufferLength.bufferForPlaybackAfterRebufferDuration,
 		videoChangeFrameRateStrategy = videoChangeFrameRateStrategy(userPreferences[UserPreferences.refreshRateSwitchingBehavior]),
 		subtitleStyle = userPreferences.subtitleStyle(),
+		audioNightMode = userPreferences[UserPreferences.audioNightMode],
 	)
 }

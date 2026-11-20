@@ -80,6 +80,7 @@ class ExoPlayerBackend(
 	private var currentStream: PlayableMediaStream? = null
 	private var subtitleView: SubtitleView? = null
 	private val audioPipeline = ExoPlayerAudioPipeline()
+	private val audioNightMode = AudioNightMode()
 	private var audioAttributeState = AudioAttributeState()
 	private var timedEventState = TimedEventState()
 	private var lastKnownDuration: Duration? = null
@@ -182,7 +183,7 @@ class ExoPlayerBackend(
 			.setPauseAtEndOfMediaItems(true)
 			.build()
 			.also { player ->
-				player.addListener(PlayerListener(player))
+				player.addListener(PlayerListener(player, exoPlayerOptions.audioNightMode))
 				player.videoChangeFrameRateStrategy = exoPlayerOptions.videoChangeFrameRateStrategy
 
 				if (exoPlayerOptions.enableDebugLogging) {
@@ -194,7 +195,7 @@ class ExoPlayerBackend(
 	}
 
 	// Ephyra: bound to its own player, so a late callback never builds a new one
-	inner class PlayerListener(private val exoPlayer: ExoPlayer) : Player.Listener {
+	inner class PlayerListener(private val exoPlayer: ExoPlayer, private val nightMode: Boolean) : Player.Listener {
 		override fun onIsPlayingChanged(isPlaying: Boolean) {
 			val state = when {
 				isPlaying -> PlayState.PLAYING
@@ -235,6 +236,9 @@ class ExoPlayerBackend(
 
 		override fun onAudioSessionIdChanged(audioSessionId: Int) {
 			audioPipeline.setAudioSessionId(audioSessionId)
+			// Ephyra: a video setting, as in the legacy player; music keeps its dynamics
+			val entry = exoPlayer.currentMediaItem?.localConfiguration?.tag as? QueueEntry
+			if (nightMode && entry?.mediaType == MediaType.Video) audioNightMode.apply(audioSessionId)
 		}
 
 		override fun onTracksChanged(tracks: Tracks) {
@@ -404,6 +408,7 @@ class ExoPlayerBackend(
 			current.player.release()
 		}
 		instance = null
+		audioNightMode.release()
 		currentStream = null
 		audioSelectionDone = null
 		lastKnownDuration = null
