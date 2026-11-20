@@ -89,6 +89,7 @@ fun VideoPlayerControls(
 				.focusRestorer()
 				.focusGroup()
 		) {
+			PreviousEntryButton(playbackManager)
 			RewindButton(playbackManager)
 			PlayPauseButton(playbackManager, playState)
 			FastForwardButton(playbackManager)
@@ -96,11 +97,8 @@ fun VideoPlayerControls(
 
 			Spacer(Modifier.weight(1f))
 
+			VideoPlayerMenus(playbackManager)
 			PlaybackInfoButton(onClick = onPlaybackInfoClick)
-
-			MoreOptionsButton {
-				PreviousEntryButton(playbackManager)
-			}
 		}
 	}
 }
@@ -179,9 +177,10 @@ private fun PreviousEntryButton(
 ) {
 	val entryIndex by playbackManager.queue.entryIndex.collectAsState()
 	val coroutineScope = rememberCoroutineScope()
+	// Ephyra: as in the legacy player, only when there is a previous entry
+	if (entryIndex <= 0) return
 
 	IconButton(
-		enabled = entryIndex > 0,
 		onClick = {
 			coroutineScope.launch {
 				playbackManager.queue.previous()
@@ -201,9 +200,10 @@ private fun NextEntryButton(
 ) {
 	val entryIndex by playbackManager.queue.entryIndex.collectAsState()
 	val coroutineScope = rememberCoroutineScope()
+	// Ephyra: as in the legacy player, only when there is a next entry
+	if (entryIndex >= playbackManager.queue.estimatedSize - 1) return
 
 	IconButton(
-		enabled = entryIndex < playbackManager.queue.estimatedSize - 1,
 		onClick = {
 			coroutineScope.launch {
 				playbackManager.queue.next()
@@ -216,8 +216,6 @@ private fun NextEntryButton(
 		)
 	}
 }
-
-private const val MORE_OPTIONS_POPOVER_OFFSET_Y = -5
 
 /** Ephyra: the position on the left, the end time and the duration on the right, under the seek bar as in the legacy player. */
 @Composable
@@ -242,38 +240,6 @@ private fun PositionRow(
 		Spacer(Modifier.weight(1f))
 		Text(stringResource(R.string.lbl_playback_control_ends, endsAt), style = style)
 		Text(formatPlaybackTime(positionInfo.duration.inWholeMilliseconds), style = style)
-	}
-}
-
-@Composable
-private fun MoreOptionsButton(
-	content: @Composable () -> Unit,
-) = Box {
-	var expanded by remember { mutableStateOf(false) }
-	IconButton(
-		onClick = { expanded = true },
-	) {
-		Icon(
-			imageVector = ImageVector.vectorResource(R.drawable.ic_more),
-			contentDescription = stringResource(R.string.lbl_other_options),
-		)
-	}
-
-	Popover(
-		expanded = expanded,
-		onDismissRequest = { expanded = false },
-		placement = PopoverPlacement(
-			alignment = Alignment.TopCenter,
-			offset = DpOffset(0.dp, MORE_OPTIONS_POPOVER_OFFSET_Y.dp),
-		),
-	) {
-		Row(
-			horizontalArrangement = Arrangement.spacedBy(12.dp),
-			modifier = Modifier
-				.padding(4.dp)
-		) {
-			content()
-		}
 	}
 }
 

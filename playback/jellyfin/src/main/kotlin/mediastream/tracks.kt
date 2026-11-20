@@ -37,6 +37,7 @@ private fun getAudioTrack(stream: MediaStream) = MediaStreamAudioTrack(
 	sampleRate = stream.sampleRate ?: 0,
 	index = stream.index,
 	isExternal = stream.isExternal,
+	title = stream.displayTitle ?: stream.title,
 )
 
 private fun getVideoTrack(stream: MediaStream) = MediaStreamVideoTrack(

@@ -44,6 +44,8 @@ data class MediaStreamAudioTrack(
 	val index: Int? = null,
 	/** Ephyra: whether the track lives in a separate file, so it is not one of the container's own tracks. */
 	val isExternal: Boolean = false,
+	/** Ephyra: the server's display name (language, codec, channels), for the player's audio menu. */
+	val title: String? = null,
 ) : MediaStreamTrack
 
 data class MediaStreamVideoTrack(

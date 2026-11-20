@@ -2,6 +2,7 @@ package org.jellyfin.playback.jellyfin.mediastream
 
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
+import org.jellyfin.playback.core.mediastream.MediaStreamAudioTrack
 import org.jellyfin.playback.core.mediastream.MediaStreamSubtitleTrack
 import org.jellyfin.sdk.model.api.AudioSpatialFormat
 import org.jellyfin.sdk.model.api.MediaStream
@@ -63,6 +64,16 @@ class TracksTests : FunSpec({
 		val result = tracks.withBurntInSubtitle(3).filterIsInstance<MediaStreamSubtitleTrack>()
 
 		result.map { it.externalUrl } shouldBe listOf(null, "https://server/b.srt")
+	}
+
+	test("an audio track carries the server's display name for the audio menu") {
+		val audio = subtitle(1, null, null).copy(
+			type = MediaStreamType.AUDIO,
+			codec = "ac3",
+			displayTitle = "Italiano - Dolby Digital - 5.1",
+			channels = 6,
+		)
+		(audio.getMediaStreamTrack(createUrl) as MediaStreamAudioTrack).title shouldBe "Italiano - Dolby Digital - 5.1"
 	}
 
 	test("a subtitle in the HLS manifest is not loaded a second time") {

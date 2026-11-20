@@ -51,6 +51,9 @@ section 2(a) of the GPL-2.0.
 - The new player's overlay looks like the legacy one: the series and episode over the title, how the server delivers
   the stream and why, the end time under the seek bar, the legacy margins and button order, and controls dimmed
   during HDR and Dolby Vision playback.
+- The new player's controls have the legacy player's menus: subtitles, audio tracks (by the server's names) and
+  chapters when the video has them, and the maximum bitrate, shown on its button as a 4K, HD or SD badge; picking one
+  restarts the stream under it from the same position. Previous and next show only when there is an item to go to.
 - The new player tells the server which version (media source) and audio track it plays, and knows the subtitle
   tracks of the stream.
 - The new player loads subtitles the server hands out as separate files and shows the subtitle the server picks
