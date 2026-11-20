@@ -22,6 +22,8 @@ fun PlayerSeekbar(
 	modifier: Modifier = Modifier,
 	colors: SeekbarColors = SeekbarDefaults.colors(),
 	playbackManager: PlaybackManager = koinInject<PlaybackManager>(),
+	// Ephyra: the position picked while scrubbing with the arrows, null when not scrubbing (for the trickplay thumbnail)
+	onScrubPositionChange: ((Duration?) -> Unit)? = null,
 ) {
 	val playState by playbackManager.state.playState.collectAsState()
 	val positionInfo = playbackManager.state.positionInfo
@@ -42,8 +44,14 @@ fun PlayerSeekbar(
 			seekRewindAmount = seekRewindAmount,
 		),
 		callbacks = SeekbarCallbacks(
-			onScrubbing = { scrubbing -> playbackManager.state.setScrubbing(scrubbing) },
-			onSeek = { progress -> playbackManager.state.seek(progress) },
+			onScrubbing = { scrubbing ->
+				playbackManager.state.setScrubbing(scrubbing)
+				if (!scrubbing) onScrubPositionChange?.invoke(null)
+			},
+			onSeek = { progress ->
+				playbackManager.state.seek(progress)
+				if (playbackManager.state.scrubbing.value) onScrubPositionChange?.invoke(progress)
+			},
 		),
 		modifier = modifier,
 		colors = colors,
