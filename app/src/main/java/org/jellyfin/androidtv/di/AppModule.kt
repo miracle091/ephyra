@@ -161,7 +161,7 @@ val appModule = module {
 	// Non API related
 	single { DataRefreshService() }
 	single { PlaybackControllerContainer() }
-	single { InteractionTrackerViewModel(get(), get()) }
+	single { InteractionTrackerViewModel(get(), get(), get()) }
 
 	single<UserRepository> { UserRepositoryImpl() }
 	single<UserViewsRepository> { UserViewsRepositoryImpl(get(), get()) }

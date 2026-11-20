@@ -20,4 +20,10 @@ class VideoInProgressTest : FunSpec({
 		isVideoInProgress(PlayState.STOPPED, entry(MediaType.Video)) shouldBe false
 		isVideoInProgress(PlayState.PLAYING, null) shouldBe false
 	}
+
+	test("only a paused video counts as paused for the screensaver") {
+		isVideoPaused(PlayState.PAUSED, entry(MediaType.Video)) shouldBe true
+		isVideoPaused(PlayState.PLAYING, entry(MediaType.Video)) shouldBe false
+		isVideoPaused(PlayState.PAUSED, entry(MediaType.Audio)) shouldBe false
+	}
 })

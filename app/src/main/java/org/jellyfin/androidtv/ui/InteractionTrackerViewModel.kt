@@ -12,6 +12,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.jellyfin.androidtv.preference.UserPreferences
 import org.jellyfin.androidtv.ui.playback.PlaybackControllerContainer
+import org.jellyfin.androidtv.ui.player.video.isVideoPaused
+import org.jellyfin.playback.core.PlaybackManager
 import org.jellyfin.sdk.model.api.BaseItemDto
 import org.jellyfin.sdk.model.api.BaseItemKind
 import kotlin.time.Duration
@@ -25,7 +27,9 @@ fun screensaverDelay(timeout: Duration, videoPaused: Boolean): Duration = if (vi
 
 class InteractionTrackerViewModel(
 	private val userPreferences: UserPreferences,
-	private val playbackControllerContainer: PlaybackControllerContainer
+	private val playbackControllerContainer: PlaybackControllerContainer,
+	// Ephyra: the new player, so a video paused there counts too
+	private val playbackManager: PlaybackManager,
 ) : ViewModel() {
 	// Screensaver
 
@@ -44,7 +48,8 @@ class InteractionTrackerViewModel(
 	private val inAppEnabled get() = userPreferences[UserPreferences.screensaverInAppEnabled]
 	private val timeout get() = userPreferences[UserPreferences.screensaverInAppTimeout].milliseconds
 	private val stillWatchingBehavior get() = userPreferences[UserPreferences.stillWatchingBehavior]
-	private val videoPaused get() = playbackControllerContainer.playbackController?.let { it.isPaused && !it.isLiveTv } == true
+	private val videoPaused
+		get() = playbackControllerContainer.playbackController?.let { it.isPaused && !it.isLiveTv } == true || playbackManager.isVideoPaused
 
 	// State
 

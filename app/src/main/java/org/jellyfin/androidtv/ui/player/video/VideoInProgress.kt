@@ -14,6 +14,14 @@ import org.jellyfin.playback.core.queue.queue
 fun isVideoInProgress(playState: PlayState, entry: QueueEntry?): Boolean =
 	entry?.mediaType == MediaType.Video && (playState == PlayState.PLAYING || playState == PlayState.PAUSED)
 
+/** Ephyra: whether the new player holds a paused video (the screensaver comes sooner then, as with the legacy player). */
+fun isVideoPaused(playState: PlayState, entry: QueueEntry?): Boolean =
+	entry?.mediaType == MediaType.Video && playState == PlayState.PAUSED
+
+/** Ephyra: [isVideoPaused] for this player now. */
+val PlaybackManager.isVideoPaused: Boolean
+	get() = isVideoPaused(state.playState.value, queue.entry.value)
+
 /** Ephyra: [isVideoInProgress] for this player now. */
 val PlaybackManager.isVideoInProgress: Boolean
 	get() = isVideoInProgress(state.playState.value, queue.entry.value)

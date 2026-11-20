@@ -81,7 +81,8 @@ section 2(a) of the GPL-2.0.
   for the rest of the queue.
 - A video in the new player is treated as playback in progress like one in the legacy player: the screensaver shows
   it when paused, another client's "display content" no longer interrupts it, and a playback started remotely replaces
-  its screen instead of opening a second player on top.
+  its screen instead of opening a second player on top. The in-app screensaver comes after the short pause delay for a
+  video paused in the new player too.
 - The new player's audio night mode really turns on: it was decided before the first video was known, so it never
   applied.
 - When the server burns a subtitle into a converted stream, the new player no longer shows a side-loaded subtitle
