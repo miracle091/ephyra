@@ -44,6 +44,8 @@ section 2(a) of the GPL-2.0.
   like the legacy one, which now shares the same code.
 - The new player applies audio night mode to videos like the legacy one. Both players now free the effect when
   playback ends and never apply it to the device's whole audio output.
+- The new player keeps the chosen playback speed for the next playback instead of falling back to normal speed
+  while still showing the old one.
 
 ### Removed
 

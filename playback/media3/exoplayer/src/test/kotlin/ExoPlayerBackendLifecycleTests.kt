@@ -20,6 +20,7 @@ class ExoPlayerBackendLifecycleTests : FunSpec({
 		backend.pause()
 		backend.seekTo(10.seconds)
 		backend.setScrubbing(true)
+		backend.setSpeed(1.5f)
 		backend.setSurfaceView(null)
 		backend.setSubtitleView(null)
 		backend.stop()

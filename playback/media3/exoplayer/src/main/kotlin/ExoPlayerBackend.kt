@@ -90,6 +90,7 @@ class ExoPlayerBackend(
 	private var instance: PlayerInstance? = null
 	private var surfaceView: PlayerSurfaceView? = null
 	private var subtitleContainer: PlayerSubtitleView? = null
+	private var speed = 1f
 
 	private val exoPlayer: ExoPlayer
 		get() = instance?.player ?: buildInstance().player
@@ -100,6 +101,7 @@ class ExoPlayerBackend(
 		val instance = PlayerInstance(createPlayer(options, assHandler), assHandler, options)
 		this.instance = instance
 		instance.player.setVideoSurfaceView(surfaceView?.surface)
+		instance.player.setPlaybackSpeed(speed)
 		subtitleContainer?.let(::attachSubtitleView)
 		return instance
 	}
@@ -430,6 +432,9 @@ class ExoPlayerBackend(
 	}
 
 	override fun setSpeed(speed: Float) {
+		// Ephyra: kept for the next player too, as PlayerState keeps it; without a player there is nothing to change yet
+		this.speed = speed
+		val exoPlayer = instance?.player ?: return
 		if (!exoPlayer.isCommandAvailable(Player.COMMAND_SET_SPEED_AND_PITCH)) {
 			Timber.w("Trying to change speed but ExoPlayer doesn't support it for the current item")
 		}
