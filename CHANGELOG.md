@@ -48,6 +48,8 @@ section 2(a) of the GPL-2.0.
   while still showing the old one.
 - The new player follows the zoom setting (fit, auto crop, stretch) like the legacy one; subtitles stay inside the
   whole picture so cropping never cuts them off.
+- The new player tells the server which version (media source) and audio track it plays, and knows the subtitle
+  tracks of the stream.
 
 ### Removed
 

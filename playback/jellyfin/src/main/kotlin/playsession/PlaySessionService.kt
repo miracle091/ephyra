@@ -133,6 +133,7 @@ class PlaySessionService(
 				PlaybackStartInfo(
 					itemId = session.item.id,
 					playSessionId = session.stream.identifier,
+					mediaSourceId = session.stream.mediaSourceId,
 					playlistItemId = session.item.playlistItemId,
 					canSeek = true,
 					isMuted = state.volume.muted,
@@ -140,6 +141,7 @@ class PlaySessionService(
 					isPaused = state.playState.value != PlayState.PLAYING,
 					aspectRatio = state.videoSize.value.aspectRatio.toString(),
 					positionTicks = position.inWholeTicks,
+					audioStreamIndex = session.stream.defaultAudioStreamIndex,
 					playMethod = session.stream.conversionMethod.playMethod,
 					repeatMode = state.repeatMode.value.remoteRepeatMode,
 					nowPlayingQueue = getQueue(),
@@ -155,6 +157,7 @@ class PlaySessionService(
 				PlaybackProgressInfo(
 					itemId = session.item.id,
 					playSessionId = session.stream.identifier,
+					mediaSourceId = session.stream.mediaSourceId,
 					playlistItemId = session.item.playlistItemId,
 					canSeek = true,
 					isMuted = state.volume.muted,
@@ -162,6 +165,7 @@ class PlaySessionService(
 					isPaused = state.playState.value != PlayState.PLAYING,
 					aspectRatio = state.videoSize.value.aspectRatio.toString(),
 					positionTicks = position.inWholeTicks,
+					audioStreamIndex = session.stream.defaultAudioStreamIndex,
 					playMethod = session.stream.conversionMethod.playMethod,
 					repeatMode = state.repeatMode.value.remoteRepeatMode,
 					nowPlayingQueue = getQueue(),
@@ -177,6 +181,7 @@ class PlaySessionService(
 				PlaybackStopInfo(
 					itemId = session.item.id,
 					playSessionId = session.stream.identifier,
+					mediaSourceId = session.stream.mediaSourceId,
 					playlistItemId = session.item.playlistItemId,
 					positionTicks = position.inWholeTicks,
 					failed = failed,

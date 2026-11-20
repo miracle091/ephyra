@@ -21,6 +21,10 @@ data class PlayableMediaStream(
 	 * Only meaningful for a stream that is not converted: a remuxed or transcoded stream carries just the requested track.
 	 */
 	val defaultAudioStreamIndex: Int? = null,
+	/** Ephyra: the server's id of the media source (version) this stream plays, for the play session reports. */
+	val mediaSourceId: String? = null,
+	/** Ephyra: index of the subtitle track the server chose from the user's settings, or null for none. */
+	val defaultSubtitleStreamIndex: Int? = null,
 ) : MediaStream
 
 data class MediaStreamContainer(
@@ -52,4 +56,18 @@ data class MediaStreamVideoTrack(
 	val frameRate: Float? = null,
 ) : MediaStreamTrack
 
-// TODO: Add subtitle track
+/** Ephyra: a subtitle track of the source. */
+data class MediaStreamSubtitleTrack(
+	override val codec: String,
+	/** Index of the track in the source (Jellyfin media stream index). */
+	val index: Int,
+	val language: String?,
+	/** The server's display name (language, codec, flags). */
+	val title: String?,
+	val isDefault: Boolean,
+	val isForced: Boolean,
+	/** Whether the track lives in a separate file, so it is not one of the container's own tracks. */
+	val isExternal: Boolean,
+	/** URL of the subtitle file for the player to load beside the stream, or null when the stream carries the track itself. */
+	val externalUrl: String?,
+) : MediaStreamTrack

@@ -134,9 +134,11 @@ class JellyfinMediaStreamResolver(
 		identifier = playSessionId,
 		conversionMethod = conversionMethod,
 		container = getMediaStreamContainer(),
-		tracks = getTracks(),
+		tracks = getTracks { path -> api.createUrl(path, ignorePathParameters = true) },
 		queueEntry = queueEntry,
 		url = url,
 		defaultAudioStreamIndex = mediaSource.defaultAudioStreamIndex,
+		mediaSourceId = mediaSource.id,
+		defaultSubtitleStreamIndex = mediaSource.defaultSubtitleStreamIndex?.takeIf { it >= 0 },
 	)
 }
