@@ -323,8 +323,17 @@ class ExoPlayerBackend(
 		Timber.i("Subtitle for server subtitle stream ${stream.defaultSubtitleStreamIndex}: $selection")
 	}
 
-	/** Ephyra: maps the subtitle [index] (or none) to the player's text tracks and selects it, unless it can't be mapped. */
-	private fun applySubtitle(exoPlayer: ExoPlayer, stream: PlayableMediaStream, tracks: Tracks, index: Int?): SubtitleSelection {
+	/**
+	 * Ephyra: maps the subtitle [index] (or none) to the player's text tracks and selects it. When it can't be mapped, the
+	 * player's own choice is restored, or left untouched with [untouchedIfUnmapped] (a pick that a new stream will bring).
+	 */
+	private fun applySubtitle(
+		exoPlayer: ExoPlayer,
+		stream: PlayableMediaStream,
+		tracks: Tracks,
+		index: Int?,
+		untouchedIfUnmapped: Boolean = false,
+	): SubtitleSelection {
 		val textGroups = tracks.groups.filter { it.type == C.TRACK_TYPE_TEXT }
 		val selection = findSubtitleSelection(
 			tracks = stream.tracks,
@@ -332,6 +341,7 @@ class ExoPlayerBackend(
 			groupExternalIndexes = textGroups.map { externalSubtitleIndex(it.mediaTrackGroup.getFormat(0).id) },
 			directPlay = stream.conversionMethod == MediaConversionMethod.None,
 		)
+		if (selection == SubtitleSelection.Keep && untouchedIfUnmapped) return selection
 
 		val parameters = exoPlayer.trackSelectionParameters.buildUpon().clearOverridesOfType(C.TRACK_TYPE_TEXT)
 		when (selection) {
@@ -373,7 +383,7 @@ class ExoPlayerBackend(
 		val converted = stream.conversionMethod != MediaConversionMethod.None
 		if (converted && !(isSideLoaded(selectedTracks.subtitleIndex) && isSideLoaded(index))) return false
 
-		val selection = applySubtitle(exoPlayer, stream, exoPlayer.currentTracks, index)
+		val selection = applySubtitle(exoPlayer, stream, exoPlayer.currentTracks, index, untouchedIfUnmapped = true)
 		Timber.i("Subtitle for subtitle stream $index: $selection")
 		if (selection == SubtitleSelection.Keep) return false
 		subtitleSelectionDone = stream
@@ -449,6 +459,7 @@ class ExoPlayerBackend(
 		val stream = requireNotNull(item.mediaStream)
 		if (currentStream == stream) return
 
+		val previousStream = currentStream
 		currentStream = stream
 		// Ephyra: the server's choice until the player shows otherwise
 		updateSelectedTracks(SelectedTracks(stream.defaultAudioStreamIndex, stream.defaultSubtitleStreamIndex))
@@ -474,6 +485,9 @@ class ExoPlayerBackend(
 			preparedItemIndex == exoPlayer.currentMediaItemIndex -> Unit
 			else -> exoPlayer.seekTo(preparedItemIndex, 0)
 		}
+
+		// Ephyra: a new stream of the same entry (another track) plays as another media item: move the entry's timed events to it
+		if (previousStream?.queueEntry === item) timedEventState.recreate(exoPlayer, lastKnownDuration)
 
 		// Update audio attributes
 		val contentType = when (item.mediaType) {

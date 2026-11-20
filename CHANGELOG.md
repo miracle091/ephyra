@@ -55,7 +55,8 @@ section 2(a) of the GPL-2.0.
 - The Audio and Subtitles buttons on the details screen work with the new player too: the picked tracks (and
   version) are requested from the server, which then streams, side-loads or burns in the subtitle as needed.
 - The new player switches audio and subtitle tracks when another client asks (the web dashboard's remote control):
-  in the player when the stream carries the track, otherwise with a new stream from the server at the same position.
+  in the player when the stream carries the track, otherwise with a new stream from the server at the same position
+  (still paused if it was; if the server can't build it, or playback moved on meanwhile, the current stream plays on).
   The reports carry the tracks actually shown.
 - The new player follows the "burn in subtitles when transcoding" setting and tells the server where playback starts,
   like the legacy one; a subtitle burnt in is not loaded a second time as a file.

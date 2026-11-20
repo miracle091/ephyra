@@ -93,6 +93,20 @@ class TimedEventState {
 		}
 	}
 
+	/**
+	 * Ephyra: creates every event's messages again for the media item playing now. A message is bound to the media item current
+	 * when it was created, so a new stream of the same entry (another track) would never reach the old ones. [knownDuration] stands
+	 * in while the new item's duration is not known yet (same content, same duration).
+	 */
+	fun recreate(exoPlayer: ExoPlayer, knownDuration: Duration?) {
+		val mediaDuration = exoPlayer.duration.takeUnless { it == C.TIME_UNSET }?.milliseconds ?: knownDuration
+		for (index in _currentEvents.indices) {
+			val (timedEvent, messages) = _currentEvents[index]
+			messages.forEach(PlayerMessage::cancel)
+			_currentEvents[index] = timedEvent to timedEvent.createMessages(exoPlayer, mediaDuration)
+		}
+	}
+
 	private fun TimedEvent.createMessages(exoPlayer: ExoPlayer, mediaDuration: Duration?) = when (this) {
 		is TimedEvent.Instant -> {
 			val position = position.withMediaDuration(mediaDuration)
