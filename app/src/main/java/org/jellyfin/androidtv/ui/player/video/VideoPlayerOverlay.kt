@@ -23,9 +23,11 @@ import org.jellyfin.androidtv.ui.player.base.toast.MediaToasts
 import org.jellyfin.playback.core.PlaybackManager
 import org.jellyfin.playback.core.mediastream.mediaStream
 import org.jellyfin.playback.core.mediastream.mediaStreamFlow
+import org.jellyfin.playback.core.queue.startPosition
 import org.jellyfin.playback.jellyfin.queue.baseItem
 import org.jellyfin.playback.jellyfin.queue.baseItemFlow
 import org.koin.compose.koinInject
+import kotlin.time.Duration
 
 // Ephyra: the legacy player's margins (ephyra_side_margin, ephyra_safe_y, ephyra_osd_padding_bottom); the bottom one is 2dp more
 // because these buttons are 44dp against the legacy 48dp, so their centres stay where the legacy ones were
@@ -45,6 +47,9 @@ fun VideoPlayerOverlay(
 	val stream = entry?.run { mediaStreamFlow.collectAsState(mediaStream) }?.value
 	// Ephyra: white text and icons glare on an HDR display, so the controls are dimmed then (HdrControlsDim)
 	val controlsAlpha = if (isHdrStream(stream)) HdrControlsDim.HDR_ALPHA else 1f
+
+	// Ephyra: the trickplay thumbnails are downloaded as playback starts, so scrubbing shows them at once
+	PrefetchTrickplay(item, stream?.mediaSourceId, entry?.startPosition ?: Duration.ZERO)
 
 	Box(modifier = modifier) {
 		PlayerOverlayLayout(

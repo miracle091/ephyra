@@ -56,6 +56,8 @@ section 2(a) of the GPL-2.0.
   restarts the stream under it from the same position. Previous and next show only when there is an item to go to.
 - The new player shows the trickplay thumbnail and time of the picked position above the seek bar while scrubbing,
   as the legacy one did, and up from the buttons reaches the seek bar instead of hiding the controls.
+- The new player downloads a video's trickplay thumbnails into the image cache as playback starts, so the first
+  thumbnail while scrubbing shows at once instead of after a second.
 - The new player tells the server which version (media source) and audio track it plays, and knows the subtitle
   tracks of the stream.
 - The new player loads subtitles the server hands out as separate files and shows the subtitle the server picks

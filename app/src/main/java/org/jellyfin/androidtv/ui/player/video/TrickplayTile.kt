@@ -14,6 +14,18 @@ data class TrickplayTile(val index: Int, val x: Int, val y: Int, val width: Int,
 fun BaseItemDto.trickplayInfo(mediaSourceId: String?): TrickplayInfoDto? =
 	trickplay?.get(mediaSourceId ?: return null)?.values?.firstOrNull()
 
+/**
+ * Ephyra: the tile images of [info] in the order to prefetch them: the one holding [position] first (where scrubbing starts),
+ * then the ones after it, then the ones before.
+ */
+fun trickplayTileOrder(info: TrickplayInfoDto, position: Duration): List<Int> {
+	val perTile = (info.tileWidth * info.tileHeight).coerceAtLeast(1)
+	val count = (info.thumbnailCount + perTile - 1) / perTile
+	if (count <= 0) return emptyList()
+	val start = trickplayTile(position, info).index.coerceIn(0, count - 1)
+	return (start until count) + (0 until start)
+}
+
 /** Ephyra: the thumbnail of [info] for [position], as the legacy player's seek provider picked it (CustomSeekProvider). */
 fun trickplayTile(position: Duration, info: TrickplayInfoDto): TrickplayTile {
 	val thumbnail = (position.inWholeMilliseconds.coerceAtLeast(0) / info.interval.coerceAtLeast(1)).toInt()

@@ -1,5 +1,6 @@
 package org.jellyfin.androidtv.ui.player.video
 
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
@@ -7,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -17,9 +19,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil3.ImageLoader
 import coil3.compose.AsyncImage
 import coil3.network.NetworkHeaders
 import coil3.network.httpHeaders
+import coil3.request.CachePolicy
+import coil3.request.ErrorResult
 import coil3.request.ImageRequest
 import coil3.request.maxBitmapSize
 import coil3.request.transformations
@@ -36,11 +41,61 @@ import org.jellyfin.sdk.api.client.util.AuthorizationHeaderBuilder
 import org.jellyfin.sdk.model.api.BaseItemDto
 import org.jellyfin.sdk.model.serializer.toUUIDOrNull
 import org.koin.compose.koinInject
+import timber.log.Timber
+import java.util.UUID
 import kotlin.time.Duration
 
 private val PreviewWidth = 240.dp
 private val PreviewGap = 12.dp
 private val PreviewShape = RoundedCornerShape(8.dp)
+
+/**
+ * Ephyra: the request for a trickplay tile image, signed as the legacy player did. The preview and the prefetch build it the same
+ * way, so the image cache on disk keys both by the same URL.
+ */
+private fun ApiClient.trickplayTileRequest(context: Context, itemId: UUID, mediaSourceId: UUID, width: Int, index: Int) =
+	ImageRequest.Builder(context)
+		.data(trickPlayApi.getTrickplayTileImageUrl(itemId = itemId, width = width, index = index, mediaSourceId = mediaSourceId))
+		.httpHeaders(
+			NetworkHeaders.Builder()
+				.set(
+					"Authorization",
+					AuthorizationHeaderBuilder.buildHeader(
+						clientInfo.name,
+						clientInfo.version,
+						deviceInfo.id,
+						deviceInfo.name,
+						accessToken,
+					),
+				)
+				.build()
+		)
+
+/**
+ * Ephyra: downloads the trickplay tile images of [item] into the image cache on disk when playback starts, one at a time from the
+ * one at [startPosition], so the first thumbnail while scrubbing shows at once. They are decoded as small as possible and kept
+ * out of the memory cache: only the downloaded file matters. Leaving the player stops it.
+ */
+@Composable
+fun PrefetchTrickplay(item: BaseItemDto?, mediaSourceId: String?, startPosition: Duration) {
+	val api = koinInject<ApiClient>()
+	val imageLoader = koinInject<ImageLoader>()
+	val context = LocalContext.current
+	val itemId = item?.id
+
+	LaunchedEffect(itemId, mediaSourceId) {
+		val info = item?.trickplayInfo(mediaSourceId) ?: return@LaunchedEffect
+		val sourceUuid = mediaSourceId?.toUUIDOrNull() ?: return@LaunchedEffect
+		for (index in trickplayTileOrder(info, startPosition)) {
+			val request = api.trickplayTileRequest(context, requireNotNull(itemId), sourceUuid, info.width, index)
+				.size(1, 1)
+				.memoryCachePolicy(CachePolicy.DISABLED)
+				.build()
+			val result = imageLoader.execute(request)
+			if (result is ErrorResult) Timber.w(result.throwable, "Failed to prefetch trickplay tile $index")
+		}
+	}
+}
 
 /**
  * Ephyra: the trickplay thumbnail of [position] with its time, drawn above the seek bar at [fraction] of its width while
@@ -65,24 +120,9 @@ fun TrickplayPreview(
 
 	val itemId = requireNotNull(item).id
 	val request = remember(itemId, sourceUuid, tile) {
-		ImageRequest.Builder(context)
-			.data(api.trickPlayApi.getTrickplayTileImageUrl(itemId = itemId, width = info.width, index = tile.index, mediaSourceId = sourceUuid))
+		api.trickplayTileRequest(context, itemId, sourceUuid, info.width, tile.index)
 			.size(Size.ORIGINAL)
 			.maxBitmapSize(Size(Dimension.Undefined, Dimension.Undefined))
-			.httpHeaders(
-				NetworkHeaders.Builder()
-					.set(
-						"Authorization",
-						AuthorizationHeaderBuilder.buildHeader(
-							api.clientInfo.name,
-							api.clientInfo.version,
-							api.deviceInfo.id,
-							api.deviceInfo.name,
-							api.accessToken,
-						),
-					)
-					.build()
-			)
 			.transformations(SubsetTransformation(tile.x, tile.y, tile.width, tile.height))
 			.build()
 	}

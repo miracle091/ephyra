@@ -32,6 +32,12 @@ class TrickplayTileTest : FunSpec({
 		trickplayTile(1_010.seconds, info) shouldBe TrickplayTile(index = 1, x = 320, y = 0, width = 320, height = 180)
 	}
 
+	test("tile images are prefetched from the one at the position, then after it, then before it") {
+		trickplayTileOrder(info, 0.seconds) shouldBe listOf(0, 1, 2)
+		trickplayTileOrder(info, 1_500.seconds) shouldBe listOf(1, 2, 0)
+		trickplayTileOrder(info.copy(thumbnailCount = 0), 0.seconds) shouldBe emptyList()
+	}
+
 	test("a position past the last thumbnail keeps the last one") {
 		trickplayTile(10_000.seconds, info) shouldBe TrickplayTile(index = 2, x = 2880, y = 720, width = 320, height = 180)
 	}
