@@ -1,9 +1,10 @@
 package org.jellyfin.androidtv.ui.player.video
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -13,8 +14,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.toSize
 import kotlinx.coroutines.flow.map
 import org.jellyfin.androidtv.data.service.BackgroundService
+import org.jellyfin.androidtv.preference.UserPreferences
+import org.jellyfin.androidtv.preference.constant.ZoomMode
 import org.jellyfin.androidtv.ui.ScreensaverLock
 import org.jellyfin.androidtv.ui.player.base.PlayerSubtitles
 import org.jellyfin.androidtv.ui.player.base.PlayerSurface
@@ -49,16 +55,25 @@ fun VideoPlayerScreen() {
 	val mediaToastRegistry = remember { MediaToastRegistry(coroutineScope) }
 	rememberPlaybackManagerMediaToastEmitter(playbackManager, mediaToastRegistry)
 
-	Box(
+	// Ephyra: the user's zoom mode for the picture; subtitles stay inside the whole (fitted) picture so none is cut off
+	val userPreferences = koinInject<UserPreferences>()
+	val zoomMode = remember { userPreferences[UserPreferences.playerZoomMode] }
+
+	BoxWithConstraints(
 		modifier = Modifier
 			.background(Color.Black)
 			.fillMaxSize()
 	) {
+		val container = IntSize(constraints.maxWidth, constraints.maxHeight)
+		val density = LocalDensity.current
+		val pictureSize = with(density) { videoFrameSize(container, aspectRatio, zoomMode).toSize().toDpSize() }
+		val subtitleSize = with(density) { videoFrameSize(container, aspectRatio, ZoomMode.FIT).toSize().toDpSize() }
+
 		PlayerSurface(
 			playbackManager = playbackManager,
 			modifier = Modifier
-				.aspectRatio(aspectRatio, videoSize.height < videoSize.width)
-				.fillMaxSize()
+				// Larger than the screen when cropping: centred, the overflow is cut off by the screen's edges
+				.requiredSize(pictureSize)
 				.align(Alignment.Center)
 		)
 
@@ -70,8 +85,7 @@ fun VideoPlayerScreen() {
 		PlayerSubtitles(
 			playbackManager = playbackManager,
 			modifier = Modifier
-				.aspectRatio(aspectRatio, videoSize.height < videoSize.width)
-				.fillMaxSize()
+				.size(subtitleSize)
 				.align(Alignment.Center)
 		)
 	}

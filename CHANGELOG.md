@@ -46,6 +46,8 @@ section 2(a) of the GPL-2.0.
   playback ends and never apply it to the device's whole audio output.
 - The new player keeps the chosen playback speed for the next playback instead of falling back to normal speed
   while still showing the old one.
+- The new player follows the zoom setting (fit, auto crop, stretch) like the legacy one; subtitles stay inside the
+  whole picture so cropping never cuts them off.
 
 ### Removed
 
