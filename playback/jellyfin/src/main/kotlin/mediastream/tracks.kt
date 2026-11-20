@@ -42,4 +42,5 @@ private fun getVideoTrack(stream: MediaStream) = MediaStreamVideoTrack(
 	width = stream.width ?: 0,
 	height = stream.height ?: 0,
 	videoRange = stream.videoRangeType.name,
+	frameRate = stream.realFrameRate,
 )

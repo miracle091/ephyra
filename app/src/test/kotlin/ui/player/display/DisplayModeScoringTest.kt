@@ -1,4 +1,4 @@
-package org.jellyfin.androidtv.ui.playback
+package org.jellyfin.androidtv.ui.player.display
 
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.comparables.shouldBeGreaterThan

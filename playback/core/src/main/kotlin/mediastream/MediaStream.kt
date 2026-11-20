@@ -48,6 +48,8 @@ data class MediaStreamVideoTrack(
 	val width: Int,
 	val height: Int,
 	val videoRange: String?,
+	/** Ephyra: the source's real frame rate, used to pick the display mode, or null when unknown. */
+	val frameRate: Float? = null,
 ) : MediaStreamTrack
 
 // TODO: Add subtitle track

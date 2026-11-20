@@ -183,6 +183,7 @@ class ExoPlayerBackend(
 			.build()
 			.also { player ->
 				player.addListener(PlayerListener(player))
+				player.videoChangeFrameRateStrategy = exoPlayerOptions.videoChangeFrameRateStrategy
 
 				if (exoPlayerOptions.enableDebugLogging) {
 					player.addAnalyticsListener(EventLogger())

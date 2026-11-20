@@ -6,8 +6,6 @@ import static org.koin.java.KoinJavaComponent.inject;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Handler;
-import android.view.Display;
-import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -25,6 +23,8 @@ import org.jellyfin.androidtv.preference.constant.StillWatchingBehavior;
 import org.jellyfin.androidtv.preference.constant.ZoomMode;
 import org.jellyfin.androidtv.ui.InteractionTrackerViewModel;
 import org.jellyfin.androidtv.ui.livetv.TvManager;
+import org.jellyfin.androidtv.ui.player.display.DisplayModeSwitcherKt;
+import org.jellyfin.androidtv.ui.player.display.VideoModeRequest;
 import org.jellyfin.androidtv.util.TimeUtils;
 import org.jellyfin.androidtv.util.Utils;
 import org.jellyfin.androidtv.util.apiclient.ReportingHelper;
@@ -140,7 +140,6 @@ public class PlaybackController implements PlaybackControllerNotifiable {
     // Ephyra: the programme after the one on air, for the "Next:" line of the live player's header
     private BaseItemDto mNextProgram = null;
 
-    private Display.Mode[] mDisplayModes;
     private RefreshRateSwitchingBehavior refreshRateSwitchingBehavior = RefreshRateSwitchingBehavior.DISABLED;
 
     public PlaybackController(List<BaseItemDto> items, CustomPlaybackOverlayFragment fragment) {
@@ -159,9 +158,6 @@ public class PlaybackController implements PlaybackControllerNotifiable {
         interactionTracker = lazyInteractionTracker.getValue();
 
         refreshRateSwitchingBehavior = userPreferences.getValue().get(UserPreferences.Companion.getRefreshRateSwitchingBehavior());
-        if (refreshRateSwitchingBehavior != RefreshRateSwitchingBehavior.DISABLED)
-            getDisplayModes();
-
     }
 
     public boolean hasFragment() {
@@ -383,90 +379,16 @@ public class PlaybackController implements PlaybackControllerNotifiable {
         }
     }
 
-    private void getDisplayModes() {
-        if (mFragment == null)
-            return;
-        Display display = mFragment.requireActivity().getWindowManager().getDefaultDisplay();
-        mDisplayModes = display.getSupportedModes();
-        Timber.i("** Available display refresh rates:");
-        for (Display.Mode mDisplayMode : mDisplayModes) {
-            Timber.i("display mode %s - %dx%d@%f", mDisplayMode.getModeId(), mDisplayMode.getPhysicalWidth(), mDisplayMode.getPhysicalHeight(), mDisplayMode.getRefreshRate());
-        }
-    }
-
-    @Nullable
-    private Display.Mode findBestDisplayMode(@Nullable MediaStream videoStream) {
-        if (mFragment == null || mDisplayModes == null || videoStream == null || videoStream.getRealFrameRate() == null || videoStream.getWidth() == null || videoStream.getHeight() == null)
-            return null;
-
-        int curWeight = 0;
-        Display.Mode bestMode = null;
-        int sourceRate = Math.round(videoStream.getRealFrameRate() * 100);
-
-        Display.Mode defaultMode = mFragment.requireActivity().getWindowManager().getDefaultDisplay().getMode();
-
-        Timber.d("trying to find display mode for video: %dx%d@%f", videoStream.getWidth(), videoStream.getHeight(), videoStream.getRealFrameRate());
-        for (Display.Mode mode : mDisplayModes) {
-            Timber.d("considering display mode: %s - %dx%d@%f", mode.getModeId(), mode.getPhysicalWidth(), mode.getPhysicalHeight(), mode.getRefreshRate());
-
-            // Skip unwanted display modes
-            if (mode.getPhysicalWidth() < 1280 || mode.getPhysicalHeight() < 720)  // Skip non-HD
-                continue;
-
-            if (mode.getPhysicalWidth() < videoStream.getWidth() || mode.getPhysicalHeight() < videoStream.getHeight())  // Disallow resolution downgrade
-                continue;
-
-            int rate = Math.round(mode.getRefreshRate() * 100);
-            if (rate != sourceRate && rate != sourceRate * 2 && rate != Math.round(sourceRate * 2.5)) // Skip inappropriate rates
-                continue;
-
-            Timber.i("qualifying display mode: %s - %dx%d@%f", mode.getModeId(), mode.getPhysicalWidth(), mode.getPhysicalHeight(), mode.getRefreshRate());
-
-            // Ephyra: SCALE_ON_DEVICE keeps the native resolution even when a lower resolution mode has a closer refresh rate
-            // (upstream #5893), SCALE_ON_TV ranks by distance from the media resolution
-            int resolutionDifference = DisplayModeScoringKt.displayModeResolutionDifference(
-                    refreshRateSwitchingBehavior,
-                    new DisplaySize(mode.getPhysicalWidth(), mode.getPhysicalHeight()),
-                    new DisplaySize(defaultMode.getPhysicalWidth(), defaultMode.getPhysicalHeight()),
-                    videoStream.getWidth());
-            int refreshRateDifference = rate - sourceRate;
-
-            // use 100,000 to account for refresh rates 120Hz+ (at 120Hz rate == 12,000)
-            int weight = 100000 - refreshRateDifference + 100000 - resolutionDifference;
-
-            if (weight > curWeight) {
-                Timber.d("preferring mode: %s - %dx%d@%f", mode.getModeId(), mode.getPhysicalWidth(), mode.getPhysicalHeight(), mode.getRefreshRate());
-                curWeight = weight;
-                bestMode = mode;
-            }
-        }
-
-        return bestMode;
-    }
-
-    private void setRefreshRate(MediaStream videoStream) {
-        if (videoStream == null || mFragment == null) {
-            Timber.e("Null video stream attempting to set refresh rate");
+    // Ephyra: the mode choice is shared with the new player (ui/player/display)
+    private void setRefreshRate(@Nullable MediaStream videoStream) {
+        if (videoStream == null || mFragment == null || videoStream.getRealFrameRate() == null || videoStream.getWidth() == null || videoStream.getHeight() == null) {
+            Timber.w("No video stream details to pick a display mode");
             return;
         }
 
-        Display.Mode current = mFragment.requireActivity().getWindowManager().getDefaultDisplay().getMode();
-        Display.Mode best = findBestDisplayMode(videoStream);
-        if (best != null) {
-            Timber.i("*** Best refresh mode is: %s - %dx%d/%f",
-                    best.getModeId(), best.getPhysicalWidth(), best.getPhysicalHeight(), best.getRefreshRate());
-            if (current.getModeId() != best.getModeId()) {
-                Timber.i("*** Attempting to change refresh rate from: %s - %dx%d@%f", current.getModeId(), current.getPhysicalWidth(),
-                        current.getPhysicalHeight(), current.getRefreshRate());
-                WindowManager.LayoutParams params = mFragment.requireActivity().getWindow().getAttributes();
-                params.preferredDisplayModeId = best.getModeId();
-                mFragment.requireActivity().getWindow().setAttributes(params);
-            } else {
-                Timber.i("Display is already in best mode");
-            }
-        } else {
-            Timber.i("*** Unable to find display mode for refresh rate: %f", videoStream.getRealFrameRate());
-        }
+        DisplayModeSwitcherKt.switchDisplayMode(mFragment.requireActivity(),
+                new VideoModeRequest(videoStream.getWidth(), videoStream.getHeight(), videoStream.getRealFrameRate()),
+                refreshRateSwitchingBehavior);
     }
 
     // central place to update mCurrentPosition

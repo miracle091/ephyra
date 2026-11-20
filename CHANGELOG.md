@@ -36,6 +36,8 @@ section 2(a) of the GPL-2.0.
 - Cast and crew cards on the details screens are larger (120dp pictures instead of 88dp).
 - The new player frees its decoders and buffers when playback stops and builds a fresh player for the next one, so
   changes to the FFmpeg, libass and buffer settings apply without restarting the app.
+- The new player switches the display to the video's frame rate (and back on exit) like the legacy one, with the
+  same choice of mode, now shared by both players.
 - The new player logs why playback failed and tells the rest of the app whether the stream, the decoder or the audio
   output was at fault, instead of a bare error state.
 

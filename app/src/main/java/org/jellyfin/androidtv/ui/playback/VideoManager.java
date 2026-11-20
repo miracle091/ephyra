@@ -48,6 +48,7 @@ import org.jellyfin.androidtv.data.compat.StreamInfo;
 import org.jellyfin.androidtv.preference.UserPreferences;
 import org.jellyfin.androidtv.preference.constant.BufferLength;
 import org.jellyfin.androidtv.preference.constant.ZoomMode;
+import org.jellyfin.androidtv.ui.player.display.FrameRateStrategyKt;
 import org.jellyfin.playback.media3.exoplayer.UrlRedactionKt;
 import org.jellyfin.playback.media3.exoplayer.shield.BitstreamFirstRenderersFactory;
 import org.jellyfin.playback.media3.exoplayer.shield.ShieldLoadControl;

@@ -1,4 +1,4 @@
-package org.jellyfin.androidtv.ui.playback
+package org.jellyfin.androidtv.ui.player.display
 
 import androidx.media3.common.C
 import io.kotest.core.spec.style.FunSpec
