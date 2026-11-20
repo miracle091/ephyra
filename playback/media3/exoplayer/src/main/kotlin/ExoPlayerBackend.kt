@@ -46,6 +46,7 @@ import org.jellyfin.playback.core.mediastream.normalizationGain
 import org.jellyfin.playback.core.model.PlayState
 import org.jellyfin.playback.core.model.PositionInfo
 import org.jellyfin.playback.core.queue.QueueEntry
+import org.jellyfin.playback.core.queue.startPosition
 import org.jellyfin.playback.core.support.PlaySupportReport
 import org.jellyfin.playback.core.timedevent.TimedEvent
 import org.jellyfin.playback.core.ui.PlayerSubtitleView
@@ -324,11 +325,14 @@ class ExoPlayerBackend(
 			preparedItemIndex = exoPlayer.mediaItemCount - 1
 		}
 
-		// Seek to prepared media item
-		when (preparedItemIndex) {
-			exoPlayer.currentMediaItemIndex - 1 -> exoPlayer.seekToPreviousMediaItem()
-			exoPlayer.currentMediaItemIndex + 1 -> exoPlayer.seekToNextMediaItem()
-			exoPlayer.currentMediaItemIndex -> Unit
+		// Seek to prepared media item; Ephyra: at the entry's start position (resume) when it has one, applied once
+		val startPosition = item.startPosition
+		item.startPosition = null
+		when {
+			startPosition != null -> exoPlayer.seekTo(preparedItemIndex, startPosition.inWholeMilliseconds)
+			preparedItemIndex == exoPlayer.currentMediaItemIndex - 1 -> exoPlayer.seekToPreviousMediaItem()
+			preparedItemIndex == exoPlayer.currentMediaItemIndex + 1 -> exoPlayer.seekToNextMediaItem()
+			preparedItemIndex == exoPlayer.currentMediaItemIndex -> Unit
 			else -> exoPlayer.seekTo(preparedItemIndex, 0)
 		}
 

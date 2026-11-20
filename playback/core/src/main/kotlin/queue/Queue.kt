@@ -30,9 +30,10 @@ interface Queue {
 	val entries: StateFlow<List<QueueEntry>>
 
 	/**
-	 * Add a supplier of queue items to the end of the queue. Will automatically fetch the first item if there is no current entry.
+	 * Add a supplier of queue items to the end of the queue. Will automatically fetch the first item if there is no current entry;
+	 * Ephyra: the item at [startIndex] instead, so a queue can start in the middle and still go back.
 	 */
-	fun addSupplier(supplier: QueueSupplier)
+	fun addSupplier(supplier: QueueSupplier, startIndex: Int = 0)
 
 	/**
 	 * Get all current suppliers of this queue.

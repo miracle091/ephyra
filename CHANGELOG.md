@@ -51,6 +51,12 @@ section 2(a) of the GPL-2.0.
 ### Fixed
 
 - The skip button's icon shows again: it was tinted into a solid light disc; it keeps its own theme colours now.
+- The new player (development option, also used for music) reports playback to the server reliably: the stop report
+  was lost because the queue was cleared before it was sent, moving to the next episode reported neither the stop of
+  the previous one nor the start of the next, errors were reported as normal stops, and progress was sent only on
+  pause; it now goes every 3 s while playing and every 15 s while paused, like the legacy player.
+- The new player resumes videos where they were left and starts a queue at the chosen item: the resume seek was
+  issued before the stream was known and the queue always started at its first item.
 
 ## [0.5.0] - 2026-11-09
 

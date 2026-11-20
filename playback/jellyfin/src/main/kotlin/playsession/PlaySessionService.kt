@@ -1,19 +1,26 @@
 package org.jellyfin.playback.jellyfin.playsession
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import org.jellyfin.playback.core.mediastream.MediaConversionMethod
+import org.jellyfin.playback.core.mediastream.PlayableMediaStream
 import org.jellyfin.playback.core.mediastream.mediaStream
 import org.jellyfin.playback.core.model.PlayState
 import org.jellyfin.playback.core.model.RepeatMode
 import org.jellyfin.playback.core.plugin.PlayerService
+import org.jellyfin.playback.core.queue.QueueEntry
 import org.jellyfin.playback.core.queue.queue
 import org.jellyfin.playback.jellyfin.queue.baseItem
 import org.jellyfin.sdk.api.client.ApiClient
 import org.jellyfin.sdk.api.client.extensions.sessionApi
+import org.jellyfin.sdk.model.api.BaseItemDto
 import org.jellyfin.sdk.model.api.PlayMethod
 import org.jellyfin.sdk.model.api.PlaybackOrder
 import org.jellyfin.sdk.model.api.PlaybackProgressInfo
@@ -23,22 +30,41 @@ import org.jellyfin.sdk.model.api.QueueItem
 import org.jellyfin.sdk.model.extensions.inWholeTicks
 import timber.log.Timber
 import kotlin.math.roundToInt
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.TimeSource
 import org.jellyfin.sdk.model.api.RepeatMode as SdkRepeatMode
 
 private const val QUEUE_PEEK_COUNT = 15
 
+// Ephyra: the legacy player's reporting rhythm (progress every 3 s while playing, every 15 s while paused to keep the session)
+private val SAMPLE_INTERVAL = 1.seconds
+private val PROGRESS_INTERVAL_PLAYING = 3.seconds
+private val PROGRESS_INTERVAL_PAUSED = 15.seconds
+
+/** Ephyra: what a report is about: the queue entry, its stream (the play session) and its item. */
+private data class PlaySession(val entry: QueueEntry, val stream: PlayableMediaStream, val item: BaseItemDto)
+
 class PlaySessionService(
 	private val api: ApiClient,
 ) : PlayerService() {
+	// Ephyra: every start gets its stop, also when the queue is cleared or moves on (see PlaySessionTracker)
+	private val tracker = PlaySessionTracker<PlaySession>()
+	private val mutex = Mutex()
+	private var lastReport = TimeSource.Monotonic.markNow()
+
 	override suspend fun onInitialize() {
-		state.playState.onEach { playState ->
-			when (playState) {
-				PlayState.PLAYING -> sendStreamStart()
-				PlayState.STOPPED -> sendStreamStop()
-				PlayState.PAUSED -> sendStreamUpdate()
-				PlayState.ERROR -> sendStreamStop()
+		state.playState.onEach { sync() }.launchIn(coroutineScope)
+		manager.queue.entry.onEach { sync() }.launchIn(coroutineScope)
+
+		// Ephyra: periodic progress, and a start as soon as the next entry's stream is known (no play state change then)
+		coroutineScope.launch {
+			while (isActive) {
+				delay(SAMPLE_INTERVAL)
+				val interval = if (state.playState.value == PlayState.PAUSED) PROGRESS_INTERVAL_PAUSED else PROGRESS_INTERVAL_PLAYING
+				if (lastReport.elapsedNow() >= interval || currentSession() != tracker.active) sync() else sample()
 			}
-		}.launchIn(coroutineScope)
+		}
 	}
 
 	private val MediaConversionMethod.playMethod
@@ -55,8 +81,41 @@ class PlaySessionService(
 			RepeatMode.REPEAT_ENTRY_INFINITE -> SdkRepeatMode.REPEAT_ALL
 		}
 
+	private val remotePlaybackOrder
+		get() = when (state.playbackOrder.value) {
+			org.jellyfin.playback.core.model.PlaybackOrder.DEFAULT -> PlaybackOrder.DEFAULT
+			org.jellyfin.playback.core.model.PlaybackOrder.RANDOM -> PlaybackOrder.SHUFFLE
+			org.jellyfin.playback.core.model.PlaybackOrder.SHUFFLE -> PlaybackOrder.SHUFFLE
+		}
+
 	suspend fun sendUpdateIfActive() {
-		coroutineScope.launch { sendStreamUpdate() }
+		coroutineScope.launch { sync() }
+	}
+
+	private fun currentSession(): PlaySession? {
+		val entry = manager.queue.entry.value ?: return null
+		val stream = entry.mediaStream ?: return null
+		val item = entry.baseItem ?: return null
+		return PlaySession(entry, stream, item)
+	}
+
+	private suspend fun sample() = mutex.withLock {
+		val current = currentSession() ?: return@withLock
+		tracker.observe(current, withContext(Dispatchers.Main) { state.positionInfo.active })
+	}
+
+	private suspend fun sync() = mutex.withLock {
+		val current = currentSession()
+		val position = if (current == null) null else withContext(Dispatchers.Main) { state.positionInfo.active }
+
+		for (report in tracker.update(current, state.playState.value, position)) {
+			when (report) {
+				is PlaySessionReport.Start -> sendStreamStart(report.session, position ?: Duration.ZERO)
+				is PlaySessionReport.Progress -> sendStreamUpdate(report.session, position ?: Duration.ZERO)
+				is PlaySessionReport.Stop -> sendStreamStop(report.session, report.position, report.failed)
+			}
+		}
+		lastReport = TimeSource.Monotonic.markNow()
 	}
 
 	private suspend fun getQueue(): List<QueueItem> {
@@ -68,82 +127,62 @@ class PlaySessionService(
 			.map { QueueItem(id = it.id, playlistItemId = it.playlistItemId) }
 	}
 
-	private suspend fun sendStreamStart() {
-		val entry = manager.queue.entry.value ?: return
-		val stream = entry.mediaStream ?: return
-		val item = entry.baseItem ?: return
-
+	private suspend fun sendStreamStart(session: PlaySession, position: Duration) {
 		runCatching {
 			api.sessionApi.reportPlaybackStart(
 				PlaybackStartInfo(
-					itemId = item.id,
-					playSessionId = stream.identifier,
-					playlistItemId = item.playlistItemId,
+					itemId = session.item.id,
+					playSessionId = session.stream.identifier,
+					playlistItemId = session.item.playlistItemId,
 					canSeek = true,
 					isMuted = state.volume.muted,
 					volumeLevel = (state.volume.volume * 100).roundToInt(),
 					isPaused = state.playState.value != PlayState.PLAYING,
 					aspectRatio = state.videoSize.value.aspectRatio.toString(),
-					positionTicks = withContext(Dispatchers.Main) { state.positionInfo.active.inWholeTicks },
-					playMethod = stream.conversionMethod.playMethod,
+					positionTicks = position.inWholeTicks,
+					playMethod = session.stream.conversionMethod.playMethod,
 					repeatMode = state.repeatMode.value.remoteRepeatMode,
 					nowPlayingQueue = getQueue(),
-					playbackOrder = when (state.playbackOrder.value) {
-						org.jellyfin.playback.core.model.PlaybackOrder.DEFAULT -> PlaybackOrder.DEFAULT
-						org.jellyfin.playback.core.model.PlaybackOrder.RANDOM -> PlaybackOrder.SHUFFLE
-						org.jellyfin.playback.core.model.PlaybackOrder.SHUFFLE -> PlaybackOrder.SHUFFLE
-					}
+					playbackOrder = remotePlaybackOrder,
 				)
 			)
 		}.onFailure { error -> Timber.w(error, "Failed to send playback start event") }
 	}
 
-	private suspend fun sendStreamUpdate() {
-		val entry = manager.queue.entry.value ?: return
-		val stream = entry.mediaStream ?: return
-		val item = entry.baseItem ?: return
-
+	private suspend fun sendStreamUpdate(session: PlaySession, position: Duration) {
 		runCatching {
 			api.sessionApi.reportPlaybackProgress(
 				PlaybackProgressInfo(
-					itemId = item.id,
-					playSessionId = stream.identifier,
-					playlistItemId = item.playlistItemId,
+					itemId = session.item.id,
+					playSessionId = session.stream.identifier,
+					playlistItemId = session.item.playlistItemId,
 					canSeek = true,
 					isMuted = state.volume.muted,
 					volumeLevel = (state.volume.volume * 100).roundToInt(),
 					isPaused = state.playState.value != PlayState.PLAYING,
 					aspectRatio = state.videoSize.value.aspectRatio.toString(),
-					positionTicks = withContext(Dispatchers.Main) { state.positionInfo.active.inWholeTicks },
-					playMethod = stream.conversionMethod.playMethod,
+					positionTicks = position.inWholeTicks,
+					playMethod = session.stream.conversionMethod.playMethod,
 					repeatMode = state.repeatMode.value.remoteRepeatMode,
 					nowPlayingQueue = getQueue(),
-					playbackOrder = when (state.playbackOrder.value) {
-						org.jellyfin.playback.core.model.PlaybackOrder.DEFAULT -> PlaybackOrder.DEFAULT
-						org.jellyfin.playback.core.model.PlaybackOrder.RANDOM -> PlaybackOrder.SHUFFLE
-						org.jellyfin.playback.core.model.PlaybackOrder.SHUFFLE -> PlaybackOrder.SHUFFLE
-					}
+					playbackOrder = remotePlaybackOrder,
 				)
 			)
-		}.onFailure { error -> Timber.w("Failed to send playback update event", error) }
+		}.onFailure { error -> Timber.w(error, "Failed to send playback update event") }
 	}
 
-	private suspend fun sendStreamStop() {
-		val entry = manager.queue.entry.value ?: return
-		val stream = entry.mediaStream ?: return
-		val item = entry.baseItem ?: return
-
+	private suspend fun sendStreamStop(session: PlaySession, position: Duration, failed: Boolean) {
 		runCatching {
 			api.sessionApi.reportPlaybackStopped(
 				PlaybackStopInfo(
-					itemId = item.id,
-					playSessionId = stream.identifier,
-					playlistItemId = item.playlistItemId,
-					positionTicks = withContext(Dispatchers.Main) { state.positionInfo.active.inWholeTicks },
-					failed = false,
+					itemId = session.item.id,
+					playSessionId = session.stream.identifier,
+					playlistItemId = session.item.playlistItemId,
+					positionTicks = position.inWholeTicks,
+					failed = failed,
 					nowPlayingQueue = getQueue(),
 				)
 			)
-		}.onFailure { error -> Timber.w("Failed to send playback stop event", error) }
+		}.onFailure { error -> Timber.w(error, "Failed to send playback stop event") }
 	}
 }

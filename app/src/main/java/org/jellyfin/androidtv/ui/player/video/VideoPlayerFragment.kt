@@ -5,8 +5,6 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.compose.content
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.launch
 import org.jellyfin.androidtv.ui.base.BaseScreen
 import org.jellyfin.androidtv.ui.playback.VideoQueueManager
 import org.jellyfin.androidtv.ui.playback.rewrite.RewriteMediaManager
@@ -29,18 +27,20 @@ class VideoPlayerFragment : Fragment() {
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 
-		// Create a queue from the items added to the legacy video queue
-		val queueSupplier = RewriteMediaManager.BaseItemQueueSupplier(api, videoQueueManager.getCurrentVideoQueue(), false)
-		Timber.i("Created a queue with ${queueSupplier.items.size} items")
+		// Create a queue from the items added to the legacy video queue; Ephyra: starting at the launcher's item and resume point,
+		// applied when that entry's stream starts (a seek here would land before the stream is known)
+		val startIndex = videoQueueManager.getCurrentMediaPosition().coerceAtLeast(0)
+		val startPosition = arguments?.getInt(EXTRA_POSITION)?.milliseconds
+		val queueSupplier = RewriteMediaManager.BaseItemQueueSupplier(
+			api,
+			videoQueueManager.getCurrentVideoQueue(),
+			false,
+			startIndex,
+			startPosition,
+		)
+		Timber.i("Created a queue with ${queueSupplier.items.size} items, starting at $startIndex")
 		playbackManager.queue.clear()
-		playbackManager.queue.addSupplier(queueSupplier)
-
-		// Set position
-		arguments?.getInt(EXTRA_POSITION)?.milliseconds?.let {
-			lifecycleScope.launch {
-				playbackManager.state.seek(it)
-			}
-		}
+		playbackManager.queue.addSupplier(queueSupplier, startIndex)
 
 		// Pause player until the initial resume
 		playbackManager.state.pause()

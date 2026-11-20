@@ -20,12 +20,14 @@ import org.jellyfin.playback.core.model.PlaybackOrder
 import org.jellyfin.playback.core.model.RepeatMode
 import org.jellyfin.playback.core.queue.QueueEntry
 import org.jellyfin.playback.core.queue.queue
+import org.jellyfin.playback.core.queue.startPosition
 import org.jellyfin.playback.core.queue.supplier.QueueSupplier
 import org.jellyfin.playback.jellyfin.queue.baseItem
 import org.jellyfin.playback.jellyfin.queue.createBaseItemQueueEntry
 import org.jellyfin.sdk.api.client.ApiClient
 import org.jellyfin.sdk.model.api.BaseItemDto
 import org.jellyfin.sdk.model.api.MediaType
+import kotlin.time.Duration
 
 @Suppress("TooManyFunctions")
 class RewriteMediaManager(
@@ -230,6 +232,9 @@ class RewriteMediaManager(
 		private val api: ApiClient,
 		val items: List<BaseItemDto>,
 		val visibleInScreensaver: Boolean,
+		// Ephyra: the resume point of the item playback starts with
+		private val startIndex: Int = 0,
+		private val startPosition: Duration? = null,
 	) : QueueSupplier {
 		override val size: Int
 			get() = items.size
@@ -238,6 +243,7 @@ class RewriteMediaManager(
 			val item = items.getOrNull(index) ?: return null
 			return createBaseItemQueueEntry(api, item).also {
 				it.visibleInScreensaver = visibleInScreensaver
+				if (index == startIndex && startPosition != null && startPosition > Duration.ZERO) it.startPosition = startPosition
 			}
 		}
 	}
