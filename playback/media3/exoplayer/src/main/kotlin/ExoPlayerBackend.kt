@@ -5,6 +5,7 @@ import android.content.Context
 import android.view.ViewGroup
 import androidx.annotation.OptIn
 import androidx.core.content.getSystemService
+import androidx.core.net.toUri
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
@@ -38,6 +39,7 @@ import io.github.peerless2012.ass.media.widget.AssSubtitleView
 import org.jellyfin.playback.core.backend.BasePlayerBackend
 import org.jellyfin.playback.core.mediastream.MediaConversionMethod
 import org.jellyfin.playback.core.mediastream.MediaStream
+import org.jellyfin.playback.core.mediastream.MediaStreamSubtitleTrack
 import org.jellyfin.playback.core.mediastream.PlayableMediaStream
 import org.jellyfin.playback.core.mediastream.mediaStream
 import org.jellyfin.playback.core.mediastream.mediatype.MediaType
@@ -51,7 +53,12 @@ import org.jellyfin.playback.core.support.PlaySupportReport
 import org.jellyfin.playback.core.timedevent.TimedEvent
 import org.jellyfin.playback.core.ui.PlayerSubtitleView
 import org.jellyfin.playback.core.ui.PlayerSurfaceView
+import org.jellyfin.playback.media3.exoplayer.mapping.SubtitleSelection
+import org.jellyfin.playback.media3.exoplayer.mapping.externalSubtitleId
+import org.jellyfin.playback.media3.exoplayer.mapping.externalSubtitleIndex
 import org.jellyfin.playback.media3.exoplayer.mapping.findAudioGroupPosition
+import org.jellyfin.playback.media3.exoplayer.mapping.findSubtitleSelection
+import org.jellyfin.playback.media3.exoplayer.mapping.subtitleMimeType
 import org.jellyfin.playback.media3.exoplayer.mapping.toPlaybackError
 import org.jellyfin.playback.media3.exoplayer.shield.BitstreamFirstRenderersFactory
 import org.jellyfin.playback.media3.exoplayer.shield.ShieldLoadControl
@@ -85,6 +92,7 @@ class ExoPlayerBackend(
 	private var timedEventState = TimedEventState()
 	private var lastKnownDuration: Duration? = null
 	private var audioSelectionDone: PlayableMediaStream? = null
+	private var subtitleSelectionDone: PlayableMediaStream? = null
 
 	// Ephyra: the player lives from first use to stop(), which releases it (decoders, buffers, libass); the views outlive it
 	private var instance: PlayerInstance? = null
@@ -245,6 +253,7 @@ class ExoPlayerBackend(
 
 		override fun onTracksChanged(tracks: Tracks) {
 			selectServerAudioTrack(tracks)
+			selectServerSubtitle(tracks)
 		}
 
 		override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
@@ -294,6 +303,40 @@ class ExoPlayerBackend(
 			.build()
 	}
 
+	/**
+	 * Ephyra: show the subtitle the server chose from the user's settings (or none), instead of ExoPlayer's own rules. Done once per
+	 * stream, as soon as its tracks are known, so a subtitle picked later in the player is not overridden.
+	 */
+	private fun selectServerSubtitle(tracks: Tracks) {
+		val stream = currentStream ?: return
+		if (
+			subtitleSelectionDone == stream ||
+			tracks.groups.isEmpty() ||
+			exoPlayer.currentMediaItem?.mediaId != stream.hashCode().toString()
+		) return
+		subtitleSelectionDone = stream
+
+		val textGroups = tracks.groups.filter { it.type == C.TRACK_TYPE_TEXT }
+		val selection = findSubtitleSelection(
+			tracks = stream.tracks,
+			wantedIndex = stream.defaultSubtitleStreamIndex,
+			groupExternalIndexes = textGroups.map { externalSubtitleIndex(it.mediaTrackGroup.getFormat(0).id) },
+			directPlay = stream.conversionMethod == MediaConversionMethod.None,
+		)
+		Timber.i("Subtitle for server subtitle stream ${stream.defaultSubtitleStreamIndex}: $selection")
+
+		val parameters = exoPlayer.trackSelectionParameters.buildUpon().clearOverridesOfType(C.TRACK_TYPE_TEXT)
+		when (selection) {
+			SubtitleSelection.Off -> parameters.setTrackTypeDisabled(C.TRACK_TYPE_TEXT, true)
+			is SubtitleSelection.Group -> parameters
+				.setTrackTypeDisabled(C.TRACK_TYPE_TEXT, false)
+				.setOverrideForType(TrackSelectionOverride(textGroups[selection.position].mediaTrackGroup, 0))
+
+			SubtitleSelection.Keep -> parameters.setTrackTypeDisabled(C.TRACK_TYPE_TEXT, false)
+		}
+		exoPlayer.trackSelectionParameters = parameters.build()
+	}
+
 	override fun supportsStream(
 		stream: MediaStream
 	): PlaySupportReport = exoPlayer.getPlaySupportReport(stream.toFormats())
@@ -331,6 +374,8 @@ class ExoPlayerBackend(
 			setTag(item)
 			setMediaId(stream.hashCode().toString())
 			setUri(stream.url)
+			// Ephyra: subtitles the server hands out as separate files, loaded beside the stream as in the legacy player
+			setSubtitleConfigurations(stream.tracks.filterIsInstance<MediaStreamSubtitleTrack>().mapNotNull { it.toSubtitleConfiguration() })
 		}.build()
 
 		// Remove any excessive items from the start
@@ -413,6 +458,7 @@ class ExoPlayerBackend(
 		audioNightMode.release()
 		currentStream = null
 		audioSelectionDone = null
+		subtitleSelectionDone = null
 		lastKnownDuration = null
 		audioAttributeState = AudioAttributeState()
 		timedEventState = TimedEventState()
@@ -455,6 +501,22 @@ class ExoPlayerBackend(
 	override fun setTimedEvents(timedEvents: List<TimedEvent>) {
 		timedEventState.setTimedEvents(exoPlayer, timedEvents)
 	}
+}
+
+/** Ephyra: a subtitle file handed out by the server, as a side-loaded track of the media item; null for the stream's own tracks. */
+@OptIn(UnstableApi::class)
+private fun MediaStreamSubtitleTrack.toSubtitleConfiguration(): MediaItem.SubtitleConfiguration? {
+	val url = externalUrl ?: return null
+	var selectionFlags = 0
+	if (isDefault) selectionFlags = selectionFlags or C.SELECTION_FLAG_DEFAULT
+	if (isForced) selectionFlags = selectionFlags or C.SELECTION_FLAG_FORCED
+	return MediaItem.SubtitleConfiguration.Builder(url.toUri())
+		.setId(externalSubtitleId(index))
+		.setMimeType(subtitleMimeType(codec, url))
+		.setLanguage(language)
+		.setLabel(title)
+		.setSelectionFlags(selectionFlags)
+		.build()
 }
 
 /** The position in [audioGroups] of the player track for the server audio stream [wantedIndex], or null (logged) if there is none. */
