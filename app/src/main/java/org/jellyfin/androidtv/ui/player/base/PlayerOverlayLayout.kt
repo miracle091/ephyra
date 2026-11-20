@@ -8,10 +8,12 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -37,7 +39,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jellyfin.androidtv.ui.base.JellyfinTheme
-import org.jellyfin.androidtv.ui.composable.modifier.overscan
+import org.jellyfin.androidtv.ui.composable.modifier.overscanPaddingValues
 import timber.log.Timber
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -51,6 +53,8 @@ fun PlayerOverlayLayout(
 	visibilityState: PlayerOverlayVisibilityState = rememberPlayerOverlayVisibility(),
 	header: (@Composable () -> Unit)? = null,
 	controls: (@Composable () -> Unit)? = null,
+	// Ephyra: the video player keeps the legacy player's margins, the other players the default overscan
+	contentPadding: PaddingValues = overscanPaddingValues,
 ) = Box(
 	modifier = modifier
 		.fillMaxSize()
@@ -81,7 +85,7 @@ fun PlayerOverlayLayout(
 			enter = slideInVertically() + fadeIn(),
 			exit = slideOutVertically() + fadeOut(),
 		) {
-			PlayerOverlayHeader(header)
+			PlayerOverlayHeader(contentPadding, header)
 		}
 	}
 
@@ -93,13 +97,13 @@ fun PlayerOverlayLayout(
 			enter = slideInVertically(initialOffsetY = { it }) + fadeIn(),
 			exit = slideOutVertically(targetOffsetY = { it }) + fadeOut(),
 		) {
-			PlayerOverlayControls(visibilityState, controls)
+			PlayerOverlayControls(visibilityState, contentPadding, controls)
 		}
 	}
 }
 
 @Composable
-private fun PlayerOverlayHeader(header: @Composable () -> Unit) {
+private fun PlayerOverlayHeader(contentPadding: PaddingValues, header: @Composable () -> Unit) {
 	Box(
 		modifier = Modifier
 			.fillMaxWidth()
@@ -112,7 +116,7 @@ private fun PlayerOverlayHeader(header: @Composable () -> Unit) {
 					)
 				)
 			)
-			.overscan()
+			.padding(contentPadding)
 	) {
 		header()
 	}
@@ -121,6 +125,7 @@ private fun PlayerOverlayHeader(header: @Composable () -> Unit) {
 @Composable
 private fun PlayerOverlayControls(
 	visibilityState: PlayerOverlayVisibilityState,
+	contentPadding: PaddingValues,
 	controls: @Composable () -> Unit,
 ) {
 	// Focus trap to detect when controls need to be closed by moving the focus up
@@ -144,7 +149,7 @@ private fun PlayerOverlayControls(
 					)
 				)
 			)
-			.overscan()
+			.padding(contentPadding)
 			.focusProperties {
 				// Hide overlay when focus is moved out by going up
 				onExit = {

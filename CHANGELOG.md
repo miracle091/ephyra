@@ -48,6 +48,9 @@ section 2(a) of the GPL-2.0.
   while still showing the old one.
 - The new player follows the zoom setting (fit, auto crop, stretch) like the legacy one; subtitles stay inside the
   whole picture so cropping never cuts them off.
+- The new player's overlay looks like the legacy one: the series and episode over the title, how the server delivers
+  the stream and why, the end time under the seek bar, the legacy margins and button order, and controls dimmed
+  during HDR and Dolby Vision playback.
 - The new player tells the server which version (media source) and audio track it plays, and knows the subtitle
   tracks of the stream.
 - The new player loads subtitles the server hands out as separate files and shows the subtitle the server picks

@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -23,16 +22,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.focusRestorer
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.onVisibilityChanged
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 import org.jellyfin.androidtv.R
+import org.jellyfin.androidtv.integration.dream.formatPlaybackTime
 import org.jellyfin.androidtv.ui.base.Icon
+import org.jellyfin.androidtv.ui.base.LocalEphyraPalette
 import org.jellyfin.androidtv.ui.base.LocalTextStyle
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.base.button.IconButton
@@ -40,33 +42,57 @@ import org.jellyfin.androidtv.ui.base.popover.Popover
 import org.jellyfin.androidtv.ui.base.popover.PopoverPlacement
 import org.jellyfin.androidtv.ui.composable.rememberPlayerPositionInfo
 import org.jellyfin.androidtv.ui.player.base.PlayerSeekbar
+import org.jellyfin.androidtv.util.getTimeFormatter
 import org.jellyfin.playback.core.PlaybackManager
 import org.jellyfin.playback.core.model.PlayState
 import org.jellyfin.playback.core.queue.queue
 import org.koin.compose.koinInject
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
-import kotlin.time.DurationUnit
+import java.time.LocalTime
 
 @Composable
 fun VideoPlayerControls(
 	playbackManager: PlaybackManager = koinInject(),
 	onPlaybackInfoClick: () -> Unit = {},
+	modifier: Modifier = Modifier,
 ) {
 	val playState by playbackManager.state.playState.collectAsState()
 
+	// Ephyra: as in the legacy player, the seek bar comes first in a 24dp row, the times and the end time 8dp under it, then the
+	// buttons 16dp lower, their centres 56dp apart (the legacy 48dp buttons with 8dp gaps; these are 44dp, so 12dp gaps and 2dp
+	// more around the row). The legacy order: rewind, play/pause, fast forward, next
 	Column(
-		verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Bottom),
+		verticalArrangement = Arrangement.Bottom,
+		modifier = modifier,
 	) {
+		Box(
+			contentAlignment = Alignment.Center,
+			modifier = Modifier
+				.fillMaxWidth()
+				.height(24.dp),
+		) {
+			PlayerSeekbar(
+				playbackManager = playbackManager,
+				modifier = Modifier
+					.fillMaxWidth()
+					.height(4.dp)
+			)
+		}
+
+		PositionRow(playbackManager, Modifier.padding(top = 8.dp))
+
 		Row(
 			horizontalArrangement = Arrangement.spacedBy(12.dp),
 			modifier = Modifier
+				.padding(start = 2.dp, top = 18.dp, end = 2.dp)
 				.focusRestorer()
 				.focusGroup()
 		) {
-			PlayPauseButton(playbackManager, playState)
 			RewindButton(playbackManager)
+			PlayPauseButton(playbackManager, playState)
 			FastForwardButton(playbackManager)
+			NextEntryButton(playbackManager)
 
 			Spacer(Modifier.weight(1f))
 
@@ -74,25 +100,7 @@ fun VideoPlayerControls(
 
 			MoreOptionsButton {
 				PreviousEntryButton(playbackManager)
-				NextEntryButton(playbackManager)
 			}
-		}
-
-		PlayerSeekbar(
-			playbackManager = playbackManager,
-			modifier = Modifier
-				.fillMaxWidth()
-				.height(4.dp)
-		)
-
-		Row(
-			horizontalArrangement = Arrangement.spacedBy(12.dp),
-			modifier = Modifier
-				.focusRestorer()
-				.focusGroup()
-		) {
-			Spacer(Modifier.weight(1f))
-			PositionText(playbackManager)
 		}
 	}
 }
@@ -209,42 +217,32 @@ private fun NextEntryButton(
 	}
 }
 
-private const val SECONDS_PER_MINUTE = 60
-private const val MINUTES_PER_HOUR = 60
-private const val SECONDS_PER_HOUR = SECONDS_PER_MINUTE * MINUTES_PER_HOUR
 private const val MORE_OPTIONS_POPOVER_OFFSET_Y = -5
 
-private fun Duration.formatted(includeHours: Boolean): String {
-	val totalSeconds = toInt(DurationUnit.SECONDS)
-	val hours = totalSeconds / SECONDS_PER_HOUR
-	val minutes = (totalSeconds % SECONDS_PER_HOUR) / SECONDS_PER_MINUTE
-	val seconds = totalSeconds % SECONDS_PER_MINUTE
-
-	return if (includeHours) "%02d:%02d:%02d".format(hours, minutes, seconds)
-	else "%02d:%02d".format(minutes, seconds)
-}
-
+/** Ephyra: the position on the left, the end time and the duration on the right, under the seek bar as in the legacy player. */
 @Composable
-private fun PositionText(
+private fun PositionRow(
 	playbackManager: PlaybackManager,
+	modifier: Modifier = Modifier,
 ) {
 	val positionInfo by rememberPlayerPositionInfo(playbackManager, precision = 1.seconds)
+	val speed by playbackManager.state.speed.collectAsState()
 	if (positionInfo.duration == Duration.ZERO) return
 
-	val text by remember {
-		derivedStateOf {
-			val includeHours = positionInfo.duration.inWholeMinutes >= MINUTES_PER_HOUR
-			val activeFormatted = positionInfo.active.formatted(includeHours)
-			val durationFormatted = positionInfo.duration.formatted(includeHours)
+	val context = LocalContext.current
+	val palette = LocalEphyraPalette.current
+	val style = LocalTextStyle.current.merge(color = palette.inkMuted, fontSize = 14.sp, fontFeatureSettings = "tnum")
+	val endsAt = context.getTimeFormatter().format(videoEndsAt(positionInfo.active, positionInfo.duration, speed, LocalTime.now()))
 
-			"$activeFormatted / $durationFormatted"
-		}
+	Row(
+		horizontalArrangement = Arrangement.spacedBy(24.dp),
+		modifier = modifier.fillMaxWidth(),
+	) {
+		Text(formatPlaybackTime(positionInfo.active.inWholeMilliseconds), style = style)
+		Spacer(Modifier.weight(1f))
+		Text(stringResource(R.string.lbl_playback_control_ends, endsAt), style = style)
+		Text(formatPlaybackTime(positionInfo.duration.inWholeMilliseconds), style = style)
 	}
-
-	Text(
-		text = text,
-		style = LocalTextStyle.current.copy(color = Color.White)
-	)
 }
 
 @Composable

@@ -9,15 +9,19 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.jellyfin.androidtv.ui.shared.toolbar.ToolbarClock
 
 @Composable
 fun PlayerHeader(
+	// Ephyra: the video player places the clock as the legacy player did
+	clockModifier: Modifier = Modifier,
+	spacing: Dp = 12.dp,
 	content: @Composable ColumnScope.() -> Unit,
 ) {
 	Row(
-		horizontalArrangement = Arrangement.spacedBy(12.dp),
+		horizontalArrangement = Arrangement.spacedBy(spacing),
 		verticalAlignment = Alignment.Top,
 	) {
 		Column {
@@ -27,7 +31,7 @@ fun PlayerHeader(
 		Spacer(Modifier.weight(1f))
 
 		ToolbarClock(
-			modifier = Modifier.wrapContentWidth(unbounded = true)
+			modifier = clockModifier.wrapContentWidth(unbounded = true)
 		)
 	}
 }
