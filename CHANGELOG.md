@@ -78,6 +78,13 @@ section 2(a) of the GPL-2.0.
   The reports carry the tracks actually shown.
 - The new player follows the "burn in subtitles when transcoding" setting and tells the server where playback starts,
   like the legacy one; a subtitle burnt in is not loaded a second time as a file.
+- The new player's seek bar keeps a knob at the playing position when it doesn't have the focus, like the legacy
+  one; at half the focused size it reads better from the couch than the legacy dot.
+- Scrubbing the seek bar seeks once, 0.6 s after the last arrow press (or at once with centre), instead of on every
+  press, so a transcoded stream restarts once; every press of a quick run counts. Music shares the seek bar.
+- Left and right seek quickly in the new player while the controls are hidden: presses add up by the fast forward and
+  rewind amounts, a toast shows the distance and the target, and one seek follows the last press (centre seeks at
+  once).
 
 ### Removed
 
@@ -108,6 +115,8 @@ section 2(a) of the GPL-2.0.
 - After a track switch that needs a new stream while a video is paused in the new player, the server sees the new
   session at once instead of losing it until playback resumes.
 - The skip button's icon shows again: it was tinted into a solid light disc; it keeps its own theme colours now.
+- Scrubbing the seek bar of the new player no longer reads as a pause: no pause toast or play icon while picking a
+  position.
 - The new player (development option, also used for music) reports playback to the server reliably: the stop report
   was lost because the queue was cleared before it was sent, moving to the next episode reported neither the stop of
   the previous one nor the start of the next, errors were reported as normal stops, and progress was sent only on

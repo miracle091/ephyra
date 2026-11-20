@@ -210,11 +210,7 @@ class ExoPlayerBackend(
 	// Ephyra: bound to its own player, so a late callback never builds a new one
 	inner class PlayerListener(private val exoPlayer: ExoPlayer) : Player.Listener {
 		override fun onIsPlayingChanged(isPlaying: Boolean) {
-			val state = when {
-				isPlaying -> PlayState.PLAYING
-				exoPlayer.playbackState == Player.STATE_IDLE || exoPlayer.playbackState == Player.STATE_ENDED -> PlayState.STOPPED
-				else -> PlayState.PAUSED
-			}
+			val state = playStateOf(isPlaying, exoPlayer.playbackState, exoPlayer.playWhenReady, exoPlayer.playbackSuppressionReason)
 			listener?.onPlayStateChange(state)
 		}
 

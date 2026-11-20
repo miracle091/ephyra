@@ -26,8 +26,15 @@ class VideoPlayerKeyActionTest : FunSpec({
 		videoPlayerKeyAction(KeyEvent.KEYCODE_DPAD_CENTER, controlsVisible = true) shouldBe null
 	}
 
+	test("left and right seek quickly while the controls are hidden") {
+		videoPlayerKeyAction(KeyEvent.KEYCODE_DPAD_RIGHT, controlsVisible = false) shouldBe VideoPlayerKeyAction.QUICK_SEEK_FORWARD
+		videoPlayerKeyAction(KeyEvent.KEYCODE_DPAD_LEFT, controlsVisible = false) shouldBe VideoPlayerKeyAction.QUICK_SEEK_REWIND
+	}
+
 	test("arrows and back are left to the focus and the controls") {
-		videoPlayerKeyAction(KeyEvent.KEYCODE_DPAD_LEFT, controlsVisible = false) shouldBe null
+		videoPlayerKeyAction(KeyEvent.KEYCODE_DPAD_LEFT, controlsVisible = true) shouldBe null
+		videoPlayerKeyAction(KeyEvent.KEYCODE_DPAD_RIGHT, controlsVisible = true) shouldBe null
+		videoPlayerKeyAction(KeyEvent.KEYCODE_DPAD_UP, controlsVisible = false) shouldBe null
 		videoPlayerKeyAction(KeyEvent.KEYCODE_DPAD_UP, controlsVisible = true) shouldBe null
 		videoPlayerKeyAction(KeyEvent.KEYCODE_BACK, controlsVisible = true) shouldBe null
 	}

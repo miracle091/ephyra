@@ -81,6 +81,7 @@ private fun VideoSeekbar(
 	var previewHideJob by remember { mutableStateOf<Job?>(null) }
 	PlayerSeekbar(
 		playbackManager = playbackManager,
+		knobAlwaysVisible = true,
 		onScrubPositionChange = { position ->
 			previewHideJob?.cancel()
 			// Keep the thumbnail a moment after the last press, so it doesn't blink between presses

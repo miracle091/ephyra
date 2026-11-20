@@ -10,6 +10,7 @@ import org.jellyfin.androidtv.ui.base.SeekbarCallbacks
 import org.jellyfin.androidtv.ui.base.SeekbarColors
 import org.jellyfin.androidtv.ui.base.SeekbarDefaults
 import org.jellyfin.androidtv.ui.base.SeekbarPosition
+import org.jellyfin.androidtv.ui.base.SeekbarStyle
 import org.jellyfin.androidtv.ui.composable.rememberPlayerProgress
 import org.jellyfin.playback.core.PlaybackManager
 import org.jellyfin.playback.core.model.PlayState
@@ -24,6 +25,8 @@ fun PlayerSeekbar(
 	playbackManager: PlaybackManager = koinInject<PlaybackManager>(),
 	// Ephyra: the position picked while scrubbing with the arrows, null when not scrubbing (for the trickplay thumbnail)
 	onScrubPositionChange: ((Duration?) -> Unit)? = null,
+	// Ephyra: the video player keeps a smaller knob without the focus, like the legacy one
+	knobAlwaysVisible: Boolean = false,
 ) {
 	val playState by playbackManager.state.playState.collectAsState()
 	val positionInfo = playbackManager.state.positionInfo
@@ -48,13 +51,11 @@ fun PlayerSeekbar(
 				playbackManager.state.setScrubbing(scrubbing)
 				if (!scrubbing) onScrubPositionChange?.invoke(null)
 			},
-			onSeek = { progress ->
-				playbackManager.state.seek(progress)
-				if (playbackManager.state.scrubbing.value) onScrubPositionChange?.invoke(progress)
-			},
+			onSeek = { progress -> playbackManager.state.seek(progress) },
+			onScrub = { progress -> onScrubPositionChange?.invoke(progress) },
 		),
 		modifier = modifier,
-		colors = colors,
 		enabled = positionInfo.duration > Duration.ZERO,
+		style = SeekbarStyle(colors, knobAlwaysVisible),
 	)
 }

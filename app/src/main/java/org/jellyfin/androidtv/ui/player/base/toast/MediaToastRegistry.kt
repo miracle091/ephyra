@@ -36,10 +36,12 @@ class MediaToastRegistry(
 	fun emit(
 		@DrawableRes icon: Int,
 		progress: Float? = null,
+		label: String? = null,
 	) {
 		val data = MediaToastData(
 			icon = icon,
 			progress = progress,
+			label = label,
 		)
 		emit(data)
 	}

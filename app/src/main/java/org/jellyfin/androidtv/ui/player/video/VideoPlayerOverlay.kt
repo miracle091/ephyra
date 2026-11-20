@@ -51,7 +51,8 @@ private fun PlaybackManager.perform(action: VideoPlayerKeyAction) {
 			PlayState.STOPPED, PlayState.ERROR -> state.play()
 		}
 		// Handled by the overlay
-		VideoPlayerKeyAction.STOP, VideoPlayerKeyAction.SUBTITLES_MENU, VideoPlayerKeyAction.AUDIO_MENU -> Unit
+		VideoPlayerKeyAction.STOP, VideoPlayerKeyAction.SUBTITLES_MENU, VideoPlayerKeyAction.AUDIO_MENU,
+		VideoPlayerKeyAction.QUICK_SEEK_FORWARD, VideoPlayerKeyAction.QUICK_SEEK_REWIND -> Unit
 	}
 }
 
@@ -82,6 +83,8 @@ fun VideoPlayerOverlay(
 	val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 	// Ephyra: the skip button of an "ask to skip" segment takes its keys first, as in the legacy player
 	val skipSegment = rememberSkipSegment(playbackManager, item, visibilityState.visible)
+	// Ephyra: left and right with the controls hidden add up to one seek (QuickSeek.kt)
+	val quickSeek = rememberQuickSeek(playbackManager, mediaToastRegistry)
 
 	val onKey = { keyCode: Int ->
 		val skipAction = skipKeyAction(skipSegment.state, keyCode)
@@ -93,7 +96,7 @@ fun VideoPlayerOverlay(
 				menuRequest = action
 				visibilityState.show()
 			}
-			else -> playbackManager.perform(action)
+			else -> if (!quickSeek.onKey(action, keyCode)) playbackManager.perform(action)
 		}
 		skipAction != null || action != null
 	}
