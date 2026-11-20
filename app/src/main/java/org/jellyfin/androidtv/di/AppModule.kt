@@ -118,7 +118,12 @@ val appModule = module {
 		SocketHandler(
 			context = get(),
 			api = get(),
-			playback = SocketPlaybackDependencies(mediaManager = get(), playbackControllerContainer = get(), playbackHelper = get()),
+			playback = SocketPlaybackDependencies(
+				mediaManager = get(),
+				playbackControllerContainer = get(),
+				playbackHelper = get(),
+				playbackManager = get(),
+			),
 			browsing = SocketBrowsingDependencies(dataRefreshService = get(), navigationRepository = get(), itemLauncher = get()),
 			audioManager = get(),
 			lifecycle = ProcessLifecycleOwner.get().lifecycle,
@@ -192,7 +197,7 @@ val appModule = module {
 	single { ItemLauncher() }
 	single { KeyProcessor() }
 	single { ReportingHelper(get(), get()) }
-	single<PlaybackHelper> { SdkPlaybackHelper(get(), get(), get(), get()) }
+	single<PlaybackHelper> { SdkPlaybackHelper(get(), get(), get(), get(), get()) }
 
 	factory { (context: Context) -> SearchFragmentDelegate(context, get()) }
 

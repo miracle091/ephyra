@@ -20,7 +20,9 @@ import org.jellyfin.androidtv.ui.navigation.NavigationRepository
 import org.jellyfin.androidtv.ui.playback.MediaManager
 import org.jellyfin.androidtv.ui.playback.PlaybackControllerContainer
 import org.jellyfin.androidtv.ui.playback.setSubtitleIndex
+import org.jellyfin.androidtv.ui.player.video.isVideoInProgress
 import org.jellyfin.androidtv.util.PlaybackHelper
+import org.jellyfin.playback.core.PlaybackManager
 import org.jellyfin.sdk.api.client.ApiClient
 import org.jellyfin.sdk.api.client.exception.ApiClientException
 import org.jellyfin.sdk.api.client.extensions.libraryApi
@@ -51,6 +53,8 @@ class SocketPlaybackDependencies(
 	val mediaManager: MediaManager,
 	val playbackControllerContainer: PlaybackControllerContainer,
 	val playbackHelper: PlaybackHelper,
+	// Ephyra: the new player, so a video playing there is not interrupted either
+	val playbackManager: PlaybackManager,
 )
 
 /**
@@ -73,6 +77,7 @@ class SocketHandler(
 	private val mediaManager = playback.mediaManager
 	private val playbackControllerContainer = playback.playbackControllerContainer
 	private val playbackHelper = playback.playbackHelper
+	private val playbackManager = playback.playbackManager
 	private val dataRefreshService = browsing.dataRefreshService
 	private val navigationRepository = browsing.navigationRepository
 	private val itemLauncher = browsing.itemLauncher
@@ -241,7 +246,8 @@ class SocketHandler(
 	private suspend fun onDisplayContent(itemId: UUID, itemKind: BaseItemKind) = withContext(Dispatchers.Main) {
 		val playbackController = playbackControllerContainer.playbackController
 
-		if (playbackController?.isPlaying == true || playbackController?.isPaused == true) {
+		val legacyPlaying = playbackController?.isPlaying == true || playbackController?.isPaused == true
+		if (legacyPlaying || playbackManager.isVideoInProgress) {
 			Timber.i("Not launching $itemId: playback in progress")
 			return@withContext
 		}

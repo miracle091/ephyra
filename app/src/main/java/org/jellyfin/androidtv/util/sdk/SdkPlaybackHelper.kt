@@ -14,8 +14,10 @@ import org.jellyfin.androidtv.preference.UserPreferences
 import org.jellyfin.androidtv.ui.playback.PlaybackControllerContainer
 import org.jellyfin.androidtv.ui.playback.PlaybackLauncher
 import org.jellyfin.androidtv.ui.playback.QueueStart
+import org.jellyfin.androidtv.ui.player.video.isVideoInProgress
 import org.jellyfin.androidtv.util.PlaybackHelper
 import org.jellyfin.androidtv.util.apiclient.Response
+import org.jellyfin.playback.core.PlaybackManager
 import org.jellyfin.sdk.api.client.ApiClient
 import org.jellyfin.sdk.api.client.extensions.libraryApi
 import org.jellyfin.sdk.api.client.extensions.showApi
@@ -34,6 +36,8 @@ class SdkPlaybackHelper(
 	private val userPreferences: UserPreferences,
 	private val playbackLauncher: PlaybackLauncher,
 	private val playbackControllerContainer: PlaybackControllerContainer,
+	// Ephyra: the new player, so a playback started while it plays a video replaces its screen
+	private val playbackManager: PlaybackManager,
 ) : PlaybackHelper {
 	companion object {
 		const val ITEM_QUERY_LIMIT = 150
@@ -169,7 +173,7 @@ class SdkPlaybackHelper(
 				context,
 				items,
 				pos.inWholeMilliseconds.toInt(),
-				playbackControllerContainer.playbackController?.hasFragment() == true,
+				playbackControllerContainer.playbackController?.hasFragment() == true || playbackManager.isVideoInProgress,
 				QueueStart(0, shuffle),
 			)
 		}
@@ -196,7 +200,7 @@ class SdkPlaybackHelper(
 				context,
 				items,
 				pos.inWholeMilliseconds.toInt(),
-				playbackControllerContainer.playbackController?.hasFragment() == true,
+				playbackControllerContainer.playbackController?.hasFragment() == true || playbackManager.isVideoInProgress,
 				QueueStart(index ?: 0, shuffle),
 			)
 		}

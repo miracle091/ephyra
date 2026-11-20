@@ -79,6 +79,9 @@ section 2(a) of the GPL-2.0.
 - The new player skips media segments as set in Settings (intro, outro, recap, preview, commercial) instead of always
   skipping intros; "ask to skip" comes with its skip button. A failed segment request no longer stops segment skipping
   for the rest of the queue.
+- A video in the new player is treated as playback in progress like one in the legacy player: the screensaver shows
+  it when paused, another client's "display content" no longer interrupts it, and a playback started remotely replaces
+  its screen instead of opening a second player on top.
 - The new player's audio night mode really turns on: it was decided before the first video was known, so it never
   applied.
 - When the server burns a subtitle into a converted stream, the new player no longer shows a side-loaded subtitle
