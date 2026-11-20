@@ -4,6 +4,7 @@ import androidx.core.view.doOnDetach
 import org.jellyfin.playback.core.mediastream.PlayableMediaStream
 import org.jellyfin.playback.core.model.PlayState
 import org.jellyfin.playback.core.model.PlaybackError
+import org.jellyfin.playback.core.model.SelectedTracks
 import org.jellyfin.playback.core.ui.PlayerSubtitleView
 import org.jellyfin.playback.core.ui.PlayerSurfaceView
 
@@ -98,6 +99,10 @@ class BackendService {
 
 		override fun onMediaStreamEnd(mediaStream: PlayableMediaStream) {
 			callListeners { onMediaStreamEnd(mediaStream) }
+		}
+
+		override fun onSelectedTracksChange(tracks: SelectedTracks) {
+			callListeners { onSelectedTracksChange(tracks) }
 		}
 	}
 }

@@ -11,6 +11,7 @@ import org.jellyfin.playback.core.model.PlaybackError
 import org.jellyfin.playback.core.model.PlaybackOrder
 import org.jellyfin.playback.core.model.PositionInfo
 import org.jellyfin.playback.core.model.RepeatMode
+import org.jellyfin.playback.core.model.SelectedTracks
 import org.jellyfin.playback.core.model.VideoSize
 import org.jellyfin.playback.core.queue.QueueService
 import kotlin.time.Duration
@@ -26,6 +27,9 @@ interface PlayerState {
 
 	/** Ephyra: why the last playback failed, set before [playState] turns to [PlayState.ERROR] and cleared when playback resumes. */
 	val error: StateFlow<PlaybackError?>
+
+	/** Ephyra: the audio and subtitle tracks shown now; [SelectedTracks.NONE] while nothing plays. */
+	val selectedTracks: StateFlow<SelectedTracks>
 
 	/**
 	 * The position information for the currently playing item or [PositionInfo.EMPTY]. This
@@ -87,6 +91,9 @@ class MutablePlayerState(
 	private val _error = MutableStateFlow<PlaybackError?>(null)
 	override val error: StateFlow<PlaybackError?> get() = _error.asStateFlow()
 
+	private val _selectedTracks = MutableStateFlow(SelectedTracks.NONE)
+	override val selectedTracks: StateFlow<SelectedTracks> get() = _selectedTracks.asStateFlow()
+
 	override val positionInfo: PositionInfo
 		get() = backendService.backend?.getPositionInfo() ?: PositionInfo.EMPTY
 
@@ -103,6 +110,10 @@ class MutablePlayerState(
 
 			override fun onVideoSizeChange(width: Int, height: Int) {
 				_videoSize.value = VideoSize(width, height)
+			}
+
+			override fun onSelectedTracksChange(tracks: SelectedTracks) {
+				_selectedTracks.value = tracks
 			}
 
 			override fun onMediaStreamEnd(mediaStream: PlayableMediaStream) {
@@ -133,6 +144,7 @@ class MutablePlayerState(
 	override fun stop() {
 		backendService.backend?.stop()
 		queue?.clear()
+		_selectedTracks.value = SelectedTracks.NONE
 	}
 
 	override fun seek(to: Duration) {

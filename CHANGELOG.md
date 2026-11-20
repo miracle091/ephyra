@@ -54,6 +54,9 @@ section 2(a) of the GPL-2.0.
   from the user's settings (or none), instead of ExoPlayer's own choice; the reports carry the subtitle track.
 - The Audio and Subtitles buttons on the details screen work with the new player too: the picked tracks (and
   version) are requested from the server, which then streams, side-loads or burns in the subtitle as needed.
+- The new player switches audio and subtitle tracks when another client asks (the web dashboard's remote control):
+  in the player when the stream carries the track, otherwise with a new stream from the server at the same position.
+  The reports carry the tracks actually shown.
 
 ### Removed
 

@@ -10,6 +10,8 @@ import kotlinx.coroutines.launch
 import org.jellyfin.playback.core.model.PlayState
 import org.jellyfin.playback.core.plugin.PlayerService
 import org.jellyfin.playback.core.queue.queue
+import org.jellyfin.playback.jellyfin.selectAudioTrack
+import org.jellyfin.playback.jellyfin.selectSubtitleTrack
 import org.jellyfin.sdk.api.client.ApiClient
 import org.jellyfin.sdk.api.sockets.subscribe
 import org.jellyfin.sdk.api.sockets.subscribeGeneralCommand
@@ -35,6 +37,26 @@ class PlaySessionSocketService(
 	private fun subscribe(coroutineScope: CoroutineScope) {
 		subscribePlayerControl(coroutineScope)
 		subscribeVolumeControl(coroutineScope)
+		subscribeTrackControl(coroutineScope)
+	}
+
+	// Ephyra: track changes from another client (the web dashboard's remote control); ignored while the new player plays nothing
+	private fun subscribeTrackControl(coroutineScope: CoroutineScope) {
+		api.webSocket.subscribeGeneralCommand(GeneralCommandType.SET_AUDIO_STREAM_INDEX).onEach { message ->
+			val index = message["index"]?.toIntOrNull() ?: return@onEach
+			coroutineScope.launch(Dispatchers.Main) {
+				manager.selectAudioTrack(index)
+				playSessionService.sendUpdateIfActive()
+			}
+		}.launchIn(coroutineScope)
+
+		api.webSocket.subscribeGeneralCommand(GeneralCommandType.SET_SUBTITLE_STREAM_INDEX).onEach { message ->
+			val index = message["index"]?.toIntOrNull() ?: return@onEach
+			coroutineScope.launch(Dispatchers.Main) {
+				manager.selectSubtitleTrack(index.takeIf { it >= 0 })
+				playSessionService.sendUpdateIfActive()
+			}
+		}.launchIn(coroutineScope)
 	}
 
 	private fun subscribePlayerControl(coroutineScope: CoroutineScope) {

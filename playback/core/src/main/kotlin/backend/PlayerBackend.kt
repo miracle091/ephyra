@@ -40,6 +40,18 @@ interface PlayerBackend {
 
 	fun setSpeed(speed: Float)
 
+	/**
+	 * Ephyra: show the audio track with the source index [index] if the playing stream carries it. Returns false when it doesn't
+	 * (a converted stream holds only the requested track): the server must build a new stream then.
+	 */
+	fun selectAudioTrack(index: Int): Boolean
+
+	/**
+	 * Ephyra: show the subtitle with the source index [index], or none for null, if the playing stream allows it. Returns false
+	 * when it doesn't (the subtitle is burnt in, or a converted stream doesn't carry it): the server must build a new stream then.
+	 */
+	fun selectSubtitleTrack(index: Int?): Boolean
+
 	fun setTimedEvents(timedEvents: List<TimedEvent>)
 }
 

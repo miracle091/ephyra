@@ -17,6 +17,7 @@ import org.jellyfin.playback.core.model.RepeatMode
 import org.jellyfin.playback.core.plugin.PlayerService
 import org.jellyfin.playback.core.queue.QueueEntry
 import org.jellyfin.playback.core.queue.queue
+import org.jellyfin.playback.jellyfin.SUBTITLES_OFF
 import org.jellyfin.playback.jellyfin.queue.baseItem
 import org.jellyfin.sdk.api.client.ApiClient
 import org.jellyfin.sdk.api.client.extensions.sessionApi
@@ -141,8 +142,8 @@ class PlaySessionService(
 					isPaused = state.playState.value != PlayState.PLAYING,
 					aspectRatio = state.videoSize.value.aspectRatio.toString(),
 					positionTicks = position.inWholeTicks,
-					audioStreamIndex = session.stream.defaultAudioStreamIndex,
-					subtitleStreamIndex = session.stream.defaultSubtitleStreamIndex,
+					audioStreamIndex = state.selectedTracks.value.audioIndex,
+					subtitleStreamIndex = state.selectedTracks.value.subtitleIndex ?: SUBTITLES_OFF,
 					playMethod = session.stream.conversionMethod.playMethod,
 					repeatMode = state.repeatMode.value.remoteRepeatMode,
 					nowPlayingQueue = getQueue(),
@@ -166,8 +167,8 @@ class PlaySessionService(
 					isPaused = state.playState.value != PlayState.PLAYING,
 					aspectRatio = state.videoSize.value.aspectRatio.toString(),
 					positionTicks = position.inWholeTicks,
-					audioStreamIndex = session.stream.defaultAudioStreamIndex,
-					subtitleStreamIndex = session.stream.defaultSubtitleStreamIndex,
+					audioStreamIndex = state.selectedTracks.value.audioIndex,
+					subtitleStreamIndex = state.selectedTracks.value.subtitleIndex ?: SUBTITLES_OFF,
 					playMethod = session.stream.conversionMethod.playMethod,
 					repeatMode = state.repeatMode.value.remoteRepeatMode,
 					nowPlayingQueue = getQueue(),

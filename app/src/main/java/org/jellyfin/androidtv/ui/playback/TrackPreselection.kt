@@ -8,8 +8,8 @@ import org.jellyfin.sdk.model.serializer.toUUIDOrNull
 import org.koin.java.KoinJavaComponent
 import java.util.UUID
 
-/** Ephyra: subtitle index that means "no subtitles", as the server reads it. */
-const val SUBTITLES_OFF = -1
+/** Ephyra: subtitle index that means "no subtitles", as the server reads it (shared with the new player). */
+const val SUBTITLES_OFF = org.jellyfin.playback.jellyfin.SUBTITLES_OFF
 
 /**
  * Ephyra: the audio and subtitle tracks picked on the details screen for one item, used once when that item starts playing.

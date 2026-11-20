@@ -9,6 +9,7 @@ import kotlinx.coroutines.withContext
 import org.jellyfin.playback.core.plugin.PlayerService
 import org.jellyfin.playback.core.queue.QueueEntry
 import org.jellyfin.playback.core.queue.queue
+import org.jellyfin.playback.core.queue.startPosition
 import org.jellyfin.playback.core.timedevent.TimedEvent
 import org.jellyfin.playback.core.timedevent.addTimedEvent
 import org.jellyfin.playback.core.timedevent.timedEvents
@@ -83,6 +84,19 @@ internal class MediaStreamService(
 				backend.stop()
 			}
 		}
+	}
+
+	/**
+	 * Ephyra: asks the resolvers again for the current entry's stream (with the entry's new requests, like another audio track) and
+	 * plays it on from the current position. The play session moves to the new stream, so the server gets a stop for the old one.
+	 */
+	fun reload() = coroutineScope.launch(Dispatchers.Main) {
+		val entry = manager.queue.entry.value ?: return@launch
+		val backend = requireNotNull(manager.backend)
+		entry.startPosition = backend.getPositionInfo().active.takeIf { it > Duration.ZERO }
+		Timber.i("Reloading the stream of $entry at ${entry.startPosition}")
+		entry.mediaStream = null
+		playEntry(entry)
 	}
 
 	private fun preloadNextEntry() = coroutineScope.launch(Dispatchers.Main) {

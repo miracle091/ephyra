@@ -21,6 +21,9 @@ class ExoPlayerBackendLifecycleTests : FunSpec({
 		backend.seekTo(10.seconds)
 		backend.setScrubbing(true)
 		backend.setSpeed(1.5f)
+		backend.selectAudioTrack(2) shouldBe false
+		backend.selectSubtitleTrack(3) shouldBe false
+		backend.selectSubtitleTrack(null) shouldBe false
 		backend.setSurfaceView(null)
 		backend.setSubtitleView(null)
 		backend.stop()
