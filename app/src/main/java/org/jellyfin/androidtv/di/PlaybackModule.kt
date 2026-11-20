@@ -17,6 +17,7 @@ import org.jellyfin.androidtv.ui.playback.PlaybackLauncher
 import org.jellyfin.androidtv.ui.playback.TrackPreselection
 import org.jellyfin.androidtv.ui.playback.VideoQueueManager
 import org.jellyfin.androidtv.ui.playback.rewrite.RewriteMediaManager
+import org.jellyfin.androidtv.ui.player.base.subtitleStyle
 import org.jellyfin.androidtv.ui.player.display.videoChangeFrameRateStrategy
 import org.jellyfin.androidtv.util.AndroidVersion
 import org.jellyfin.androidtv.util.profile.createDeviceProfile
@@ -107,5 +108,6 @@ internal fun createExoPlayerOptions(userPreferences: UserPreferences, httpDataSo
 		bufferForPlaybackDuration = bufferLength.bufferForPlaybackDuration,
 		bufferForPlaybackAfterRebufferDuration = bufferLength.bufferForPlaybackAfterRebufferDuration,
 		videoChangeFrameRateStrategy = videoChangeFrameRateStrategy(userPreferences[UserPreferences.refreshRateSwitchingBehavior]),
+		subtitleStyle = userPreferences.subtitleStyle(),
 	)
 }

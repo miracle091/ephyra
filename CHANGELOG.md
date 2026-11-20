@@ -40,6 +40,8 @@ section 2(a) of the GPL-2.0.
   same choice of mode, now shared by both players.
 - The new player logs why playback failed and tells the rest of the app whether the stream, the decoder or the audio
   output was at fault, instead of a bare error state.
+- The new player draws subtitles with the colours, outline, weight, size and position set in the subtitle settings,
+  like the legacy one, which now shares the same code.
 
 ### Removed
 

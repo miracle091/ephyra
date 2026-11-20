@@ -75,7 +75,7 @@ class ExoPlayerBackend(
 		const val MEDIA_ITEM_COUNT_MAX = 10
 	}
 
-	private class PlayerInstance(val player: ExoPlayer, val assHandler: AssHandler?)
+	private class PlayerInstance(val player: ExoPlayer, val assHandler: AssHandler?, val options: ExoPlayerOptions)
 
 	private var currentStream: PlayableMediaStream? = null
 	private var subtitleView: SubtitleView? = null
@@ -96,7 +96,7 @@ class ExoPlayerBackend(
 	private fun buildInstance(): PlayerInstance {
 		val options = exoPlayerOptions()
 		val assHandler = if (options.enableLibass) AssHandler(AssRenderType.OVERLAY_OPEN_GL) else null
-		val instance = PlayerInstance(createPlayer(options, assHandler), assHandler)
+		val instance = PlayerInstance(createPlayer(options, assHandler), assHandler, options)
 		this.instance = instance
 		instance.player.setVideoSurfaceView(surfaceView?.surface)
 		subtitleContainer?.let(::attachSubtitleView)
@@ -307,6 +307,7 @@ class ExoPlayerBackend(
 	private fun attachSubtitleView(container: PlayerSubtitleView) {
 		val current = instance ?: return
 		val view = SubtitleView(container.context).apply {
+			current.options.subtitleStyle?.let(::applyStyle)
 			current.assHandler?.let { addView(AssSubtitleView(container.context, it)) }
 		}
 		subtitleView = view

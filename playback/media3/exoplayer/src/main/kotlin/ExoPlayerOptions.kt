@@ -16,4 +16,6 @@ data class ExoPlayerOptions(
 	val bufferForPlaybackAfterRebufferDuration: Duration? = null,
 	/** Ephyra: a `C.VIDEO_CHANGE_FRAME_RATE_STRATEGY_*` value; OFF when the app switches the display mode itself. */
 	val videoChangeFrameRateStrategy: Int = C.VIDEO_CHANGE_FRAME_RATE_STRATEGY_ONLY_IF_SEAMLESS,
+	/** Ephyra: the user's look for text subtitles; null keeps Media3's default. */
+	val subtitleStyle: SubtitleStyle? = null,
 )

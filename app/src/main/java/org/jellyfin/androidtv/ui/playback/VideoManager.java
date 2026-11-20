@@ -2,18 +2,14 @@ package org.jellyfin.androidtv.ui.playback;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Handler;
-import android.util.TypedValue;
 import android.view.View;
 import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.OptIn;
-import androidx.core.graphics.TypefaceCompat;
 import androidx.media3.common.AudioAttributes;
 import androidx.media3.common.C;
 import androidx.media3.common.Format;
@@ -40,7 +36,6 @@ import androidx.media3.extractor.DefaultExtractorsFactory;
 import androidx.media3.extractor.ExtractorsFactory;
 import androidx.media3.extractor.ts.TsExtractor;
 import androidx.media3.ui.AspectRatioFrameLayout;
-import androidx.media3.ui.CaptionStyleCompat;
 import androidx.media3.ui.PlayerView;
 
 import org.jellyfin.androidtv.R;
@@ -48,7 +43,9 @@ import org.jellyfin.androidtv.data.compat.StreamInfo;
 import org.jellyfin.androidtv.preference.UserPreferences;
 import org.jellyfin.androidtv.preference.constant.BufferLength;
 import org.jellyfin.androidtv.preference.constant.ZoomMode;
+import org.jellyfin.androidtv.ui.player.base.SubtitleStylePreferenceKt;
 import org.jellyfin.androidtv.ui.player.display.FrameRateStrategyKt;
+import org.jellyfin.playback.media3.exoplayer.SubtitleStyleKt;
 import org.jellyfin.playback.media3.exoplayer.UrlRedactionKt;
 import org.jellyfin.playback.media3.exoplayer.shield.BitstreamFirstRenderersFactory;
 import org.jellyfin.playback.media3.exoplayer.shield.ShieldLoadControl;
@@ -120,19 +117,8 @@ public class VideoManager {
 
         mExoPlayerView = view.findViewById(R.id.exoPlayerView);
         mExoPlayerView.setPlayer(mExoPlayer);
-        int strokeColor = userPreferences.get(UserPreferences.Companion.getSubtitleTextStrokeColor()).intValue();
-        int textWeight = userPreferences.get(UserPreferences.Companion.getSubtitlesTextWeight());
-        CaptionStyleCompat subtitleStyle = new CaptionStyleCompat(
-                userPreferences.get(UserPreferences.Companion.getSubtitlesTextColor()).intValue(),
-                userPreferences.get(UserPreferences.Companion.getSubtitlesBackgroundColor()).intValue(),
-                Color.TRANSPARENT,
-                Color.alpha(strokeColor) == 0 ? CaptionStyleCompat.EDGE_TYPE_NONE : CaptionStyleCompat.EDGE_TYPE_OUTLINE,
-                strokeColor,
-                TypefaceCompat.create(activity, Typeface.DEFAULT, textWeight, false)
-        );
-        mExoPlayerView.getSubtitleView().setFixedTextSize(TypedValue.COMPLEX_UNIT_DIP, userPreferences.get(UserPreferences.Companion.getSubtitlesTextSize()));
-        mExoPlayerView.getSubtitleView().setBottomPaddingFraction(userPreferences.get(UserPreferences.Companion.getSubtitlesOffsetPosition()));
-        mExoPlayerView.getSubtitleView().setStyle(subtitleStyle);
+        // Ephyra: the same subtitle look as the new player
+        SubtitleStyleKt.applyStyle(mExoPlayerView.getSubtitleView(), SubtitleStylePreferenceKt.subtitleStyle(userPreferences));
 
         if (assHandler != null) {
             assHandler.init(mExoPlayer);
