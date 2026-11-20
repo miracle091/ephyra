@@ -52,6 +52,7 @@ import org.jellyfin.playback.core.timedevent.TimedEvent
 import org.jellyfin.playback.core.ui.PlayerSubtitleView
 import org.jellyfin.playback.core.ui.PlayerSurfaceView
 import org.jellyfin.playback.media3.exoplayer.mapping.findAudioGroupPosition
+import org.jellyfin.playback.media3.exoplayer.mapping.toPlaybackError
 import org.jellyfin.playback.media3.exoplayer.shield.BitstreamFirstRenderersFactory
 import org.jellyfin.playback.media3.exoplayer.shield.ShieldLoadControl
 import org.jellyfin.playback.media3.exoplayer.shield.ShieldMediaCodecSelector
@@ -203,6 +204,9 @@ class ExoPlayerBackend(
 		}
 
 		override fun onPlayerError(error: PlaybackException) {
+			// Ephyra: say why, so the retry logic and the UI can act on it
+			Timber.e(error, "Playback failed (${error.errorCodeName})")
+			listener?.onPlayError(error.toPlaybackError())
 			listener?.onPlayStateChange(PlayState.ERROR)
 		}
 
@@ -428,7 +432,7 @@ class ExoPlayerBackend(
 
 	// Ephyra: polled often (UI, play session); without a player there is nothing to report, so don't build one
 	override fun getPositionInfo(): PositionInfo {
-		val exoPlayer = instance?.player ?: return PositionInfo(Duration.ZERO, Duration.ZERO, Duration.ZERO)
+		val exoPlayer = instance?.player ?: return PositionInfo.EMPTY
 		return PositionInfo(
 			active = exoPlayer.currentPosition.milliseconds,
 			buffer = exoPlayer.bufferedPosition.milliseconds,

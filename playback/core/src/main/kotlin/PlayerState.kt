@@ -7,6 +7,7 @@ import org.jellyfin.playback.core.backend.BackendService
 import org.jellyfin.playback.core.backend.PlayerBackendEventListener
 import org.jellyfin.playback.core.mediastream.PlayableMediaStream
 import org.jellyfin.playback.core.model.PlayState
+import org.jellyfin.playback.core.model.PlaybackError
 import org.jellyfin.playback.core.model.PlaybackOrder
 import org.jellyfin.playback.core.model.PositionInfo
 import org.jellyfin.playback.core.model.RepeatMode
@@ -22,6 +23,9 @@ interface PlayerState {
 	val playbackOrder: StateFlow<PlaybackOrder>
 	val repeatMode: StateFlow<RepeatMode>
 	val scrubbing: StateFlow<Boolean>
+
+	/** Ephyra: why the last playback failed, set before [playState] turns to [PlayState.ERROR] and cleared when playback resumes. */
+	val error: StateFlow<PlaybackError?>
 
 	/**
 	 * The position information for the currently playing item or [PositionInfo.EMPTY]. This
@@ -80,13 +84,21 @@ class MutablePlayerState(
 	private val _scrubbing = MutableStateFlow(false)
 	override val scrubbing: StateFlow<Boolean> get() = _scrubbing.asStateFlow()
 
+	private val _error = MutableStateFlow<PlaybackError?>(null)
+	override val error: StateFlow<PlaybackError?> get() = _error.asStateFlow()
+
 	override val positionInfo: PositionInfo
 		get() = backendService.backend?.getPositionInfo() ?: PositionInfo.EMPTY
 
 	init {
 		backendService.addListener(object : PlayerBackendEventListener() {
 			override fun onPlayStateChange(state: PlayState) {
+				if (state == PlayState.PLAYING) _error.value = null
 				_playState.value = state
+			}
+
+			override fun onPlayError(error: PlaybackError) {
+				_error.value = error
 			}
 
 			override fun onVideoSizeChange(width: Int, height: Int) {
