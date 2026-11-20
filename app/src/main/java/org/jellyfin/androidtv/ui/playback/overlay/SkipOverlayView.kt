@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.AbstractComposeView
 import androidx.compose.ui.res.stringResource
@@ -70,7 +71,8 @@ fun SkipOverlayComposable(
 					imageVector = ImageVector.vectorResource(R.drawable.ic_control_select),
 					contentDescription = null,
 					modifier = Modifier.size(24.dp),
-					tint = palette.ink,
+					// Ephyra: a multi-colour drawable (disc, arrows, centre dot from the theme); a tint would flatten it into a solid disc
+					tint = Color.Unspecified,
 				)
 
 				Text(

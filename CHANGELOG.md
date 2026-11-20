@@ -44,6 +44,10 @@ section 2(a) of the GPL-2.0.
 - Upstream repository leftovers: `CODEOWNERS`, `renovate.json`, the stale, triage and merge-conflict workflows (they
   only run in repositories owned by Jellyfin) and `fastlane/` (store texts of the official app).
 
+### Fixed
+
+- The skip button's icon shows again: it was tinted into a solid light disc; it keeps its own theme colours now.
+
 ## [0.5.0] - 2026-11-09
 
 ### Added
