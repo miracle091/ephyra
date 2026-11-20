@@ -63,6 +63,9 @@ section 2(a) of the GPL-2.0.
   Its playback info panel shows the audio track playing instead of the first one.
 - The first key pressed in the new video and photo players works: it used to only give the player the focus, when
   playback started and each time the controls hid.
+- The new player shows the legacy player's Skip button inside media segments set to "ask to skip" (intros and outros
+  by default): it dims, hides after the chosen delay and comes back on centre, up or down; centre skips to the end of
+  the segment and back closes it. Until now the new player did nothing for these segments.
 - The new player tells the server which version (media source) and audio track it plays, and knows the subtitle
   tracks of the stream.
 - The new player loads subtitles the server hands out as separate files and shows the subtitle the server picks

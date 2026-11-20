@@ -2,6 +2,7 @@ package org.jellyfin.androidtv.ui.player.video
 
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
@@ -18,8 +19,11 @@ import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.unit.dp
+import org.jellyfin.androidtv.ui.base.EphyraTheme
 import org.jellyfin.androidtv.ui.composable.rememberQueueEntry
 import org.jellyfin.androidtv.ui.playback.HdrControlsDim
+import org.jellyfin.androidtv.ui.playback.overlay.SkipButtonState
+import org.jellyfin.androidtv.ui.playback.overlay.SkipOverlayComposable
 import org.jellyfin.androidtv.ui.player.base.PlayerOverlayLayout
 import org.jellyfin.androidtv.ui.player.base.rememberPlayerOverlayVisibility
 import org.jellyfin.androidtv.ui.player.base.toast.MediaToastRegistry
@@ -76,21 +80,27 @@ fun VideoPlayerOverlay(
 	// Ephyra: the legacy player's keys (VideoPlayerKeyAction.kt); Captions and Audio track show the controls with that menu open
 	var menuRequest by remember { mutableStateOf<VideoPlayerKeyAction?>(null) }
 	val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+	// Ephyra: the skip button of an "ask to skip" segment takes its keys first, as in the legacy player
+	val skipSegment = rememberSkipSegment(playbackManager, item, visibilityState.visible)
+
+	val onKey = { keyCode: Int ->
+		val skipAction = skipKeyAction(skipSegment.state, keyCode)
+		val action = if (skipAction == null) videoPlayerKeyAction(keyCode, visibilityState.visible) else null
+		when (action) {
+			null -> skipAction?.let(skipSegment.onKey)
+			VideoPlayerKeyAction.STOP -> backDispatcher?.onBackPressed()
+			VideoPlayerKeyAction.SUBTITLES_MENU, VideoPlayerKeyAction.AUDIO_MENU -> {
+				menuRequest = action
+				visibilityState.show()
+			}
+			else -> playbackManager.perform(action)
+		}
+		skipAction != null || action != null
+	}
 
 	Box(
 		modifier = modifier.onPreviewKeyEvent { event ->
-			if (event.type != KeyEventType.KeyDown) return@onPreviewKeyEvent false
-			val action = videoPlayerKeyAction(event.nativeKeyEvent.keyCode, visibilityState.visible)
-				?: return@onPreviewKeyEvent false
-			when (action) {
-				VideoPlayerKeyAction.STOP -> backDispatcher?.onBackPressed()
-				VideoPlayerKeyAction.SUBTITLES_MENU, VideoPlayerKeyAction.AUDIO_MENU -> {
-					menuRequest = action
-					visibilityState.show()
-				}
-				else -> playbackManager.perform(action)
-			}
-			true
+			event.type == KeyEventType.KeyDown && onKey(event.nativeKeyEvent.keyCode)
 		}
 	) {
 		PlayerOverlayLayout(
@@ -115,16 +125,34 @@ fun VideoPlayerOverlay(
 			},
 		)
 
-		// Playback info overlay - positioned below header area, always visible when enabled
-		if (showPlaybackInfo) {
-			PlaybackInfoOverlay(
-				playbackManager = playbackManager,
-				modifier = Modifier
-					.align(Alignment.TopStart)
-					.padding(start = 48.dp, top = 100.dp)
-			)
-		}
-
-		MediaToasts(mediaToastRegistry)
+		VideoPlayerOverlayExtras(playbackManager, showPlaybackInfo, skipSegment, mediaToastRegistry)
 	}
+}
+
+/** The playback info panel when asked for, Ephyra's skip button and the toasts, over the video. */
+@Composable
+private fun BoxScope.VideoPlayerOverlayExtras(
+	playbackManager: PlaybackManager,
+	showPlaybackInfo: Boolean,
+	skipSegment: SkipSegment,
+	mediaToastRegistry: MediaToastRegistry,
+) {
+	// Playback info overlay - positioned below header area, always visible when enabled
+	if (showPlaybackInfo) {
+		PlaybackInfoOverlay(
+			playbackManager = playbackManager,
+			modifier = Modifier
+				.align(Alignment.TopStart)
+				.padding(start = 48.dp, top = 100.dp)
+		)
+	}
+
+	// Ephyra: the legacy player's skip button, in the user's theme colours, at the bottom right
+	Box(modifier = Modifier.align(Alignment.BottomEnd)) {
+		EphyraTheme {
+			SkipOverlayComposable(visible = skipSegment.state == SkipButtonState.SHOWN)
+		}
+	}
+
+	MediaToasts(mediaToastRegistry)
 }
