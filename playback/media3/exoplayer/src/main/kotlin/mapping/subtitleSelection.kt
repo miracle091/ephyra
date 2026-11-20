@@ -38,7 +38,8 @@ sealed interface SubtitleSelection {
  *
  * An external file is found by its id. On direct play the container's own subtitles come in the same order in both lists, so the
  * position among the non-external tracks gives the group, as for audio; when the counts differ the order can't be trusted. A
- * converted stream carries at most the chosen subtitle (in the HLS manifest), or none when it is burnt into the picture.
+ * converted stream carries at most the chosen subtitle (in the HLS manifest), or none when it is burnt into the picture: then the
+ * player shows no subtitle of its own.
  */
 fun findSubtitleSelection(
 	tracks: Collection<MediaStreamTrack>,
@@ -55,7 +56,12 @@ fun findSubtitleSelection(
 	}
 
 	val ownGroups = groupExternalIndexes.indices.filter { groupExternalIndexes[it] == null }
-	if (!directPlay) return ownGroups.singleOrNull()?.let(SubtitleSelection::Group) ?: SubtitleSelection.Keep
+	if (!directPlay) return when (ownGroups.size) {
+		// Burnt into the picture: no player subtitle on top (a side-loaded file flagged default would show otherwise)
+		0 -> SubtitleSelection.Off
+		1 -> SubtitleSelection.Group(ownGroups.single())
+		else -> SubtitleSelection.Keep
+	}
 
 	val embeddedIndexes = subtitles.filterNot { it.isExternal }.map { it.index }.sorted()
 	if (embeddedIndexes.size != ownGroups.size) return SubtitleSelection.Keep

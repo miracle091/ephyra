@@ -89,6 +89,7 @@ class ExoPlayerBackend(
 	private var subtitleView: SubtitleView? = null
 	private val audioPipeline = ExoPlayerAudioPipeline()
 	private val audioNightMode = AudioNightMode()
+	private var audioSessionId = C.AUDIO_SESSION_ID_UNSET
 	private var audioAttributeState = AudioAttributeState()
 	private var timedEventState = TimedEventState()
 	private var lastKnownDuration: Duration? = null
@@ -195,7 +196,7 @@ class ExoPlayerBackend(
 			.setPauseAtEndOfMediaItems(true)
 			.build()
 			.also { player ->
-				player.addListener(PlayerListener(player, exoPlayerOptions.audioNightMode))
+				player.addListener(PlayerListener(player))
 				player.videoChangeFrameRateStrategy = exoPlayerOptions.videoChangeFrameRateStrategy
 
 				if (exoPlayerOptions.enableDebugLogging) {
@@ -207,7 +208,7 @@ class ExoPlayerBackend(
 	}
 
 	// Ephyra: bound to its own player, so a late callback never builds a new one
-	inner class PlayerListener(private val exoPlayer: ExoPlayer, private val nightMode: Boolean) : Player.Listener {
+	inner class PlayerListener(private val exoPlayer: ExoPlayer) : Player.Listener {
 		override fun onIsPlayingChanged(isPlaying: Boolean) {
 			val state = when {
 				isPlaying -> PlayState.PLAYING
@@ -248,9 +249,9 @@ class ExoPlayerBackend(
 
 		override fun onAudioSessionIdChanged(audioSessionId: Int) {
 			audioPipeline.setAudioSessionId(audioSessionId)
-			// Ephyra: a video setting, as in the legacy player; music keeps its dynamics
-			val entry = exoPlayer.currentMediaItem?.localConfiguration?.tag as? QueueEntry
-			if (nightMode && entry?.mediaType == MediaType.Video) audioNightMode.apply(audioSessionId)
+			// Ephyra: the session comes once, often before the first item is known (the player is built early): decide in playItem too
+			this@ExoPlayerBackend.audioSessionId = audioSessionId
+			updateNightMode()
 		}
 
 		override fun onTracksChanged(tracks: Tracks) {
@@ -380,6 +381,13 @@ class ExoPlayerBackend(
 		return true
 	}
 
+	/** Ephyra: night mode on the player's audio session while a video plays, as in the legacy player; music keeps its dynamics. */
+	private fun updateNightMode() {
+		val enabled = instance?.options?.audioNightMode == true
+		val video = currentStream?.queueEntry?.mediaType == MediaType.Video
+		if (enabled && video) audioNightMode.apply(audioSessionId) else audioNightMode.release()
+	}
+
 	private fun updateSelectedTracks(tracks: SelectedTracks) {
 		if (tracks == selectedTracks) return
 		selectedTracks = tracks
@@ -444,6 +452,7 @@ class ExoPlayerBackend(
 		currentStream = stream
 		// Ephyra: the server's choice until the player shows otherwise
 		updateSelectedTracks(SelectedTracks(stream.defaultAudioStreamIndex, stream.defaultSubtitleStreamIndex))
+		updateNightMode()
 
 		var preparedItemIndex = (0 until exoPlayer.mediaItemCount).firstOrNull { index ->
 			exoPlayer.getMediaItemAt(index).mediaId == stream.hashCode().toString()
@@ -507,6 +516,7 @@ class ExoPlayerBackend(
 		}
 		instance = null
 		audioNightMode.release()
+		audioSessionId = C.AUDIO_SESSION_ID_UNSET
 		currentStream = null
 		audioSelectionDone = null
 		subtitleSelectionDone = null

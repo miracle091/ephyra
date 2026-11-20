@@ -25,8 +25,11 @@ class AudioNightMode internal constructor(private val createEffect: (audioSessio
 	constructor() : this(::createNightModeEffect)
 
 	private var effect: AudioEffect? = null
+	private var effectSessionId = C.AUDIO_SESSION_ID_UNSET
 
+	/** Applies night mode to [audioSessionId]; nothing to do when it already runs there. */
 	fun apply(audioSessionId: Int) {
+		if (effect != null && effectSessionId == audioSessionId) return
 		release()
 		// Session 0 is the device's whole output mix, not this player's audio
 		if (audioSessionId == C.AUDIO_SESSION_ID_UNSET) return
@@ -35,11 +38,13 @@ class AudioNightMode internal constructor(private val createEffect: (audioSessio
 		effect = runCatching { createEffect(audioSessionId) }
 			.onFailure { Timber.w(it, "Audio night mode is not available for session $audioSessionId") }
 			.getOrNull()
+		effectSessionId = audioSessionId
 	}
 
 	fun release() {
 		effect?.release()
 		effect = null
+		effectSessionId = C.AUDIO_SESSION_ID_UNSET
 	}
 }
 

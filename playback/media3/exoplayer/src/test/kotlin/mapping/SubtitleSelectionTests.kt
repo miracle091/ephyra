@@ -42,8 +42,9 @@ class SubtitleSelectionTests : FunSpec({
 		findSubtitleSelection(tracks, 3, listOf(null), directPlay = false) shouldBe SubtitleSelection.Group(0)
 	}
 
-	test("a subtitle burnt into a converted stream has nothing to select") {
-		findSubtitleSelection(tracks, 3, emptyList(), directPlay = false) shouldBe SubtitleSelection.Keep
+	test("a subtitle burnt into a converted stream turns the player's subtitles off, side-loaded files included") {
+		findSubtitleSelection(tracks, 3, emptyList(), directPlay = false) shouldBe SubtitleSelection.Off
+		findSubtitleSelection(tracks, 3, listOf(5), directPlay = false) shouldBe SubtitleSelection.Off
 	}
 
 	test("an index the stream doesn't list keeps the player's choice") {

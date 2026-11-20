@@ -29,6 +29,17 @@ class AudioNightModeTests : FunSpec({
 		verify(exactly = 0) { effects[1].release() }
 	}
 
+	test("applying again to the same session keeps the running effect") {
+		val effects = mutableListOf<AudioEffect>()
+		val nightMode = AudioNightMode { mockk<AudioEffect>(relaxed = true).also(effects::add) }
+
+		nightMode.apply(5)
+		nightMode.apply(5)
+
+		effects.size shouldBe 1
+		verify(exactly = 0) { effects[0].release() }
+	}
+
 	test("release frees the effect once") {
 		val effect = mockk<AudioEffect>(relaxed = true)
 		val nightMode = AudioNightMode { effect }
