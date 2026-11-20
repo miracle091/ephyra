@@ -48,12 +48,12 @@ import org.jellyfin.androidtv.util.getActivity
 import org.jellyfin.sdk.api.client.ApiClient
 import org.koin.compose.koinInject
 
-// Small enough that the cast row (title, picture, name and role) fits on screen under the details without scrolling
-private val CastImageSize = 88.dp
+// Large enough to recognise faces from the sofa, small enough that a row still shows several people
+private val CastImageSize = 120.dp
 private const val MARQUEE_DELAY_MS = 1500
 
 /**
- * Ephyra: the compact cast card of the details screens: a square 88dp picture with rounded corners and, under it, the person's
+ * Ephyra: the compact cast card of the details screens: a square 120dp picture with rounded corners and, under it, the person's
  * name and role in two small lines. More people fit in a row than with the poster-shaped cards. Focus ring and click behaviour
  * are the covers': the row handles the click and the ring is drawn here.
  */

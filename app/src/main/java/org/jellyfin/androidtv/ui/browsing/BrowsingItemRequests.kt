@@ -97,7 +97,7 @@ fun createPlaylistsRequest() = GetItemsRequest(
 
 fun createBrowseGridItemsRequest(parent: BaseItemDto): GetItemsRequest {
 	val baseRequest = GetItemsRequest(
-		fields = ItemRepository.itemFields,
+		fields = ItemRepository.gridFields, // Ephyra: lighter pages, see gridFields
 		parentId = parent.id,
 	)
 

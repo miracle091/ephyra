@@ -31,6 +31,13 @@ fun <T : Any> ItemRowAdapter.setItems(
 ) {
 	Timber.i("Creating items from $itemsLoaded existing and ${items.size} new, adapter size is ${size()}")
 
+	// Ephyra: the next page of a list that holds only loaded items is appended, without diffing the whole list on the main thread
+	if (itemsLoaded == size()) {
+		addAll(items.mapIndexedNotNull { index, item -> transform(item, itemsLoaded + index) })
+		itemsLoaded = size()
+		return
+	}
+
 	val allItems = buildList {
 		// Add current items before loaded items
 		repeat(itemsLoaded) {

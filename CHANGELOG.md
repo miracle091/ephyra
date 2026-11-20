@@ -30,6 +30,10 @@ section 2(a) of the GPL-2.0.
   playback queries, Leanback channels, card presenter, info row, settings screens, home rows); Compose components take
   style and slot classes and Koin constructors take dependency groups. `detekt.yaml` uses the `comments` key of
   `ForbiddenComment`, so only `STOPSHIP:` is forbidden as intended.
+- Library grids load faster: pages leave out the fields the grid never shows (chapters, trickplay, media streams,
+  paths, overviews, taglines), their size follows the cards on screen instead of a fixed 100, and each new page is
+  appended instead of diffing the whole list on the main thread.
+- Cast and crew cards on the details screens are larger (120dp pictures instead of 88dp).
 
 ### Removed
 
