@@ -1,6 +1,7 @@
 package org.jellyfin.androidtv.ui.player.video
 
 import org.jellyfin.playback.core.mediastream.MediaConversionMethod
+import org.jellyfin.playback.core.mediastream.MediaStreamAudioTrack
 import org.jellyfin.playback.core.mediastream.MediaStreamVideoTrack
 import org.jellyfin.playback.core.mediastream.PlayableMediaStream
 import org.jellyfin.sdk.model.api.PlayMethod
@@ -25,6 +26,16 @@ fun isHdrStream(stream: PlayableMediaStream?): Boolean {
 	if (stream == null || stream.conversionMethod == MediaConversionMethod.Transcode) return false
 	val range = stream.tracks.filterIsInstance<MediaStreamVideoTrack>().firstOrNull()?.videoRange ?: return false
 	return range.uppercase() !in nonHdrRanges
+}
+
+/**
+ * Ephyra: the audio track playing, for the playback info panel: the one the player reports ([selectedIndex]), else the one the
+ * server chose for [stream], else the first. A converted stream lists the source's tracks but carries only the chosen one.
+ */
+fun playingAudioTrack(stream: PlayableMediaStream, selectedIndex: Int?): MediaStreamAudioTrack? {
+	val audioTracks = stream.tracks.filterIsInstance<MediaStreamAudioTrack>()
+	val index = selectedIndex ?: stream.defaultAudioStreamIndex
+	return audioTracks.firstOrNull { it.index != null && it.index == index } ?: audioTracks.firstOrNull()
 }
 
 /** Ephyra: when the video ends if it plays on from [position] at [speed], for the "Ends at" line under the seek bar. */

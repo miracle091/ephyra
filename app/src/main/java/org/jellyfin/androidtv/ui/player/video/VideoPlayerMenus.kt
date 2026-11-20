@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -44,9 +45,11 @@ import timber.log.Timber
 @Composable
 fun VideoPlayerMenus(
 	playbackManager: PlaybackManager,
+	// Ephyra: the menu its remote key asked for (Captions, Audio track); a request for a menu the video lacks is just dropped
+	menuRequest: VideoPlayerKeyAction? = null,
+	onMenuRequestHandled: () -> Unit = {},
 	userPreferences: UserPreferences = koinInject(),
 ) {
-	val context = LocalContext.current
 	val entry by rememberQueueEntry(playbackManager)
 	val stream = entry?.run { mediaStreamFlow.collectAsState(mediaStream) }?.value
 	val item = entry?.run { baseItemFlow.collectAsState(baseItem) }?.value
@@ -55,38 +58,53 @@ fun VideoPlayerMenus(
 
 	val noneLabel = stringResource(R.string.lbl_none)
 	val subtitles = remember(tracks, noneLabel) { subtitleMenuOptions(tracks, noneLabel) }
+	val audio = remember(tracks) { audioMenuOptions(tracks) }
+	LaunchedEffect(menuRequest, subtitles, audio) {
+		val available = when (menuRequest) {
+			VideoPlayerKeyAction.SUBTITLES_MENU -> subtitles.size > 1
+			VideoPlayerKeyAction.AUDIO_MENU -> audio.size > 1
+			else -> true
+		}
+		if (!available) onMenuRequestHandled()
+	}
+
 	if (subtitles.size > 1) {
 		VideoPlayerMenuButton(
-			icon = R.drawable.ic_select_subtitle,
-			contentDescription = stringResource(R.string.lbl_subtitle_track),
+			icon = { MenuIcon(R.drawable.ic_select_subtitle, stringResource(R.string.lbl_subtitle_track)) },
 			options = subtitles,
 			selected = selectedTracks.subtitleIndex,
 			onSelect = { index -> playbackManager.selectSubtitleTrack(index) },
+			onOpenRequest = onMenuRequestHandled.takeIf { menuRequest == VideoPlayerKeyAction.SUBTITLES_MENU },
 		)
 	}
 
-	val audio = remember(tracks) { audioMenuOptions(tracks) }
 	if (audio.size > 1) {
 		VideoPlayerMenuButton(
-			icon = R.drawable.ic_select_audio,
-			contentDescription = stringResource(R.string.lbl_audio_track),
+			icon = { MenuIcon(R.drawable.ic_select_audio, stringResource(R.string.lbl_audio_track)) },
 			options = audio,
 			selected = selectedTracks.audioIndex,
 			onSelect = { index -> playbackManager.selectAudioTrack(index) },
+			onOpenRequest = onMenuRequestHandled.takeIf { menuRequest == VideoPlayerKeyAction.AUDIO_MENU },
 		)
 	}
 
 	val chapters = remember(item) { chapterMenuOptions(item?.chapters.orEmpty()) }
 	if (chapters.isNotEmpty()) {
 		VideoPlayerMenuButton(
-			icon = R.drawable.ic_select_chapter,
-			contentDescription = stringResource(R.string.lbl_chapters),
+			icon = { MenuIcon(R.drawable.ic_select_chapter, stringResource(R.string.lbl_chapters)) },
 			options = chapters,
 			selected = currentChapter(chapters, playbackManager.state.positionInfo.active),
 			onSelect = { start -> playbackManager.state.seek(start) },
 		)
 	}
 
+	QualityMenuButton(playbackManager, userPreferences)
+}
+
+/** Ephyra: the quality (maximum bitrate) menu; picking one asks the server for a new stream under it, from the current position. */
+@Composable
+private fun QualityMenuButton(playbackManager: PlaybackManager, userPreferences: UserPreferences) {
+	val context = LocalContext.current
 	val qualities = remember { getQualityProfiles(context).map { (value, label) -> PlayerMenuOption(value, label) } }
 	var maxBitrate by rememberPreference(userPreferences, UserPreferences.maxBitrate)
 	VideoPlayerMenuButton(

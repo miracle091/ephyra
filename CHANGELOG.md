@@ -58,6 +58,9 @@ section 2(a) of the GPL-2.0.
   as the legacy one did, and up from the buttons reaches the seek bar instead of hiding the controls.
 - The new player downloads a video's trickplay thumbnails into the image cache as playback starts, so the first
   thumbnail while scrubbing shows at once instead of after a second.
+- The new player answers the remote like the legacy one: centre plays or pauses while the controls are hidden, R1/R2
+  and L1/L2 fast forward and rewind, Stop closes the player, and the Captions and Audio track keys open those menus.
+  Its playback info panel shows the audio track playing instead of the first one.
 - The new player tells the server which version (media source) and audio track it plays, and knows the subtitle
   tracks of the stream.
 - The new player loads subtitles the server hands out as separate files and shows the subtitle the server picks

@@ -116,6 +116,9 @@ private fun VideoSeekbar(
 fun VideoPlayerControls(
 	playbackManager: PlaybackManager = koinInject(),
 	onPlaybackInfoClick: () -> Unit = {},
+	// Ephyra: a menu asked for by its remote key (Captions, Audio track), opened once the controls show
+	menuRequest: VideoPlayerKeyAction? = null,
+	onMenuRequestHandled: () -> Unit = {},
 	modifier: Modifier = Modifier,
 ) {
 	val playState by playbackManager.state.playState.collectAsState()
@@ -154,7 +157,7 @@ fun VideoPlayerControls(
 
 			Spacer(Modifier.weight(1f))
 
-			VideoPlayerMenus(playbackManager)
+			VideoPlayerMenus(playbackManager, menuRequest, onMenuRequestHandled)
 			PlaybackInfoButton(onClick = onPlaybackInfoClick)
 		}
 	}

@@ -3,6 +3,7 @@ package org.jellyfin.androidtv.ui.player.video
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import org.jellyfin.playback.core.mediastream.MediaConversionMethod
+import org.jellyfin.playback.core.mediastream.MediaStreamAudioTrack
 import org.jellyfin.playback.core.mediastream.MediaStreamContainer
 import org.jellyfin.playback.core.mediastream.MediaStreamVideoTrack
 import org.jellyfin.playback.core.mediastream.PlayableMediaStream
@@ -39,6 +40,17 @@ class VideoPlayerInfoTest : FunSpec({
 		isHdrStream(stream(MediaConversionMethod.None, null)) shouldBe false
 		isHdrStream(stream(MediaConversionMethod.Transcode, "HDR10")) shouldBe false
 		isHdrStream(null) shouldBe false
+	}
+
+	test("the info panel shows the audio track playing, not the first one") {
+		val italian = MediaStreamAudioTrack("ac3", 0, 6, 48000, index = 1)
+		val english = MediaStreamAudioTrack("eac3", 0, 6, 48000, index = 2)
+		val source = stream(MediaConversionMethod.None, "SDR").copy(tracks = listOf(italian, english), defaultAudioStreamIndex = 1)
+
+		playingAudioTrack(source, selectedIndex = 2) shouldBe english
+		playingAudioTrack(source, selectedIndex = null) shouldBe italian
+		playingAudioTrack(source.copy(defaultAudioStreamIndex = null), selectedIndex = 9) shouldBe italian
+		playingAudioTrack(source.copy(tracks = emptyList()), selectedIndex = 1) shouldBe null
 	}
 
 	test("the end time counts the remaining time at the playback speed") {

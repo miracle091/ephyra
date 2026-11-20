@@ -18,7 +18,6 @@ import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.composable.rememberQueueEntry
 import org.jellyfin.playback.core.PlaybackManager
 import org.jellyfin.playback.core.mediastream.MediaConversionMethod
-import org.jellyfin.playback.core.mediastream.MediaStreamAudioTrack
 import org.jellyfin.playback.core.mediastream.MediaStreamVideoTrack
 import org.jellyfin.playback.core.mediastream.mediaStreamFlow
 
@@ -31,8 +30,10 @@ fun PlaybackInfoOverlay(
 	val mediaStream by entry?.mediaStreamFlow?.collectAsState(null) ?: return
 	val stream = mediaStream ?: return
 
+	val selectedTracks by playbackManager.state.selectedTracks.collectAsState()
 	val videoTrack = stream.tracks.filterIsInstance<MediaStreamVideoTrack>().firstOrNull()
-	val audioTrack = stream.tracks.filterIsInstance<MediaStreamAudioTrack>().firstOrNull()
+	// Ephyra: the track playing, not the source's first one
+	val audioTrack = playingAudioTrack(stream, selectedTracks.audioIndex)
 
 	Column(
 		verticalArrangement = Arrangement.spacedBy(4.dp),
