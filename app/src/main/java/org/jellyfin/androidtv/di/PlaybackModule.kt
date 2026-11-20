@@ -87,7 +87,15 @@ fun Scope.createPlaybackManager() = playbackManager(androidContext()) {
 	install(media3SessionPlugin(get(), mediaSessionOptions))
 
 	val deviceProfileBuilder = { createDeviceProfile(androidContext(), userPreferences) }
-	install(jellyfinPlugin(get(), deviceProfileBuilder, setOf(MediaSegmentType.INTRO), ProcessLifecycleOwner.get().lifecycle))
+	install(
+		jellyfinPlugin(
+			get(),
+			deviceProfileBuilder,
+			setOf(MediaSegmentType.INTRO),
+			ProcessLifecycleOwner.get().lifecycle,
+			alwaysBurnInSubtitles = { userPreferences[UserPreferences.subtitlesBurnDuringTranscode] },
+		)
+	)
 
 	// Options
 	val userSettingPreferences = get<UserSettingPreferences>()

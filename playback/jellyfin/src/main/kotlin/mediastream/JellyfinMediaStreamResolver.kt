@@ -4,6 +4,7 @@ import org.jellyfin.playback.core.mediastream.MediaConversionMethod
 import org.jellyfin.playback.core.mediastream.MediaStreamResolver
 import org.jellyfin.playback.core.mediastream.PlayableMediaStream
 import org.jellyfin.playback.core.queue.QueueEntry
+import org.jellyfin.playback.core.queue.startPosition
 import org.jellyfin.playback.jellyfin.queue.audioStreamIndex
 import org.jellyfin.playback.jellyfin.queue.baseItem
 import org.jellyfin.playback.jellyfin.queue.mediaSourceId
@@ -17,10 +18,13 @@ import org.jellyfin.sdk.model.api.DeviceProfile
 import org.jellyfin.sdk.model.api.MediaProtocol
 import org.jellyfin.sdk.model.api.MediaType
 import org.jellyfin.sdk.model.api.PlaybackInfoDto
+import org.jellyfin.sdk.model.extensions.inWholeTicks
 
 class JellyfinMediaStreamResolver(
 	private val api: ApiClient,
 	private val deviceProfileBuilder: () -> DeviceProfile,
+	// Ephyra: read for each request, so a changed setting applies from the next stream
+	private val alwaysBurnInSubtitles: () -> Boolean = { false },
 ) : MediaStreamResolver {
 	companion object {
 		private val supportedMediaTypes = arrayOf(MediaType.VIDEO, MediaType.AUDIO)
@@ -30,16 +34,10 @@ class JellyfinMediaStreamResolver(
 		val baseItem = queueEntry.baseItem
 		if (baseItem == null || !supportedMediaTypes.contains(baseItem.mediaType)) return null
 
-		var mediaInfo = getPlaybackInfo(baseItem, queueEntry.mediaSourceId, queueEntry.audioStreamIndex, queueEntry.subtitleStreamIndex)
+		var mediaInfo = getPlaybackInfo(baseItem, queueEntry, queueEntry.mediaSourceId)
 		// Ephyra: Media3 can't read Blu-ray transport streams, and the path is only known from the answer: ask again without direct play
 		if (mediaInfo.mediaSource.supportsDirectPlay && isBluRayTransportStream(mediaInfo.mediaSource.path)) {
-			mediaInfo = getPlaybackInfo(
-				baseItem,
-				mediaInfo.mediaSource.id,
-				queueEntry.audioStreamIndex,
-				queueEntry.subtitleStreamIndex,
-				enableDirectPlay = false,
-			)
+			mediaInfo = getPlaybackInfo(baseItem, queueEntry, mediaInfo.mediaSource.id, enableDirectPlay = false)
 		}
 
 		return when {
@@ -92,9 +90,8 @@ class JellyfinMediaStreamResolver(
 
 	private suspend fun getPlaybackInfo(
 		item: BaseItemDto,
-		mediaSourceId: String? = null,
-		audioStreamIndex: Int? = null,
-		subtitleStreamIndex: Int? = null,
+		queueEntry: QueueEntry,
+		mediaSourceId: String?,
 		enableDirectPlay: Boolean = true,
 	): MediaInfo {
 		val profile = deviceProfileBuilder()
@@ -102,10 +99,14 @@ class JellyfinMediaStreamResolver(
 			itemId = item.id,
 			data = PlaybackInfoDto(
 				mediaSourceId = mediaSourceId,
+				// Ephyra: where playback starts (resume, or a new stream for another track), so a transcode starts there
+				startTimeTicks = queueEntry.startPosition?.inWholeTicks,
 				// Ephyra: the requested audio track; without one the server picks from the user's language preferences
-				audioStreamIndex = audioStreamIndex,
+				audioStreamIndex = queueEntry.audioStreamIndex,
 				// Ephyra: the requested subtitle (-1 for none), so the server picks its delivery (file, manifest or burnt in)
-				subtitleStreamIndex = subtitleStreamIndex,
+				subtitleStreamIndex = queueEntry.subtitleStreamIndex,
+				// Ephyra: the user's "burn in subtitles when transcoding" setting, as in the legacy player
+				alwaysBurnInSubtitleWhenTranscoding = alwaysBurnInSubtitles(),
 				deviceProfile = profile,
 				enableDirectPlay = enableDirectPlay,
 				enableDirectStream = true,
@@ -140,15 +141,21 @@ class JellyfinMediaStreamResolver(
 		queueEntry: QueueEntry,
 		conversionMethod: MediaConversionMethod,
 		url: String,
-	) = PlayableMediaStream(
-		identifier = playSessionId,
-		conversionMethod = conversionMethod,
-		container = getMediaStreamContainer(),
-		tracks = getTracks { path -> api.createUrl(path, ignorePathParameters = true) },
-		queueEntry = queueEntry,
-		url = url,
-		defaultAudioStreamIndex = mediaSource.defaultAudioStreamIndex,
-		mediaSourceId = mediaSource.id,
-		defaultSubtitleStreamIndex = mediaSource.defaultSubtitleStreamIndex?.takeIf { it >= 0 },
-	)
+	): PlayableMediaStream {
+		val defaultSubtitleStreamIndex = mediaSource.defaultSubtitleStreamIndex?.takeIf { it >= 0 }
+		val tracks = getTracks { path -> api.createUrl(path, ignorePathParameters = true) }
+		// Ephyra: with "burn in when transcoding" the server burns the subtitle in but still lists it as a file: don't load it again
+		val burntIn = conversionMethod == MediaConversionMethod.Transcode && alwaysBurnInSubtitles()
+		return PlayableMediaStream(
+			identifier = playSessionId,
+			conversionMethod = conversionMethod,
+			container = getMediaStreamContainer(),
+			tracks = if (burntIn) tracks.withBurntInSubtitle(defaultSubtitleStreamIndex) else tracks,
+			queueEntry = queueEntry,
+			url = url,
+			defaultAudioStreamIndex = mediaSource.defaultAudioStreamIndex,
+			mediaSourceId = mediaSource.id,
+			defaultSubtitleStreamIndex = defaultSubtitleStreamIndex,
+		)
+	}
 }

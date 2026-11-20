@@ -16,8 +16,10 @@ fun jellyfinPlugin(
 	deviceProfileBuilder: () -> DeviceProfile,
 	mediaSegmentSkipTypes: Set<MediaSegmentType> = emptySet(),
 	lifecycle: Lifecycle? = null,
+	// Ephyra: the user's "burn in subtitles when transcoding" setting
+	alwaysBurnInSubtitles: () -> Boolean = { false },
 ) = playbackPlugin {
-	provide(JellyfinMediaStreamResolver(api, deviceProfileBuilder))
+	provide(JellyfinMediaStreamResolver(api, deviceProfileBuilder, alwaysBurnInSubtitles))
 
 	val playSessionService = PlaySessionService(api)
 	provide(playSessionService)

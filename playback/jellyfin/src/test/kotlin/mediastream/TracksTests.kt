@@ -54,6 +54,17 @@ class TracksTests : FunSpec({
 		(subtitle(2, SubtitleDeliveryMethod.ENCODE, null).getMediaStreamTrack(createUrl) as MediaStreamSubtitleTrack).externalUrl shouldBe null
 	}
 
+	test("a subtitle burnt in while transcoding loses its file, the others keep theirs") {
+		val tracks = listOf(
+			subtitle(3, SubtitleDeliveryMethod.EXTERNAL, "/a.srt").getMediaStreamTrack(createUrl),
+			subtitle(4, SubtitleDeliveryMethod.EXTERNAL, "/b.srt").getMediaStreamTrack(createUrl),
+		).filterIsInstance<MediaStreamSubtitleTrack>()
+
+		val result = tracks.withBurntInSubtitle(3).filterIsInstance<MediaStreamSubtitleTrack>()
+
+		result.map { it.externalUrl } shouldBe listOf(null, "https://server/b.srt")
+	}
+
 	test("a subtitle in the HLS manifest is not loaded a second time") {
 		val track = subtitle(4, SubtitleDeliveryMethod.HLS, "/Videos/1/1/Subtitles/4/subtitles.m3u8").getMediaStreamTrack(createUrl)
 		(track as MediaStreamSubtitleTrack).externalUrl shouldBe null

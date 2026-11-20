@@ -3,6 +3,7 @@ package org.jellyfin.playback.jellyfin.mediastream
 import org.jellyfin.playback.core.mediastream.MediaStreamAudioTrack
 import org.jellyfin.playback.core.mediastream.MediaStreamContainer
 import org.jellyfin.playback.core.mediastream.MediaStreamSubtitleTrack
+import org.jellyfin.playback.core.mediastream.MediaStreamTrack
 import org.jellyfin.playback.core.mediastream.MediaStreamVideoTrack
 import org.jellyfin.sdk.model.api.MediaStream
 import org.jellyfin.sdk.model.api.MediaStreamType
@@ -60,3 +61,8 @@ private fun getSubtitleTrack(stream: MediaStream, createUrl: (path: String) -> S
 		?.takeIf { stream.deliveryMethod == SubtitleDeliveryMethod.EXTERNAL }
 		?.let(createUrl),
 )
+
+/** Ephyra: these tracks with the subtitle [index] burnt into the picture, so the player doesn't load its file as well. */
+fun List<MediaStreamTrack>.withBurntInSubtitle(index: Int?) = map { track ->
+	if (track is MediaStreamSubtitleTrack && track.index == index) track.copy(externalUrl = null) else track
+}
