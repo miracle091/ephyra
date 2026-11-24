@@ -25,16 +25,16 @@ import java.util.UUID
 @Composable
 fun SettingsLibrariesDisplayScreen(itemId: UUID, displayPreferencesId: String) {
 	val userViewsRepository = koinInject<UserViewsRepository>()
-	val userView = rememberUserView(itemId)
+	val item = rememberBaseItemDto(itemId)
 	val libraryPreferences = rememberLibraryPreferences(displayPreferencesId) ?: return
 
-	val allowViewSelection = userViewsRepository.allowViewSelection(userView?.collectionType)
+	val allowViewSelection = item != null && userViewsRepository.allowViewSelection(item.collectionType)
 
 	SettingsColumn {
 		item {
 			ListSection(
 				overlineContent = { Text(stringResource(R.string.pref_libraries).uppercase()) },
-				headingContent = { Text(userView?.name.orEmpty()) },
+				headingContent = { Text(item?.name.orEmpty()) },
 			)
 		}
 
@@ -112,6 +112,6 @@ private fun LibraryDisplayButton(
 				mapOf("itemId" to itemId.toString(), "displayPreferencesId" to displayPreferencesId)
 			)
 		},
-		modifier = Modifier.focusKey(route)
+		modifier = Modifier.focusKey(route, initialFocus = route == Routes.LIBRARIES_DISPLAY_IMAGE_SIZE)
 	)
 }
