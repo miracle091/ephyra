@@ -238,6 +238,7 @@ public class BrowseGridFragment extends Fragment implements View.OnKeyListener {
         mGridView.setClipToPadding(false);
         binding.rowsFragment.setClipChildren(false);
         mGridView.setFocusable(true);
+        mGridView.setOnUnhandledKeyListener(event -> BrowseGridFragmentHelperKt.moveGridFocus(mGridView, event));
         binding.rowsFragment.removeAllViews();
         binding.rowsFragment.addView(mGridViewHolder.view);
 
