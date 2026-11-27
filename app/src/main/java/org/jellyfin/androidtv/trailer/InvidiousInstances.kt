@@ -1,6 +1,7 @@
 package org.jellyfin.androidtv.trailer
 
 import kotlinx.serialization.json.JsonArray
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import kotlin.time.Duration.Companion.hours
 
 /** Velella: the public list of Invidious instances, kept for [INSTANCE_LIST_MAX_AGE]. */
@@ -20,11 +21,12 @@ fun parseInvidiousInstances(json: String): List<String> {
 	}
 }
 
-/** Velella: [address] as an instance base URL: HTTPS when it names no scheme, no trailing slash; null when blank. */
+/** Velella: [address] as an instance base URL: HTTPS when it names no scheme, no trailing slash; null when blank or malformed. */
 fun normalizeInvidiousInstance(address: String?): String? {
 	val trimmed = address?.trim()?.trimEnd('/')
 	if (trimmed.isNullOrEmpty()) return null
-	return if (trimmed.startsWith("https://") || trimmed.startsWith("http://")) trimmed else "https://$trimmed"
+	val url = if (trimmed.startsWith("https://") || trimmed.startsWith("http://")) trimmed else "https://$trimmed"
+	return url.takeIf { it.toHttpUrlOrNull() != null }
 }
 
 /** Velella: the instances to try, in order: the user's own, the last one that worked, then the listed ones. */

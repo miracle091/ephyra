@@ -416,7 +416,7 @@ class ExoPlayerBackend(
 		)
 
 		// Enjoy!
-		Timber.i("Playing ${item.mediaStream?.url?.redactApiKey()}")
+		Timber.i("Playing ${item.mediaStream?.url?.redactForLog()}")
 		exoPlayer.play()
 	}
 

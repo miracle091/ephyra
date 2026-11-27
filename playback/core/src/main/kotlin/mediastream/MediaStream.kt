@@ -27,6 +27,8 @@ data class PlayableMediaStream(
 	val defaultSubtitleStreamIndex: Int? = null,
 	/** Velella: whether this is a live TV stream, which counts as failed when it doesn't start in time ([LIVE_START_TIMEOUT]). */
 	val isLive: Boolean = false,
+	/** Velella: the server's id of the live stream it opened for this stream, sent in the reports so the server closes it. */
+	val liveStreamId: String? = null,
 ) : MediaStream
 
 data class MediaStreamContainer(

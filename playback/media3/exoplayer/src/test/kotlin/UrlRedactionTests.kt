@@ -23,4 +23,12 @@ class UrlRedactionTests : FunSpec({
 		"https://tv.example/a?x=1&y=2".redactApiKey() shouldBe "https://tv.example/a?x=1&y=2"
 		"https://tv.example/a?myapi_key=1&ApiKeyHint=2".redactApiKey() shouldBe "https://tv.example/a?myapi_key=1&ApiKeyHint=2"
 	}
+
+	test("a server URL is logged without its token, a remote source only by its host") {
+		"https://tv.example/Videos/1/stream?static=true&api_key=abc".redactForLog() shouldBe
+			"https://tv.example/Videos/1/stream?static=true&api_key=***"
+		"http://iptv.example:8080/live/user/pass/1.ts".redactForLog() shouldBe "http://iptv.example:8080"
+		"https://cdn.example/movie.mp4?token=secret".redactForLog() shouldBe "https://cdn.example"
+		"not a url".redactForLog() shouldBe "<stream>"
+	}
 })

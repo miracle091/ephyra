@@ -37,6 +37,7 @@ internal class MediaStreamService(
 
 	private var reloadJob: Job? = null
 	private var liveStartJob: Job? = null
+	private var retryReloadJob: Job? = null
 	private val retryPolicy = PlaybackRetryPolicy()
 
 	private val _failures = MutableSharedFlow<PlaybackFailure>(extraBufferCapacity = FAILURE_BUFFER)
@@ -52,11 +53,18 @@ internal class MediaStreamService(
 			}
 		})
 
+		// Velella: the retry chain counts again only after the stream really played for a while
+		manager.state.playState.onEach { state ->
+			if (state == PlayState.PLAYING) retryPolicy.onPlaying()
+		}.launchIn(coroutineScope + Dispatchers.Main)
+
 		manager.queue.entry.onEach { entry ->
 			Timber.d("Queue entry changed to $entry")
 			reloadJob?.cancel()
 			liveStartJob?.cancel()
 			retryPolicy.reset()
+			// Playing on from the previous entry (gapless): no new play state comes
+			if (manager.state.playState.value == PlayState.PLAYING) retryPolicy.onPlaying()
 
 			if (entry == null) {
 				val backend = requireNotNull(manager.backend)
@@ -140,6 +148,11 @@ internal class MediaStreamService(
 	/** Velella: the legacy retry chain ([PlaybackRetryPolicy]): the same entry again with a heavier stream from the same position. */
 	private fun onPlaybackError(error: PlaybackError) {
 		val entry = manager.queue.entry.value ?: return
+		// A late error of the stream a retry is already replacing must not count as another attempt
+		if (retryReloadJob?.isActive == true) {
+			Timber.i("Ignoring a ${error.reason} error while the retry's new stream loads")
+			return
+		}
 		val fallback = retryPolicy.onError(error.reason, entry.streamFallback)
 		if (fallback == null) {
 			Timber.w("Giving up on $entry after repeated errors (${error.reason})")
@@ -154,6 +167,7 @@ internal class MediaStreamService(
 			Timber.w("No other stream for $entry")
 			_failures.tryEmit(PlaybackFailure.GaveUp(error))
 		}
+		retryReloadJob = reloadJob
 	}
 
 	/**

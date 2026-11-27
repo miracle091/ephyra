@@ -5,8 +5,9 @@ import org.jellyfin.playback.core.queue.StreamFallback
 
 /**
  * Velella: the legacy player's retry chain for the current entry. The first error drops direct play, the second asks for a transcode,
- * the third gives up; a decoder error goes to a transcode at once, since a remux carries the same codec. Errors more than
- * [STABLE_MS] apart count again from the first attempt, and an entry never steps back up to a lighter stream.
+ * the third gives up; a decoder error goes to a transcode at once, since a remux carries the same codec. After the stream has
+ * played for [STABLE_MS] since the last error, the next error counts from the first attempt again; errors far apart without playback
+ * in between (a live channel that never starts) keep counting. An entry never steps back up to a lighter stream.
  */
 internal class PlaybackRetryPolicy(
 	private val clock: () -> Long = System::currentTimeMillis,
@@ -17,14 +18,20 @@ internal class PlaybackRetryPolicy(
 	}
 
 	private var attempts = 0
-	private var lastErrorAt = 0L
+	private var playingSince: Long? = null
+
+	/** The stream started or went on playing; call it each time the play state turns to playing. */
+	fun onPlaying() {
+		if (playingSince == null) playingSince = clock()
+	}
 
 	/** The stream to retry with after an error of [reason], given the entry's [current] fallback, or null to give up. */
 	fun onError(reason: PlaybackError.Reason, current: StreamFallback?): StreamFallback? {
 		val now = clock()
-		if (attempts > 0 && now - lastErrorAt > STABLE_MS) attempts = 0
+		val since = playingSince
+		if (attempts > 0 && since != null && now - since > STABLE_MS) attempts = 0
+		playingSince = null
 		attempts++
-		lastErrorAt = now
 		if (attempts >= MAX_ATTEMPTS) return null
 
 		val byAttempt = if (attempts == 1) StreamFallback.NO_DIRECT_PLAY else StreamFallback.TRANSCODE
@@ -40,6 +47,6 @@ internal class PlaybackRetryPolicy(
 	/** Forgets the attempts, for a new entry. */
 	fun reset() {
 		attempts = 0
-		lastErrorAt = 0L
+		playingSince = null
 	}
 }

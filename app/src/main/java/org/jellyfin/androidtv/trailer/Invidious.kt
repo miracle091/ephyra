@@ -8,7 +8,7 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.contentOrNull
-import java.net.URI
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 
 private const val MAX_TRAILER_HEIGHT = 1080
 private const val AAC_ITAG = "140"
@@ -36,10 +36,25 @@ private fun JsonElement.height(): Int? = string("resolution")?.substringBefore('
 private fun JsonElement.type(): String = string("type").orEmpty()
 private fun JsonElement.bitrate(): Long = string("bitrate")?.toLongOrNull() ?: 0L
 
-private fun resolveUrl(instance: String, url: String?): String? = when {
-	url.isNullOrBlank() -> null
-	url.startsWith("https://") || url.startsWith("http://") -> url
-	else -> URI("$instance/").resolve(url.removePrefix("/")).toString()
+/** Velella: the hosts of YouTube and Google's video servers; a trailer stream never comes from them. */
+private val YouTubeHosts = listOf(
+	"googlevideo.com", "youtube.com", "youtu.be", "youtube-nocookie.com", "ytimg.com", "ggpht.com", "googleusercontent.com", "google.com",
+)
+
+/** Velella: whether [host] is (a subdomain of) one of YouTube's or Google's video hosts. */
+fun isYouTubeHost(host: String): Boolean {
+	val name = host.lowercase().trimEnd('.')
+	return YouTubeHosts.any { name == it || name.endsWith(".$it") }
+}
+
+/**
+ * Velella: [url] from an instance's answer as a full address, relative ones against [instance]. Null when it is missing or
+ * malformed, or when it points at YouTube: an instance that doesn't proxy the streams (`local=true` is only a request) is skipped.
+ */
+private fun resolveUrl(instance: String, url: String?): String? {
+	if (url.isNullOrBlank()) return null
+	val resolved = "$instance/".toHttpUrlOrNull()?.resolve(url.removePrefix("/")) ?: return null
+	return resolved.takeUnless { isYouTubeHost(it.host) }?.toString()
 }
 
 /**

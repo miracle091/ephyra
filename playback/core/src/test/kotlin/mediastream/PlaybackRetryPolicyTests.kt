@@ -30,14 +30,34 @@ class PlaybackRetryPolicyTests : FunSpec({
 		policy().onError(Reason.SOURCE, StreamFallback.TRANSCODE) shouldBe StreamFallback.TRANSCODE
 	}
 
-	test("after 30 s without errors the attempts count again from the start") {
+	test("after 30 s of playback since the last error the attempts count again from the start") {
 		val policy = policy()
 		policy.onError(Reason.SOURCE, null)
 		now += 5.seconds.inWholeMilliseconds
 		policy.onError(Reason.SOURCE, StreamFallback.NO_DIRECT_PLAY)
 
+		now += 2.seconds.inWholeMilliseconds
+		policy.onPlaying()
 		now += 31.seconds.inWholeMilliseconds
 		policy.onError(Reason.SOURCE, StreamFallback.TRANSCODE) shouldBe StreamFallback.TRANSCODE
+	}
+
+	test("errors far apart with no playback in between keep counting, so a stream that never starts gives up") {
+		val policy = policy()
+		policy.onError(Reason.SOURCE, null) shouldBe StreamFallback.NO_DIRECT_PLAY
+		now += 45.seconds.inWholeMilliseconds
+		policy.onError(Reason.SOURCE, StreamFallback.NO_DIRECT_PLAY) shouldBe StreamFallback.TRANSCODE
+		now += 45.seconds.inWholeMilliseconds
+		policy.onError(Reason.SOURCE, StreamFallback.TRANSCODE) shouldBe null
+	}
+
+	test("a stream that plays only briefly between errors keeps counting too") {
+		val policy = policy()
+		policy.onError(Reason.SOURCE, null)
+		now += 35.seconds.inWholeMilliseconds
+		policy.onPlaying()
+		now += 5.seconds.inWholeMilliseconds
+		policy.onError(Reason.SOURCE, StreamFallback.NO_DIRECT_PLAY) shouldBe StreamFallback.TRANSCODE
 	}
 
 	test("each fallback tells the server which streams it may still offer") {

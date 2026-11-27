@@ -108,6 +108,15 @@ section 2(a) of the GPL-2.0.
   address); sources Media3 can't read directly go through the server.
 - A live channel that has not started playing 20 seconds after the new player got its stream counts as a stream
   error, so the retry chain tries it again or gives up (about a minute on a dead channel), as in the legacy player.
+- The new player tells the server which live stream it played, so the server closes it (and frees the tuner) when
+  playback stops or moves to another stream. The retry chain counts its attempts again only after 30 seconds of real
+  playback, not merely 30 seconds after the last error, and ignores a late error of the stream a retry is already
+  replacing, so a channel that never starts reaches the transcode and gives up instead of retrying forever. Stream
+  addresses that are not the server's are logged by their host only, since they may hold credentials.
+- Trailers skip an Invidious instance that hands out YouTube's own addresses instead of proxying the video, and the
+  trailer player refuses any request or redirect to YouTube's or Google's video hosts. A malformed instance address
+  or answer moves on to the next instance instead of closing the app; leaving the trailer stops the search; the
+  trailer takes the audio focus, so music playing in the app pauses.
 - The new player tells the server which version (media source) and audio track it plays, and knows the subtitle
   tracks of the stream.
 - The new player loads subtitles the server hands out as separate files and shows the subtitle the server picks

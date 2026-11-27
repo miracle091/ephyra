@@ -178,6 +178,7 @@ class JellyfinMediaStreamResolver(
 			mediaSourceId = mediaSource.id,
 			defaultSubtitleStreamIndex = defaultSubtitleStreamIndex,
 			isLive = queueEntry.baseItem?.isLiveTvChannel == true,
+			liveStreamId = mediaSource.liveStreamId,
 		)
 	}
 }

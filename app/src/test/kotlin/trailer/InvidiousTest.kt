@@ -77,4 +77,24 @@ class InvidiousTest : FunSpec({
 			null
 		parseTrailerStreams("<html>", "https://i.example") shouldBe null
 	}
+
+	test("an instance that hands out YouTube's own addresses instead of proxying them gives nothing to play") {
+		val json = """
+			{"adaptiveFormats": [], "formatStreams": [
+				{"type": "video/mp4; codecs=\"avc1.64001F, mp4a.40.2\"", "resolution": "720p",
+					"url": "https://rr3---sn-abc.GoogleVideo.com/videoplayback?itag=22"}
+			]}
+		""".trimIndent()
+		parseTrailerStreams(json, "https://i.example") shouldBe null
+		isYouTubeHost("www.youtube.com") shouldBe true
+		isYouTubeHost("youtube.com.") shouldBe true
+		isYouTubeHost("notyoutube.com") shouldBe false
+		isYouTubeHost("i.example") shouldBe false
+	}
+
+	test("a malformed address is dropped instead of crashing the search") {
+		invidiousCandidates(own = "invidious .home.lan", lastWorking = "https://host:abc", listed = listOf("https://a.example")) shouldBe
+			listOf("https://a.example")
+		parseTrailerStreams("""{"formatStreams": [{"type": "video/mp4", "url": "http://[bad"}]}""", "https://i.example") shouldBe null
+	}
 })

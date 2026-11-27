@@ -135,6 +135,8 @@ class PlaySessionService(
 					itemId = session.item.id,
 					playSessionId = session.stream.identifier,
 					mediaSourceId = session.stream.mediaSourceId,
+					// Velella: the server closes a live stream it opened (tuner, shared M3U stream) when the stop report names it
+					liveStreamId = session.stream.liveStreamId,
 					playlistItemId = session.item.playlistItemId,
 					canSeek = true,
 					isMuted = state.volume.muted,
@@ -160,6 +162,8 @@ class PlaySessionService(
 					itemId = session.item.id,
 					playSessionId = session.stream.identifier,
 					mediaSourceId = session.stream.mediaSourceId,
+					// Velella: the server closes a live stream it opened (tuner, shared M3U stream) when the stop report names it
+					liveStreamId = session.stream.liveStreamId,
 					playlistItemId = session.item.playlistItemId,
 					canSeek = true,
 					isMuted = state.volume.muted,
@@ -185,6 +189,8 @@ class PlaySessionService(
 					itemId = session.item.id,
 					playSessionId = session.stream.identifier,
 					mediaSourceId = session.stream.mediaSourceId,
+					// Velella: the server closes a live stream it opened (tuner, shared M3U stream) when the stop report names it
+					liveStreamId = session.stream.liveStreamId,
 					playlistItemId = session.item.playlistItemId,
 					positionTicks = position.inWholeTicks,
 					failed = failed,

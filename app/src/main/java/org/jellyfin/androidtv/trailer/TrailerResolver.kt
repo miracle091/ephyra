@@ -2,6 +2,7 @@ package org.jellyfin.androidtv.trailer
 
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -31,6 +32,18 @@ class TrailerResolver(
 		.callTimeout(INSTANCE_TIMEOUT_SECONDS, TimeUnit.SECONDS)
 		.build()
 
+	/**
+	 * The client the trailer player reads the streams with: every request and redirect to a YouTube or Google video host fails, so
+	 * an instance that redirects to YouTube instead of proxying can't reach it.
+	 */
+	val streamClient: OkHttpClient = baseClient.newBuilder()
+		.addNetworkInterceptor { chain ->
+			val host = chain.request().url.host
+			if (isYouTubeHost(host)) throw IOException("Trailer stream redirected to $host, which is YouTube")
+			chain.proceed(chain.request())
+		}
+		.build()
+
 	/** The streams of the YouTube video [videoId] from the first instance that has them, skipping [skip]; null when none has. */
 	suspend fun resolve(videoId: String, skip: Set<String> = emptySet()): ResolvedTrailer? = withContext(Dispatchers.IO) {
 		val candidates = invidiousCandidates(
@@ -40,12 +53,15 @@ class TrailerResolver(
 		).filterNot { it in skip }
 
 		for (instance in candidates) {
+			// The user left: stop asking the other instances
+			ensureActive()
 			val streams = try {
 				fetch("$instance/api/v1/videos/$videoId?local=true&fields=adaptiveFormats,formatStreams")
 					?.let { parseTrailerStreams(it, instance) }
 			} catch (error: CancellationException) {
 				throw error
-			} catch (error: IOException) {
+			} catch (@Suppress("TooGenericExceptionCaught") error: Exception) {
+				// A malformed address or answer from one instance must not end the search
 				Timber.w(error, "Invidious instance %s did not answer", instance)
 				null
 			}
@@ -63,7 +79,7 @@ class TrailerResolver(
 	private fun instances(): List<String> {
 		val cached = cacheFile.takeIf { it.exists() }
 		val listed = if (cached != null && isInstanceListFresh(cached.lastModified(), System.currentTimeMillis())) {
-			parseInvidiousInstances(cached.readText())
+			parseInvidiousInstances(readCache(cached))
 		} else {
 			val fetched = try {
 				fetch(INVIDIOUS_INSTANCES_URL)
@@ -72,10 +88,23 @@ class TrailerResolver(
 				null
 			}
 			fetched?.let { json ->
-				parseInvidiousInstances(json).also { if (it.isNotEmpty()) cacheFile.writeText(json) }
-			} ?: cached?.let { parseInvidiousInstances(it.readText()) }.orEmpty()
+				parseInvidiousInstances(json).also { if (it.isNotEmpty()) writeCache(json) }
+			} ?: cached?.let { parseInvidiousInstances(readCache(it)) }.orEmpty()
 		}
 		return listed + InvidiousFallbackInstances
+	}
+
+	private fun readCache(file: File): String = try {
+		file.readText()
+	} catch (error: IOException) {
+		Timber.w(error, "Could not read the cached Invidious instance list")
+		""
+	}
+
+	private fun writeCache(json: String) = try {
+		cacheFile.writeText(json)
+	} catch (error: IOException) {
+		Timber.w(error, "Could not cache the Invidious instance list")
 	}
 
 	/** The body of a successful JSON answer at [url], or null; at most a few megabytes. */

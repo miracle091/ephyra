@@ -7,11 +7,13 @@ import android.widget.Toast
 import androidx.annotation.OptIn
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
+import androidx.media3.common.AudioAttributes
+import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
-import androidx.media3.datasource.DefaultHttpDataSource
+import androidx.media3.datasource.okhttp.OkHttpDataSource
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.MergingMediaSource
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
@@ -66,12 +68,19 @@ class TrailerPlayerActivity : FragmentActivity() {
 	}
 
 	private fun play(streams: TrailerStreams) {
-		val exoPlayer = player ?: ExoPlayer.Builder(this).build().also { created ->
+		val exoPlayer = player ?: ExoPlayer.Builder(this)
+			// Music playing in the app pauses for the trailer
+			.setAudioAttributes(
+				AudioAttributes.Builder().setUsage(C.USAGE_MEDIA).setContentType(C.AUDIO_CONTENT_TYPE_MOVIE).build(),
+				true,
+			)
+			.build().also { created ->
 			created.addListener(TrailerListener())
 			player = created
 			playerView.player = created
 		}
-		val sources = ProgressiveMediaSource.Factory(DefaultHttpDataSource.Factory())
+		// Through the resolver's client, which refuses YouTube's hosts even after a redirect
+		val sources = ProgressiveMediaSource.Factory(OkHttpDataSource.Factory(resolver.streamClient))
 		val video = sources.createMediaSource(MediaItem.fromUri(streams.videoUrl))
 		val source = streams.audioUrl?.let { MergingMediaSource(video, sources.createMediaSource(MediaItem.fromUri(it))) } ?: video
 		exoPlayer.setMediaSource(source)
