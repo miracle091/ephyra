@@ -85,6 +85,8 @@ fun SettingsPlaybackScreen() {
 
 		item { PlaybackButton(R.drawable.ic_trailer, R.string.pref_playback_prerolls, Routes.PLAYBACK_PREROLLS) }
 
+		item { PlaybackButton(R.drawable.ic_trailer, R.string.velella_pref_trailers, Routes.PLAYBACK_TRAILERS) }
+
 		item { PlaybackButton(R.drawable.ic_subtitles, R.string.pref_customization_subtitles, Routes.CUSTOMIZATION_SUBTITLES) }
 
 		item { PlaybackButton(R.drawable.ic_clapperboard, R.string.pref_playback_media_segments, Routes.PLAYBACK_MEDIA_SEGMENTS) }

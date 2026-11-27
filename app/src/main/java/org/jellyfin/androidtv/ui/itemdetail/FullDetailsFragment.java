@@ -862,7 +862,7 @@ public class FullDetailsFragment extends Fragment implements RecordingIndicatorV
             mDetailsOverviewRow.addAction(button);
         }
 
-        if (TrailerUtils.hasPlayableTrailers(requireContext(), mBaseItem)) {
+        if (TrailerUtils.hasPlayableTrailers(mBaseItem)) {
             trailerButton = TextUnderButton.create(requireContext(), R.drawable.ic_trailer, buttonSize, 0, getString(R.string.lbl_play_trailers), new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

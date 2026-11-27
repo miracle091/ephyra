@@ -139,4 +139,10 @@
     <!-- New player: the server gave no playable stream for an item (ui/player/video/VideoPlayerExits.kt) -->
     <string name="velella_player_unplayable">This video can\'t be played: the server offered no stream for it</string>
     <string name="velella_player_unplayable_skipped">Skipped a video the server offered no stream for</string>
+    <!-- Trailers through Invidious (trailer/, ui/settings/screen/playback/SettingsPlaybackTrailersScreen.kt) -->
+    <string name="velella_pref_trailers">Trailers</string>
+    <string name="velella_pref_trailers_description">YouTube trailers play here through Invidious, never through YouTube</string>
+    <string name="velella_pref_trailers_instance">Your Invidious instance</string>
+    <string name="velella_pref_trailers_instance_description">Address of your own Invidious server, tried before the public ones. Leave it empty to use the public instances: they are few and not always up.</string>
+    <string name="velella_trailer_unavailable">No Invidious instance could play this trailer</string>
 </resources>

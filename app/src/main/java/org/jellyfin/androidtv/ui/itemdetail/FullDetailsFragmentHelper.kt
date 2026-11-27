@@ -3,7 +3,6 @@
 
 package org.jellyfin.androidtv.ui.itemdetail
 
-import android.content.ActivityNotFoundException
 import android.view.View
 import android.widget.Toast
 import androidx.core.view.isVisible
@@ -15,9 +14,10 @@ import org.jellyfin.androidtv.R
 import org.jellyfin.androidtv.data.model.DataRefreshService
 import org.jellyfin.androidtv.data.repository.ItemMutationRepository
 import org.jellyfin.androidtv.data.repository.ItemRepository
+import org.jellyfin.androidtv.trailer.TrailerPlayerActivity
+import org.jellyfin.androidtv.trailer.youTubeTrailerIds
 import org.jellyfin.androidtv.util.TimeUtils
 import org.jellyfin.androidtv.util.popupMenu
-import org.jellyfin.androidtv.util.sdk.TrailerUtils.getExternalTrailerIntent
 import org.jellyfin.androidtv.util.sdk.compat.canResume
 import org.jellyfin.androidtv.util.sdk.compat.copyWithUserData
 import org.jellyfin.androidtv.util.showIfNotEmpty
@@ -113,17 +113,10 @@ fun FullDetailsFragment.togglePlayed() {
 fun FullDetailsFragment.playTrailers() {
 	val localTrailerCount = mBaseItem.localTrailerCount ?: 0
 
-	// External trailer
-	if (localTrailerCount < 1) try {
-		val intent = getExternalTrailerIntent(requireContext(), mBaseItem)
-		if (intent != null) startActivity(intent)
-	} catch (exception: ActivityNotFoundException) {
-		Timber.w(exception, "Unable to open external trailer")
-		Toast.makeText(
-			requireContext(),
-			getString(R.string.no_player_message),
-			Toast.LENGTH_LONG
-		).show()
+	// Velella: YouTube trailers play in the app through Invidious, never through YouTube
+	if (localTrailerCount < 1) {
+		val videoIds = mBaseItem.youTubeTrailerIds()
+		if (videoIds.isNotEmpty()) startActivity(TrailerPlayerActivity.intent(requireContext(), videoIds))
 	} else lifecycleScope.launch {
 		val api by inject<ApiClient>()
 

@@ -5,6 +5,7 @@ import org.jellyfin.androidtv.preference.constant.AccentColor
 import org.jellyfin.preference.booleanPreference
 import org.jellyfin.preference.enumPreference
 import org.jellyfin.preference.intPreference
+import org.jellyfin.preference.stringPreference
 import org.jellyfin.preference.store.SharedPreferenceStore
 
 /** Velella: settings of the fork's own features. */
@@ -32,5 +33,11 @@ class VelellaPreferences(context: Context) : SharedPreferenceStore(
 
 		/** The episodes of a season as rows with the picture on the left and the plot beside it, instead of a row of cards. */
 		val compactEpisodeList = booleanPreference("compact_episode_list", false)
+
+		/** The user's own Invidious instance for trailers, tried before the public ones; empty for none. */
+		val invidiousInstance = stringPreference("invidious_instance", "")
+
+		/** The Invidious instance that last gave a trailer's streams, tried next time before the public list. */
+		val invidiousLastInstance = stringPreference("invidious_last_instance", "")
 	}
 }

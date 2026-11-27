@@ -18,6 +18,10 @@ section 2(a) of the GPL-2.0.
   version's section and a link to it.
 - The "Recently added" rows of the home screen end with a "See all" card that opens the library, as its tile in My
   media does.
+- YouTube trailers play in the app through Invidious, never through YouTube: the trailer button asks the user's own
+  instance first (Settings > Playback > Trailers), then the last one that worked and the public ones (their list is
+  fetched at most once a day), 5 seconds each, as AVC video up to 1080p with AAC audio. Nothing is fetched until a
+  trailer is picked; trailers on other sites are ignored.
 
 ### Changed
 
@@ -119,6 +123,8 @@ section 2(a) of the GPL-2.0.
 
 ### Removed
 
+- Trailers no longer open the YouTube app or a browser, and the app no longer declares that it looks for apps that open
+  YouTube links.
 - Dead code: functions and members with no caller (`PopoverMenu.kt`, `ItemRowAdapter.setSiblingRow`,
   `GuideFilters.isMovies`, `HorizontalGridPresenter.enableChildRoundedCorners`, `DisplayPreferencesStore.clearCache`,
   `ImageHelper.getLogoImageUrl`, `MenuBuilder.subMenu`, `toHtmlSpanned`, `createSeriesGetNextUpRequest`).

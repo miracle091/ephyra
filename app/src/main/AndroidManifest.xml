@@ -34,13 +34,6 @@
     <queries>
         <intent>
             <action android:name="android.intent.action.VIEW" />
-            <data
-                android:host="youtube.com"
-                android:scheme="https" />
-        </intent>
-
-        <intent>
-            <action android:name="android.intent.action.VIEW" />
             <data android:mimeType="video/*" />
         </intent>
     </queries>
@@ -142,6 +135,11 @@
             android:windowSoftInputMode="adjustNothing" />
 
         <activity android:name=".ui.playback.ExternalPlayerActivity" />
+
+        <!-- Velella: trailers through Invidious, never YouTube -->
+        <activity
+            android:name=".trailer.TrailerPlayerActivity"
+            android:exported="false" />
 
         <!-- Velella: result of an update installation -->
         <receiver

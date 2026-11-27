@@ -66,6 +66,7 @@ import org.jellyfin.androidtv.util.PlaybackHelper
 import org.jellyfin.androidtv.util.apiclient.ReportingHelper
 import org.jellyfin.androidtv.util.coil.CoilTimberLogger
 import org.jellyfin.androidtv.util.coil.createCoilConnectivityChecker
+import org.jellyfin.androidtv.trailer.TrailerResolver
 import org.jellyfin.androidtv.update.AppUpdater
 import org.jellyfin.androidtv.update.DailyUpdateCheck
 import org.jellyfin.androidtv.util.sdk.SdkPlaybackHelper
@@ -79,6 +80,7 @@ import org.koin.core.module.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.bind
 import org.koin.dsl.module
+import java.io.File
 import org.jellyfin.sdk.Jellyfin as JellyfinSdk
 
 val defaultDeviceInfo = named("defaultDeviceInfo")
@@ -207,5 +209,13 @@ val appModule = module {
 		AppUpdater(androidContext(), httpClient, ProcessLifecycleOwner.get().lifecycleScope)
 	}
 	single { DailyUpdateCheck(androidContext(), get(), get(), get()) }
+	// Velella: trailers through Invidious, never YouTube
+	single {
+		TrailerResolver(
+			preferences = get(),
+			baseClient = get<OkHttpFactory>().createClient(get<HttpClientOptions>()),
+			cacheFile = File(androidContext().cacheDir, "invidious-instances.json"),
+		)
+	}
 	single { ShieldDisplayHint(androidContext(), get(), get()) }
 }

@@ -48,6 +48,7 @@ import org.jellyfin.androidtv.ui.settings.screen.playback.SettingsPlaybackMaxBit
 import org.jellyfin.androidtv.ui.settings.screen.playback.SettingsPlaybackPhotoPlayerScreen
 import org.jellyfin.androidtv.ui.settings.screen.playback.SettingsPlaybackPlayerScreen
 import org.jellyfin.androidtv.ui.settings.screen.playback.SettingsPlaybackPrerollsScreen
+import org.jellyfin.androidtv.ui.settings.screen.playback.SettingsPlaybackTrailersScreen
 import org.jellyfin.androidtv.ui.settings.screen.playback.SettingsPlaybackRefreshRateSwitchingBehaviorScreen
 import org.jellyfin.androidtv.ui.settings.screen.playback.SettingsPlaybackResumeSubtractDurationScreen
 import org.jellyfin.androidtv.ui.settings.screen.playback.SettingsPlaybackScreen
@@ -99,6 +100,7 @@ object Routes {
 	const val PLAYBACK_NEXT_UP_BEHAVIOR = "/playback/next-up/behavior"
 	const val PLAYBACK_INACTIVITY_PROMPT = "/playback/inactivity-prompt"
 	const val PLAYBACK_PREROLLS = "/playback/prerolls"
+	const val PLAYBACK_TRAILERS = "/playback/trailers"
 	const val PLAYBACK_MEDIA_SEGMENTS = "/playback/media-segments"
 	const val PLAYBACK_MEDIA_SEGMENTS_SKIP_DURATION = "/playback/media-segments/skip-duration"
 	const val PLAYBACK_MEDIA_SEGMENT = "/playback/media-segments/{segmentType}"
@@ -241,6 +243,9 @@ val routes = mapOf<String, RouteComposable>(
 	},
 	Routes.PLAYBACK_PREROLLS to {
 		SettingsPlaybackPrerollsScreen()
+	},
+	Routes.PLAYBACK_TRAILERS to {
+		SettingsPlaybackTrailersScreen()
 	},
 	Routes.PLAYBACK_MEDIA_SEGMENTS to {
 		SettingsPlaybackMediaSegmentsScreen()
