@@ -36,6 +36,7 @@ internal class MediaStreamService(
 	}
 
 	private var reloadJob: Job? = null
+	private var liveStartJob: Job? = null
 	private val retryPolicy = PlaybackRetryPolicy()
 
 	private val _failures = MutableSharedFlow<PlaybackFailure>(extraBufferCapacity = FAILURE_BUFFER)
@@ -54,6 +55,7 @@ internal class MediaStreamService(
 		manager.queue.entry.onEach { entry ->
 			Timber.d("Queue entry changed to $entry")
 			reloadJob?.cancel()
+			liveStartJob?.cancel()
 			retryPolicy.reset()
 
 			if (entry == null) {
@@ -105,6 +107,7 @@ internal class MediaStreamService(
 
 		if (hasMediaStream) {
 			backend.playItem(entry)
+			watchLiveStart(entry)
 		} else {
 			Timber.e("Unable to resolve stream for entry $entry")
 
@@ -116,6 +119,21 @@ internal class MediaStreamService(
 			} else {
 				backend.stop()
 			}
+		}
+	}
+
+	/**
+	 * Velella: a live stream that neither plays nor fails within [LIVE_START_TIMEOUT] counts as a stream error, so the retry chain
+	 * tries it again with a heavier stream or gives up, as the legacy player does for channels that buffer forever.
+	 */
+	private fun watchLiveStart(entry: QueueEntry) {
+		liveStartJob?.cancel()
+		if (entry.mediaStream?.isLive != true) return
+		liveStartJob = coroutineScope.launch(Dispatchers.Main) {
+			if (!liveStartStalled(manager.state.playState)) return@launch
+			if (manager.queue.entry.value !== entry) return@launch
+			Timber.w("Live stream of $entry did not start within $LIVE_START_TIMEOUT")
+			onPlaybackError(PlaybackError(PlaybackError.Reason.SOURCE, "Live stream did not start within $LIVE_START_TIMEOUT"))
 		}
 	}
 
@@ -160,7 +178,7 @@ internal class MediaStreamService(
 				resolve = { entry.resolveMediaStream() },
 			) {
 				backend.playItem(entry)
-				if (!play) backend.pause()
+				if (!play) backend.pause() else watchLiveStart(entry)
 			}
 			if (!reloaded) {
 				Timber.w("Kept the current stream of $entry: no new stream, or playback moved on")

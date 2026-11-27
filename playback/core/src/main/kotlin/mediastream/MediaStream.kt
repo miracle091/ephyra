@@ -25,6 +25,8 @@ data class PlayableMediaStream(
 	val mediaSourceId: String? = null,
 	/** Velella: index of the subtitle track the server chose from the user's settings, or null for none. */
 	val defaultSubtitleStreamIndex: Int? = null,
+	/** Velella: whether this is a live TV stream, which counts as failed when it doesn't start in time ([LIVE_START_TIMEOUT]). */
+	val isLive: Boolean = false,
 ) : MediaStream
 
 data class MediaStreamContainer(
