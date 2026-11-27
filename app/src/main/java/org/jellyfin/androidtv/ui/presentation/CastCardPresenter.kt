@@ -126,8 +126,8 @@ private fun CastCard(item: BaseRowItem, focused: Boolean) {
 	val name = item.getFullName(context)
 	val role = item.getSubText(context)
 	val image = item.getImage(ImageType.POSTER)
-	// A name or role longer than the card scrolls by itself, focused or not
-	val marquee = Modifier.basicMarquee(iterations = Int.MAX_VALUE, initialDelayMillis = MARQUEE_DELAY_MS)
+	// Only the focused card scrolls a name or role longer than the card; the others ellipsize, so the texts never run into each other
+	val marquee = if (focused) Modifier.basicMarquee(iterations = Int.MAX_VALUE, initialDelayMillis = MARQUEE_DELAY_MS) else Modifier
 
 	Column(modifier = Modifier.width(CastImageWidth)) {
 		Box(
