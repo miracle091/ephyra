@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Velella</title>
+<meta name="description" content="Velella: a de-Googled Jellyfin client for every NVIDIA Shield TV, from 2015 to the 2019 Pro.">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="images/velella-banner.svg" type="image/svg+xml">
+<style>
+	:root {
+		--bg: #0a0f24;
+		--surface: #121a3a;
+		--surface-2: #1b2550;
+		--ink: #f1f3fa;
+		--ink-muted: #aab3cf;
+		--accent: #00a4dc;
+		--accent-2: #aa5cc3;
+		--radius: 16px;
+		--gutter: 16px;
+	}
+
+	* { box-sizing: border-box; }
+
+	html { scroll-behavior: smooth; }
+
+	body {
+		margin: 0;
+		background: var(--bg);
+		color: var(--ink);
+		font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+		line-height: 1.55;
+		-webkit-font-smoothing: antialiased;
+	}
+
+	a { color: var(--accent); }
+
+	.wrap { max-width: 1120px; margin: 0 auto; padding: 0 var(--gutter); }
+
+	header.nav {
+		position: sticky; top: 0; z-index: 10;
+		background: rgba(10, 15, 36, 0.85);
+		backdrop-filter: blur(8px);
+		border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+	}
+	header.nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 60px; gap: 16px; }
+	header.nav .brand { color: var(--ink); text-decoration: none; font-weight: 700; font-size: 1.15rem; letter-spacing: 0.01em; }
+	header.nav nav { display: flex; gap: 20px; flex-wrap: wrap; }
+	header.nav nav a { color: var(--ink-muted); text-decoration: none; font-size: 0.95rem; }
+	header.nav nav a:hover, header.nav nav a:focus-visible { color: var(--ink); }
+
+	.hero { padding: 72px 0 56px; text-align: center; }
+	.hero img { width: min(440px, 100%); height: auto; border-radius: var(--radius); }
+	.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); margin: 28px 0 8px; letter-spacing: -0.01em; }
+	.hero p.lead { font-size: clamp(1.05rem, 2.6vw, 1.3rem); color: var(--ink-muted); margin: 0 auto; max-width: 640px; }
+	.actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 32px; }
+	.button {
+		display: inline-block; padding: 12px 24px; border-radius: 999px; font-weight: 600; text-decoration: none;
+		background: var(--surface-2); color: var(--ink);
+	}
+	.button.primary { background: linear-gradient(135deg, var(--accent-2), var(--accent)); color: #fff; }
+	.button:hover, .button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+	section { padding: 56px 0; }
+	section h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); margin: 0 0 8px; }
+	section p.intro { color: var(--ink-muted); margin: 0 0 32px; max-width: 720px; }
+
+	.features { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+	.feature { background: var(--surface); border-radius: var(--radius); padding: 24px; }
+	.feature h3 { margin: 0 0 8px; font-size: 1.1rem; }
+	.feature p { margin: 0; color: var(--ink-muted); font-size: 0.97rem; }
+	.feature .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 10px;
+		background: linear-gradient(135deg, var(--accent-2), var(--accent)); }
+
+	.shots { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+	figure { margin: 0; background: var(--surface); border-radius: var(--radius); overflow: hidden; }
+	figure img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; }
+	figcaption { padding: 14px 18px; color: var(--ink-muted); font-size: 0.95rem; }
+
+	ol.steps { margin: 0; padding-left: 1.3em; max-width: 760px; }
+	ol.steps li { margin-bottom: 12px; }
+	code { background: var(--surface-2); padding: 2px 6px; border-radius: 6px; font-size: 0.92em; word-break: break-all; }
+
+	footer { padding: 40px 0 56px; border-top: 1px solid rgba(255, 255, 255, 0.06); color: var(--ink-muted); font-size: 0.9rem; }
+	footer p { margin: 6px 0; }
+</style>
+</head>
+<body>
+<header class="nav">
+	<div class="wrap">
+		<a class="brand" href="#top">Velella</a>
+		<nav aria-label="Sections">
+			<a href="#features">Features</a>
+			<a href="#screenshots">Screenshots</a>
+			<a href="#install">Install</a>
+			<a href="https://github.com/miracle091/velella">GitHub</a>
+		</nav>
+	</div>
+</header>
+
+<main id="top">
+	<div class="wrap hero">
+		<img src="images/velella-banner.svg" alt="The Velella logo: a velella's blue float with its sail" width="440" height="248">
+		<h1>Velella</h1>
+		<p class="lead">A de-Googled Jellyfin client for the NVIDIA Shield TV, every model from 2015 to the 2019 Pro.</p>
+		<div class="actions">
+			<a class="button primary" href="https://github.com/miracle091/velella/releases/latest">Download the latest release</a>
+			<a class="button" href="https://github.com/miracle091/velella/wiki">Read the wiki</a>
+		</div>
+	</div>
+
+	<section id="features">
+		<div class="wrap">
+			<h2>What is different</h2>
+			<p class="intro">Velella is a fork of the official Jellyfin for Android TV app, trimmed and tuned for the Shield. It installs
+				next to the official app instead of replacing it.</p>
+			<div class="features">
+				<div class="feature">
+					<h3><span class="dot"></span>No Google services</h3>
+					<p>No Play Services, Firebase, Play Core or Cast SDK, checked at every build. The same APK runs on stock Shield software
+						and on GMS-free AOSP or LineageOS builds.</p>
+				</div>
+				<div class="feature">
+					<h3><span class="dot"></span>Built for the Shield</h3>
+					<p>Android 11 or later, ARM only (64-bit, plus 32-bit for the 2019 tube), with a baseline profile so the app starts
+						fast even when sideloaded.</p>
+				</div>
+				<div class="feature">
+					<h3><span class="dot"></span>Hardware playback first</h3>
+					<p>Hardware decoders before software ones, AV1 transcoded by the server, refresh-rate switching on by default, bitstream
+						audio for every format your receiver takes.</p>
+				</div>
+				<div class="feature">
+					<h3><span class="dot"></span>Trailers without YouTube</h3>
+					<p>Trailers play in the app through Invidious, your own instance first. Nothing is fetched until you press the
+						button.</p>
+				</div>
+				<div class="feature">
+					<h3><span class="dot"></span>A calmer interface</h3>
+					<p>Night-blue themes with one accent colour, a full-width spotlight on the home screen, readable type from the sofa
+						and a solid focus you can always find.</p>
+				</div>
+				<div class="feature">
+					<h3><span class="dot"></span>Updates from GitHub</h3>
+					<p>No store needed: the app checks GitHub Releases by itself, or add the repository to Obtainium.</p>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section id="screenshots">
+		<div class="wrap">
+			<h2>Screenshots</h2>
+			<p class="intro">Taken on the Android TV emulator with the Jellyfin demo server.</p>
+			<div class="shots">
+				<figure>
+					<img src="images/home.jpg" alt="The home screen: a full-width spotlight with the title, ratings, genres, overview, Play and Details buttons, above the library rows" width="1280" height="720" loading="lazy">
+					<figcaption>Home: a spotlight on new titles you have not watched yet.</figcaption>
+				</figure>
+				<figure>
+					<img src="images/details.jpg" alt="A film's details: poster, genres, info badges, overview, director and running time, with the cast below" width="1280" height="720" loading="lazy">
+					<figcaption>Details: the essentials at a glance, cast and crew below.</figcaption>
+				</figure>
+				<figure>
+					<img src="images/player.jpg" alt="The player's controls: series and episode title, a thin seek bar, end time and time left, skip buttons showing their seconds" width="1280" height="720" loading="lazy">
+					<figcaption>Player: how the stream is delivered, the end time and the time left.</figcaption>
+				</figure>
+				<figure>
+					<img src="images/trailers.jpg" alt="The trailer settings, with a field for your own Invidious instance" width="1280" height="720" loading="lazy">
+					<figcaption>Settings: your own Invidious instance for trailers.</figcaption>
+				</figure>
+			</div>
+		</div>
+	</section>
+
+	<section id="install">
+		<div class="wrap">
+			<h2>Install</h2>
+			<p class="intro">Velella is sideloaded: it is not on Google Play, F-Droid or any other store. You need a Jellyfin server.</p>
+			<ol class="steps">
+				<li>Download the APK from <a href="https://github.com/miracle091/velella/releases/latest">the latest release</a>, or add
+					<code>https://github.com/miracle091/velella</code> to Obtainium.</li>
+				<li>Install it on the Shield with a file manager, or over ADB: <code>adb install velella-v&lt;version&gt;.apk</code>.</li>
+				<li>Open Velella, pick your server and sign in. From then on it checks for new releases by itself.</li>
+			</ol>
+			<p>The <a href="https://github.com/miracle091/velella/wiki">wiki</a> covers installation, features, building and the FAQ.</p>
+		</div>
+	</section>
+</main>
+
+<footer>
+	<div class="wrap">
+		<p>Velella is free software under the <a href="https://github.com/miracle091/velella/blob/velella/main/LICENSE">GPL-2.0</a>, a
+			fork of <a href="https://github.com/jellyfin/jellyfin-androidtv">Jellyfin for Android TV</a>. It is not affiliated with the
+			Jellyfin project or NVIDIA; NVIDIA and Shield are trademarks of NVIDIA Corporation.</p>
+		<p>Screenshots show <em>Pioneer One</em> and <em>Caminandes: Llamigos</em> (Blender Foundation, CC BY) from the Jellyfin
+			demo server.</p>
+	</div>
+</footer>
+</body>
+</html>
