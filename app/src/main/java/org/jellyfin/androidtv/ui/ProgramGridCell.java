@@ -17,6 +17,7 @@ import org.jellyfin.androidtv.R;
 import org.jellyfin.androidtv.preference.LiveTvPreferences;
 import org.jellyfin.androidtv.ui.livetv.GuideStyle;
 import org.jellyfin.androidtv.ui.livetv.LiveTvGuide;
+import org.jellyfin.androidtv.ui.livetv.LiveTvGuideFragmentHelperKt;
 import org.jellyfin.androidtv.util.DateTimeExtensionsKt;
 import org.jellyfin.androidtv.util.Utils;
 import org.jellyfin.androidtv.util.sdk.BaseItemExtensionsKt;
@@ -25,6 +26,8 @@ import org.jellyfin.sdk.model.api.BaseItemDto;
 import java.time.LocalDateTime;
 
 public class ProgramGridCell extends RelativeLayout implements RecordingIndicatorView {
+    // Velella: how much a programme already over is faded
+    private static final float PAST_ALPHA = 0.45f;
 
     private LiveTvGuide mActivity;
     private TextView mProgramName;
@@ -32,6 +35,13 @@ public class ProgramGridCell extends RelativeLayout implements RecordingIndicato
     private BaseItemDto mProgram;
     private ImageView mRecIndicator;
     private int mBackgroundColor = 0;
+    // Velella: the on-air state the cell is drawn in, and the views refreshNow changes with it
+    private boolean mLive;
+    private boolean mOver;
+    private View mContent;
+    private TextView mStartTime;
+    private TextView mLiveLabel;
+    private TextView mTimeLeft;
     private boolean isLast;
     private boolean isFirst;
 
@@ -44,16 +54,17 @@ public class ProgramGridCell extends RelativeLayout implements RecordingIndicato
         mActivity = activity;
 
         LayoutInflater inflater = LayoutInflater.from(context);
-        View v = inflater.inflate(R.layout.program_grid_cell, this, false);
-        this.addView(v);
+        mContent = inflater.inflate(R.layout.program_grid_cell, this, false);
+        this.addView(mContent);
 
         setFocusable(true);
-        setBackground(GuideStyle.cellBackground(context));
-        // Velella: the now bar hugs the bottom edge, so the cell's rounded corners clip it
+        // Velella: the elapsed fill reaches the cell's edges, so the cell's rounded corners clip it
         setClipToOutline(true);
 
         mProgramName = findViewById(R.id.programName);
         mInfoRow = findViewById(R.id.infoRow);
+        mLiveLabel = findViewById(R.id.liveLabel);
+        mTimeLeft = findViewById(R.id.timeLeft);
         mProgramName.setText(program.getName());
         mProgram = program;
         mRecIndicator = findViewById(R.id.recIndicator);
@@ -64,12 +75,12 @@ public class ProgramGridCell extends RelativeLayout implements RecordingIndicato
             LocalDateTime localStart = program.getStartDate();
             if (localStart.plusMinutes(1).isBefore(activity.getCurrentLocalStartDate())) {
                 // Velella: no "<<" before the name; the start time under it tells the programme began earlier
-                TextView time = new TextView(context);
-                time.setTypeface(GuideStyle.monoTypeface(context));
-                time.setTextColor(Utils.getThemeColor(context, R.attr.controlIconForegroundInactive));
-                time.setTextSize(12);
-                time.setText(DateTimeExtensionsKt.getTimeFormatter(getContext()).format(program.getStartDate()));
-                mInfoRow.addView(time);
+                mStartTime = new TextView(context);
+                mStartTime.setTypeface(GuideStyle.monoTypeface(context));
+                mStartTime.setTextColor(Utils.getThemeColor(context, R.attr.controlIconForegroundInactive));
+                mStartTime.setTextSize(12);
+                mStartTime.setText(DateTimeExtensionsKt.getTimeFormatter(getContext()).format(program.getStartDate()));
+                mInfoRow.addView(mStartTime);
             }
         }
 
@@ -116,34 +127,37 @@ public class ProgramGridCell extends RelativeLayout implements RecordingIndicato
     }
 
     /**
-     * Velella: the programme on air gets a red dot before its name, like the player's LIVE badge, a bar in the theme's accent
-     * that runs with the clock, and a thin line across the cell at the current time, where the bar ends. Called again by the
-     * guide's ticker, so they move on to the next programme without reloading.
+     * Velella: the programme on air gets a lighter cell, its elapsed part filled in the theme's accent up to the current time, and
+     * an "on air" tag with the time left in place of its start time; programmes already over are faded. Called again by the
+     * guide's ticker, so the marks move on to the next programme without reloading.
      */
     public void refreshNow() {
         ProgressBar nowBar = findViewById(R.id.nowBar);
-        View nowMarker = findViewById(R.id.nowMarker);
         int now = -1;
+        boolean over = false;
         LocalDateTime time = LocalDateTime.now();
-        if (mProgram != null && mProgram.getStartDate() != null && mProgram.getEndDate() != null) {
+        if (mProgram != null && !LiveTvGuideFragmentHelperKt.isNoProgramData(mProgram) && mProgram.getStartDate() != null
+                && mProgram.getEndDate() != null) {
             now = GuideStyle.nowProgress(mProgram.getStartDate(), mProgram.getEndDate(), time);
+            over = !time.isBefore(mProgram.getEndDate());
         }
-        if (now >= 0) {
-            // The cell starts at the guide's start when the programme began earlier: the bar and the line run over that visible
-            // part
+        boolean live = now >= 0;
+        if (live) {
+            // The cell starts at the guide's start when the programme began earlier: the fill runs over that visible part
             LocalDateTime visibleStart = GuideStyle.visibleStart(mProgram.getStartDate(), mActivity.getCurrentLocalStartDate());
-            int progress = Math.max(0, GuideStyle.nowProgress(visibleStart, mProgram.getEndDate(), time));
-            nowBar.setProgress(progress);
-            nowBar.setVisibility(View.VISIBLE);
-            nowMarker.setVisibility(View.VISIBLE);
-            // Where the bar ends: it spans the cell less its 2dp margins; placed once the cell has its width
-            nowBar.post(() -> nowMarker.setTranslationX(nowBar.getLeft() + nowBar.getWidth() * (float) progress / nowBar.getMax()
-                    - nowMarker.getWidth() / 2f));
-            mProgramName.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.velella_guide_live_dot, 0, 0, 0);
-        } else {
-            nowBar.setVisibility(View.GONE);
-            nowMarker.setVisibility(View.GONE);
-            mProgramName.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, 0, 0);
+            nowBar.setProgress(Math.max(0, GuideStyle.nowProgress(visibleStart, mProgram.getEndDate(), time)));
+            mTimeLeft.setText(GuideStyle.timeLeftText(getContext(), mProgram.getEndDate(), time));
+        }
+        int liveVisibility = live ? View.VISIBLE : View.GONE;
+        nowBar.setVisibility(liveVisibility);
+        mLiveLabel.setVisibility(liveVisibility);
+        mTimeLeft.setVisibility(liveVisibility);
+        if (mStartTime != null) mStartTime.setVisibility(live ? View.GONE : View.VISIBLE);
+        mOver = over;
+        applyFade();
+        if (live != mLive) {
+            mLive = live;
+            applyBackground();
         }
     }
 
@@ -171,14 +185,25 @@ public class ProgramGridCell extends RelativeLayout implements RecordingIndicato
             } else if (Utils.isTrue(mProgram.isKids())) {
                 mBackgroundColor = getResources().getColor(R.color.guide_kids_bg);
             }
-
-            setBackground(GuideStyle.cellBackground(getContext(), mBackgroundColor));
         }
+        applyBackground();
+    }
+
+    // Velella: a programme already over is faded, but not while it has focus, so it stays readable
+    private void applyFade() {
+        mContent.setAlpha(mOver && !hasFocus() ? PAST_ALPHA : 1f);
+    }
+
+    private void applyBackground() {
+        setBackground(GuideStyle.cellBackground(getContext(), mBackgroundColor, mLive));
     }
 
     @Override
     protected void onFocusChanged(boolean gainFocus, int direction, Rect previouslyFocusedRect) {
         super.onFocusChanged(gainFocus, direction, previouslyFocusedRect);
+        // Velella: a name too long for its cell scrolls while the cell has focus (the marquee runs only on a selected view)
+        mProgramName.setSelected(gainFocus);
+        applyFade();
 
         if (gainFocus) {
             mActivity.setSelectedProgram(this);

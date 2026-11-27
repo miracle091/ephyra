@@ -21,7 +21,7 @@ import androidx.fragment.compose.AndroidFragment
 import androidx.fragment.compose.content
 import androidx.lifecycle.Lifecycle
 import org.jellyfin.androidtv.ui.home.spotlight.HomeSpotlight
-import org.jellyfin.androidtv.ui.home.spotlight.HomeSpotlightBackdrop
+import org.jellyfin.androidtv.ui.home.spotlight.SpotlightBackdrop
 import org.jellyfin.androidtv.ui.home.spotlight.rememberHomeSpotlightState
 import org.jellyfin.androidtv.ui.shared.toolbar.MainToolbar
 import org.jellyfin.androidtv.ui.shared.toolbar.MainToolbarActiveButton
@@ -41,7 +41,7 @@ class HomeFragment : Fragment() {
 		var rowsSupportFragment by remember { mutableStateOf<HomeRowsFragment?>(null) }
 		// Velella: the spotlight's backdrop runs behind the toolbar and its text sits above the rows
 		val spotlight = rememberHomeSpotlightState(rowsSupportFragment)
-		HomeSpotlightBackdrop(spotlight)
+		SpotlightBackdrop(spotlight)
 
 		Column {
 			MainToolbar(MainToolbarActiveButton.Home)

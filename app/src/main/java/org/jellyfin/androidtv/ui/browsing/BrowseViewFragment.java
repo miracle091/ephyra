@@ -91,17 +91,12 @@ public class BrowseViewFragment extends EnhancedBrowseFragment {
                 isLiveTvLibrary = true;
                 showViews = true;
 
-                //On now
-                mRows.add(new BrowseRowDef(getString(R.string.lbl_on_now), BrowsingUtils.createLiveTVOnNowRequest()));
-
-                //Upcoming
-                mRows.add(new BrowseRowDef(getString(R.string.lbl_coming_up), BrowsingUtils.createLiveTVUpcomingRequest()));
+                // Velella: no On now and Coming up rows, the spotlight above the rows shows the programmes on air
 
                 //Fav Channels
                 mRows.add(new BrowseRowDef(getString(R.string.lbl_favorite_channels), BrowsingUtils.createLiveTVChannelsRequest(true)));
 
-                //Other Channels
-                mRows.add(new BrowseRowDef(getString(R.string.lbl_other_channels), BrowsingUtils.createLiveTVChannelsRequest(false)));
+                // Velella: no Other channels row, the guide lists every channel
 
                 //Latest Recordings
                 BrowseViewFragmentHelperKt.getLiveTvRecordingsAndTimers(this, (recordings, timers) -> {
@@ -189,7 +184,7 @@ public class BrowseViewFragment extends EnhancedBrowseFragment {
     protected void addAdditionalRows(MutableObjectAdapter<Row> rowAdapter) {
         if (isLiveTvLibrary) {
             // Velella: the Views row comes first, the guide one key away; the other rows are added after it
-            HeaderItem gridHeader = new HeaderItem(0, getString(R.string.lbl_views));
+            HeaderItem gridHeader = new HeaderItem(0, getString(R.string.velella_livetv_views_row));
 
             GridButtonPresenter mGridPresenter = new GridButtonPresenter();
             ArrayObjectAdapter gridRowAdapter = new ArrayObjectAdapter(mGridPresenter);

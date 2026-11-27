@@ -5,25 +5,7 @@ package org.jellyfin.androidtv.ui.browsing
 
 import org.jellyfin.androidtv.data.repository.ItemRepository
 import org.jellyfin.sdk.model.api.request.GetLiveTvChannelsRequest
-import org.jellyfin.sdk.model.api.request.GetRecommendedProgramsRequest
 import org.jellyfin.sdk.model.api.request.GetRecordingsRequest
-
-fun createLiveTVOnNowRequest() = GetRecommendedProgramsRequest(
-	isAiring = true,
-	fields = ItemRepository.itemFields,
-	imageTypeLimit = 1,
-	enableTotalRecordCount = false,
-	limit = 150,
-)
-
-fun createLiveTVUpcomingRequest() = GetRecommendedProgramsRequest(
-	isAiring = false,
-	hasAired = false,
-	fields = ItemRepository.itemFields,
-	imageTypeLimit = 1,
-	enableTotalRecordCount = false,
-	limit = 150,
-)
 
 @JvmOverloads
 fun createLiveTVRecordingsRequest(limit: Int? = null) = GetRecordingsRequest(

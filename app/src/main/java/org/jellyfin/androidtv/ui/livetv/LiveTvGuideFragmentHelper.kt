@@ -46,6 +46,9 @@ fun createNoProgramDataBaseItem(
 	endDate = endDate,
 )
 
+/** Velella: whether [item] is a filler made by [createNoProgramDataBaseItem], not a real programme, so it is never on air or over. */
+fun isNoProgramData(item: BaseItemDto): Boolean = item.type == BaseItemKind.FOLDER
+
 fun LiveTvGuideFragment.toggleFavorite() {
 	val header = mSelectedProgramView as? GuideChannelHeader
 	val channel = header?.channel ?: return

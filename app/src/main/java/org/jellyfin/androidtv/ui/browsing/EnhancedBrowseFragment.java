@@ -41,6 +41,7 @@ import org.jellyfin.androidtv.data.repository.CustomMessageRepository;
 import org.jellyfin.androidtv.data.service.BackgroundService;
 import org.jellyfin.androidtv.databinding.EnhancedDetailBrowseBinding;
 import org.jellyfin.androidtv.ui.GridButton;
+import org.jellyfin.androidtv.ui.home.HomeRowsAlignmentKt;
 import org.jellyfin.androidtv.ui.itemhandling.BaseRowItem;
 import org.jellyfin.androidtv.ui.itemhandling.GridButtonBaseRowItem;
 import org.jellyfin.androidtv.ui.itemhandling.ItemLauncher;
@@ -141,7 +142,26 @@ public class EnhancedBrowseFragment extends Fragment implements RowLoader, View.
 
         mRowsFragment.setAdapter(mRowsAdapter);
 
+        // Velella: inside a Compose screen with its own toolbar and spotlight (LiveTvFragment) only the rows show
+        if (isEmbedded()) {
+            binding.title.setVisibility(View.GONE);
+            binding.infoRow.setVisibility(View.GONE);
+            binding.summary.setVisibility(View.GONE);
+            binding.clock.setVisibility(View.GONE);
+            binding.npBug.setVisibility(View.GONE);
+        }
+
         return binding.getRoot();
+    }
+
+    // Velella: whether a Compose screen hosts these rows under its own toolbar and spotlight (Extras.Embedded)
+    protected boolean isEmbedded() {
+        return getArguments() != null && getArguments().getBoolean(Extras.Embedded, false);
+    }
+
+    /** Velella: the rows, for a hosting Compose screen that hands the focus over and follows the selected row. */
+    public RowsSupportFragment getRowsFragment() {
+        return mRowsFragment;
     }
 
     @Override
@@ -149,6 +169,14 @@ public class EnhancedBrowseFragment extends Fragment implements RowLoader, View.
         super.onViewCreated(view, savedInstanceState);
 
         setupEventListeners();
+        // Velella: embedded rows line up at the home rows' fixed line, so the spotlight above never hides the first row's title
+        if (isEmbedded()) {
+            mRowsFragment.getViewLifecycleOwnerLiveData().observe(getViewLifecycleOwner(), owner -> {
+                if (owner != null && mRowsFragment.getVerticalGridView() != null) {
+                    HomeRowsAlignmentKt.alignHomeRows(mRowsFragment.getVerticalGridView());
+                }
+            });
+        }
     }
 
     @Override

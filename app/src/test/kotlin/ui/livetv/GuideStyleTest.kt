@@ -37,4 +37,11 @@ class GuideStyleTest : FunSpec({
 		GuideStyle.nowProgress(visible, end, start.plusMinutes(45)) shouldBe 500
 		GuideStyle.visibleStart(start.plusMinutes(40), guideStart) shouldBe start.plusMinutes(40)
 	}
+
+	test("The minutes left round up, so a programme on air never shows zero") {
+		GuideStyle.minutesLeft(end, end.minusMinutes(27)) shouldBe 27
+		GuideStyle.minutesLeft(end, end.minusSeconds(30)) shouldBe 1
+		GuideStyle.minutesLeft(end, end.minusMinutes(26).minusSeconds(1)) shouldBe 27
+		GuideStyle.minutesLeft(end, end) shouldBe 0
+	}
 })

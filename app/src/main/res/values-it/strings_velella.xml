@@ -135,9 +135,14 @@
     <string name="velella_pref_trailers_instance">La tua istanza Invidious</string>
     <string name="velella_pref_trailers_instance_description">Indirizzo del tuo server Invidious, provato prima di quelli pubblici. Lascialo vuoto per usare le istanze pubbliche: sono poche e non sempre attive.</string>
     <string name="velella_trailer_unavailable">Nessuna istanza Invidious è riuscita a riprodurre questo trailer</string>
-    <!-- Live TV library: the buttons of the first row (ui/browsing/BrowseViewFragment.java) -->
+    <!-- Live TV library: the first row and its buttons (ui/browsing/BrowseViewFragment.java) -->
+    <string name="velella_livetv_views_row">TV e registrazioni</string>
     <string name="velella_livetv_guide">Guida TV</string>
     <string name="velella_livetv_recordings">Registrazioni</string>
     <string name="velella_livetv_scheduled">Programmate</string>
     <string name="velella_livetv_series">Serie registrate</string>
+    <!-- Live TV guide: the tag and the time left of the programme on air (ui/ProgramGridCell.java) -->
+    <string name="velella_guide_on_air">IN ONDA</string>
+    <string name="velella_guide_minutes_left">ancora %1$d min</string>
+    <string name="velella_guide_hours_left">ancora %1$d h %2$d min</string>
 </resources>

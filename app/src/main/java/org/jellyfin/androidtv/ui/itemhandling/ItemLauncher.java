@@ -62,7 +62,7 @@ public class ItemLauncher {
                 if (!enableSmartScreen) return Destinations.INSTANCE.libraryBrowser(baseItem, null);
                 else return Destinations.INSTANCE.librarySmartScreen(baseItem);
             case LIVETV:
-                return Destinations.INSTANCE.librarySmartScreen(baseItem);
+                return Destinations.INSTANCE.liveTv(baseItem); // Velella: laid out like the home, with a spotlight
             default:
                 return Destinations.INSTANCE.libraryBrowser(baseItem, null);
         }

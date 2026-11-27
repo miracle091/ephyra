@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Velella: the "on air" tag of a guide cell, filled in the theme's accent (its text takes the theme's background colour), radius-xs
+     like velella_guide_badge -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="?android:attr/colorAccent" />
+    <corners android:radius="4dp" />
+</shape>

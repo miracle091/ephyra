@@ -15,6 +15,7 @@ import org.jellyfin.androidtv.ui.home.HomeFragment
 import org.jellyfin.androidtv.ui.itemdetail.FullDetailsFragment
 import org.jellyfin.androidtv.ui.itemdetail.ItemListFragment
 import org.jellyfin.androidtv.ui.itemdetail.MusicFavoritesListFragment
+import org.jellyfin.androidtv.ui.livetv.LiveTvFragment
 import org.jellyfin.androidtv.ui.livetv.LiveTvGuideFragment
 import org.jellyfin.androidtv.ui.playback.AudioNowPlayingFragment
 import org.jellyfin.androidtv.ui.playback.CustomPlaybackOverlayFragment
@@ -109,6 +110,10 @@ object Destinations {
 	}
 
 	// Live TV
+	// Velella: the Live TV library opens laid out like the home, with a spotlight of the programmes on air
+	fun liveTv(item: BaseItemDto) = fragmentDestination<LiveTvFragment> {
+		putString(Extras.Folder, Json.encodeToString(item))
+	}
 	val liveTvGuide = fragmentDestination<LiveTvGuideFragment>()
 	val liveTvSchedule = fragmentDestination<BrowseScheduleFragment>()
 	val liveTvRecordings = fragmentDestination<BrowseRecordingsFragment>()

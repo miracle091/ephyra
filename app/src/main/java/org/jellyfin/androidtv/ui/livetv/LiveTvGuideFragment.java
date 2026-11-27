@@ -71,6 +71,8 @@ public class LiveTvGuideFragment extends Fragment implements LiveTvGuide, View.O
     public static final int GUIDE_FULL_WIDTH_PER_MIN_DP = 9;
     // Velella: space kept above and below the focused row when the grid scrolls
     private static final int GUIDE_SCROLL_MARGIN_DP = 20;
+    // Velella: narrowest programme cell, as wide as a quarter of an hour, so a programme of a few minutes still shows the start of its name
+    private static final int GUIDE_MIN_CELL_MINUTES = 15;
     public static final int PAGE_SIZE = 75;
     public static final int NORMAL_HOURS = 9;
     public static final int FILTERED_HOURS = 4;
@@ -272,15 +274,19 @@ public class LiveTvGuideFragment extends Fragment implements LiveTvGuide, View.O
         doLoad();
 
         mHandler.removeCallbacks(nowTicker);
-        mHandler.postDelayed(nowTicker, NOW_TICK_MS);
+        mHandler.post(nowTicker);
     }
 
-    // Velella: moves the on-air bars with the clock while the guide is open, without reloading it
-    private static final long NOW_TICK_MS = 30_000L;
+    // Velella: moves the on-air marks (fill, tag, time left, faded past) with the clock while the guide is open, without reloading
+    // it; it runs just after each minute starts, when programmes end and the minutes left change
     private final Runnable nowTicker = new Runnable() {
         @Override
         public void run() {
             if (!getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED) || mProgramRows == null) return;
+            // A new half hour has begun: the page showing now moves on to it, keeping the selected channel, unless a menu is open
+            if (GuideLayoutHelper.isBehindNow(mCurrentGuideStart, LocalDateTime.now()) && !isMenuOpen()) {
+                pageGuideTo(GuideLayoutHelper.guideStart(LocalDateTime.now()));
+            }
             for (int i = 0; i < mProgramRows.getChildCount(); i++) {
                 View row = mProgramRows.getChildAt(i);
                 if (!(row instanceof LinearLayout)) continue;
@@ -290,7 +296,7 @@ public class LiveTvGuideFragment extends Fragment implements LiveTvGuide, View.O
                     if (cell instanceof ProgramGridCell) ((ProgramGridCell) cell).refreshNow();
                 }
             }
-            mHandler.postDelayed(this, NOW_TICK_MS);
+            mHandler.postDelayed(this, GuideLayoutHelper.delayToNextMinute(System.currentTimeMillis()));
         }
     };
 
@@ -311,6 +317,12 @@ public class LiveTvGuideFragment extends Fragment implements LiveTvGuide, View.O
 
             mFirstFocusChannelId = GuideStartHelperKt.guideFocusChannelId(TvManager.getLastLiveTvChannel(), shouldRestoreLastChannel()); // Velella
         }
+    }
+
+    // Velella: the programme popup, the options or the filters are showing, so the grid must not reload under them
+    private boolean isMenuOpen() {
+        return (mDetailPopup != null && mDetailPopup.isShowing()) || Boolean.TRUE.equals(showOptions.getValue())
+                || Boolean.TRUE.equals(showFilterOptions.getValue());
     }
 
     // Velella
@@ -678,7 +690,8 @@ public class LiveTvGuideFragment extends Fragment implements LiveTvGuide, View.O
                         getContext(),
                         channelId,
                         mCurrentGuideStart.plusMinutes(30l * slot),
-                        mCurrentGuideEnd.plusMinutes(30l * (slot + 1))
+                        // Velella: half an hour after the slot's start (upstream counted from the guide's end)
+                        GuideLayoutHelper.fillerSlotEnd(mCurrentGuideStart, slot)
                 );
 
                 ProgramGridCell cell = new ProgramGridCell(requireContext(), this, empty, false);
@@ -756,6 +769,8 @@ public class LiveTvGuideFragment extends Fragment implements LiveTvGuide, View.O
             programRow.addView(cell);
         }
 
+        // Velella: no cell narrower than the minimum, borrowing the space from the next one
+        GuideLayoutHelper.fitRowWidths(programRow, GUIDE_MIN_CELL_MINUTES * guideRowWidthPerMinPx);
         return programRow;
     }
 

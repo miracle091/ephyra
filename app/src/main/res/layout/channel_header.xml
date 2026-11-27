@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Velella: a channel of the Live TV guide, the number in mono over the name, the logo on the right. The cell background and its
+<!-- Velella: a channel of the Live TV guide, the number in mono over the name, the logo top right (up to 72dp wide, so wide logos
+     stay legible, and 24dp tall, so it stays above the name: the header has 43dp inside); the name takes the whole width and scrolls while the header has focus. The cell background and its
      focus state come from GuideChannelHeader -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
@@ -26,9 +27,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_marginEnd="48dp"
-        android:ellipsize="end"
-        android:maxLines="1"
+        android:layout_toStartOf="@+id/favImage"
+        android:ellipsize="marquee"
+        android:includeFontPadding="false"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:singleLine="true"
         android:textColor="?attr/headerTextColor"
         android:textSize="14sp"
         android:textStyle="bold"
@@ -36,11 +39,11 @@
 
     <org.jellyfin.androidtv.ui.AsyncImageView
         android:id="@+id/channelImage"
-        android:layout_width="40dp"
-        android:layout_height="32dp"
+        android:layout_width="72dp"
+        android:layout_height="24dp"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
-        android:scaleType="centerInside" />
+        android:scaleType="fitEnd" />
 
     <ImageView
         android:id="@+id/favImage"

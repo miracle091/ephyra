@@ -28,10 +28,22 @@ section 2(a) of the GPL-2.0.
 ### Changed
 
 - The live TV guide is easier to read: a wider time scale (about two hours across instead of two and a half), so
-  short programmes keep their titles; only half-hour marks on the time line and, in each programme on air, a line at
-  the current time where its bar ends; the grid starts at the half hour now falls in; the focused row always stays
-  whole on screen; the rows line up with their channels again; the bars of programmes on air end at the current time;
-  the clock, home and the guide's own buttons sit where and as large as on the other screens.
+  short programmes keep their titles and no programme is narrower than a quarter of an hour; only half-hour marks on
+  the time line; the grid starts at the half hour now falls in; the focused row always stays whole on screen; the rows
+  line up with their channels again; a programme on air has a lighter cell, its elapsed part tinted up to the current
+  time and an "On air" tag with the time left, in place of the red dot (too easily taken for the recording mark) and
+  the progress bar, updated as each minute starts, and at each new half hour the grid moves on by itself, keeping the
+  selected channel; programmes already over are faded until focused; names too long for their programme or channel
+  cell scroll while it has focus; channel logos get more room; the clock, home and the guide's own buttons sit where
+  and as large as on the other screens.
+- The Live TV screen is laid out like the home: the toolbar, then a spotlight of the programmes on air (name, an "On air"
+  tag with the time left, channel, overview, Watch and Details), which moves on when a programme ends, then the rows.
+  The On now, Coming up and Other channels rows are gone (the spotlight and the guide show them) and the first row is
+  called "TV and recordings".
+- The home and Live TV spotlights lay a veil of the theme's background over their image behind the text and the
+  toolbar, so the overview, the clock and the icons stay readable over a bright picture.
+- Grid buttons (TV guide, Recordings, Genres...) show their name centred under the card, like the home's library
+  cards, instead of in bold on it.
 - The Live TV library shows its views first (TV guide, Recordings, Scheduled, Recorded series, renamed), then the
   recordings and channels, and no longer writes "No recordings" in the header.
 - The home spotlight's Play and Details buttons show only their icons, like Favorite.

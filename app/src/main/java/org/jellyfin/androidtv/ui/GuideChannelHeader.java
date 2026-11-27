@@ -80,6 +80,8 @@ public class GuideChannelHeader extends RelativeLayout {
     @Override
     protected void onFocusChanged(boolean gainFocus, int direction, Rect previouslyFocusedRect) {
         super.onFocusChanged(gainFocus, direction, previouslyFocusedRect);
+        // Velella: a name too long for the header scrolls while it has focus (the marquee runs only on a selected view)
+        findViewById(R.id.channelName).setSelected(gainFocus);
 
         if (gainFocus) {
             mTvGuide.setSelectedProgram(this);

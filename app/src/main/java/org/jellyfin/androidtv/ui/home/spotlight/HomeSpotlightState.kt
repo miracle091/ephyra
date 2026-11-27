@@ -1,5 +1,6 @@
 package org.jellyfin.androidtv.ui.home.spotlight
 
+import android.view.View
 import android.view.ViewTreeObserver
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -9,6 +10,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import kotlinx.coroutines.delay
 import org.jellyfin.androidtv.preference.VelellaPreferences
@@ -20,9 +22,12 @@ import kotlin.time.Duration.Companion.seconds
 
 private val SpotlightInterval = 10.seconds
 
-/** Velella: the titles of the home spotlight and the one showing, shared by its backdrop and its text. */
+/**
+ * Velella: the items of a spotlight (the home's titles, the Live TV programmes on air) and the one showing, shared by its backdrop
+ * and its text.
+ */
 @Stable
-class HomeSpotlightState internal constructor() {
+class SpotlightState internal constructor() {
 	var items by mutableStateOf(emptyList<BaseItemDto>())
 		internal set
 	var index by mutableIntStateOf(0)
@@ -30,7 +35,7 @@ class HomeSpotlightState internal constructor() {
 	internal var firstRowSelected by mutableStateOf(true)
 	internal var focused by mutableStateOf(false)
 
-	/** The title showing, null while the rows below the first one are selected or nothing has loaded. */
+	/** The item showing, null while the rows below the first one are selected or nothing has loaded. */
 	val item: BaseItemDto? get() = if (firstRowSelected && items.isNotEmpty()) items[index % items.size] else null
 }
 
@@ -40,14 +45,24 @@ class HomeSpotlightState internal constructor() {
  * stops rotating while it has the focus. Null when the setting turns it off.
  */
 @Composable
-fun rememberHomeSpotlightState(rowsFragment: HomeRowsFragment?): HomeSpotlightState? {
+fun rememberHomeSpotlightState(rowsFragment: HomeRowsFragment?): SpotlightState? {
 	val preferences = koinInject<VelellaPreferences>()
 	if (!preferences[VelellaPreferences.homeSpotlight]) return null
 
 	val api = koinInject<ApiClient>()
-	val state = remember { HomeSpotlightState() }
+	val state = rememberSpotlightState(rowsFragment?.view) { (rowsFragment?.selectedPosition ?: 0) <= 0 }
 	LaunchedEffect(api) { state.items = loadSpotlightItems(api) }
-	TrackFirstRowSelected(rowsFragment, state)
+	return state
+}
+
+/**
+ * Velella: a spotlight above the rows in [rowsView], showing while [isFirstRowSelected] and rotating its items every few seconds
+ * while it does not have the focus. The caller loads the items.
+ */
+@Composable
+fun rememberSpotlightState(rowsView: View?, isFirstRowSelected: () -> Boolean): SpotlightState {
+	val state = remember { SpotlightState() }
+	TrackFirstRowSelected(rowsView, isFirstRowSelected, state)
 	// The rotation goes on where it was when the spotlight shows again
 	LaunchedEffect(state.items, state.focused, state.firstRowSelected) {
 		while (state.firstRowSelected && !state.focused && state.items.size > 1) {
@@ -58,16 +73,16 @@ fun rememberHomeSpotlightState(rowsFragment: HomeRowsFragment?): HomeSpotlightSt
 	return state
 }
 
-/** Tracks whether the first row of [rowsFragment] is selected, through focus changes (Leanback has no Compose state). */
+/** Tracks whether the first row in [rowsView] is selected, through focus changes (Leanback has no Compose state). */
 @Composable
-private fun TrackFirstRowSelected(rowsFragment: HomeRowsFragment?, state: HomeSpotlightState) {
-	DisposableEffect(rowsFragment) {
-		val view = rowsFragment?.view
+private fun TrackFirstRowSelected(rowsView: View?, isFirstRowSelected: () -> Boolean, state: SpotlightState) {
+	val firstRowSelected by rememberUpdatedState(isFirstRowSelected)
+	DisposableEffect(rowsView) {
 		val listener = ViewTreeObserver.OnGlobalFocusChangeListener { _, _ ->
 			// The row selection settles after the focus moves
-			view?.post { state.firstRowSelected = rowsFragment.selectedPosition <= 0 }
+			rowsView?.post { state.firstRowSelected = firstRowSelected() }
 		}
-		view?.viewTreeObserver?.addOnGlobalFocusChangeListener(listener)
-		onDispose { view?.viewTreeObserver?.removeOnGlobalFocusChangeListener(listener) }
+		rowsView?.viewTreeObserver?.addOnGlobalFocusChangeListener(listener)
+		onDispose { rowsView?.viewTreeObserver?.removeOnGlobalFocusChangeListener(listener) }
 	}
 }

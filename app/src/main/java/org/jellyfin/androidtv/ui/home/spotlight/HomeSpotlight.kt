@@ -89,6 +89,16 @@ private const val FADE_H_SOFT = 0.4f
 private const val FADE_H_FULL = 0.8f
 private const val FADE_V_TOP = 0.25f
 private const val FADE_V_HOLD = 0.6f
+// The veil over the backdrop: strong across the text column (560dp from 32dp, about 60% of a 960dp-wide TV) and fading after
+// it, and over the toolbar's band on top
+private const val SCRIM_SIDE = 0.85f
+private const val SCRIM_SIDE_HOLD = 0.6f
+private const val SCRIM_SIDE_HELD = 0.7f
+private const val SCRIM_SIDE_END = 0.85f
+private const val SCRIM_TOP = 0.8f
+private const val SCRIM_TOP_HOLD = 0.2f
+private const val SCRIM_TOP_HELD = 0.6f
+private const val SCRIM_TOP_END = 0.4f
 private val BackdropFadeHorizontal = Brush.horizontalGradient(
 	0f to Color.Black.copy(alpha = 0.1f),
 	FADE_H_SOFT to Color.Black.copy(alpha = 0.3f),
@@ -101,39 +111,71 @@ private val BackdropFadeVertical = Brush.verticalGradient(
 	1f to Color.Transparent,
 )
 
-/** Velella: the backdrop of the title showing, across the top of the home screen behind the toolbar and the spotlight's text. */
+/** Velella: the backdrop of the item showing, across the top of the screen behind the toolbar and the spotlight's text. */
 @Composable
-fun HomeSpotlightBackdrop(state: HomeSpotlightState?, modifier: Modifier = Modifier) {
+fun SpotlightBackdrop(state: SpotlightState?, modifier: Modifier = Modifier) {
 	val item = state?.item ?: return
 	val api = koinInject<ApiClient>()
+	val bg = LocalVelellaPalette.current.bg
 	Crossfade(
 		targetState = item,
 		animationSpec = tween(SPOTLIGHT_FADE_MS),
 		label = "SpotlightBackdrop",
 		modifier = modifier
 			.fillMaxWidth()
-			.height(SpotlightBackdropHeight),
+			.height(SpotlightBackdropHeight)
+			// Velella: a veil in the theme's background behind the text on the left and the toolbar on top, so the overview,
+			// the clock and the icons stay readable over a bright image
+			.drawWithContent {
+				drawContent()
+				drawRect(
+					Brush.horizontalGradient(
+						0f to bg.copy(alpha = SCRIM_SIDE),
+						SCRIM_SIDE_HOLD to bg.copy(alpha = SCRIM_SIDE_HELD),
+						SCRIM_SIDE_END to bg.copy(alpha = 0f),
+					)
+				)
+				drawRect(
+					Brush.verticalGradient(
+						0f to bg.copy(alpha = SCRIM_TOP),
+						SCRIM_TOP_HOLD to bg.copy(alpha = SCRIM_TOP_HELD),
+						SCRIM_TOP_END to bg.copy(alpha = 0f),
+					)
+				)
+			},
 	) { shown ->
 		// Velella: the pan alternates its side from title to title and each title's pan goes on through the crossfade
-		SpotlightBackdrop(shown, api, BackdropPanSpec.direction(state.items.indexOfFirst { it.id == shown.id }))
+		SpotlightBackdropImage(shown, api, BackdropPanSpec.direction(state.items.indexOfFirst { it.id == shown.id }))
 	}
 }
 
-/** Velella: the spotlight's text and buttons, under the toolbar, above the rows. */
+/** Velella: the home spotlight's text and buttons, under the toolbar, above the rows. */
 @Composable
-fun HomeSpotlight(state: HomeSpotlightState?, modifier: Modifier = Modifier) {
+fun HomeSpotlight(state: SpotlightState?, modifier: Modifier = Modifier) {
+	SpotlightFrame(state, modifier) { item, page, pages, infoModifier -> SpotlightInfo(item, page, pages, infoModifier) }
+}
+
+/**
+ * Velella: the room of a spotlight under the toolbar, above the rows, with the [info] of the item showing (its page among the
+ * pages) left aligned and centred on its height. Nothing while no item shows.
+ */
+@Composable
+internal fun SpotlightFrame(
+	state: SpotlightState?,
+	modifier: Modifier = Modifier,
+	info: @Composable (item: BaseItemDto, page: Int, pages: Int, modifier: Modifier) -> Unit,
+) {
 	val item = state?.item ?: return
 	Box(
 		modifier = modifier
 			.fillMaxWidth()
 			.height(SpotlightHeight)
 	) {
-		SpotlightInfo(
-			item = item,
-			page = state.index % state.items.size,
-			pages = state.items.size,
-			modifier = Modifier
-				// Left aligned, centred on the spotlight's height
+		info(
+			item,
+			state.index % state.items.size,
+			state.items.size,
+			Modifier
 				.align(Alignment.CenterStart)
 				.padding(start = 32.dp)
 				.onFocusChanged { state.focused = it.hasFocus },
@@ -142,8 +184,9 @@ fun HomeSpotlight(state: HomeSpotlightState?, modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun SpotlightBackdrop(item: BaseItemDto, api: ApiClient, panDirection: Int) {
-	val image = item.itemBackdropImages.firstOrNull() ?: return
+private fun SpotlightBackdropImage(item: BaseItemDto, api: ApiClient, panDirection: Int) {
+	// A programme on air often has no backdrop, only its thumbnail or primary image
+	val image = item.itemBackdropImages.firstOrNull() ?: item.itemImages[ImageType.THUMB] ?: item.itemImages[ImageType.PRIMARY] ?: return
 	val maxWidth = with(LocalDensity.current) { BackdropMaxWidth.roundToPx() }
 	AsyncImage(
 		model = image.getUrl(api, maxWidth = maxWidth),
@@ -240,9 +283,9 @@ private fun SpotlightTexts(item: BaseItemDto) {
 	}
 }
 
-/** One dash per title of the spotlight, the one showing longer and in the accent colour; nothing for a single title. */
+/** One dash per item of the spotlight, the one showing longer and in the accent colour; nothing for a single item. */
 @Composable
-private fun SpotlightDashes(page: Int, pages: Int) {
+internal fun SpotlightDashes(page: Int, pages: Int) {
 	if (pages < 2) return
 	val palette = LocalVelellaPalette.current
 	Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -309,7 +352,7 @@ private fun SpotlightButtons(item: BaseItemDto, playFocusRequester: FocusRequest
 }
 
 @Composable
-private fun SpotlightMetaText(text: String) {
+internal fun SpotlightMetaText(text: String) {
 	Text(
 		text = text,
 		style = LocalTextStyle.current.merge(

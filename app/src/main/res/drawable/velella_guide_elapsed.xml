@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Velella: the elapsed part of a programme on air in the Live TV guide, filled up to the current time in the theme's accent (the view
+     fades it, see program_grid_cell.xml); no track under the part still to come -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@android:id/progress">
+        <clip>
+            <shape android:shape="rectangle">
+                <solid android:color="?android:attr/colorAccent" />
+            </shape>
+        </clip>
+    </item>
+</layer-list>

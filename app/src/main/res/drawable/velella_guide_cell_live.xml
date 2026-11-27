@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Velella: the cell of a programme on air in the Live TV guide: surface-3, a step lighter than the other cells (velella_guide_cell), with
+     the same ink ring when focused -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:enterFadeDuration="@integer/button_fade_duration"
+    android:exitFadeDuration="@integer/button_fade_duration">
+    <item android:state_focused="true">
+        <inset
+            android:insetBottom="2dp"
+            android:insetLeft="2dp"
+            android:insetRight="2dp"
+            android:insetTop="2dp">
+            <shape android:shape="rectangle">
+                <solid android:color="?attr/progressBackground" />
+                <stroke
+                    android:width="3dp"
+                    android:color="?attr/headerTextColor" />
+                <corners android:radius="12dp" />
+            </shape>
+        </inset>
+    </item>
+    <item>
+        <inset
+            android:insetBottom="2dp"
+            android:insetLeft="2dp"
+            android:insetRight="2dp"
+            android:insetTop="2dp">
+            <shape android:shape="rectangle">
+                <solid android:color="?attr/progressBackground" />
+                <corners android:radius="12dp" />
+            </shape>
+        </inset>
+    </item>
+</selector>

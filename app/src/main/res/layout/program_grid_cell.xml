@@ -1,11 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Velella: a programme of the Live TV guide, name over the tags; the programme on air gets a red dot before its name and an accent bar on the bottom edge. The cell
+<!-- Velella: a programme of the Live TV guide, name over the tags. The programme on air has a lighter cell, its elapsed part filled in the
+     theme's accent up to the current time, and an "on air" tag with the time left; programmes already over are faded. The cell
      background and its focus state come from ProgramGridCell -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="55dp"
     tools:layout_width="210dp">
+
+    <!-- First, so it sits behind the text; inside the cell's 2dp gap, faded so the text stays readable over it -->
+    <ProgressBar
+        android:id="@+id/nowBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="2dp"
+        android:alpha="0.22"
+        android:importantForAccessibility="no"
+        android:max="1000"
+        android:progressDrawable="@drawable/velella_guide_elapsed"
+        android:visibility="gone" />
 
     <TextView
         android:id="@+id/programName"
@@ -14,11 +28,11 @@
         android:layout_alignParentTop="true"
         android:layout_marginHorizontal="12dp"
         android:layout_marginTop="8dp"
-        android:ellipsize="end"
+        android:ellipsize="marquee"
         android:focusable="false"
         android:focusableInTouchMode="false"
-        android:maxLines="1"
-        android:drawablePadding="8dp"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:singleLine="true"
         android:text="@string/no_program_data"
         android:textColor="?attr/headerTextColor"
         android:textSize="16sp"
@@ -30,13 +44,39 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/programName"
         android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
         android:layout_marginTop="2dp"
         android:divider="@drawable/blank10x10"
         android:focusable="false"
         android:focusableInTouchMode="false"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:showDividers="middle" />
+        android:showDividers="middle">
+
+        <TextView
+            android:id="@+id/liveLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/velella_guide_live_badge"
+            android:maxLines="1"
+            android:paddingHorizontal="4dp"
+            android:text="@string/velella_guide_on_air"
+            android:textColor="?attr/defaultBackground"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/timeLeft"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="?attr/headerTextColor"
+            android:textSize="12sp"
+            android:visibility="gone"
+            tools:text="27 min left" />
+    </LinearLayout>
 
     <ImageView
         android:id="@+id/recIndicator"
@@ -49,27 +89,4 @@
         android:contentDescription="@null"
         android:scaleType="fitCenter"
         tools:src="@drawable/ic_record_series_red" />
-
-    <ProgressBar
-        android:id="@+id/nowBar"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/velella_card_progress_height"
-        android:layout_alignParentBottom="true"
-        android:layout_marginHorizontal="2dp"
-        android:layout_marginBottom="2dp"
-        android:max="1000"
-        android:progressDrawable="@drawable/velella_card_progress"
-        android:visibility="gone" />
-
-    <!-- Velella: the current time across the programme on air, where its bar ends (moved by ProgramGridCell.refreshNow) -->
-    <View
-        android:id="@+id/nowMarker"
-        android:layout_width="2dp"
-        android:layout_height="match_parent"
-        android:layout_alignParentStart="true"
-        android:layout_marginVertical="2dp"
-        android:background="?android:attr/colorAccent"
-        android:importantForAccessibility="no"
-        android:visibility="gone" />
 </RelativeLayout>
