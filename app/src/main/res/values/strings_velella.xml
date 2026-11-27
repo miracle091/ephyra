@@ -145,4 +145,9 @@
     <string name="velella_pref_trailers_instance">Your Invidious instance</string>
     <string name="velella_pref_trailers_instance_description">Address of your own Invidious server, tried before the public ones. Leave it empty to use the public instances: they are few and not always up.</string>
     <string name="velella_trailer_unavailable">No Invidious instance could play this trailer</string>
+    <!-- Live TV library: the buttons of the first row (ui/browsing/BrowseViewFragment.java) -->
+    <string name="velella_livetv_guide">TV guide</string>
+    <string name="velella_livetv_recordings">Recordings</string>
+    <string name="velella_livetv_scheduled">Scheduled</string>
+    <string name="velella_livetv_series">Recorded series</string>
 </resources>

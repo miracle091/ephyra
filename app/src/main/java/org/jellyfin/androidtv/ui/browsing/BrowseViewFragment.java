@@ -140,19 +140,19 @@ public class BrowseViewFragment extends EnhancedBrowseFragment {
                             ItemRowAdapter weekAdapter = new ItemRowAdapter(requireContext(), weekItems, mCardPresenter, mRowsAdapter, true);
                             weekAdapter.Retrieve();
                             ListRow weekRow = new ListRow(new HeaderItem(getString(R.string.past_week)), weekAdapter);
-                            mRowsAdapter.add(0, weekRow);
+                            mRowsAdapter.add(1, weekRow); // Velella: after the Views row
                         }
                         if (!nearTimers.isEmpty()) {
                             ItemRowAdapter scheduledAdapter = new ItemRowAdapter(requireContext(), nearTimers, mCardPresenter, mRowsAdapter, true);
                             scheduledAdapter.Retrieve();
                             ListRow scheduleRow = new ListRow(new HeaderItem(getString(R.string.scheduled_in_next_24_hours)), scheduledAdapter);
-                            mRowsAdapter.add(0, scheduleRow);
+                            mRowsAdapter.add(1, scheduleRow); // Velella: after the Views row
                         }
                         if (!dayItems.isEmpty()) {
                             ItemRowAdapter dayAdapter = new ItemRowAdapter(requireContext(), dayItems, mCardPresenter, mRowsAdapter, true);
                             dayAdapter.Retrieve();
                             ListRow dayRow = new ListRow(new HeaderItem(getString(R.string.past_24_hours)), dayAdapter);
-                            mRowsAdapter.add(0, dayRow);
+                            mRowsAdapter.add(1, dayRow); // Velella: after the Views row
                         }
 
                     } else {
@@ -162,10 +162,9 @@ public class BrowseViewFragment extends EnhancedBrowseFragment {
                             ItemRowAdapter scheduledAdapter = new ItemRowAdapter(requireContext(), nearTimers, mCardPresenter, mRowsAdapter, true);
                             scheduledAdapter.Retrieve();
                             ListRow scheduleRow = new ListRow(new HeaderItem(getString(R.string.scheduled_in_next_24_hours)), scheduledAdapter);
-                            mRowsAdapter.add(0, scheduleRow);
+                            mRowsAdapter.add(1, scheduleRow); // Velella: after the Views row
                         } else {
-                            mTitle.setText(R.string.lbl_no_recordings);
-
+                            // Velella: no "no recordings" text in the header, the empty rows are simply not shown
                         }
                     }
 
@@ -189,19 +188,19 @@ public class BrowseViewFragment extends EnhancedBrowseFragment {
     @Override
     protected void addAdditionalRows(MutableObjectAdapter<Row> rowAdapter) {
         if (isLiveTvLibrary) {
-            //Views row
-            HeaderItem gridHeader = new HeaderItem(mRowsAdapter.size(), getString(R.string.lbl_views));
+            // Velella: the Views row comes first, the guide one key away; the other rows are added after it
+            HeaderItem gridHeader = new HeaderItem(0, getString(R.string.lbl_views));
 
             GridButtonPresenter mGridPresenter = new GridButtonPresenter();
             ArrayObjectAdapter gridRowAdapter = new ArrayObjectAdapter(mGridPresenter);
-            gridRowAdapter.add(new GridButton(LiveTvOption.LIVE_TV_GUIDE_OPTION_ID, getString(R.string.lbl_live_tv_guide), null, R.drawable.ic_tv_guide));
-            gridRowAdapter.add(new GridButton(LiveTvOption.LIVE_TV_RECORDINGS_OPTION_ID, getString(R.string.lbl_recorded_tv), null, R.drawable.ic_tv_play));
+            gridRowAdapter.add(new GridButton(LiveTvOption.LIVE_TV_GUIDE_OPTION_ID, getString(R.string.velella_livetv_guide), null, R.drawable.ic_tv_guide));
+            gridRowAdapter.add(new GridButton(LiveTvOption.LIVE_TV_RECORDINGS_OPTION_ID, getString(R.string.velella_livetv_recordings), null, R.drawable.ic_tv_play));
             if (Utils.canManageRecordings(KoinJavaComponent.<UserRepository>get(UserRepository.class).getCurrentUser().getValue())) {
-                gridRowAdapter.add(new GridButton(LiveTvOption.LIVE_TV_SCHEDULE_OPTION_ID, getString(R.string.lbl_schedule), null, R.drawable.ic_calendar));
-                gridRowAdapter.add(new GridButton(LiveTvOption.LIVE_TV_SERIES_OPTION_ID, getString(R.string.lbl_series), null, R.drawable.ic_tv_timer));
+                gridRowAdapter.add(new GridButton(LiveTvOption.LIVE_TV_SCHEDULE_OPTION_ID, getString(R.string.velella_livetv_scheduled), null, R.drawable.ic_calendar));
+                gridRowAdapter.add(new GridButton(LiveTvOption.LIVE_TV_SERIES_OPTION_ID, getString(R.string.velella_livetv_series), null, R.drawable.ic_tv_timer));
             }
 
-            mRowsAdapter.add(new ListRow(gridHeader, gridRowAdapter));
+            mRowsAdapter.add(0, new ListRow(gridHeader, gridRowAdapter));
 
         } else {
             super.addAdditionalRows(rowAdapter);
