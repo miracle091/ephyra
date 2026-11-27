@@ -61,4 +61,15 @@
         android:max="1000"
         android:progressDrawable="@drawable/velella_card_progress"
         android:visibility="gone" />
+
+    <!-- Velella: the current time across the programme on air, where its bar ends (moved by ProgramGridCell.refreshNow) -->
+    <View
+        android:id="@+id/nowMarker"
+        android:layout_width="2dp"
+        android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:layout_marginVertical="2dp"
+        android:background="?android:attr/colorAccent"
+        android:importantForAccessibility="no"
+        android:visibility="gone" />
 </RelativeLayout>

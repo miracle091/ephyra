@@ -25,6 +25,15 @@
         <item name="android:scaleType">fitCenter</item>
     </style>
 
+    <!-- Velella: an icon button the size of the toolbar's (MainToolbar: 44dp, a 24dp icon in 10dp padding), for screens that
+         place their own icons in the header, like the live TV guide -->
+    <style name="Button.Velella.ToolbarIcon" parent="Button.Icon">
+        <item name="android:layout_width">44dp</item>
+        <item name="android:layout_height">44dp</item>
+        <item name="android:padding">10dp</item>
+        <item name="android:scaleType">fitCenter</item>
+    </style>
+
     <style name="Button.Velella.PlayerIcon.Large">
         <item name="android:layout_width">64dp</item>
         <item name="android:layout_height">64dp</item>

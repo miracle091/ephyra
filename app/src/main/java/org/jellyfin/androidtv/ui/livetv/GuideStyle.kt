@@ -45,6 +45,10 @@ object GuideStyle {
 	 * How far the programme on air has run, from 0 to [NOW_BAR_MAX], over its whole length, also when it began before the
 	 * guide's start. Returns -1 when the programme is not on air at [now].
 	 */
+	/** Velella: where a programme's cell begins: its start, or the guide's [guideStart] when it began earlier. */
+	@JvmStatic
+	fun visibleStart(start: LocalDateTime, guideStart: LocalDateTime): LocalDateTime = maxOf(start, guideStart)
+
 	@JvmStatic
 	fun nowProgress(start: LocalDateTime, end: LocalDateTime, now: LocalDateTime): Int {
 		if (now.isBefore(start) || !now.isBefore(end)) return -1

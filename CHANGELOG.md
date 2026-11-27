@@ -27,6 +27,11 @@ section 2(a) of the GPL-2.0.
 
 ### Changed
 
+- The live TV guide is easier to read: a wider time scale (about two hours across instead of two and a half), so
+  short programmes keep their titles; only half-hour marks on the time line and, in each programme on air, a line at
+  the current time where its bar ends; the grid starts at the half hour now falls in; the focused row always stays
+  whole on screen; the rows line up with their channels again; the bars of programmes on air end at the current time;
+  the clock, home and the guide's own buttons sit where and as large as on the other screens.
 - The home spotlight's Play and Details buttons show only their icons, like Favorite.
 - The home spotlight spans the screen behind the toolbar, about 60% of its height, fading to the left and into the
   rows; it shows the title's logo in large (the name when there is none), the genres in the info row, up to three lines

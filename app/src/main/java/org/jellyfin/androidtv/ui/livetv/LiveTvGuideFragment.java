@@ -11,6 +11,7 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
@@ -66,6 +67,10 @@ import timber.log.Timber;
 public class LiveTvGuideFragment extends Fragment implements LiveTvGuide, View.OnKeyListener {
     public static final int GUIDE_ROW_HEIGHT_DP = 55;
     public static final int GUIDE_ROW_WIDTH_PER_MIN_DP = 7;
+    // Velella: the full-screen guide is wider per minute (was 7, shared with the legacy in-player guide), so short programmes keep a readable name
+    public static final int GUIDE_FULL_WIDTH_PER_MIN_DP = 9;
+    // Velella: space kept above and below the focused row when the grid scrolls
+    private static final int GUIDE_SCROLL_MARGIN_DP = 20;
     public static final int PAGE_SIZE = 75;
     public static final int NORMAL_HOURS = 9;
     public static final int FILTERED_HOURS = 4;
@@ -82,6 +87,7 @@ public class LiveTvGuideFragment extends Fragment implements LiveTvGuide, View.O
     private HorizontalScrollView mTimelineScroller;
     private View mSpinner;
     private View mResetButton;
+    private ViewTreeObserver.OnGlobalFocusChangeListener mFocusScrollListener; // Velella
 
     BaseItemDto mSelectedProgram;
     RelativeLayout mSelectedProgramView;
@@ -114,7 +120,7 @@ public class LiveTvGuideFragment extends Fragment implements LiveTvGuide, View.O
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         guideRowHeightPx = Utils.convertDpToPixel(requireContext(), GUIDE_ROW_HEIGHT_DP);
-        guideRowWidthPerMinPx = Utils.convertDpToPixel(requireContext(), GUIDE_ROW_WIDTH_PER_MIN_DP);
+        guideRowWidthPerMinPx = Utils.convertDpToPixel(requireContext(), GUIDE_FULL_WIDTH_PER_MIN_DP);
 
         LiveTvGuideBinding binding = LiveTvGuideBinding.inflate(getLayoutInflater(), container, false);
 
@@ -169,6 +175,15 @@ public class LiveTvGuideFragment extends Fragment implements LiveTvGuide, View.O
         mProgramRows.setFocusable(false);
         mChannelScroller = binding.channelScroller;
         ObservableScrollView programVScroller = binding.programVScroller;
+
+        // Velella: keep the focused row (programme, channel or paging button) fully on screen, with a margin above and below
+        int scrollMarginPx = Utils.convertDpToPixel(requireContext(), GUIDE_SCROLL_MARGIN_DP);
+        mFocusScrollListener = (oldFocus, newFocus) -> {
+            GuideLayoutHelper.scrollRowIntoView(programVScroller, mProgramRows, newFocus, scrollMarginPx);
+            GuideLayoutHelper.scrollRowIntoView(programVScroller, mChannels, newFocus, scrollMarginPx);
+        };
+        binding.getRoot().getViewTreeObserver().addOnGlobalFocusChangeListener(mFocusScrollListener);
+
         programVScroller.setScrollViewListener(new ScrollViewListener() {
             @Override
             public void onScrollChanged(ObservableScrollView scrollView, int x, int y, int oldx, int oldy) {
@@ -217,7 +232,9 @@ public class LiveTvGuideFragment extends Fragment implements LiveTvGuide, View.O
     }
 
     private void load() {
-        mCurrentGuideStart = LocalDateTime.now();
+        // Velella: from the half hour now falls in, as TV guides do: the programmes on air show from that mark and the "now" line
+        // sits inside the grid
+        mCurrentGuideStart = GuideLayoutHelper.guideStart(LocalDateTime.now());
         fillTimeLine(mCurrentGuideStart, getGuideHours());
         TvManager.loadAllChannels(this, ndx -> {
             // Velella: a last channel past the first page is centred in its page, unless the user turned that off
@@ -276,6 +293,17 @@ public class LiveTvGuideFragment extends Fragment implements LiveTvGuide, View.O
             mHandler.postDelayed(this, NOW_TICK_MS);
         }
     };
+
+    @Override
+    public void onDestroyView() {
+        // Velella: the focus listener sits on the view tree's observer, which outlives nothing but the view itself
+        View root = getView();
+        if (root != null && mFocusScrollListener != null) {
+            root.getViewTreeObserver().removeOnGlobalFocusChangeListener(mFocusScrollListener);
+        }
+        mFocusScrollListener = null;
+        super.onDestroyView();
+    }
 
     protected void doLoad() {
         if (TvManager.shouldForceReload() || mCurrentGuideStart.plusMinutes(30).isBefore(LocalDateTime.now()) || mChannels.getChildCount() == 0) {
@@ -447,7 +475,9 @@ public class LiveTvGuideFragment extends Fragment implements LiveTvGuide, View.O
     }
 
     private void pageGuideTo(LocalDateTime startTime) {
-        if (startTime.isBefore(LocalDateTime.now())) startTime = LocalDateTime.now();
+        // Velella: never before the half hour now falls in, so the "now" line has room to show
+        LocalDateTime earliest = GuideLayoutHelper.guideStart(LocalDateTime.now());
+        if (startTime.isBefore(earliest)) startTime = earliest;
         Timber.i("page to %s", startTime);
         TvManager.forceReload(); // don't allow cache
         if (mSelectedProgram != null) {
@@ -739,24 +769,27 @@ public class LiveTvGuideFragment extends Fragment implements LiveTvGuide, View.O
         mDisplayDate.setText(TimeUtils.getFriendlyDate(requireContext(), mCurrentGuideStart));
         mCurrentGuideEnd = mCurrentGuideStart
                 .plusHours(hours);
-        int oneHour = 60 * guideRowWidthPerMinPx;
-        int halfHour = 30 * guideRowWidthPerMinPx;
-
-        int interval = mCurrentGuideStart.getMinute() >= 30 ? 60 - mCurrentGuideStart.getMinute() : 30 - mCurrentGuideStart.getMinute();
         mTimeline.removeAllViews();
 
-        LocalDateTime current = mCurrentGuideStart;
+        // Velella: only half-hour labels, each starting at its mark; an empty spacer covers the time before the first mark
+        int offset = GuideLayoutHelper.minutesToNextHalfHour(mCurrentGuideStart);
+        if (offset > 0) {
+            mTimeline.addView(new View(requireContext()), offset * guideRowWidthPerMinPx, 1);
+        }
+
+        int labelPadding = Utils.convertDpToPixel(requireContext(), 4);
+        LocalDateTime current = mCurrentGuideStart.plusMinutes(offset);
         while (current.isBefore(mCurrentGuideEnd)) {
             TextView time = new TextView(requireContext());
             time.setTypeface(GuideStyle.monoTypeface(requireContext()));
             time.setTextColor(Utils.getThemeColor(requireContext(), R.attr.controlIconForegroundInactive));
             time.setTextSize(14);
             time.setText(DateTimeExtensionsKt.getTimeFormatter(getContext()).format(current));
-            time.setWidth(interval != 60 ? ( interval < 15 ? 15 * guideRowWidthPerMinPx : interval * guideRowWidthPerMinPx) : oneHour);
+            time.setPaddingRelative(labelPadding, 0, 0, 0);
+            time.setSingleLine();
+            time.setWidth(30 * guideRowWidthPerMinPx);
             mTimeline.addView(time);
-            current = current.plusMinutes(interval);
-            //after first one, we always go on hours
-            interval = interval < 30 ? 30 : 60;
+            current = current.plusMinutes(30);
         }
     }
 

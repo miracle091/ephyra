@@ -28,4 +28,13 @@ class GuideStyleTest : FunSpec({
 	test("A programme that began before the guide's start is measured over its whole length") {
 		GuideStyle.nowProgress(start, end, start.plusMinutes(45)) shouldBe 750
 	}
+
+	test("The cell of a programme that began before the guide's start begins at the guide's start, so its bar ends on now") {
+		val guideStart = start.plusMinutes(30)
+		val visible = GuideStyle.visibleStart(start, guideStart)
+		visible shouldBe guideStart
+		// 45 of 60 minutes have run, but only 15 of the 30 visible ones
+		GuideStyle.nowProgress(visible, end, start.plusMinutes(45)) shouldBe 500
+		GuideStyle.visibleStart(start.plusMinutes(40), guideStart) shouldBe start.plusMinutes(40)
+	}
 })

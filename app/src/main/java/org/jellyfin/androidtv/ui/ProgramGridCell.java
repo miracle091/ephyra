@@ -116,21 +116,33 @@ public class ProgramGridCell extends RelativeLayout implements RecordingIndicato
     }
 
     /**
-     * Velella: the programme on air gets a red dot before its name, like the player's LIVE badge, and a bar in the theme's accent
-     * that runs with the clock. Called again by the guide's ticker, so both move on to the next programme without reloading.
+     * Velella: the programme on air gets a red dot before its name, like the player's LIVE badge, a bar in the theme's accent
+     * that runs with the clock, and a thin line across the cell at the current time, where the bar ends. Called again by the
+     * guide's ticker, so they move on to the next programme without reloading.
      */
     public void refreshNow() {
         ProgressBar nowBar = findViewById(R.id.nowBar);
+        View nowMarker = findViewById(R.id.nowMarker);
         int now = -1;
+        LocalDateTime time = LocalDateTime.now();
         if (mProgram != null && mProgram.getStartDate() != null && mProgram.getEndDate() != null) {
-            now = GuideStyle.nowProgress(mProgram.getStartDate(), mProgram.getEndDate(), LocalDateTime.now());
+            now = GuideStyle.nowProgress(mProgram.getStartDate(), mProgram.getEndDate(), time);
         }
         if (now >= 0) {
-            nowBar.setProgress(now);
+            // The cell starts at the guide's start when the programme began earlier: the bar and the line run over that visible
+            // part
+            LocalDateTime visibleStart = GuideStyle.visibleStart(mProgram.getStartDate(), mActivity.getCurrentLocalStartDate());
+            int progress = Math.max(0, GuideStyle.nowProgress(visibleStart, mProgram.getEndDate(), time));
+            nowBar.setProgress(progress);
             nowBar.setVisibility(View.VISIBLE);
+            nowMarker.setVisibility(View.VISIBLE);
+            // Where the bar ends: it spans the cell less its 2dp margins; placed once the cell has its width
+            nowBar.post(() -> nowMarker.setTranslationX(nowBar.getLeft() + nowBar.getWidth() * (float) progress / nowBar.getMax()
+                    - nowMarker.getWidth() / 2f));
             mProgramName.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.velella_guide_live_dot, 0, 0, 0);
         } else {
             nowBar.setVisibility(View.GONE);
+            nowMarker.setVisibility(View.GONE);
             mProgramName.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, 0, 0);
         }
     }

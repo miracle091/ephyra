@@ -62,8 +62,7 @@
             android:layout_width="wrap_content"
             android:layout_height="fill_parent"
             android:id="@+id/timeline"
-            android:gravity="center_vertical"
-            android:paddingStart="4dp" />
+            android:gravity="center_vertical" />
     </HorizontalScrollView>
 
     <TextView
@@ -84,8 +83,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/clock"
-        android:layout_alignTop="@+id/title"
-        android:layout_marginTop="@dimen/velella_safe_y"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="@dimen/velella_clock_top"
         android:layout_marginEnd="@dimen/velella_side_margin"
         android:layout_alignParentEnd="true" />
 
@@ -141,12 +140,12 @@
         android:maxLines="5"
         android:fontFamily="@font/atkinson_hyperlegible_next_family" />
 
-    <!-- Velella: the video player's icon button (48dp, 24dp icon, solid ink circle when focused) -->
+    <!-- Velella: the toolbar's icon button (44dp, 24dp icon, solid ink circle when focused), 8dp apart like the toolbar's -->
     <ImageButton
         android:id="@+id/optionsButton"
-        style="@style/Button.Velella.PlayerIcon"
-        android:layout_width="@dimen/velella_osd_button"
-        android:layout_height="@dimen/velella_osd_button"
+        style="@style/Button.Velella.ToolbarIcon"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
         android:layout_above="@+id/timelineHScroller"
         android:layout_marginBottom="8dp"
         android:background="@drawable/velella_osd_button_back"
@@ -154,15 +153,15 @@
         android:src="@drawable/ic_settings"
         android:tint="@color/velella_osd_icon_tint"
         android:layout_alignParentEnd="true"
-        android:layout_marginEnd="20dp"
+        android:layout_marginEnd="@dimen/velella_side_margin"
     />
 
-    <!-- Velella: the video player's icon button (48dp, 24dp icon, solid ink circle when focused) -->
+    <!-- Velella: the toolbar's icon button (44dp, 24dp icon, solid ink circle when focused), 8dp apart like the toolbar's -->
     <ImageButton
         android:id="@+id/filterButton"
-        style="@style/Button.Velella.PlayerIcon"
-        android:layout_width="@dimen/velella_osd_button"
-        android:layout_height="@dimen/velella_osd_button"
+        style="@style/Button.Velella.ToolbarIcon"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
         android:layout_above="@+id/timelineHScroller"
         android:layout_marginBottom="8dp"
         android:background="@drawable/velella_osd_button_back"
@@ -170,14 +169,15 @@
         android:src="@drawable/ic_filter"
         android:tint="@color/velella_osd_icon_tint"
         android:layout_toStartOf="@id/optionsButton"
+        android:layout_marginEnd="8dp"
     />
 
-    <!-- Velella: the video player's icon button (48dp, 24dp icon, solid ink circle when focused) -->
+    <!-- Velella: the toolbar's icon button (44dp, 24dp icon, solid ink circle when focused), 8dp apart like the toolbar's -->
     <ImageButton
         android:id="@+id/dateButton"
-        style="@style/Button.Velella.PlayerIcon"
-        android:layout_width="@dimen/velella_osd_button"
-        android:layout_height="@dimen/velella_osd_button"
+        style="@style/Button.Velella.ToolbarIcon"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
         android:layout_above="@+id/timelineHScroller"
         android:layout_marginBottom="8dp"
         android:background="@drawable/velella_osd_button_back"
@@ -185,14 +185,15 @@
         android:src="@drawable/ic_calendar"
         android:tint="@color/velella_osd_icon_tint"
         android:layout_toStartOf="@+id/filterButton"
+        android:layout_marginEnd="8dp"
     />
 
-    <!-- Velella: the video player's icon button (48dp, 24dp icon, solid ink circle when focused) -->
+    <!-- Velella: the toolbar's icon button (44dp, 24dp icon, solid ink circle when focused), 8dp apart like the toolbar's -->
     <ImageButton
         android:id="@+id/resetButton"
-        style="@style/Button.Velella.PlayerIcon"
-        android:layout_width="@dimen/velella_osd_button"
-        android:layout_height="@dimen/velella_osd_button"
+        style="@style/Button.Velella.ToolbarIcon"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
         android:layout_above="@+id/timelineHScroller"
         android:layout_marginBottom="8dp"
         android:background="@drawable/velella_osd_button_back"
@@ -201,6 +202,7 @@
         android:tint="@color/velella_osd_icon_tint"
         android:visibility="gone"
         android:layout_toStartOf="@+id/dateButton"
+        android:layout_marginEnd="8dp"
     />
 
     <RelativeLayout

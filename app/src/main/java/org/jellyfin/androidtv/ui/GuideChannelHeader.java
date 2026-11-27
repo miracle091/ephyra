@@ -44,6 +44,9 @@ public class GuideChannelHeader extends RelativeLayout {
         this.addView(v);
         this.setFocusable(true);
         this.setBackground(GuideStyle.cellBackground(context));
+        // Velella: the cell drawable's inset would pad the header 2dp more above and below than a programme row, so the rows drifted
+        // off their channels; the inset is still drawn, the header keeps the row's height
+        this.setPadding(0, 0, 0, 0);
         ((TextView) findViewById(R.id.channelName)).setText(channel.getName());
         ((TextView) findViewById(R.id.channelNumber)).setText(channel.getNumber());
         mChannelImage = findViewById(R.id.channelImage);
