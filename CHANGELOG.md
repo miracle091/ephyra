@@ -121,6 +121,8 @@ section 2(a) of the GPL-2.0.
 
 ### Fixed
 
+- Leaving the new player refreshes the details screen below, as the legacy player does: the resume point, the
+  watched state and the episode played last show at once, and the focus moves to Resume or Play.
 - The new player skips media segments as set in Settings (intro, outro, recap, preview, commercial) instead of always
   skipping intros; "ask to skip" comes with its skip button. A failed segment request no longer stops segment skipping
   for the rest of the queue.

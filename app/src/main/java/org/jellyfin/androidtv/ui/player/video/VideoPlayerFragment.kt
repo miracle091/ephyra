@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
+import org.jellyfin.androidtv.data.model.DataRefreshService
 import org.jellyfin.androidtv.preference.UserPreferences
 import org.jellyfin.androidtv.ui.InteractionTrackerViewModel
 import org.jellyfin.androidtv.ui.base.BaseScreen
@@ -39,6 +40,7 @@ import org.jellyfin.sdk.api.client.ApiClient
 import org.jellyfin.sdk.model.extensions.ticks
 import org.koin.android.ext.android.inject
 import timber.log.Timber
+import java.time.Instant
 import kotlin.time.Duration.Companion.milliseconds
 
 class VideoPlayerFragment : Fragment() {
@@ -52,6 +54,7 @@ class VideoPlayerFragment : Fragment() {
 	private val userPreferences by inject<UserPreferences>()
 	private val trackPreselection by inject<TrackPreselection>()
 	private val interactionTracker by inject<InteractionTrackerViewModel>()
+	private val dataRefreshService by inject<DataRefreshService>()
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -83,7 +86,11 @@ class VideoPlayerFragment : Fragment() {
 		// Velella: the prompt lasts until another entry starts; closing the player (no entry) keeps it, see playerOverlay
 		playbackManager.queue.entry
 			.filterNotNull()
-			.onEach { endPrompt.value = EndOfEntryPrompt.NONE }
+			.onEach { entry ->
+				endPrompt.value = EndOfEntryPrompt.NONE
+				// Velella: as the legacy player, so the details screen below shows the episode played last
+				entry.baseItem?.let { dataRefreshService.lastPlayedItem = it }
+			}
 			.launchIn(lifecycleScope)
 	}
 
@@ -144,6 +151,8 @@ class VideoPlayerFragment : Fragment() {
 		super.onStop()
 
 		playbackManager.state.stop()
+		// Velella: as the legacy player's stop report, so the screens below fetch the item's progress and watched state again
+		dataRefreshService.markPlaybackStopped(dataRefreshService.lastPlayedItem?.type, Instant.now())
 	}
 
 	override fun onDestroy() {
