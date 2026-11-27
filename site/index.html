@@ -49,7 +49,8 @@
 	header.nav nav a { color: var(--ink-muted); text-decoration: none; font-size: 0.95rem; }
 	header.nav nav a:hover, header.nav nav a:focus-visible { color: var(--ink); }
 
-	.hero { padding: 72px 0 56px; text-align: center; }
+	/* Only top and bottom: the side padding comes from .wrap */
+	.hero { padding-top: 72px; padding-bottom: 56px; text-align: center; }
 	.hero img { width: min(440px, 100%); height: auto; border-radius: var(--radius); }
 	.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); margin: 28px 0 8px; letter-spacing: -0.01em; }
 	.hero p.lead { font-size: clamp(1.05rem, 2.6vw, 1.3rem); color: var(--ink-muted); margin: 0 auto; max-width: 640px; }
@@ -76,6 +77,7 @@
 	figure { margin: 0; background: var(--surface); border-radius: var(--radius); overflow: hidden; }
 	figure img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; }
 	figcaption { padding: 14px 18px; color: var(--ink-muted); font-size: 0.95rem; }
+	figcaption strong { color: var(--ink); font-weight: 600; }
 
 	ol.steps { margin: 0; padding-left: 1.3em; max-width: 760px; }
 	ol.steps li { margin-bottom: 12px; }
@@ -112,37 +114,68 @@
 	<section id="features">
 		<div class="wrap">
 			<h2>What is different</h2>
-			<p class="intro">Velella is a fork of the official Jellyfin for Android TV app, trimmed and tuned for the Shield. It installs
-				next to the official app instead of replacing it.</p>
+			<p class="intro">Velella starts from the official Jellyfin for Android TV app and reworks it for one family of devices: the
+				Shield. Playback leans on the Shield's hardware and your receiver, the interface is quieter, and nothing in it talks
+				to Google. It installs next to the official app, so you can keep both.</p>
 			<div class="features">
 				<div class="feature">
 					<h3><span class="dot"></span>No Google services</h3>
-					<p>No Play Services, Firebase, Play Core or Cast SDK, checked at every build. The same APK runs on stock Shield software
-						and on GMS-free AOSP or LineageOS builds.</p>
+					<p>No Play Services, Firebase, Play Core or Cast SDK, and a build check fails if one ever slips in. The same APK
+						runs on stock Shield software and on GMS-free AOSP or LineageOS builds.</p>
 				</div>
 				<div class="feature">
-					<h3><span class="dot"></span>Built for the Shield</h3>
-					<p>Android 11 or later, ARM only (64-bit, plus 32-bit for the 2019 tube), with a baseline profile so the app starts
-						fast even when sideloaded.</p>
+					<h3><span class="dot"></span>Made for every Shield</h3>
+					<p>The 2015, 2017 and both 2019 models: Android 11 or later, ARM only (64-bit, plus 32-bit for the 2019 tube),
+						with a baseline profile so the app starts fast even when sideloaded.</p>
 				</div>
 				<div class="feature">
 					<h3><span class="dot"></span>Hardware playback first</h3>
-					<p>Hardware decoders before software ones, AV1 transcoded by the server, refresh-rate switching on by default, bitstream
-						audio for every format your receiver takes.</p>
+					<p>Hardware decoders before software ones, and the server converts what the Shield can't decode, such as AV1.
+						Refresh-rate switching is on by default and keeps the native resolution.</p>
+				</div>
+				<div class="feature">
+					<h3><span class="dot"></span>Sound for your receiver</h3>
+					<p>Dolby Digital, Dolby Digital Plus, DTS and TrueHD go to the receiver as bitstream whenever it takes them.
+						On TV speakers, an optional night mode evens out the volume.</p>
+				</div>
+				<div class="feature">
+					<h3><span class="dot"></span>HDR that fits your TV</h3>
+					<p>The Dolby Vision profile 7 workaround applies only on TVs that report Dolby Vision, so HDR10 TVs get HDR10.
+						You can override the formats your display reports.</p>
+				</div>
+				<div class="feature">
+					<h3><span class="dot"></span>Recovers on its own</h3>
+					<p>When a stream fails, the player tries again from the same spot with a lighter stream: first without direct
+						play, then converted by the server. A live channel that won't start gets the same retries.</p>
+				</div>
+				<div class="feature">
+					<h3><span class="dot"></span>Series without friction</h3>
+					<p>A Next card on the series page plays the next episode, which keeps the audio and subtitle language of the
+						last one. Skip intros, recaps and credits with one press, and call the button back if you missed it.</p>
 				</div>
 				<div class="feature">
 					<h3><span class="dot"></span>Trailers without YouTube</h3>
-					<p>Trailers play in the app through Invidious, your own instance first. Nothing is fetched until you press the
-						button.</p>
+					<p>Trailers play inside the app through Invidious, never through YouTube: your own instance first, then public
+						ones. Nothing is fetched until you press the trailer button.</p>
 				</div>
 				<div class="feature">
 					<h3><span class="dot"></span>A calmer interface</h3>
-					<p>Night-blue themes with one accent colour, a full-width spotlight on the home screen, readable type from the sofa
-						and a solid focus you can always find.</p>
+					<p>Night-blue themes with one accent colour, a full-width spotlight on the home screen, a lighter default home,
+						type you can read from the sofa and a focus you can always find.</p>
+				</div>
+				<div class="feature">
+					<h3><span class="dot"></span>Live TV that picks up</h3>
+					<p>The guide opens on the channel you watched last, and the server's tuner is freed as soon as you leave a
+						channel.</p>
+				</div>
+				<div class="feature">
+					<h3><span class="dot"></span>Your data stays home</h3>
+					<p>No analytics and no tracking. Crash reports, if you leave them on, go only to your own Jellyfin server.</p>
 				</div>
 				<div class="feature">
 					<h3><span class="dot"></span>Updates from GitHub</h3>
-					<p>No store needed: the app checks GitHub Releases by itself, or add the repository to Obtainium.</p>
+					<p>No store needed: the app checks GitHub Releases by itself, or you can follow the repository with
+						<a href="https://obtainium.imranr.dev/">Obtainium</a>.</p>
 				</div>
 			</div>
 		</div>
@@ -151,23 +184,39 @@
 	<section id="screenshots">
 		<div class="wrap">
 			<h2>Screenshots</h2>
-			<p class="intro">Taken on the Android TV emulator with the Jellyfin demo server.</p>
+			<p class="intro">Taken on the Android TV emulator at 1080p with the Jellyfin demo server.</p>
 			<div class="shots">
 				<figure>
 					<img src="images/home.jpg" alt="The home screen: a full-width spotlight with the title, ratings, genres, overview, Play and Details buttons, above the library rows" width="1280" height="720" loading="lazy">
-					<figcaption>Home: a spotlight on new titles you have not watched yet.</figcaption>
+					<figcaption><strong>Home.</strong> A spotlight on new titles you haven't watched yet, with your libraries below.</figcaption>
+				</figure>
+				<figure>
+					<img src="images/series.jpg" alt="A series page: poster, genres, status, overview, the play buttons and a Next card with the next episode's picture" width="1280" height="720" loading="lazy">
+					<figcaption><strong>Series.</strong> The Next card picks up the next episode right from the series page.</figcaption>
+				</figure>
+				<figure>
+					<img src="images/episodes.jpg" alt="An episode with its rating, date, length and stream badges, above the row of the season's episodes with their running time and end time" width="1280" height="720" loading="lazy">
+					<figcaption><strong>Episodes.</strong> Every episode of the season in a row, with its length and when it would end.</figcaption>
 				</figure>
 				<figure>
 					<img src="images/details.jpg" alt="A film's details: poster, genres, info badges, overview, director and running time, with the cast below" width="1280" height="720" loading="lazy">
-					<figcaption>Details: the essentials at a glance, cast and crew below.</figcaption>
+					<figcaption><strong>Details.</strong> Resolution, HDR and audio at a glance, the director, the end time, and the cast below.</figcaption>
 				</figure>
 				<figure>
 					<img src="images/player.jpg" alt="The player's controls: series and episode title, a thin seek bar, end time and time left, skip buttons showing their seconds" width="1280" height="720" loading="lazy">
-					<figcaption>Player: how the stream is delivered, the end time and the time left.</figcaption>
+					<figcaption><strong>Player.</strong> How the server delivers the stream, the end time and the time left.</figcaption>
+				</figure>
+				<figure>
+					<img src="images/playback.jpg" alt="Advanced playback settings: resume pre-roll, skip length, buffer size, maximum bitrate and refresh rate switching" width="1280" height="720" loading="lazy">
+					<figcaption><strong>Playback settings.</strong> Buffer size, bitrate limit and refresh-rate switching.</figcaption>
+				</figure>
+				<figure>
+					<img src="images/audio.jpg" alt="Audio settings: audio output, night mode and the FFmpeg option that still sends Dolby, DTS and TrueHD to the receiver" width="1280" height="720" loading="lazy">
+					<figcaption><strong>Audio settings.</strong> Bitstream to the receiver, night mode for TV speakers.</figcaption>
 				</figure>
 				<figure>
 					<img src="images/trailers.jpg" alt="The trailer settings, with a field for your own Invidious instance" width="1280" height="720" loading="lazy">
-					<figcaption>Settings: your own Invidious instance for trailers.</figcaption>
+					<figcaption><strong>Trailers.</strong> Point the app at your own Invidious instance.</figcaption>
 				</figure>
 			</div>
 		</div>
@@ -179,7 +228,7 @@
 			<p class="intro">Velella is sideloaded: it is not on Google Play, F-Droid or any other store. You need a Jellyfin server.</p>
 			<ol class="steps">
 				<li>Download the APK from <a href="https://github.com/miracle091/velella/releases/latest">the latest release</a>, or add
-					<code>https://github.com/miracle091/velella</code> to Obtainium.</li>
+					<code>https://github.com/miracle091/velella</code> to <a href="https://obtainium.imranr.dev/">Obtainium</a>.</li>
 				<li>Install it on the Shield with a file manager, or over ADB: <code>adb install velella-v&lt;version&gt;.apk</code>.</li>
 				<li>Open Velella, pick your server and sign in. From then on it checks for new releases by itself.</li>
 			</ol>

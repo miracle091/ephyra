@@ -16,7 +16,8 @@ section 2(a) of the GPL-2.0.
 
 - Release notes are written from this changelog: the release workflow fills `.github/release-template.md` with the
   version's section and a link to it.
-- A one-page showcase site (`site/`), published to GitHub Pages by the `velella-pages.yaml` workflow when it changes.
+- A one-page showcase site (`site/`), published to GitHub Pages by the `velella-pages.yaml` workflow when it changes:
+  twelve features, eight screenshots from the emulator and the install steps, with a link to Obtainium.
 - The "Recently added" rows of the home screen end with a "See all" card that opens the library, as its tile in My
   media does.
 - YouTube trailers play in the app through Invidious, never through YouTube: the trailer button asks the user's own
