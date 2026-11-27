@@ -57,7 +57,7 @@ class TrailerResolver(
 			ensureActive()
 			val streams = try {
 				fetch("$instance/api/v1/videos/$videoId?local=true&fields=adaptiveFormats,formatStreams")
-					?.let { parseTrailerStreams(it, instance) }
+					?.let { parseTrailerStreams(it, instance, videoId) }
 			} catch (error: CancellationException) {
 				throw error
 			} catch (@Suppress("TooGenericExceptionCaught") error: Exception) {

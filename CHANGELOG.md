@@ -166,6 +166,9 @@ section 2(a) of the GPL-2.0.
   its name and role inside the card.
 - A trailer shows a spinner while the Invidious instances are asked and the stream starts, instead of a black screen.
 - Down from the seek bar of the new player goes to play/pause, not to whichever button was nearest.
+- YouTube trailers play again: Invidious instances now answer with YouTube's own stream addresses even when asked for
+  proxied ones, so every trailer was refused; the streams now come through the instance's own proxy (`/latest_version`).
+  invidious.nikkosphere.com joins the fallback instances.
 - Leaving the new player refreshes the details screen below, as the legacy player does: the resume point, the
   watched state and the episode played last show at once, and the focus moves to Resume or Play.
 - The new player skips media segments as set in Settings (intro, outro, recap, preview, commercial) instead of always

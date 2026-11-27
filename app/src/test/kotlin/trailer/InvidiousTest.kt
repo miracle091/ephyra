@@ -59,42 +59,50 @@ class InvidiousTest : FunSpec({
 			}
 		""".trimIndent()
 
-		parseTrailerStreams(json, "https://i.example") shouldBe
-			TrailerStreams(videoUrl = "https://i.example/v1080", audioUrl = "https://i.example/videoplayback?a=140")
+		parseTrailerStreams(json, "https://i.example", "abc") shouldBe TrailerStreams(
+			videoUrl = "https://i.example/latest_version?id=abc&itag=137&local=true",
+			audioUrl = "https://i.example/latest_version?id=abc&itag=140&local=true",
+		)
 	}
 
 	test("without separate AVC and AAC streams the progressive MP4 plays; nothing playable gives null") {
 		val progressive = """
 			{"adaptiveFormats": [], "formatStreams": [
-				{"type": "video/mp4; codecs=\"avc1.42001E, mp4a.40.2\"", "resolution": "360p", "url": "https://i.example/p360"},
-				{"type": "video/mp4; codecs=\"avc1.64001F, mp4a.40.2\"", "resolution": "720p", "url": "https://i.example/p720"}
+				{"itag": "18", "type": "video/mp4; codecs=\"avc1.42001E, mp4a.40.2\"", "resolution": "360p", "url": "https://i.example/p360"},
+				{"itag": "22", "type": "video/mp4; codecs=\"avc1.64001F, mp4a.40.2\"", "resolution": "720p", "url": "https://i.example/p720"}
 			]}
 		""".trimIndent()
-		parseTrailerStreams(progressive, "https://i.example") shouldBe TrailerStreams("https://i.example/p720", null)
+		parseTrailerStreams(progressive, "https://i.example", "abc") shouldBe
+			TrailerStreams("https://i.example/latest_version?id=abc&itag=22&local=true", null)
 
-		parseTrailerStreams("""{"error": "This video is unavailable"}""", "https://i.example") shouldBe null
-		parseTrailerStreams("""{"adaptiveFormats": [{"type": "video/webm; codecs=\"vp9\"", "url": "x"}]}""", "https://i.example") shouldBe
-			null
-		parseTrailerStreams("<html>", "https://i.example") shouldBe null
+		parseTrailerStreams("""{"error": "This video is unavailable"}""", "https://i.example", "abc") shouldBe null
+		val vp9Only = """{"adaptiveFormats": [{"itag": "303", "type": "video/webm; codecs=\"vp9\""}]}"""
+		parseTrailerStreams(vp9Only, "https://i.example", "abc") shouldBe null
+		parseTrailerStreams("<html>", "https://i.example", "abc") shouldBe null
 	}
 
-	test("an instance that hands out YouTube's own addresses instead of proxying them gives nothing to play") {
+	test("the streams come through the instance's proxy, never from the addresses in its answer") {
+		// Instances now hand out YouTube's own addresses even with local=true; /latest_version still proxies the stream
 		val json = """
 			{"adaptiveFormats": [], "formatStreams": [
-				{"type": "video/mp4; codecs=\"avc1.64001F, mp4a.40.2\"", "resolution": "720p",
+				{"itag": "22", "type": "video/mp4; codecs=\"avc1.64001F, mp4a.40.2\"", "resolution": "720p",
 					"url": "https://rr3---sn-abc.GoogleVideo.com/videoplayback?itag=22"}
 			]}
 		""".trimIndent()
-		parseTrailerStreams(json, "https://i.example") shouldBe null
+		parseTrailerStreams(json, "https://i.example/", "a b") shouldBe
+			TrailerStreams("https://i.example/latest_version?id=a%20b&itag=22&local=true", null)
 		isYouTubeHost("www.youtube.com") shouldBe true
 		isYouTubeHost("youtube.com.") shouldBe true
 		isYouTubeHost("notyoutube.com") shouldBe false
 		isYouTubeHost("i.example") shouldBe false
 	}
 
-	test("a malformed address is dropped instead of crashing the search") {
+	test("a malformed address or a stream without an itag is dropped instead of crashing the search") {
 		invidiousCandidates(own = "invidious .home.lan", lastWorking = "https://host:abc", listed = listOf("https://a.example")) shouldBe
 			listOf("https://a.example")
-		parseTrailerStreams("""{"formatStreams": [{"type": "video/mp4", "url": "http://[bad"}]}""", "https://i.example") shouldBe null
+		parseTrailerStreams("""{"formatStreams": [{"itag": "18", "type": "video/mp4"}]}""", "http://[bad", "abc") shouldBe null
+		parseTrailerStreams("""{"formatStreams": [{"type": "video/mp4", "url": "https://i.example/p"}]}""", "https://i.example", "abc") shouldBe
+			null
+		parseTrailerStreams("""{"formatStreams": [{"itag": "18&x=1", "type": "video/mp4"}]}""", "https://i.example", "abc") shouldBe null
 	}
 })

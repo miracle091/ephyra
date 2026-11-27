@@ -8,8 +8,11 @@ import kotlin.time.Duration.Companion.hours
 const val INVIDIOUS_INSTANCES_URL = "https://api.invidious.io/instances.json"
 private val INSTANCE_LIST_MAX_AGE = 24.hours
 
-/** Velella: instances tried after the public list, for when it cannot be fetched: the ones that had their API open. */
-val InvidiousFallbackInstances = listOf("https://yt.chocolatemoo53.com")
+/**
+ * Velella: instances tried after the public list, also for when it cannot be fetched: ones seen with their API open and their
+ * streams proxied through `/latest_version` (invidious.nikkosphere.com is not on the public list).
+ */
+val InvidiousFallbackInstances = listOf("https://yt.chocolatemoo53.com", "https://invidious.nikkosphere.com")
 
 /** Velella: the HTTPS instances of the public list ([INVIDIOUS_INSTANCES_URL]) with their API open, without the trailing slash. */
 fun parseInvidiousInstances(json: String): List<String> {

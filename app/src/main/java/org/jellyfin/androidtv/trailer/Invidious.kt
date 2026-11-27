@@ -48,21 +48,27 @@ fun isYouTubeHost(host: String): Boolean {
 }
 
 /**
- * Velella: [url] from an instance's answer as a full address, relative ones against [instance]. Null when it is missing or
- * malformed, or when it points at YouTube: an instance that doesn't proxy the streams (`local=true` is only a request) is skipped.
+ * Velella: the address of [format] of the video [videoId] through [instance]'s own proxy (`/latest_version` with `local=true`),
+ * never the address in the answer: instances hand out YouTube's own addresses there even when asked for local ones. Null when
+ * the format has no numeric itag or the instance address is malformed. An instance that doesn't proxy redirects to YouTube,
+ * which the stream client refuses, so the next instance is tried.
  */
-private fun resolveUrl(instance: String, url: String?): String? {
-	if (url.isNullOrBlank()) return null
-	val resolved = "$instance/".toHttpUrlOrNull()?.resolve(url.removePrefix("/")) ?: return null
-	return resolved.takeUnless { isYouTubeHost(it.host) }?.toString()
+private fun proxiedUrl(instance: String, videoId: String, format: JsonElement?): String? {
+	val itag = format?.string("itag")?.takeIf { it.isNotEmpty() && it.all(Char::isDigit) } ?: return null
+	return instance.trimEnd('/').toHttpUrlOrNull()?.newBuilder()
+		?.addPathSegment("latest_version")
+		?.addQueryParameter("id", videoId)
+		?.addQueryParameter("itag", itag)
+		?.addQueryParameter("local", "true")
+		?.build()?.toString()
 }
 
 /**
- * Velella: the streams to play from an Invidious `/api/v1/videos/<id>` answer: the best AVC video up to 1080p with the AAC audio
- * (the default track, itag 140 first), which every Shield decodes in hardware; else the best progressive MP4. Null when the
- * answer is an error or has neither.
+ * Velella: the streams to play from an Invidious `/api/v1/videos/<videoId>` answer of [instance]: the best AVC video up to
+ * 1080p with the AAC audio (the default track, itag 140 first), which every Shield decodes in hardware; else the best
+ * progressive MP4. Null when the answer is an error or has neither.
  */
-fun parseTrailerStreams(json: String, instance: String): TrailerStreams? {
+fun parseTrailerStreams(json: String, instance: String, videoId: String): TrailerStreams? {
 	val video = parseJson(json) as? JsonObject ?: return null
 	val adaptive = (video["adaptiveFormats"] as? JsonArray).orEmpty()
 
@@ -78,12 +84,12 @@ fun parseTrailerStreams(json: String, instance: String): TrailerStreams? {
 				{ it.bitrate() },
 			)
 		)
-	val videoUrl = resolveUrl(instance, avc?.string("url"))
-	val audioUrl = resolveUrl(instance, aac?.string("url"))
+	val videoUrl = proxiedUrl(instance, videoId, avc)
+	val audioUrl = proxiedUrl(instance, videoId, aac)
 	if (videoUrl != null && audioUrl != null) return TrailerStreams(videoUrl, audioUrl)
 
 	val progressive = (video["formatStreams"] as? JsonArray).orEmpty()
 		.filter { it.type().startsWith("video/mp4") }
 		.maxByOrNull { it.height() ?: 0 }
-	return resolveUrl(instance, progressive?.string("url"))?.let { TrailerStreams(it, null) }
+	return proxiedUrl(instance, videoId, progressive)?.let { TrailerStreams(it, null) }
 }
