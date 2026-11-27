@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -52,7 +51,6 @@ import org.jellyfin.androidtv.ui.base.Icon
 import org.jellyfin.androidtv.ui.base.LocalTextStyle
 import org.jellyfin.androidtv.ui.base.LocalVelellaPalette
 import org.jellyfin.androidtv.ui.base.Text
-import org.jellyfin.androidtv.ui.base.button.Button
 import org.jellyfin.androidtv.ui.base.button.IconButton
 import org.jellyfin.androidtv.ui.browsing.composable.inforow.COMMUNITY_RATING_SCALE
 import org.jellyfin.androidtv.ui.browsing.composable.inforow.CRITIC_RATING_SCALE
@@ -273,15 +271,20 @@ private fun SpotlightButtons(item: BaseItemDto, playFocusRequester: FocusRequest
 	val favorite = favorites[item.id] ?: (item.userData?.isFavorite == true)
 
 	Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-		Button(
+		// Icons only, the labels kept for TalkBack
+		IconButton(
 			// A series starts from its next up episode
 			onClick = { scope.launch { playbackHelper.retrieveAndPlay(loadSpotlightPlayTarget(api, item), false, context) } },
 			modifier = Modifier.focusRequester(playFocusRequester),
 		) {
-			SpotlightButtonLabel(R.drawable.ic_play, stringResource(R.string.lbl_play))
+			Icon(painterResource(R.drawable.ic_play), contentDescription = stringResource(R.string.lbl_play), modifier = Modifier.size(20.dp))
 		}
-		Button(onClick = { navigationRepository.navigate(Destinations.itemDetails(item.id)) }) {
-			SpotlightButtonLabel(R.drawable.ic_info, stringResource(R.string.velella_spotlight_details))
+		IconButton(onClick = { navigationRepository.navigate(Destinations.itemDetails(item.id)) }) {
+			Icon(
+				painterResource(R.drawable.ic_info),
+				contentDescription = stringResource(R.string.velella_spotlight_details),
+				modifier = Modifier.size(20.dp),
+			)
 		}
 		IconButton(onClick = {
 			scope.launch {
@@ -303,13 +306,6 @@ private fun SpotlightButtons(item: BaseItemDto, playFocusRequester: FocusRequest
 			)
 		}
 	}
-}
-
-@Composable
-private fun RowScope.SpotlightButtonLabel(icon: Int, label: String) {
-	Icon(painterResource(icon), contentDescription = null, modifier = Modifier.size(20.dp))
-	Spacer(Modifier.width(8.dp))
-	Text(text = label, style = LocalTextStyle.current.copy(fontSize = 16.sp))
 }
 
 @Composable
