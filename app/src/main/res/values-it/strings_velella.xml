@@ -137,6 +137,12 @@
     <string name="velella_trailer_unavailable">Nessuna istanza Invidious è riuscita a riprodurre questo trailer</string>
     <!-- Live TV library: the first row and its buttons (ui/browsing/BrowseViewFragment.java) -->
     <string name="velella_livetv_views_row">TV e registrazioni</string>
+    <plurals name="velella_home_libraries_row">
+        <item quantity="one">Libreria</item>
+        <item quantity="many">Librerie</item>
+        <item quantity="other">Librerie</item>
+    </plurals>
+    <string name="velella_home_next_up_row">Prossimo episodio</string>
     <string name="velella_livetv_guide">Guida TV</string>
     <string name="velella_livetv_recordings">Registrazioni</string>
     <string name="velella_livetv_scheduled">Programmate</string>

@@ -4,7 +4,8 @@ import org.jellyfin.androidtv.R
 import org.jellyfin.preference.PreferenceEnum
 
 /**
- * All possible homesections, "synced" with jellyfin-web (Velella: without "resumebook", the app has no books).
+ * All possible homesections, "synced" with jellyfin-web (Velella: without "resumebook", the app has no books, and
+ * without "livetv", the Live TV screen's spotlight shows what is on air).
  *
  * https://github.com/jellyfin/jellyfin-web/blob/master/src/components/homesections/homesections.js
  */
@@ -19,6 +20,5 @@ enum class HomeSectionType(
 	RESUME_AUDIO("resumeaudio", R.string.home_section_resume_audio),
 	ACTIVE_RECORDINGS("activerecordings", R.string.home_section_active_recordings),
 	NEXT_UP("nextup", R.string.home_section_next_up),
-	LIVE_TV("livetv", R.string.home_section_livetv),
 	NONE("none", R.string.home_section_none),
 }

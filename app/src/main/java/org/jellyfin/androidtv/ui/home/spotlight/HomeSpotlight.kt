@@ -3,12 +3,15 @@ package org.jellyfin.androidtv.ui.home.spotlight
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -22,6 +25,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
@@ -75,10 +80,14 @@ import java.util.UUID
 
 // Leaves the first row's card labels, focused card included, above the bottom fade and the safe margin on a 540dp-high TV
 private val SpotlightHeight = 226.dp
+// Velella: the buttons stay this far above the rows, where they sat with the longest texts
+private val SpotlightBottomPadding = 6.dp
 // The backdrop runs behind the toolbar too, so it covers the top 60% of a 540dp-high TV
 private val ToolbarHeight = 95.dp
 private val SpotlightBackdropHeight = ToolbarHeight + SpotlightHeight
 private const val SPOTLIGHT_FADE_MS = 240
+private const val TITLE_MARQUEE_DELAY_MS = 1500
+private const val DASH_TRACK_ALPHA = 0.35f
 private val LogoMaxWidth = 320.dp
 private val LogoMaxHeight = 72.dp
 private val BackdropMaxWidth = 960.dp
@@ -152,18 +161,18 @@ fun SpotlightBackdrop(state: SpotlightState?, modifier: Modifier = Modifier) {
 /** Velella: the home spotlight's text and buttons, under the toolbar, above the rows. */
 @Composable
 fun HomeSpotlight(state: SpotlightState?, modifier: Modifier = Modifier) {
-	SpotlightFrame(state, modifier) { item, page, pages, infoModifier -> SpotlightInfo(item, page, pages, infoModifier) }
+	SpotlightFrame(state, modifier) { item, dashes, infoModifier -> SpotlightInfo(item, dashes, infoModifier) }
 }
 
 /**
- * Velella: the room of a spotlight under the toolbar, above the rows, with the [info] of the item showing (its page among the
- * pages) left aligned and centred on its height. Nothing while no item shows.
+ * Velella: the room of a spotlight under the toolbar, above the rows, with the [info] of the item showing (and its dashes, one
+ * per item) left aligned over its whole height, so the buttons can stay at its bottom. Nothing while no item shows.
  */
 @Composable
 internal fun SpotlightFrame(
 	state: SpotlightState?,
 	modifier: Modifier = Modifier,
-	info: @Composable (item: BaseItemDto, page: Int, pages: Int, modifier: Modifier) -> Unit,
+	info: @Composable (item: BaseItemDto, dashes: @Composable () -> Unit, modifier: Modifier) -> Unit,
 ) {
 	val item = state?.item ?: return
 	Box(
@@ -173,11 +182,10 @@ internal fun SpotlightFrame(
 	) {
 		info(
 			item,
-			state.index % state.items.size,
-			state.items.size,
+			{ SpotlightDashes(state.index % state.items.size, state.items.size) { state.progress.value } },
 			Modifier
-				.align(Alignment.CenterStart)
-				.padding(start = 32.dp)
+				.fillMaxHeight()
+				.padding(start = 32.dp, bottom = SpotlightBottomPadding)
 				.onFocusChanged { state.focused = it.hasFocus },
 		)
 	}
@@ -205,7 +213,7 @@ private fun SpotlightBackdropImage(item: BaseItemDto, api: ApiClient, panDirecti
 }
 
 @Composable
-private fun SpotlightInfo(item: BaseItemDto, page: Int, pages: Int, modifier: Modifier = Modifier) {
+private fun SpotlightInfo(item: BaseItemDto, dashes: @Composable () -> Unit, modifier: Modifier = Modifier) {
 	val playFocusRequester = remember { FocusRequester() }
 
 	Column(
@@ -214,16 +222,28 @@ private fun SpotlightInfo(item: BaseItemDto, page: Int, pages: Int, modifier: Mo
 			.width(560.dp)
 			.focusProperties { onEnter = { playFocusRequester.requestFocus() } }
 			.focusGroup(),
-		verticalArrangement = Arrangement.spacedBy(6.dp),
 	) {
-		SpotlightTexts(item)
-		Spacer(Modifier.height(4.dp))
+		SpotlightTextsAboveButtons { SpotlightTexts(item) }
 		Row(verticalAlignment = Alignment.CenterVertically) {
 			SpotlightButtons(item, playFocusRequester)
 			Spacer(Modifier.width(24.dp))
-			SpotlightDashes(page, pages)
+			dashes()
 		}
 	}
+}
+
+/**
+ * Velella: the texts of a spotlight, sitting on its buttons and growing upwards, so the buttons and dashes stay in place
+ * whatever the length of the title and the overview.
+ */
+@Composable
+internal fun ColumnScope.SpotlightTextsAboveButtons(texts: @Composable ColumnScope.() -> Unit) {
+	Column(
+		modifier = Modifier.weight(1f),
+		verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.Bottom),
+		content = texts,
+	)
+	Spacer(Modifier.height(10.dp))
 }
 
 /** The title (its logo when the server has one), the info row and the overview of the spotlight. */
@@ -252,7 +272,8 @@ private fun SpotlightTexts(item: BaseItemDto) {
 				lineHeight = 34.sp,
 			),
 			maxLines = 1,
-			overflow = TextOverflow.Ellipsis,
+			// Velella: a name too long for the spotlight scrolls instead of being cut
+			modifier = Modifier.basicMarquee(iterations = Int.MAX_VALUE, initialDelayMillis = TITLE_MARQUEE_DELAY_MS),
 		)
 	}
 	// Ratings first, with the gold star and the Rotten Tomatoes logo, as in the details' info row; groups divided by thin
@@ -283,18 +304,28 @@ private fun SpotlightTexts(item: BaseItemDto) {
 	}
 }
 
-/** One dash per item of the spotlight, the one showing longer and in the accent colour; nothing for a single item. */
+/**
+ * One dash per item of the spotlight, the one showing longer and filling in the accent colour as its time passes ([progress],
+ * read while drawing so the row does not recompose each frame); nothing for a single item.
+ */
 @Composable
-internal fun SpotlightDashes(page: Int, pages: Int) {
+internal fun SpotlightDashes(page: Int, pages: Int, progress: () -> Float) {
 	if (pages < 2) return
 	val palette = LocalVelellaPalette.current
+	val track = palette.ink.copy(alpha = DASH_TRACK_ALPHA)
 	Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
 		repeat(pages) { dash ->
 			val current = dash == page
 			Box(
 				Modifier
 					.size(width = if (current) 24.dp else 12.dp, height = 3.dp)
-					.background(if (current) palette.accent else palette.ink.copy(alpha = 0.35f), RoundedCornerShape(2.dp))
+					.clip(RoundedCornerShape(2.dp))
+					.background(track)
+					.then(
+						if (current) Modifier.drawBehind {
+							drawRect(palette.accent, size = size.copy(width = size.width * progress().coerceIn(0f, 1f)))
+						} else Modifier
+					)
 			)
 		}
 	}

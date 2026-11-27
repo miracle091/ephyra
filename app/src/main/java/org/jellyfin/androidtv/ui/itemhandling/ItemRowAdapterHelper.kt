@@ -11,6 +11,8 @@ import kotlinx.coroutines.withContext
 import org.jellyfin.androidtv.data.querying.GetAdditionalPartsRequest
 import org.jellyfin.androidtv.data.querying.GetSpecialsRequest
 import org.jellyfin.androidtv.data.repository.UserViewsRepository
+import org.jellyfin.androidtv.data.repository.recordingFolderIds
+import org.jellyfin.androidtv.data.repository.withoutRecordingFolders
 import org.jellyfin.sdk.api.client.ApiClient
 import org.jellyfin.sdk.api.client.extensions.showApi
 import org.jellyfin.sdk.api.client.extensions.userViewApi
@@ -224,7 +226,7 @@ fun ItemRowAdapter.retrieveUserViews(api: ApiClient, userViewsRepository: UserVi
 				api.userViewApi.getUserViews().content
 			}
 
-			val filteredItems = response.items
+			val filteredItems = withoutRecordingFolders(response.items, recordingFolderIds(api))
 				.filter { userViewsRepository.isShownInMyMedia(it.collectionType) }
 
 			setItems(

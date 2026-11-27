@@ -1,14 +1,37 @@
 package org.jellyfin.androidtv.data.repository
 
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.withContext
 import org.jellyfin.androidtv.preference.VelellaPreferences
 import org.jellyfin.sdk.api.client.ApiClient
+import org.jellyfin.sdk.api.client.extensions.liveTvApi
 import org.jellyfin.sdk.api.client.extensions.userViewApi
 import org.jellyfin.sdk.model.api.BaseItemDto
 import org.jellyfin.sdk.model.api.CollectionType
+import timber.log.Timber
+import java.util.UUID
+
+/**
+ * Velella: [views] without the live TV recordings folders (the server gives them no collection type, like mixed
+ * libraries, so only their ids tell them apart): the Live TV screen opens the recordings.
+ */
+fun withoutRecordingFolders(views: List<BaseItemDto>, recordingFolderIds: Set<UUID>) = views.filter { it.id !in recordingFolderIds }
+
+/** Velella: the ids of the live TV recordings folders, none when the user has no live TV or the server fails */
+suspend fun recordingFolderIds(api: ApiClient): Set<UUID> = withContext(Dispatchers.IO) {
+	try {
+		api.liveTvApi.getRecordingFolders().content.items.map { it.id }.toSet()
+	} catch (error: CancellationException) {
+		throw error
+	} catch (@Suppress("TooGenericExceptionCaught") error: Exception) {
+		Timber.w(error, "Could not load the live TV recordings folders")
+		emptySet()
+	}
+}
 
 interface UserViewsRepository {
 	val views: Flow<Collection<BaseItemDto>>

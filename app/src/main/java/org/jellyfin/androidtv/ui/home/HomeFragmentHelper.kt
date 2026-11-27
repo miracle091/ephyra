@@ -11,7 +11,6 @@ import org.jellyfin.sdk.model.api.BaseItemDto
 import org.jellyfin.sdk.model.api.BaseItemKind
 import org.jellyfin.sdk.model.api.MediaType
 import org.jellyfin.sdk.model.api.request.GetNextUpRequest
-import org.jellyfin.sdk.model.api.request.GetRecommendedProgramsRequest
 import org.jellyfin.sdk.model.api.request.GetRecordingsRequest
 import org.jellyfin.sdk.model.api.request.GetResumeItemsRequest
 import java.time.LocalDateTime
@@ -70,19 +69,9 @@ class HomeFragmentHelper(
 			nextUpDateCutoff = nextUpDateCutoff,
 		)
 
-		return HomeFragmentBrowseRowDefRow(BrowseRowDef(context.getString(R.string.lbl_next_up), query, arrayOf(ChangeTriggerType.TvPlayback)))
-	}
-
-	fun loadOnNow(): HomeFragmentRow {
-		val query = GetRecommendedProgramsRequest(
-			isAiring = true,
-			fields = ItemRepository.itemFields,
-			imageTypeLimit = 1,
-			enableTotalRecordCount = false,
-			limit = ITEM_LIMIT_ON_NOW
-		)
-
-		return HomeFragmentBrowseRowDefRow(BrowseRowDef(context.getString(R.string.lbl_on_now), query))
+		// Velella: upstream "Next up"
+		val title = context.getString(R.string.velella_home_next_up_row)
+		return HomeFragmentBrowseRowDefRow(BrowseRowDef(title, query, arrayOf(ChangeTriggerType.TvPlayback)))
 	}
 
 	companion object {
@@ -90,6 +79,5 @@ class HomeFragmentHelper(
 		private const val ITEM_LIMIT_RESUME = 50
 		private const val ITEM_LIMIT_RECORDINGS = 40
 		private const val ITEM_LIMIT_NEXT_UP = 50
-		private const val ITEM_LIMIT_ON_NOW = 20
 	}
 }

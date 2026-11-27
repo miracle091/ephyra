@@ -124,7 +124,8 @@ class HomeRowsFragment : RowsSupportFragment(), AudioEventListener, View.OnKeyLi
 
 	private fun loadHomeRows() {
 		lifecycleScope.launch(Dispatchers.IO) {
-			val currentUser = withTimeout(30.seconds) {
+			// Wait for the signed-in user before loading the rows
+			withTimeout(30.seconds) {
 				userRepository.currentUser.filterNotNull().first()
 			}
 
@@ -135,8 +136,7 @@ class HomeRowsFragment : RowsSupportFragment(), AudioEventListener, View.OnKeyLi
 			if (!isActive) return@launch
 
 			// Actually add the sections
-			val liveTvAccess = currentUser.policy?.enableLiveTvAccess == true
-			val rows = homesections.mapNotNull { section -> createSectionRow(helper, userViewsRepository, section, liveTvAccess) }
+			val rows = homesections.mapNotNull { section -> createSectionRow(helper, userViewsRepository, section) }
 
 			// Add sections to layout
 			withContext(Dispatchers.Main) {
@@ -270,7 +270,6 @@ private suspend fun createSectionRow(
 	helper: HomeFragmentHelper,
 	userViewsRepository: UserViewsRepository,
 	section: HomeSectionType,
-	liveTvAccess: Boolean,
 ): HomeFragmentRow? = when (section) {
 	HomeSectionType.LATEST_MEDIA -> helper.loadRecentlyAdded(userViewsRepository.views.first())
 	HomeSectionType.LIBRARY_TILES_SMALL -> HomeFragmentViewsRow(small = false)
@@ -279,7 +278,5 @@ private suspend fun createSectionRow(
 	HomeSectionType.RESUME_AUDIO -> helper.loadResumeAudio()
 	HomeSectionType.ACTIVE_RECORDINGS -> helper.loadLatestLiveTvRecordings()
 	HomeSectionType.NEXT_UP -> helper.loadNextUp()
-	// Velella: only what is on now; the guide and recordings buttons live in the Live TV library
-	HomeSectionType.LIVE_TV -> if (liveTvAccess) helper.loadOnNow() else null
 	HomeSectionType.NONE -> null
 }

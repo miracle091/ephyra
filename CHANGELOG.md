@@ -42,6 +42,9 @@ section 2(a) of the GPL-2.0.
   called "TV and recordings".
 - The home and Live TV spotlights lay a veil of the theme's background over their image behind the text and the
   toolbar, so the overview, the clock and the icons stay readable over a bright picture.
+- The home and Live TV spotlights rotate a little slower (every 12 seconds instead of 10), the current dash fills as
+  the item's time passes, a name without a logo scrolls when it is too long instead of being cut, and the buttons and dashes stay in place
+  whatever the length of the texts above them.
 - Grid buttons (TV guide, Recordings, Genres...) show their name centred under the card, like the home's library
   cards, instead of in bold on it.
 - The Live TV library shows its views first (TV guide, Recordings, Scheduled, Recorded series, renamed), then the
@@ -169,6 +172,10 @@ section 2(a) of the GPL-2.0.
 ### Removed
 
 - The More like this row on the details of films, trailers and shows.
+- The home's On now row and its Live TV home section (the Live TV screen's spotlight shows what is on air; a home slot
+  set to it falls back to its default), and the Recordings card among the home's libraries (the Live TV screen opens
+  the recordings); the libraries row is called "Libraries" ("Library" with only one)
+  instead of "My media" and the Next up row "Next episode".
 - Trailers no longer open the YouTube app or a browser, and the app no longer declares that it looks for apps that open
   YouTube links.
 - Dead code: functions and members with no caller (`PopoverMenu.kt`, `ItemRowAdapter.setSiblingRow`,

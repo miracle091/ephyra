@@ -147,6 +147,11 @@
     <string name="velella_trailer_unavailable">No Invidious instance could play this trailer</string>
     <!-- Live TV library: the first row and its buttons (ui/browsing/BrowseViewFragment.java) -->
     <string name="velella_livetv_views_row">TV and recordings</string>
+    <plurals name="velella_home_libraries_row">
+        <item quantity="one">Library</item>
+        <item quantity="other">Libraries</item>
+    </plurals>
+    <string name="velella_home_next_up_row">Next episode</string>
     <string name="velella_livetv_guide">TV guide</string>
     <string name="velella_livetv_recordings">Recordings</string>
     <string name="velella_livetv_scheduled">Scheduled</string>

@@ -2,12 +2,12 @@ package org.jellyfin.androidtv.ui.livetv
 
 import android.view.View
 import androidx.compose.foundation.background
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -42,10 +42,10 @@ import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.base.button.IconButton
 import org.jellyfin.androidtv.ui.composable.InfoRowGroups
 import org.jellyfin.androidtv.ui.home.spotlight.SPOTLIGHT_SIZE
-import org.jellyfin.androidtv.ui.home.spotlight.SpotlightDashes
 import org.jellyfin.androidtv.ui.home.spotlight.SpotlightFrame
 import org.jellyfin.androidtv.ui.home.spotlight.SpotlightMetaText
 import org.jellyfin.androidtv.ui.home.spotlight.SpotlightState
+import org.jellyfin.androidtv.ui.home.spotlight.SpotlightTextsAboveButtons
 import org.jellyfin.androidtv.ui.home.spotlight.rememberSpotlightState
 import org.jellyfin.androidtv.ui.home.spotlight.spotlightOverview
 import org.jellyfin.androidtv.ui.navigation.Destinations
@@ -67,6 +67,7 @@ import kotlin.time.Duration.Companion.seconds
 private const val ON_AIR_CANDIDATES = 20
 private val MinReload = 1.minutes
 private val EndMargin = 5.seconds
+private const val TITLE_MARQUEE_DELAY_MS = 1500
 
 /**
  * Velella: the spotlight of the Live TV screen: programmes on air, one at a time, with their channel, an "on air" tag and the
@@ -117,11 +118,11 @@ suspend fun loadOnAirPrograms(api: ApiClient): List<BaseItemDto> = withContext(D
 /** Velella: the Live TV spotlight's text and buttons, under the toolbar, above the rows. */
 @Composable
 fun LiveTvSpotlight(state: SpotlightState?, modifier: Modifier = Modifier) {
-	SpotlightFrame(state, modifier) { item, page, pages, infoModifier -> LiveTvSpotlightInfo(item, page, pages, infoModifier) }
+	SpotlightFrame(state, modifier) { item, dashes, infoModifier -> LiveTvSpotlightInfo(item, dashes, infoModifier) }
 }
 
 @Composable
-private fun LiveTvSpotlightInfo(item: BaseItemDto, page: Int, pages: Int, modifier: Modifier = Modifier) {
+private fun LiveTvSpotlightInfo(item: BaseItemDto, dashes: @Composable () -> Unit, modifier: Modifier = Modifier) {
 	val watchFocusRequester = remember { FocusRequester() }
 	Column(
 		// Coming from the rows or the toolbar, the focus lands on Watch
@@ -129,34 +130,39 @@ private fun LiveTvSpotlightInfo(item: BaseItemDto, page: Int, pages: Int, modifi
 			.width(560.dp)
 			.focusProperties { onEnter = { watchFocusRequester.requestFocus() } }
 			.focusGroup(),
-		verticalArrangement = Arrangement.spacedBy(6.dp),
 	) {
-		Text(
-			text = item.name.orEmpty(),
-			style = LocalTextStyle.current.merge(
-				color = LocalVelellaPalette.current.ink,
-				fontSize = 28.sp,
-				fontWeight = FontWeight.Bold,
-				lineHeight = 34.sp,
-			),
-			maxLines = 1,
-			overflow = TextOverflow.Ellipsis,
-		)
-		LiveTvSpotlightInfoRow(item)
-		spotlightOverview(item)?.let { overview ->
-			Text(
-				text = overview,
-				style = LocalTextStyle.current.merge(color = LocalVelellaPalette.current.inkMuted, fontSize = 14.sp, lineHeight = 19.sp),
-				maxLines = 3,
-				overflow = TextOverflow.Ellipsis,
-			)
-		}
-		Spacer(Modifier.height(4.dp))
+		SpotlightTextsAboveButtons { LiveTvSpotlightTexts(item) }
 		Row(verticalAlignment = Alignment.CenterVertically) {
 			LiveTvSpotlightButtons(item, watchFocusRequester)
 			Spacer(Modifier.width(24.dp))
-			SpotlightDashes(page, pages)
+			dashes()
 		}
+	}
+}
+
+/** The programme's name, the info row and the overview. */
+@Composable
+private fun LiveTvSpotlightTexts(item: BaseItemDto) {
+	Text(
+		text = item.name.orEmpty(),
+		style = LocalTextStyle.current.merge(
+			color = LocalVelellaPalette.current.ink,
+			fontSize = 28.sp,
+			fontWeight = FontWeight.Bold,
+			lineHeight = 34.sp,
+		),
+		maxLines = 1,
+		// A name too long for the spotlight scrolls instead of being cut
+		modifier = Modifier.basicMarquee(iterations = Int.MAX_VALUE, initialDelayMillis = TITLE_MARQUEE_DELAY_MS),
+	)
+	LiveTvSpotlightInfoRow(item)
+	spotlightOverview(item)?.let { overview ->
+		Text(
+			text = overview,
+			style = LocalTextStyle.current.merge(color = LocalVelellaPalette.current.inkMuted, fontSize = 14.sp, lineHeight = 19.sp),
+			maxLines = 3,
+			overflow = TextOverflow.Ellipsis,
+		)
 	}
 }
 

@@ -5,7 +5,10 @@ import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import org.jellyfin.androidtv.preference.VelellaPreferences
+import org.jellyfin.sdk.model.api.BaseItemDto
+import org.jellyfin.sdk.model.api.BaseItemKind
 import org.jellyfin.sdk.model.api.CollectionType
+import java.util.UUID
 
 class UserViewsRepositoryTest : FunSpec({
 	fun repository(showPlaylists: Boolean) = UserViewsRepositoryImpl(
@@ -32,5 +35,13 @@ class UserViewsRepositoryTest : FunSpec({
 
 	test("unsupported libraries stay hidden") {
 		repository(showPlaylists = true).isShownInMyMedia(CollectionType.BOOKS) shouldBe false
+	}
+
+	test("the live TV recordings folder is left out of the home's libraries, mixed libraries stay") {
+		fun folder(name: String) = BaseItemDto(id = UUID.randomUUID(), name = name, type = BaseItemKind.COLLECTION_FOLDER)
+		val mixed = folder("Mixed")
+		val recordings = folder("Recordings")
+
+		withoutRecordingFolders(listOf(mixed, recordings), setOf(recordings.id)) shouldBe listOf(mixed)
 	}
 })
