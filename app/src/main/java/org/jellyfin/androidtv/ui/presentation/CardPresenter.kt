@@ -383,7 +383,10 @@ private fun CardPreview(
 					maxLines = 1,
 					overflow = TextOverflow.Ellipsis,
 					style = LocalTextStyle.current.merge(textAlign = TextAlign.Center),
-					modifier = Modifier.then(focusModifier),
+					// Velella: the full card width, so the title centres like the line under it
+					modifier = Modifier
+						.fillMaxWidth()
+						.then(focusModifier),
 				)
 			}
 		},

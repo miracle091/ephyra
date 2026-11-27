@@ -193,6 +193,8 @@ section 2(a) of the GPL-2.0.
   pause; it now goes every 3 s while playing and every 15 s while paused, like the legacy player.
 - The new player resumes videos where they were left and starts a queue at the chosen item: the resume seek was
   issued before the stream was known and the queue always started at its first item.
+- Card titles under posters (seasons, films in the rows) are centred like the line under them, instead of starting at
+  the left.
 
 ## [0.5.0] - 2026-11-09
 
