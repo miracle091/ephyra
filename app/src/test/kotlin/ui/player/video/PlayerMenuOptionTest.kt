@@ -50,15 +50,6 @@ class PlayerMenuOptionTest : FunSpec({
 		)
 	}
 
-	test("the quality badge shows 4K from 40 Mbps, HD from 8 Mbps, SD below") {
-		qualityTierText("200") shouldBe "4K"
-		qualityTierText("40") shouldBe "4K"
-		qualityTierText("30") shouldBe "HD"
-		qualityTierText("10") shouldBe "HD"
-		qualityTierText("5") shouldBe "SD"
-		qualityTierText("0.42") shouldBe "SD"
-	}
-
 	test("the current chapter is the last one started") {
 		val options = listOf(PlayerMenuOption(0.seconds, "a"), PlayerMenuOption(5.minutes, "b"))
 

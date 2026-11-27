@@ -1,28 +1,14 @@
 package org.jellyfin.androidtv.ui.player.video
 
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import org.jellyfin.androidtv.R
-import org.jellyfin.androidtv.ui.base.LocalTextStyle
-import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.constant.getQualityProfiles
 import org.jellyfin.androidtv.preference.UserPreferences
 import org.jellyfin.androidtv.ui.composable.rememberQueueEntry
@@ -38,8 +24,8 @@ import org.koin.compose.koinInject
 import timber.log.Timber
 
 /**
- * Velella: the legacy player's round menu buttons on the right of the controls, in its order: subtitles (when the source has any),
- * audio (with more than one track), chapters (when the item has any) and quality (the maximum bitrate; picking one asks the server
+ * Velella: the menu buttons on the right of the controls: subtitles (when the source has any) and audio (with more than one
+ * track) in sight, then "…" with chapters (when the item has any) and quality (the maximum bitrate; picking one asks the server
  * for a new stream under it, from the current position).
  */
 @Composable
@@ -89,26 +75,30 @@ fun VideoPlayerMenus(
 	}
 
 	val chapters = remember(item) { chapterMenuOptions(item?.chapters.orEmpty()) }
-	if (chapters.isNotEmpty()) {
-		VideoPlayerMenuButton(
-			icon = { MenuIcon(R.drawable.ic_select_chapter, stringResource(R.string.lbl_chapters)) },
+	val chaptersLabel = stringResource(R.string.lbl_chapters)
+	val chapterMenu = if (chapters.isEmpty()) null else {
+		val current = currentChapter(chapters, playbackManager.state.positionInfo.active)
+		PlayerSubmenu(
+			label = chaptersLabel,
+			current = chapters.firstOrNull { it.value == current }?.label,
 			options = chapters,
-			selected = currentChapter(chapters, playbackManager.state.positionInfo.active),
+			selected = current,
 			onSelect = { start -> playbackManager.state.seek(start) },
 		)
 	}
 
-	QualityMenuButton(playbackManager, userPreferences)
+	VideoPlayerMoreButton(listOfNotNull(chapterMenu, qualitySubmenu(playbackManager, userPreferences)))
 }
 
 /** Velella: the quality (maximum bitrate) menu; picking one asks the server for a new stream under it, from the current position. */
 @Composable
-private fun QualityMenuButton(playbackManager: PlaybackManager, userPreferences: UserPreferences) {
+private fun qualitySubmenu(playbackManager: PlaybackManager, userPreferences: UserPreferences): PlayerSubmenu<String> {
 	val context = LocalContext.current
 	val qualities = remember { getQualityProfiles(context).map { (value, label) -> PlayerMenuOption(value, label) } }
 	var maxBitrate by rememberPreference(userPreferences, UserPreferences.maxBitrate)
-	VideoPlayerMenuButton(
-		icon = { BitrateBadge(maxBitrate, stringResource(R.string.lbl_quality_profile)) },
+	return PlayerSubmenu(
+		label = stringResource(R.string.lbl_quality_profile),
+		current = qualities.firstOrNull { it.value == maxBitrate }?.label,
 		options = qualities,
 		selected = maxBitrate,
 		onSelect = { value ->
@@ -118,28 +108,4 @@ private fun QualityMenuButton(playbackManager: PlaybackManager, userPreferences:
 			playbackManager.reloadStream()
 		},
 	)
-}
-
-/**
- * Velella: the quality button shows the tier of the chosen maximum bitrate ("4K", "HD", "SD") in a small frame instead of an icon,
- * so it reads as quality and not as a screen, in the button's content colour (dark on the focused button).
- */
-@Composable
-private fun BitrateBadge(maxBitrate: String, contentDescription: String) {
-	val color = LocalTextStyle.current.color
-	Box(
-		contentAlignment = Alignment.Center,
-		modifier = Modifier
-			.defaultMinSize(minWidth = 24.dp, minHeight = 24.dp)
-			.semantics { this.contentDescription = contentDescription },
-	) {
-		Text(
-			text = qualityTierText(maxBitrate),
-			maxLines = 1,
-			style = LocalTextStyle.current.merge(color = color, fontSize = 11.sp, fontWeight = FontWeight.Bold),
-			modifier = Modifier
-				.border(1.5.dp, color, RoundedCornerShape(3.dp))
-				.padding(horizontal = 3.dp, vertical = 1.dp),
-		)
-	}
 }

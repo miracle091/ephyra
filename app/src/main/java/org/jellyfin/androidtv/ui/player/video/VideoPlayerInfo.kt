@@ -1,5 +1,6 @@
 package org.jellyfin.androidtv.ui.player.video
 
+import org.jellyfin.androidtv.integration.dream.formatPlaybackTime
 import org.jellyfin.playback.core.mediastream.MediaConversionMethod
 import org.jellyfin.playback.core.mediastream.MediaStreamAudioTrack
 import org.jellyfin.playback.core.mediastream.MediaStreamVideoTrack
@@ -44,3 +45,10 @@ fun videoEndsAt(position: Duration, duration: Duration, speed: Float, now: Local
 	val atSpeed = if (speed > 0f) remaining / speed.toDouble() else remaining
 	return now.plusSeconds(atSpeed.inWholeSeconds)
 }
+
+/** Velella: the media time left after [position], as "-24:20", on the right under the seek bar. */
+fun remainingPlaybackTime(position: Duration, duration: Duration): String =
+	"-" + formatPlaybackTime((duration - position).coerceAtLeast(Duration.ZERO).inWholeMilliseconds)
+
+/** Velella: the skip length in whole seconds, drawn inside the rewind and fast forward icons. */
+fun skipSecondsLabel(amount: Duration): String = amount.inWholeSeconds.toString()

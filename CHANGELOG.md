@@ -63,9 +63,13 @@ section 2(a) of the GPL-2.0.
 - The new player's overlay looks like the legacy one: the series and episode over the title, how the server delivers
   the stream and why, the end time under the seek bar, the legacy margins and button order, and controls dimmed
   during HDR and Dolby Vision playback.
-- The new player's controls have the legacy player's menus: subtitles, audio tracks (by the server's names) and
-  chapters when the video has them, and the maximum bitrate, shown on its button as a 4K, HD or SD badge; picking one
-  restarts the stream under it from the same position. Previous and next show only when there is an item to go to.
+- The new player's controls have the legacy player's menus: subtitles and audio tracks (by the server's names) in
+  sight, chapters when the video has them and the maximum bitrate under a "…" button that lists them with their
+  current choice (Back returns from a menu to the list); picking a bitrate restarts the stream under it from the same
+  position. Previous and next show only when there is an item to go to.
+- The new player's seek bar is a thin line in the theme's accent colour that thickens when it has the focus; the time
+  left ("-24:20") replaces the duration next to "Ends at", and the rewind and fast forward buttons show the skip
+  length set in the settings inside a circular arrow.
 - The new player shows the trickplay thumbnail and time of the picked position above the seek bar while scrubbing,
   as the legacy one did, and up from the buttons reaches the seek bar instead of hiding the controls.
 - The new player downloads a video's trickplay thumbnails into the image cache as playback starts, so the first

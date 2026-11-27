@@ -32,22 +32,6 @@ fun chapterMenuOptions(chapters: List<ChapterInfo>): List<PlayerMenuOption<Durat
 	PlayerMenuOption(start, if (name == null) time else "$name · $time")
 }
 
-private const val UHD_MIN_MBPS = 40.0
-private const val HD_MIN_MBPS = 8.0
-
-/**
- * Velella: the quality tier the quality button shows in place of an icon for the maximum bitrate [value] (the preference's Mbps,
- * "20" or "0.72"): "4K" from 40 Mbps, "HD" from 8 Mbps, "SD" below, the rough bitrates those resolutions need.
- */
-fun qualityTierText(value: String): String {
-	val mbps = value.toDoubleOrNull() ?: return value
-	return when {
-		mbps >= UHD_MIN_MBPS -> "4K"
-		mbps >= HD_MIN_MBPS -> "HD"
-		else -> "SD"
-	}
-}
-
 /** Velella: the chapter playing at [position]: the last one that started at or before it. */
 fun currentChapter(options: List<PlayerMenuOption<Duration>>, position: Duration): Duration? =
 	options.lastOrNull { it.value <= position }?.value

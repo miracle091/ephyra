@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.jellyfin.androidtv.integration.dream.model.DreamContent
 import org.jellyfin.androidtv.ui.base.SeekbarDefaults
+import org.jellyfin.androidtv.ui.base.SeekbarStyle
 import org.jellyfin.androidtv.ui.base.LocalTextStyle
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.composable.AsyncImage
@@ -182,10 +183,12 @@ private fun DreamMetadata(
 
 		PlayerSeekbar(
 			playbackManager = playbackManager,
-			colors = SeekbarDefaults.colors(
-				backgroundColor = Color.White.copy(alpha = 0.2f),
-				progressColor = Color.White,
-				bufferColor = Color.Transparent,
+			style = SeekbarStyle(
+				SeekbarDefaults.colors(
+					backgroundColor = Color.White.copy(alpha = 0.2f),
+					progressColor = Color.White,
+					bufferColor = Color.Transparent,
+				),
 			),
 			modifier = Modifier
 				.fillMaxWidth()

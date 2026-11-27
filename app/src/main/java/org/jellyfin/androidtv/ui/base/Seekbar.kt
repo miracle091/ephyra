@@ -26,6 +26,7 @@ import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
+import androidx.compose.ui.unit.Dp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -90,13 +91,15 @@ data class SeekbarCallbacks(
 )
 
 /**
- * Velella: how a [Seekbar] looks: its [colors], and whether it keeps a smaller knob without the focus ([knobAlwaysVisible], like
- * the legacy Leanback seek bar) or shows the knob only with the focus.
+ * Velella: how a [Seekbar] looks: its [colors], whether it keeps a smaller knob without the focus ([knobAlwaysVisible], like
+ * the legacy Leanback seek bar) or shows the knob only with the focus, and a fixed focused [knobRadius] if the bar changes size.
  */
 @Immutable
 data class SeekbarStyle(
 	val colors: SeekbarColors,
 	val knobAlwaysVisible: Boolean = false,
+	// Velella: the focused knob's radius when the bar's thickness changes (the video player's), else twice the bar's height
+	val knobRadius: Dp? = null,
 )
 
 @Composable
@@ -169,7 +172,8 @@ private fun SeekbarBar(
 			.onKeyEvent { state.enabled && scrub.onKey(it, state) }
 			.focusable(interactionSource = interactionSource, enabled = state.enabled)
 			.drawWithContent {
-				drawSeekbar(style.colors, state.buffer, visibleProgress, knobAlpha, knobScale)
+				val knobRadius = style.knobRadius?.toPx()?.times(knobScale / KNOB_SCALE_FOCUSED) ?: (size.minDimension * knobScale)
+				drawSeekbar(style.colors, state.buffer, visibleProgress, knobAlpha, knobRadius)
 			}
 	)
 }
@@ -257,7 +261,7 @@ private fun DrawScope.drawSeekbar(
 	buffer: Float,
 	visibleProgress: Float,
 	knobAlpha: Float,
-	knobScale: Float,
+	knobRadius: Float,
 ) {
 	val barCornerRadius = CornerRadius(size.minDimension, size.minDimension)
 
@@ -296,6 +300,6 @@ private fun DrawScope.drawSeekbar(
 		center = center.copy(
 			x = visibleProgress * size.width,
 		),
-		radius = size.minDimension * knobScale,
+		radius = knobRadius,
 	)
 }

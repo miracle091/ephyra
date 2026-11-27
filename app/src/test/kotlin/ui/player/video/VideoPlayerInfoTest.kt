@@ -10,7 +10,9 @@ import org.jellyfin.playback.core.mediastream.PlayableMediaStream
 import org.jellyfin.playback.core.queue.QueueEntry
 import org.jellyfin.sdk.model.api.PlayMethod
 import java.time.LocalTime
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 class VideoPlayerInfoTest : FunSpec({
 	fun stream(method: MediaConversionMethod, range: String?) = PlayableMediaStream(
@@ -58,5 +60,17 @@ class VideoPlayerInfoTest : FunSpec({
 		videoEndsAt(10.minutes, 40.minutes, 1f, now) shouldBe LocalTime.of(20, 30)
 		videoEndsAt(10.minutes, 40.minutes, 1.5f, now) shouldBe LocalTime.of(20, 20)
 		videoEndsAt(50.minutes, 40.minutes, 1f, now) shouldBe now
+	}
+
+	test("the remaining time is the media time left, with a minus sign") {
+		remainingPlaybackTime(10.minutes, 40.minutes) shouldBe "-30:00"
+		remainingPlaybackTime(25.seconds, 90.minutes) shouldBe "-1:29:35"
+		remainingPlaybackTime(50.minutes, 40.minutes) shouldBe "-0:00"
+	}
+
+	test("the skip buttons show the skip length in whole seconds") {
+		skipSecondsLabel(10.seconds) shouldBe "10"
+		skipSecondsLabel(5_500.milliseconds) shouldBe "5"
+		skipSecondsLabel(30.seconds) shouldBe "30"
 	}
 })

@@ -7,7 +7,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import org.jellyfin.androidtv.ui.base.Seekbar
 import org.jellyfin.androidtv.ui.base.SeekbarCallbacks
-import org.jellyfin.androidtv.ui.base.SeekbarColors
 import org.jellyfin.androidtv.ui.base.SeekbarDefaults
 import org.jellyfin.androidtv.ui.base.SeekbarPosition
 import org.jellyfin.androidtv.ui.base.SeekbarStyle
@@ -21,12 +20,12 @@ import kotlin.time.times
 @Composable
 fun PlayerSeekbar(
 	modifier: Modifier = Modifier,
-	colors: SeekbarColors = SeekbarDefaults.colors(),
+	// Velella: colours and knob (the video player keeps a smaller knob without the focus, like the legacy one, and a fixed size
+	// while its bar thickens)
+	style: SeekbarStyle = SeekbarStyle(SeekbarDefaults.colors()),
 	playbackManager: PlaybackManager = koinInject<PlaybackManager>(),
 	// Velella: the position picked while scrubbing with the arrows, null when not scrubbing (for the trickplay thumbnail)
 	onScrubPositionChange: ((Duration?) -> Unit)? = null,
-	// Velella: the video player keeps a smaller knob without the focus, like the legacy one
-	knobAlwaysVisible: Boolean = false,
 ) {
 	val playState by playbackManager.state.playState.collectAsState()
 	val positionInfo = playbackManager.state.positionInfo
@@ -56,6 +55,6 @@ fun PlayerSeekbar(
 		),
 		modifier = modifier,
 		enabled = positionInfo.duration > Duration.ZERO,
-		style = SeekbarStyle(colors, knobAlwaysVisible),
+		style = style,
 	)
 }

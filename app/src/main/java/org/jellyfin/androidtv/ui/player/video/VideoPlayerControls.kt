@@ -1,6 +1,8 @@
 package org.jellyfin.androidtv.ui.player.video
 
+import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -9,7 +11,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -21,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.focus.focusRestorer
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
@@ -32,6 +38,7 @@ import androidx.compose.ui.layout.onVisibilityChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -43,6 +50,8 @@ import org.jellyfin.androidtv.integration.dream.formatPlaybackTime
 import org.jellyfin.androidtv.ui.base.Icon
 import org.jellyfin.androidtv.ui.base.LocalVelellaPalette
 import org.jellyfin.androidtv.ui.base.LocalTextStyle
+import org.jellyfin.androidtv.ui.base.SeekbarDefaults
+import org.jellyfin.androidtv.ui.base.SeekbarStyle
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.base.button.IconButton
 import org.jellyfin.androidtv.ui.base.popover.Popover
@@ -64,6 +73,12 @@ import kotlin.time.Duration.Companion.seconds
 import java.time.LocalTime
 
 private val PREVIEW_HIDE_DELAY = 1.5.seconds
+private val SEEKBAR_HEIGHT = 3.dp
+private val SEEKBAR_FOCUSED_HEIGHT = 6.dp
+private val SEEKBAR_KNOB_RADIUS = 8.dp
+// Velella: a little larger than the other icons, so the seconds inside read from across the room
+private val SKIP_ICON_SIZE = 30.dp
+private val ICON_SIZE = 24.dp
 
 /** Velella: the seek bar in its 24dp row, with the trickplay thumbnail of the picked position while scrubbing, as in the legacy player. */
 @Composable
@@ -79,9 +94,12 @@ private fun VideoSeekbar(
 	var scrubPosition by remember { mutableStateOf<Duration?>(null) }
 	val previewScope = rememberCoroutineScope()
 	var previewHideJob by remember { mutableStateOf<Job?>(null) }
+	// Velella: a thin line while the buttons have the focus, thicker when it is the one moving
+	var focused by remember { mutableStateOf(false) }
+	val barHeight by animateDpAsState(if (focused) SEEKBAR_FOCUSED_HEIGHT else SEEKBAR_HEIGHT)
 	PlayerSeekbar(
 		playbackManager = playbackManager,
-		knobAlwaysVisible = true,
+		style = SeekbarStyle(SeekbarDefaults.colors(), knobAlwaysVisible = true, knobRadius = SEEKBAR_KNOB_RADIUS),
 		onScrubPositionChange = { position ->
 			previewHideJob?.cancel()
 			// Keep the thumbnail a moment after the last press, so it doesn't blink between presses
@@ -93,7 +111,8 @@ private fun VideoSeekbar(
 		},
 		modifier = Modifier
 			.fillMaxWidth()
-			.height(4.dp)
+			.height(barHeight)
+			.onFocusChanged { focused = it.isFocused }
 			.focusRequester(focusRequester)
 	)
 
@@ -214,10 +233,8 @@ private fun RewindButton(
 ) = IconButton(
 	onClick = { playbackManager.state.rewind() },
 ) {
-	Icon(
-		imageVector = ImageVector.vectorResource(R.drawable.ic_rewind),
-		contentDescription = stringResource(R.string.rewind),
-	)
+	val amount = remember { playbackManager.options.defaultRewindAmount() }
+	SkipIcon(R.drawable.ic_skip_back, skipSecondsLabel(amount), stringResource(R.string.rewind))
 }
 
 @Composable
@@ -226,9 +243,27 @@ private fun FastForwardButton(
 ) = IconButton(
 	onClick = { playbackManager.state.fastForward() },
 ) {
+	val amount = remember { playbackManager.options.defaultFastForwardAmount() }
+	SkipIcon(R.drawable.ic_skip_forward, skipSecondsLabel(amount), stringResource(R.string.fast_forward))
+}
+
+/** Velella: a circular arrow with the skip length in seconds inside, so the button says how far it jumps. */
+@Composable
+private fun SkipIcon(@DrawableRes icon: Int, seconds: String, contentDescription: String) = Box(
+	contentAlignment = Alignment.Center,
+	// The button keeps the size of the others; the larger icon reaches into its padding
+	modifier = Modifier.size(ICON_SIZE),
+) {
 	Icon(
-		imageVector = ImageVector.vectorResource(R.drawable.ic_fast_forward),
-		contentDescription = stringResource(R.string.fast_forward),
+		imageVector = ImageVector.vectorResource(icon),
+		contentDescription = contentDescription,
+		modifier = Modifier.requiredSize(SKIP_ICON_SIZE),
+	)
+	Text(
+		text = seconds,
+		style = LocalTextStyle.current.merge(fontSize = 10.sp, fontWeight = FontWeight.Bold, lineHeight = 10.sp),
+		// The arrow's circle sits a little under the icon's centre
+		modifier = Modifier.offset(y = 1.dp),
 	)
 }
 
@@ -278,7 +313,7 @@ private fun NextEntryButton(
 	}
 }
 
-/** Velella: the position on the left, the end time and the duration on the right, under the seek bar as in the legacy player. */
+/** Velella: the position on the left, the end time and the time left ("-24:20") on the right, under the seek bar. */
 @Composable
 private fun PositionRow(
 	playbackManager: PlaybackManager,
@@ -300,7 +335,7 @@ private fun PositionRow(
 		Text(formatPlaybackTime(positionInfo.active.inWholeMilliseconds), style = style)
 		Spacer(Modifier.weight(1f))
 		Text(stringResource(R.string.lbl_playback_control_ends, endsAt), style = style)
-		Text(formatPlaybackTime(positionInfo.duration.inWholeMilliseconds), style = style)
+		Text(remainingPlaybackTime(positionInfo.active, positionInfo.duration), style = style)
 	}
 }
 
