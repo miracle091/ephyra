@@ -19,9 +19,9 @@ section 2(a) of the GPL-2.0.
 
 ### Changed
 
-- Ephyra is now called Velella, with a new logo (a velella's float and sail) and the application id
-  `com.velella.app`, so it is no longer confused with [midasvo/ephyra](https://github.com/midasvo/ephyra), another
-  Jellyfin client. It installs as a new app: sign in again and set it up anew, then uninstall Ephyra. The server
+- Ephyra is now called Velella, with a new logo (a velella's float and sail, also next to About in the settings) and
+  the application id `com.velella.app`, so it is no longer confused with
+  [midasvo/ephyra](https://github.com/midasvo/ephyra), another Jellyfin client. It installs as a new app: sign in again and set it up anew, then uninstall Ephyra. The server
   lists it as "Velella" and keeps its per-library view settings under the client id `velella`; the release APK is
   `velella-v<version>.apk` and the repository moves to `miracle091/velella`.
 - The issue and pull request templates are written for Velella: they point to this repository and the wiki instead of
