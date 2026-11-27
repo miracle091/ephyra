@@ -21,15 +21,18 @@ section 2(a) of the GPL-2.0.
 
 - Ephyra is now called Velella, with a new logo (a velella's float and sail, also next to About in the settings) and
   the application id `com.velella.app`, so it is no longer confused with
-  [midasvo/ephyra](https://github.com/midasvo/ephyra), another Jellyfin client. It installs as a new app: sign in again and set it up anew, then uninstall Ephyra. The server
-  lists it as "Velella" and keeps its per-library view settings under the client id `velella`; the release APK is
-  `velella-v<version>.apk` and the repository moves to `miracle091/velella`.
+  [midasvo/ephyra](https://github.com/midasvo/ephyra), another Jellyfin client. It installs as a new app: sign in
+  again and set it up anew, then uninstall Ephyra. The server lists it as "Velella" and keeps its per-library view
+  settings under the client id `velella`; the release APK is `velella-v<version>.apk` and the repository moves to
+  `miracle091/velella`.
 - The issue and pull request templates are written for Velella: they point to this repository and the wiki instead of
   Jellyfin's forum and repository, and ask for the Shield model, the system version and, for playback bugs, the TV.
 - The detekt and Android lint configurations live in `config/` (`config/detekt.yaml`, `config/android-lint.xml`).
 - detekt fails the build on any issue, as `maxIssues: 0` intends: upstream's `ignoreFailures` only reported them to
   code scanning, so 11 warnings had slipped back in since the cleanup; they are fixed (the new player's backend
   factories split out of `createPlayer`, track selection in its own interface, shorter lines, named constants).
+- The tests of `playback:core` use `kotlinx-coroutines-test` (tests only, not in the APK), so the new player's retry
+  chain is tested through its media stream service, not just its retry rule.
 - `FORK.md` keeps the origin, the license and the change notice; the per-change table moved to this changelog and
   the user documentation to the [wiki](https://github.com/miracle091/velella/wiki).
 - detekt warnings cut from 574 to 0: Velella's own code fixed (named constants, split helpers and files, shorter
