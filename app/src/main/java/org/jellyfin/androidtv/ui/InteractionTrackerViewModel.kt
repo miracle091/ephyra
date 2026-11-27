@@ -90,9 +90,12 @@ class InteractionTrackerViewModel(
 		resetSession()
 	}
 
-	fun onEpisodeWatched() {
+	fun onEpisodeWatched() = onEpisodeWatched(playbackControllerContainer.playbackController?.duration ?: 0)
+
+	// Velella: the new player passes its own entry's length
+	fun onEpisodeWatched(durationMs: Long) {
 		if (!episodeWasInterrupted) episodeCount++
-		watchTime += playbackControllerContainer.playbackController?.duration ?: 0
+		watchTime += durationMs
 		episodeWasInterrupted = false
 	}
 

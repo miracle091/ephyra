@@ -4,7 +4,10 @@ import org.jellyfin.playback.core.mediastream.MediaConversionMethod
 import org.jellyfin.playback.core.mediastream.MediaStreamResolver
 import org.jellyfin.playback.core.mediastream.PlayableMediaStream
 import org.jellyfin.playback.core.queue.QueueEntry
+import org.jellyfin.playback.core.queue.allowsDirectPlay
+import org.jellyfin.playback.core.queue.allowsDirectStream
 import org.jellyfin.playback.core.queue.startPosition
+import org.jellyfin.playback.core.queue.streamFallback
 import org.jellyfin.playback.jellyfin.queue.audioStreamIndex
 import org.jellyfin.playback.jellyfin.queue.baseItem
 import org.jellyfin.playback.jellyfin.queue.mediaSourceId
@@ -34,7 +37,9 @@ class JellyfinMediaStreamResolver(
 		val baseItem = queueEntry.baseItem
 		if (baseItem == null || !supportedMediaTypes.contains(baseItem.mediaType)) return null
 
-		var mediaInfo = getPlaybackInfo(baseItem, queueEntry, queueEntry.mediaSourceId)
+		// Velella: after playback errors the entry asks for a heavier conversion (retry chain in MediaStreamService)
+		val enableDirectPlay = queueEntry.streamFallback.allowsDirectPlay
+		var mediaInfo = getPlaybackInfo(baseItem, queueEntry, queueEntry.mediaSourceId, enableDirectPlay)
 		// Velella: Media3 can't read Blu-ray transport streams, and the path is only known from the answer: ask again without direct play
 		if (mediaInfo.mediaSource.supportsDirectPlay && isBluRayTransportStream(mediaInfo.mediaSource.path)) {
 			mediaInfo = getPlaybackInfo(baseItem, queueEntry, mediaInfo.mediaSource.id, enableDirectPlay = false)
@@ -109,7 +114,7 @@ class JellyfinMediaStreamResolver(
 				alwaysBurnInSubtitleWhenTranscoding = alwaysBurnInSubtitles(),
 				deviceProfile = profile,
 				enableDirectPlay = enableDirectPlay,
-				enableDirectStream = true,
+				enableDirectStream = queueEntry.streamFallback.allowsDirectStream,
 				enableTranscoding = true,
 				allowVideoStreamCopy = true,
 				allowAudioStreamCopy = true,

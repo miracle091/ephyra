@@ -3,9 +3,12 @@ package org.jellyfin.playback.core
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import org.jellyfin.playback.core.backend.BackendService
 import org.jellyfin.playback.core.backend.PlayerBackend
 import org.jellyfin.playback.core.mediastream.MediaStreamService
+import org.jellyfin.playback.core.model.PlaybackFailure
 import org.jellyfin.playback.core.plugin.PlayerService
 import timber.log.Timber
 import kotlin.reflect.KClass
@@ -24,7 +27,8 @@ class PlaybackManager internal constructor(
 	val state: PlayerState = MutablePlayerState(
 		options = options,
 		backendService = backendService,
-		queue = getService()
+		queue = getService(),
+		seekByReload = { position -> getService<MediaStreamService>()?.reload(position = position) },
 	)
 
 	init {
@@ -38,6 +42,10 @@ class PlaybackManager internal constructor(
 	fun reloadStream() {
 		getService<MediaStreamService>()?.reload()
 	}
+
+	/** Velella: what the player did about each failed playback (retried with a heavier stream, gave up, skipped an entry). */
+	val failures: Flow<PlaybackFailure>
+		get() = getService<MediaStreamService>()?.failures ?: emptyFlow()
 
 	fun addService(service: PlayerService) {
 		Timber.i("Adding service $service")

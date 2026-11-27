@@ -126,4 +126,7 @@
     <string name="velella_pref_compact_episodes_description">Mostra gli episodi di una stagione come righe, con l\'immagine e la trama accanto al titolo</string>
     <!-- Details of a series: the next up card (ui/itemdetail/DetailsNextUpCard.kt) -->
     <string name="velella_next_up_card">Prossimo: %1$s</string>
+    <!-- New player: the server gave no playable stream for an item (ui/player/video/VideoPlayerExits.kt) -->
+    <string name="velella_player_unplayable">Questo video non si può riprodurre: il server non ha offerto nessuno stream</string>
+    <string name="velella_player_unplayable_skipped">Saltato un video per cui il server non ha offerto nessuno stream</string>
 </resources>

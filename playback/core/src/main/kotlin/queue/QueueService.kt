@@ -55,12 +55,35 @@ class QueueService internal constructor() : PlayerService(), Queue {
 		manager.backendService.addListener(object : PlayerBackendEventListener() {
 			override fun onMediaStreamEnd(mediaStream: PlayableMediaStream) {
 				coroutineScope.launch {
+					// Velella: hold on the ended entry when the player asks for a prompt first (see advanceAtEnd)
+					val ended = _entry.value
+					if (ended != null && state.repeatMode.value == RepeatMode.NONE) {
+						val held = peekNext(usePlaybackOrder = true, useRepeatMode = false)?.takeUnless { advanceAtEnd(ended, it) }
+						if (held != null) {
+							_heldNext.value = held
+							return@launch
+						}
+					}
 					val nextEntry = next(usePlaybackOrder = true, useRepeatMode = true)
 					if (nextEntry == null && _entryIndex.value != Queue.INDEX_NONE) setIndex(Queue.INDEX_NONE, true)
 				}
 			}
 		})
 	}
+
+	// Velella: holding at the end of an entry
+
+	/**
+	 * Velella: asked when an entry ends on its own and another one follows (no repeat mode): true moves on at once, false holds the
+	 * queue on the ended entry and offers the next one in [heldNext] until [next] or [setIndex] moves it on (the player's next up
+	 * and still watching prompts).
+	 */
+	var advanceAtEnd: (ended: QueueEntry, next: QueueEntry) -> Boolean = { _, _ -> true }
+
+	private val _heldNext = MutableStateFlow<QueueEntry?>(null)
+
+	/** Velella: the entry waiting to play after a held end ([advanceAtEnd]), or null. */
+	val heldNext: StateFlow<QueueEntry?> get() = _heldNext.asStateFlow()
 
 	// Entry management
 
@@ -137,6 +160,7 @@ class QueueService internal constructor() : PlayerService(), Queue {
 		currentSupplierEntryIndex = 0
 		fetchedEntries.clear()
 		_entries.value = emptyList()
+		_heldNext.value = null
 		_entry.value = null
 		_entryIndex.value = Queue.INDEX_NONE
 		currentQueueIndicesPlayed.clear()
@@ -191,6 +215,7 @@ class QueueService internal constructor() : PlayerService(), Queue {
 		}
 
 		// Set new index
+		_heldNext.value = null
 		val currentEntry = getOrSupplyEntry(index)
 		_entryIndex.value = if (currentEntry == null) Queue.INDEX_NONE else index
 		_entry.value = currentEntry

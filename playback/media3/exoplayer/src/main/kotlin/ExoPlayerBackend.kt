@@ -458,6 +458,13 @@ class ExoPlayerBackend(
 		exoPlayer.seekTo(position.inWholeMilliseconds)
 	}
 
+	// Velella: a progressive transcode is not seekable; PlayerState then asks the server for a new stream at the position
+	override val isSeekable: Boolean
+		get() {
+			val exoPlayer = instance?.player ?: return true
+			return exoPlayer.isCommandAvailable(Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM) && exoPlayer.isCurrentMediaItemSeekable
+		}
+
 	override fun setScrubbing(scrubbing: Boolean) {
 		instance?.player?.isScrubbingModeEnabled = scrubbing
 	}

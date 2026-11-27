@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -17,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.toSize
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import org.jellyfin.androidtv.data.service.BackgroundService
 import org.jellyfin.androidtv.preference.UserPreferences
@@ -28,13 +30,23 @@ import org.jellyfin.androidtv.ui.player.base.toast.MediaToastRegistry
 import org.jellyfin.androidtv.ui.player.video.toast.rememberPlaybackManagerMediaToastEmitter
 import org.jellyfin.playback.core.PlaybackManager
 import org.jellyfin.playback.core.model.PlayState
+import org.jellyfin.playback.core.queue.QueueService
 import org.koin.compose.koinInject
 
 private const val DEFAULT_VIDEO_ASPECT_RATIO = 16f / 9f
 
 @Composable
-fun VideoPlayerScreen() {
+fun VideoPlayerScreen(
+	// Velella: the prompt asked while the queue holds at the end of an entry (VideoPlayerFragment sets the hold)
+	endPrompt: StateFlow<EndOfEntryPrompt>,
+) {
 	val playbackManager = koinInject<PlaybackManager>()
+	val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+	val close = { backDispatcher?.onBackPressed() ?: Unit }
+	VideoPlayerExits(playbackManager, onClose = close)
+	val queueService = remember(playbackManager) { requireNotNull(playbackManager.getService<QueueService>()) { "No queue service" } }
+	val heldNext by queueService.heldNext.collectAsState()
+	val prompt by endPrompt.collectAsState()
 
 	val backgroundService = koinInject<BackgroundService>()
 	LaunchedEffect(backgroundService) {
@@ -77,16 +89,23 @@ fun VideoPlayerScreen() {
 				.align(Alignment.Center)
 		)
 
-		VideoPlayerOverlay(
-			playbackManager = playbackManager,
-			mediaToastRegistry = mediaToastRegistry,
-		)
-
 		PlayerSubtitles(
 			playbackManager = playbackManager,
 			modifier = Modifier
 				.size(subtitleSize)
 				.align(Alignment.Center)
 		)
+
+		// Velella: next up or still watching replace the controls while the queue holds (the controls would take the focus back)
+		val next = heldNext
+		when (playerOverlay(prompt, holding = next != null)) {
+			PlayerOverlay.CONTROLS -> VideoPlayerOverlay(
+				playbackManager = playbackManager,
+				mediaToastRegistry = mediaToastRegistry,
+			)
+
+			PlayerOverlay.END_OF_ENTRY -> if (next != null) EndOfEntryOverlay(playbackManager, prompt, next, onClose = close)
+			PlayerOverlay.NONE -> Unit
+		}
 	}
 }

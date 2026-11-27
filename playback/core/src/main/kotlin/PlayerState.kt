@@ -5,7 +5,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.jellyfin.playback.core.backend.BackendService
 import org.jellyfin.playback.core.backend.PlayerBackendEventListener
+import org.jellyfin.playback.core.mediastream.MediaConversionMethod
 import org.jellyfin.playback.core.mediastream.PlayableMediaStream
+import org.jellyfin.playback.core.mediastream.mediaStream
 import org.jellyfin.playback.core.model.PlayState
 import org.jellyfin.playback.core.model.PlaybackError
 import org.jellyfin.playback.core.model.PlaybackOrder
@@ -63,10 +65,19 @@ interface PlayerState {
 	fun setRepeatMode(mode: RepeatMode)
 }
 
+/**
+ * Velella: whether a seek has to ask the server for the stream again from the new position, as the legacy player did: a converted
+ * stream the player can't seek in (a progressive transcode). A stream of unknown length (live) is left to the player.
+ */
+internal fun needsReloadToSeek(seekable: Boolean, conversion: MediaConversionMethod?, duration: Duration): Boolean =
+	!seekable && duration > Duration.ZERO && conversion != null && conversion != MediaConversionMethod.None
+
 class MutablePlayerState(
 	private val options: PlaybackManagerOptions,
 	private val backendService: BackendService,
 	private val queue: QueueService?,
+	// Velella: asks the server for the current entry's stream again from a position, for streams the player can't seek in
+	private val seekByReload: ((Duration) -> Unit)? = null,
 ) : PlayerState {
 	override val volume: PlayerVolumeState
 
@@ -148,12 +159,19 @@ class MutablePlayerState(
 	}
 
 	override fun seek(to: Duration) {
-		backendService.backend?.seekTo(to)
+		val backend = backendService.backend ?: return
+		val reload = seekByReload
+		val conversion = queue?.entry?.value?.mediaStream?.conversionMethod
+		if (reload != null && needsReloadToSeek(backend.isSeekable, conversion, backend.getPositionInfo().duration)) {
+			reload(to.coerceAtLeast(Duration.ZERO))
+		} else {
+			backend.seekTo(to)
+		}
 	}
 
 	private fun seekRelative(amount: Duration) {
 		val current = backendService.backend?.getPositionInfo()?.active ?: Duration.ZERO
-		backendService.backend?.seekTo(current + amount)
+		seek(current + amount)
 	}
 
 	override fun fastForward(amount: Duration?) {

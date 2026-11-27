@@ -8,7 +8,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.compose.content
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
@@ -16,6 +18,7 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import org.jellyfin.androidtv.preference.UserPreferences
+import org.jellyfin.androidtv.ui.InteractionTrackerViewModel
 import org.jellyfin.androidtv.ui.base.BaseScreen
 import org.jellyfin.androidtv.ui.playback.TrackPreselection
 import org.jellyfin.androidtv.ui.playback.VideoQueueManager
@@ -28,8 +31,12 @@ import org.jellyfin.playback.core.PlaybackManager
 import org.jellyfin.playback.core.mediastream.MediaStreamVideoTrack
 import org.jellyfin.playback.core.mediastream.mediaStream
 import org.jellyfin.playback.core.mediastream.mediaStreamFlow
+import org.jellyfin.playback.core.queue.QueueEntry
+import org.jellyfin.playback.core.queue.QueueService
 import org.jellyfin.playback.core.queue.queue
+import org.jellyfin.playback.jellyfin.queue.baseItem
 import org.jellyfin.sdk.api.client.ApiClient
+import org.jellyfin.sdk.model.extensions.ticks
 import org.koin.android.ext.android.inject
 import timber.log.Timber
 import kotlin.time.Duration.Companion.milliseconds
@@ -44,6 +51,7 @@ class VideoPlayerFragment : Fragment() {
 	private val api by inject<ApiClient>()
 	private val userPreferences by inject<UserPreferences>()
 	private val trackPreselection by inject<TrackPreselection>()
+	private val interactionTracker by inject<InteractionTrackerViewModel>()
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -69,6 +77,30 @@ class VideoPlayerFragment : Fragment() {
 
 		// Pause player until the initial resume
 		playbackManager.state.pause()
+
+		// Velella: next up and still watching, as in the legacy player: the queue holds at the end of an entry while one is asked
+		queueService.advanceAtEnd = advanceAtEnd
+		// Velella: the prompt lasts until another entry starts; closing the player (no entry) keeps it, see playerOverlay
+		playbackManager.queue.entry
+			.filterNotNull()
+			.onEach { endPrompt.value = EndOfEntryPrompt.NONE }
+			.launchIn(lifecycleScope)
+	}
+
+	private val queueService get() = requireNotNull(playbackManager.getService<QueueService>()) { "No queue service" }
+	private val endPrompt = MutableStateFlow(EndOfEntryPrompt.NONE)
+	private val advanceAtEnd: (QueueEntry, QueueEntry) -> Boolean = { ended, _ ->
+		val endedItem = ended.baseItem
+		interactionTracker.onEpisodeWatched(endedItem?.runTimeTicks?.ticks?.inWholeMilliseconds ?: 0)
+		val prompt = endOfEntryPrompt(
+			endedType = endedItem?.type,
+			nextUp = userPreferences[UserPreferences.nextUpBehavior],
+			stillWatching = userPreferences[UserPreferences.stillWatchingBehavior],
+			stillWatchingDue = interactionTracker.getShowStillWatching(),
+		)
+		Timber.i("Entry ended, prompt: $prompt")
+		endPrompt.value = prompt
+		prompt == EndOfEntryPrompt.NONE
 	}
 
 	override fun onCreateView(
@@ -77,7 +109,7 @@ class VideoPlayerFragment : Fragment() {
 		savedInstanceState: Bundle?
 	) = content {
 		BaseScreen {
-			VideoPlayerScreen()
+			VideoPlayerScreen(endPrompt = endPrompt)
 		}
 	}
 
@@ -119,5 +151,7 @@ class VideoPlayerFragment : Fragment() {
 
 		// Velella: give the display its previous mode back
 		activity?.resetDisplayMode()
+		// Velella: other players (music, a newer video player) move on by themselves; leave a newer player's hold in place
+		if (queueService.advanceAtEnd === advanceAtEnd) queueService.advanceAtEnd = { _, _ -> true }
 	}
 }

@@ -75,6 +75,14 @@ section 2(a) of the GPL-2.0.
 - The new player shows the legacy player's Skip button inside media segments set to "ask to skip" (intros and outros
   by default): it dims, hides after the chosen delay and comes back on centre, up or down; centre skips to the end of
   the segment and back closes it. Until now the new player did nothing for these segments.
+- The new player retries a failed stream like the legacy one: first without direct play, then as a transcode (at
+  once for a decoder error), with a message each time; after three errors within 30 seconds, or when the server has
+  no stream for the item, it closes (an unplayable item with another one after it is skipped instead).
+- Seeking in a transcode the player can't seek in asks the server for a new stream at that position, as the legacy
+  player does, instead of doing nothing.
+- The new player shows the legacy player's Next up and Still watching screens over the last picture when an episode
+  ends, with the same settings, countdowns and watched-episode count; Cancel closes the player. It also closes by
+  itself when the queue ends, instead of staying on a black screen.
 - The new player tells the server which version (media source) and audio track it plays, and knows the subtitle
   tracks of the stream.
 - The new player loads subtitles the server hands out as separate files and shows the subtitle the server picks

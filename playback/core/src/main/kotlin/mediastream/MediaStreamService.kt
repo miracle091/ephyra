@@ -3,16 +3,23 @@ package org.jellyfin.playback.core.mediastream
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import kotlinx.coroutines.withContext
+import org.jellyfin.playback.core.backend.PlayerBackendEventListener
 import org.jellyfin.playback.core.model.PlayState
+import org.jellyfin.playback.core.model.PlaybackError
+import org.jellyfin.playback.core.model.PlaybackFailure
 import org.jellyfin.playback.core.plugin.PlayerService
 import org.jellyfin.playback.core.queue.QueueEntry
 import org.jellyfin.playback.core.queue.queue
 import org.jellyfin.playback.core.queue.startPosition
+import org.jellyfin.playback.core.queue.streamFallback
 import org.jellyfin.playback.core.timedevent.TimedEvent
 import org.jellyfin.playback.core.timedevent.addTimedEvent
 import org.jellyfin.playback.core.timedevent.timedEvents
@@ -25,14 +32,29 @@ internal class MediaStreamService(
 ) : PlayerService() {
 	private companion object {
 		private const val TIMED_EVENT_PRELOAD = "MediaStreamServicePreloadNext"
+		private const val FAILURE_BUFFER = 8
 	}
 
 	private var reloadJob: Job? = null
+	private val retryPolicy = PlaybackRetryPolicy()
+
+	private val _failures = MutableSharedFlow<PlaybackFailure>(extraBufferCapacity = FAILURE_BUFFER)
+
+	/** Velella: what the player did about each failed playback, for the UI. */
+	val failures: SharedFlow<PlaybackFailure> = _failures.asSharedFlow()
 
 	override suspend fun onInitialize() {
+		// Velella: the backend's errors, each one (the play state stays ERROR when a retry fails again, so it can't tell them apart)
+		manager.backendService.addListener(object : PlayerBackendEventListener() {
+			override fun onPlayError(error: PlaybackError) {
+				coroutineScope.launch(Dispatchers.Main) { onPlaybackError(error) }
+			}
+		})
+
 		manager.queue.entry.onEach { entry ->
 			Timber.d("Queue entry changed to $entry")
 			reloadJob?.cancel()
+			retryPolicy.reset()
 
 			if (entry == null) {
 				val backend = requireNotNull(manager.backend)
@@ -86,8 +108,10 @@ internal class MediaStreamService(
 		} else {
 			Timber.e("Unable to resolve stream for entry $entry")
 
-			// TODO: Somehow notify the user that we skipped an unplayable entry
-			if (manager.queue.peekNext() != null) {
+			// Velella: the UI tells the user that the entry was skipped, or closes the player
+			val hasNext = manager.queue.peekNext() != null
+			_failures.tryEmit(PlaybackFailure.Unplayable(hasNext))
+			if (hasNext) {
 				manager.queue.next(usePlaybackOrder = true, useRepeatMode = false)
 			} else {
 				backend.stop()
@@ -95,30 +119,53 @@ internal class MediaStreamService(
 		}
 	}
 
+	/** Velella: the legacy retry chain ([PlaybackRetryPolicy]): the same entry again with a heavier stream from the same position. */
+	private fun onPlaybackError(error: PlaybackError) {
+		val entry = manager.queue.entry.value ?: return
+		val fallback = retryPolicy.onError(error.reason, entry.streamFallback)
+		if (fallback == null) {
+			Timber.w("Giving up on $entry after repeated errors (${error.reason})")
+			_failures.tryEmit(PlaybackFailure.GaveUp(error))
+			return
+		}
+
+		Timber.i("Retrying $entry with $fallback after a ${error.reason} error")
+		entry.streamFallback = fallback
+		_failures.tryEmit(PlaybackFailure.Retrying(error, fallback))
+		reload(resume = true) {
+			Timber.w("No other stream for $entry")
+			_failures.tryEmit(PlaybackFailure.GaveUp(error))
+		}
+	}
+
 	/**
 	 * Velella: asks the resolvers again for the current entry's stream (with the entry's new requests, like another audio track) and
-	 * plays it on from the current position, paused if it was. The play session moves to the new stream, so the server gets a stop
-	 * for the old one. A newer reload or another entry cancels it; on failure the current stream plays on.
+	 * plays it on from [position] (the current one by default), paused if it was unless [resume] says otherwise. The play session
+	 * moves to the new stream, so the server gets a stop for the old one. A newer reload or another entry cancels it; on failure the
+	 * current stream plays on and [onKept] runs.
 	 */
-	fun reload() {
+	fun reload(position: Duration? = null, resume: Boolean? = null, onKept: () -> Unit = {}) {
 		reloadJob?.cancel()
 		reloadJob = coroutineScope.launch(Dispatchers.Main) {
 			val entry = manager.queue.entry.value ?: return@launch
 			val backend = requireNotNull(manager.backend)
-			val wasPlaying = manager.state.playState.value == PlayState.PLAYING
-			val position = backend.getPositionInfo().active
-			Timber.i("Reloading the stream of $entry at $position")
+			val play = resume ?: (manager.state.playState.value == PlayState.PLAYING)
+			val start = position ?: backend.getPositionInfo().active
+			Timber.i("Reloading the stream of $entry at $start")
 
 			val reloaded = reloadEntryStream(
 				entry = entry,
-				position = position,
+				position = start,
 				isCurrent = { manager.queue.entry.value === entry },
 				resolve = { entry.resolveMediaStream() },
 			) {
 				backend.playItem(entry)
-				if (!wasPlaying) backend.pause()
+				if (!play) backend.pause()
 			}
-			if (!reloaded) Timber.w("Kept the current stream of $entry: no new stream, or playback moved on")
+			if (!reloaded) {
+				Timber.w("Kept the current stream of $entry: no new stream, or playback moved on")
+				if (manager.queue.entry.value === entry) onKept()
+			}
 		}
 	}
 

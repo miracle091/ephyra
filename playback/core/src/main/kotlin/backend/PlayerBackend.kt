@@ -36,6 +36,10 @@ interface PlayerBackend : PlayerTrackSelector {
 	fun stop()
 
 	fun seekTo(position: Duration)
+
+	/** Velella: whether [seekTo] can move inside the current item (a progressive transcode can't); true when unknown. */
+	val isSeekable: Boolean get() = true
+
 	fun setScrubbing(scrubbing: Boolean)
 
 	fun setSpeed(speed: Float)
