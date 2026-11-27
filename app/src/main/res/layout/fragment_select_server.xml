@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Ephyra: one centred 640dp column like user selection and sign in: saved and discovered servers as sections, a ghost button
+<!-- Velella: one centred 640dp column like user selection and sign in: saved and discovered servers as sections, a ghost button
      to enter an address at the bottom -->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingHorizontal="@dimen/ephyra_side_margin"
+    android:paddingHorizontal="@dimen/velella_side_margin"
     android:paddingBottom="@dimen/overscan_vertical">
 
     <LinearLayout
@@ -31,7 +31,7 @@
 
         <TextView
             android:id="@+id/stored_servers_title"
-            style="@style/TextAppearance.Ephyra.SectionTitle"
+            style="@style/TextAppearance.Velella.SectionTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/saved_servers"
@@ -50,10 +50,10 @@
 
         <TextView
             android:id="@+id/welcome_title"
-            style="@style/TextAppearance.Ephyra.SectionTitle"
+            style="@style/TextAppearance.Velella.SectionTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/ephyra_welcome_title" />
+            android:text="@string/velella_welcome_title" />
 
         <TextView
             android:id="@+id/welcome_content"
@@ -72,7 +72,7 @@
 
             <TextView
                 android:id="@+id/discovery_title"
-                style="@style/TextAppearance.Ephyra.SectionTitle"
+                style="@style/TextAppearance.Velella.SectionTitle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -109,7 +109,7 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/enter_server_address"
-        style="@style/Button.Ephyra.Ghost"
+        style="@style/Button.Velella.Ghost"
         android:layout_width="wrap_content"
         android:layout_height="40dp"
         android:drawableStart="@drawable/ic_add"

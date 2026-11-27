@@ -41,7 +41,7 @@ import kotlinx.coroutines.launch
 import org.jellyfin.androidtv.R
 import org.jellyfin.androidtv.integration.dream.formatPlaybackTime
 import org.jellyfin.androidtv.ui.base.Icon
-import org.jellyfin.androidtv.ui.base.LocalEphyraPalette
+import org.jellyfin.androidtv.ui.base.LocalVelellaPalette
 import org.jellyfin.androidtv.ui.base.LocalTextStyle
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.base.button.IconButton
@@ -65,7 +65,7 @@ import java.time.LocalTime
 
 private val PREVIEW_HIDE_DELAY = 1.5.seconds
 
-/** Ephyra: the seek bar in its 24dp row, with the trickplay thumbnail of the picked position while scrubbing, as in the legacy player. */
+/** Velella: the seek bar in its 24dp row, with the trickplay thumbnail of the picked position while scrubbing, as in the legacy player. */
 @Composable
 private fun VideoSeekbar(
 	playbackManager: PlaybackManager,
@@ -117,7 +117,7 @@ private fun VideoSeekbar(
 fun VideoPlayerControls(
 	playbackManager: PlaybackManager = koinInject(),
 	onPlaybackInfoClick: () -> Unit = {},
-	// Ephyra: a menu asked for by its remote key (Captions, Audio track), opened once the controls show
+	// Velella: a menu asked for by its remote key (Captions, Audio track), opened once the controls show
 	menuRequest: VideoPlayerKeyAction? = null,
 	onMenuRequestHandled: () -> Unit = {},
 	modifier: Modifier = Modifier,
@@ -125,7 +125,7 @@ fun VideoPlayerControls(
 	val playState by playbackManager.state.playState.collectAsState()
 	val seekbarFocus = remember { FocusRequester() }
 
-	// Ephyra: as in the legacy player, the seek bar comes first in a 24dp row, the times and the end time 8dp under it, then the
+	// Velella: as in the legacy player, the seek bar comes first in a 24dp row, the times and the end time 8dp under it, then the
 	// buttons 16dp lower, their centres 56dp apart (the legacy 48dp buttons with 8dp gaps; these are 44dp, so 12dp gaps and 2dp
 	// more around the row). The legacy order: rewind, play/pause, fast forward, next
 	Column(
@@ -140,7 +140,7 @@ fun VideoPlayerControls(
 			horizontalArrangement = Arrangement.spacedBy(12.dp),
 			modifier = Modifier
 				.padding(start = 2.dp, top = 18.dp, end = 2.dp)
-				// Ephyra: up from the buttons goes to the seek bar above them; the 2D focus search skipped the thin bar and left
+				// Velella: up from the buttons goes to the seek bar above them; the 2D focus search skipped the thin bar and left
 				// the controls, which hides the overlay
 				.onPreviewKeyEvent { event ->
 					val up = event.type == KeyEventType.KeyDown && event.key == Key.DirectionUp
@@ -238,7 +238,7 @@ private fun PreviousEntryButton(
 ) {
 	val entryIndex by playbackManager.queue.entryIndex.collectAsState()
 	val coroutineScope = rememberCoroutineScope()
-	// Ephyra: as in the legacy player, only when there is a previous entry
+	// Velella: as in the legacy player, only when there is a previous entry
 	if (entryIndex <= 0) return
 
 	IconButton(
@@ -261,7 +261,7 @@ private fun NextEntryButton(
 ) {
 	val entryIndex by playbackManager.queue.entryIndex.collectAsState()
 	val coroutineScope = rememberCoroutineScope()
-	// Ephyra: as in the legacy player, only when there is a next entry
+	// Velella: as in the legacy player, only when there is a next entry
 	if (entryIndex >= playbackManager.queue.estimatedSize - 1) return
 
 	IconButton(
@@ -278,7 +278,7 @@ private fun NextEntryButton(
 	}
 }
 
-/** Ephyra: the position on the left, the end time and the duration on the right, under the seek bar as in the legacy player. */
+/** Velella: the position on the left, the end time and the duration on the right, under the seek bar as in the legacy player. */
 @Composable
 private fun PositionRow(
 	playbackManager: PlaybackManager,
@@ -289,7 +289,7 @@ private fun PositionRow(
 	if (positionInfo.duration == Duration.ZERO) return
 
 	val context = LocalContext.current
-	val palette = LocalEphyraPalette.current
+	val palette = LocalVelellaPalette.current
 	val style = LocalTextStyle.current.merge(color = palette.inkMuted, fontSize = 14.sp, fontFeatureSettings = "tnum")
 	val endsAt = context.getTimeFormatter().format(videoEndsAt(positionInfo.active, positionInfo.duration, speed, LocalTime.now()))
 

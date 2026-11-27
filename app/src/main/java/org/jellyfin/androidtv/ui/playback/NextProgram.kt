@@ -8,7 +8,7 @@ import org.jellyfin.sdk.model.api.BaseItemDto
 import java.time.LocalDateTime
 
 /**
- * Ephyra: the "Next: title · time" line under the programme on air in the live TV player's header, after the design system's
+ * Velella: the "Next: title · time" line under the programme on air in the live TV player's header, after the design system's
  * "Live TV" board. The line is hidden when the channel has no programme after the one on air.
  */
 object NextProgram {
@@ -34,7 +34,7 @@ object NextProgram {
 			return
 		}
 
-		view.text = view.context.getString(R.string.ephyra_osd_next_program, next.name, view.context.getTimeFormatter().format(start))
+		view.text = view.context.getString(R.string.velella_osd_next_program, next.name, view.context.getTimeFormatter().format(start))
 		view.isVisible = true
 	}
 }

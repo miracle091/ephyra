@@ -13,10 +13,10 @@ import org.jellyfin.androidtv.R
 import org.jellyfin.androidtv.ui.base.JellyfinTheme
 
 /**
- * Ephyra: the one progress bar of cards, shared by every surface that shows watched progress. It hugs the bottom edge of the card,
+ * Velella: the one progress bar of cards, shared by every surface that shows watched progress. It hugs the bottom edge of the card,
  * full width, with square ends (the card clips it to its rounded corners): a black 38% track and a fill in the theme's accent.
  * The accent is [JellyfinTheme.colorScheme]'s `rangeControlFill`, the design system's `accent` of the user's theme. The View twin
- * is `@drawable/ephyra_card_progress` (accent from `?android:attr/colorAccent`), which uses the same height and track colour.
+ * is `@drawable/velella_card_progress` (accent from `?android:attr/colorAccent`), which uses the same height and track colour.
  */
 @Composable
 fun CardProgressBar(
@@ -26,8 +26,8 @@ fun CardProgressBar(
 	Box(
 		modifier = modifier
 			.fillMaxWidth()
-			.height(dimensionResource(R.dimen.ephyra_card_progress_height))
-			.background(colorResource(R.color.ephyra_card_progress_track))
+			.height(dimensionResource(R.dimen.velella_card_progress_height))
+			.background(colorResource(R.color.velella_card_progress_track))
 	) {
 		Box(
 			modifier = Modifier

@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.sp
 import org.jellyfin.androidtv.R
 import androidx.compose.ui.text.font.FontWeight
 import org.jellyfin.androidtv.ui.base.CircularProgressIndicator
-import org.jellyfin.androidtv.ui.base.EphyraTheme
+import org.jellyfin.androidtv.ui.base.VelellaTheme
 import org.jellyfin.androidtv.ui.base.Icon
 import org.jellyfin.androidtv.ui.base.LocalTextStyle
 import org.jellyfin.androidtv.ui.base.ProvideTextStyle
@@ -152,8 +152,8 @@ class ServerButtonView @JvmOverloads constructor(
 			else interactionSource.emit(FocusInteraction.Unfocus(focusInteraction))
 		}
 
-		// Ephyra: the theme's colours (the startup screens have no EphyraTheme around them) and a 64dp row with radius-md
-		EphyraTheme { ServerButton(
+		// Velella: the theme's colours (the startup screens have no VelellaTheme around them) and a 64dp row with radius-md
+		VelellaTheme { ServerButton(
 			content = ServerButtonContent(
 				icon = {
 					when (state) {

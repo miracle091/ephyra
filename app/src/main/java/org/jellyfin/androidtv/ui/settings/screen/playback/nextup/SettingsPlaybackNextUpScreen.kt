@@ -65,7 +65,7 @@ fun SettingsPlaybackNextUpScreen() {
 			)
 		}
 
-		item { StopAtSeasonEndListButton() } // Ephyra
+		item { StopAtSeasonEndListButton() } // Velella
 
 		item {
 			var nextUpBehavior by rememberPreference(userPreferences, UserPreferences.nextUpBehavior)

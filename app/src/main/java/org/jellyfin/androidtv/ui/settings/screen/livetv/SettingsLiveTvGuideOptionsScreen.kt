@@ -85,12 +85,12 @@ private data class GuideCheckboxOption(
 
 private val guideCheckboxes = listOf(
 	GuideCheckboxOption(LiveTvPreferences.favsAtTop, R.string.lbl_start_favorites, "favs_at_top"),
-	// Ephyra
+	// Velella
 	GuideCheckboxOption(
 		preference = LiveTvPreferences.restoreLastChannel,
-		heading = R.string.ephyra_pref_guide_restore_last_channel,
+		heading = R.string.velella_pref_guide_restore_last_channel,
 		key = "restore_last_channel",
-		caption = R.string.ephyra_pref_guide_restore_last_channel_description,
+		caption = R.string.velella_pref_guide_restore_last_channel_description,
 	),
 	GuideCheckboxOption(LiveTvPreferences.colorCodeGuide, R.string.lbl_colored_backgrounds, "color_code_guide"),
 )

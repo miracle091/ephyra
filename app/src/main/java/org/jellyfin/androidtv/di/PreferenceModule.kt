@@ -1,6 +1,6 @@
 package org.jellyfin.androidtv.di
 
-import org.jellyfin.androidtv.preference.EphyraPreferences
+import org.jellyfin.androidtv.preference.VelellaPreferences
 import org.jellyfin.androidtv.preference.HintPreferences
 import org.jellyfin.androidtv.preference.LiveTvPreferences
 import org.jellyfin.androidtv.preference.PreferencesRepository
@@ -19,7 +19,7 @@ val preferenceModule = module {
 	single { UserPreferences(get()) }
 	single { SystemPreferences(get()) }
 	single { TelemetryPreferences(get()) }
-	single { UpdatePreferences(get()) } // Ephyra
-	single { EphyraPreferences(get()) } // Ephyra
-	single { HintPreferences(get()) } // Ephyra
+	single { UpdatePreferences(get()) } // Velella
+	single { VelellaPreferences(get()) } // Velella
+	single { HintPreferences(get()) } // Velella
 }

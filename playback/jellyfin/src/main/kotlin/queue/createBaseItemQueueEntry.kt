@@ -49,7 +49,7 @@ fun createBaseItemQueueEntry(api: ApiClient, baseItem: BaseItemDto): QueueEntry 
 		genre = baseItem.genres?.joinToString(", "),
 	)
 	entry.baseItem = baseItem
-	// Ephyra: an item with several versions lists them all as media sources, take the one of this item (upstream #5932)
+	// Velella: an item with several versions lists them all as media sources, take the one of this item (upstream #5932)
 	baseItem.mediaSources
 		?.firstOrNull { it.id?.toUUIDOrNull() == baseItem.id }
 		?.id

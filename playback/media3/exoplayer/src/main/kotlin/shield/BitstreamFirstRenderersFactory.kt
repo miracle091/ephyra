@@ -18,7 +18,7 @@ import androidx.media3.exoplayer.audio.AudioSink
 import androidx.media3.exoplayer.mediacodec.MediaCodecSelector
 
 /**
- * Ephyra: with "prefer FFmpeg" the extension audio renderer is placed before MediaCodecAudioRenderer, and it reports every Dolby and DTS
+ * Velella: with "prefer FFmpeg" the extension audio renderer is placed before MediaCodecAudioRenderer, and it reports every Dolby and DTS
  * format as handled, so the track selector picks it and the Shield decodes to PCM instead of sending the bitstream to the receiver.
  * Here the FFmpeg renderer is wrapped so it steps aside for any format the audio sink can play directly as passthrough;
  * MediaCodecAudioRenderer (next in line) then wins. The sink is the one the

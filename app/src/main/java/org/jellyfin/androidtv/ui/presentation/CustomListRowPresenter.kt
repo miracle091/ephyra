@@ -11,9 +11,9 @@ import org.jellyfin.androidtv.ui.composable.item.ROW_ITEM_GAP_DP
 
 open class CustomListRowPresenter @JvmOverloads constructor(
 	private val topPadding: Int? = null,
-	// Ephyra: the compact episode rows are too wide to zoom when focused
+	// Velella: the compact episode rows are too wide to zoom when focused
 	focusZoomFactor: Int = FocusHighlight.ZOOM_FACTOR_MEDIUM,
-	// Ephyra: the details screens drop the cards' bottom padding so the title of the next row shows above the fade
+	// Velella: the details screens drop the cards' bottom padding so the title of the next row shows above the fade
 	private val bottomPadding: Int? = null,
 ) : ListRowPresenter(focusZoomFactor) {
 	init {
@@ -22,7 +22,7 @@ open class CustomListRowPresenter @JvmOverloads constructor(
 
 	override fun isUsingDefaultShadow() = false
 
-	// Ephyra: a gap the focused card's zoom does not cover, so its ring stays off the next card
+	// Velella: a gap the focused card's zoom does not cover, so its ring stays off the next card
 	override fun createRowViewHolder(parent: ViewGroup): RowPresenter.ViewHolder = super.createRowViewHolder(parent).also { holder ->
 		val gap = (ROW_ITEM_GAP_DP * parent.resources.displayMetrics.density).toInt()
 		(holder as? ViewHolder)?.gridView?.horizontalSpacing = gap

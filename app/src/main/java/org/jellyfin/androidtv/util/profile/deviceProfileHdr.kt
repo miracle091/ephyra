@@ -99,7 +99,7 @@ private fun MutableSet<VideoRangeType>.addHevcDolbyVisionExclusions(mediaTest: M
 	val decodesHevcDolbyVisionHdr10 = supportsHevcDolbyVision && supportsHevcMain10 && supportsHevcHDR10
 	if (
 		!hdr.unreportedDoviProfile7Support ||
-		// Ephyra: without a Dolby Vision display the decoder gives SDR; the server strips the RPU and sends the HDR10 layer
+		// Velella: without a Dolby Vision display the decoder gives SDR; the server strips the RPU and sends the HDR10 layer
 		!hdr.displaySupportsDolbyVision ||
 		!decodesHevcDolbyVisionHdr10
 	) {

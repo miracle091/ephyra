@@ -32,7 +32,7 @@ class PlaybackManager internal constructor(
 	}
 
 	/**
-	 * Ephyra: builds the current entry's stream again, with the entry's current requests (another audio or subtitle track), and
+	 * Velella: builds the current entry's stream again, with the entry's current requests (another audio or subtitle track), and
 	 * plays it on from the current position.
 	 */
 	fun reloadStream() {

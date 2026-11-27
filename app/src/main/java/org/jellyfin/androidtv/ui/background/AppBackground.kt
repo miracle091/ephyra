@@ -54,6 +54,6 @@ fun AppBackground() {
 	val backgroundService = koinInject<BackgroundService>()
 	val enabled by backgroundService.enabled.collectAsState()
 
-	// Ephyra: the theme's plain background on every screen, no item backdrops
+	// Velella: the theme's plain background on every screen, no item backdrops
 	if (enabled) AppThemeBackground()
 }

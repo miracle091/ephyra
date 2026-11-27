@@ -100,7 +100,7 @@ public class ItemListFragment extends Fragment implements View.OnKeyListener {
 
         BUTTON_SIZE = Utils.convertDpToPixel(requireContext(), 35);
 
-        // Ephyra: the album's own hero layout instead of the shared details row
+        // Velella: the album's own hero layout instead of the shared details row
         mTitle = binding.fdTitle;
         mTitle.setText(getString(R.string.loading));
         mGenreRow = binding.fdGenreRow;
@@ -306,9 +306,9 @@ public class ItemListFragment extends Fragment implements View.OnKeyListener {
         InfoLayoutHelper.addInfoRow(requireContext(), item, mainInfoRow, false);
         addGenres(mGenreRow);
         addButtons(BUTTON_SIZE);
-        ItemListFragmentHelperKt.showButtonIconsOnly(mButtonRow); // Ephyra
+        ItemListFragmentHelperKt.showButtonIconsOnly(mButtonRow); // Velella
         mSummary.setText(mBaseItem.getOverview());
-        mSummary.setVisibility(TextUtils.isEmpty(mBaseItem.getOverview()) ? View.GONE : View.VISIBLE); // Ephyra: no gap without one
+        mSummary.setVisibility(TextUtils.isEmpty(mBaseItem.getOverview()) ? View.GONE : View.VISIBLE); // Velella: no gap without one
 
         Double aspect = imageHelper.getValue().getImageAspectRatio(item, false);
         String primaryImageUrl = imageHelper.getValue().getPrimaryImageUrl(item, null, ImageHelper.MAX_PRIMARY_IMAGE_HEIGHT);
@@ -319,7 +319,7 @@ public class ItemListFragment extends Fragment implements View.OnKeyListener {
     }
 
     private Function1<List<BaseItemDto>, Unit> itemResponse = (List<BaseItemDto> items) -> {
-        // Ephyra: the title keeps the home's 28sp and wraps to two lines instead of scaling to 32sp
+        // Velella: the title keeps the home's 28sp and wraps to two lines instead of scaling to 32sp
         mTitle.setText(mBaseItem.getName());
         if (!items.isEmpty()) {
             mItems = new ArrayList<>();
@@ -333,7 +333,7 @@ public class ItemListFragment extends Fragment implements View.OnKeyListener {
                 mAudioEventListener.onPlaybackStateChange(PlaybackController.PlaybackState.PLAYING, mediaManager.getValue().getCurrentAudioItem());
             }
 
-            backgroundService.getValue().clearBackgrounds(); // Ephyra: plain background behind the album, no artist backdrop
+            backgroundService.getValue().clearBackgrounds(); // Velella: plain background behind the album, no artist backdrop
         }
         return null;
     };

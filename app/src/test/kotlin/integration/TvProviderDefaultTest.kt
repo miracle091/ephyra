@@ -5,7 +5,7 @@ import io.kotest.matchers.shouldBe
 import org.jellyfin.androidtv.preference.UserPreferences
 
 class TvProviderDefaultTest : FunSpec({
-	// Ephyra: no launcher on the target Shield reads the channels, so the worker skips its server calls by default
+	// Velella: no launcher on the target Shield reads the channels, so the worker skips its server calls by default
 	test("Home-screen channels and Watch Next are off by default") {
 		UserPreferences.tvProviderEnabled.defaultValue shouldBe false
 	}

@@ -38,8 +38,8 @@ import androidx.compose.ui.platform.AbstractComposeView
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import org.jellyfin.androidtv.ui.base.EphyraTheme
-import org.jellyfin.androidtv.ui.base.LocalEphyraPalette
+import org.jellyfin.androidtv.ui.base.VelellaTheme
+import org.jellyfin.androidtv.ui.base.LocalVelellaPalette
 import org.jellyfin.androidtv.ui.base.LocalTextStyle
 import org.jellyfin.androidtv.ui.base.ProfilePicture
 import org.jellyfin.androidtv.ui.base.ProvideTextStyle
@@ -50,7 +50,7 @@ import org.jellyfin.androidtv.util.popupMenu
 import org.jellyfin.androidtv.util.AndroidVersion
 import org.jellyfin.androidtv.util.showIfNotEmpty
 
-// Ephyra: the zoom of a focused cover (scale-focus)
+// Velella: the zoom of a focused cover (scale-focus)
 private const val CARD_FOCUS_SCALE = 1.06f
 
 @Composable
@@ -64,8 +64,8 @@ fun UserCard(
 	val shape: Shape = CircleShape
 	val focused by interactionSource.collectIsFocusedAsState()
 
-	// Ephyra: the avatar of the design system, on surface-3 with the covers' focus ring and zoom, the name muted until focused
-	val palette = LocalEphyraPalette.current
+	// Velella: the avatar of the design system, on surface-3 with the covers' focus ring and zoom, the name muted until focused
+	val palette = LocalVelellaPalette.current
 	val scale by animateFloatAsState(if (focused) CARD_FOCUS_SCALE else 1f, label = "UserCardFocusScale")
 
 	Column(
@@ -155,8 +155,8 @@ class UserCardView @JvmOverloads constructor(
 			else interactionSource.emit(FocusInteraction.Unfocus(focusInteraction))
 		}
 
-		// Ephyra: the theme's colours, the startup screens have no EphyraTheme around them
-		EphyraTheme { UserCard(
+		// Velella: the theme's colours, the startup screens have no VelellaTheme around them
+		VelellaTheme { UserCard(
 			image = {
 				ProfilePicture(
 					url = image,
@@ -170,7 +170,7 @@ class UserCardView @JvmOverloads constructor(
 					maxLines = 1
 				)
 			},
-			// Ephyra: 128dp avatars, 32dp apart
+			// Velella: 128dp avatars, 32dp apart
 			modifier = Modifier
 				.padding(horizontal = 16.dp, vertical = 8.dp)
 				.width(128.dp),

@@ -39,7 +39,7 @@ fun SettingsScreensaverScreen() {
 				headingContent = { Text(stringResource(R.string.pref_screensaver_inapp_enabled)) },
 				slots = ListItemSlots(
 					trailingContent = { Checkbox(checked = screensaverInAppEnabled) },
-					captionContent = { Text(stringResource(R.string.ephyra_screensaver_inapp_enabled_description)) },
+					captionContent = { Text(stringResource(R.string.velella_screensaver_inapp_enabled_description)) },
 				),
 				onClick = { screensaverInAppEnabled = !screensaverInAppEnabled },
 				modifier = Modifier.focusKey("screensaver_in_app_enabled")
@@ -61,6 +61,6 @@ fun SettingsScreensaverScreen() {
 				modifier = Modifier.focusKey(Routes.CUSTOMIZATION_SCREENSAVER_TIMEOUT)
 			)
 		}
-		// Ephyra: no age rating options, the screensaver is a clock and shows no titles
+		// Velella: no age rating options, the screensaver is a clock and shows no titles
 	}
 }

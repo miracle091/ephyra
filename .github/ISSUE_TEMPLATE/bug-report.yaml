@@ -1,5 +1,5 @@
 name: Bug report
-description: Report a bug in Ephyra
+description: Report a bug in Velella
 labels:
   - bug
 body:
@@ -9,16 +9,16 @@ body:
       label: "This issue respects the following points:"
       description: All conditions are **required**.
       options:
-        - label: This issue is **not** already reported on [GitHub](https://github.com/miracle091/ephyra/issues?q=is%3Aissue) _(I've searched it)_.
+        - label: This issue is **not** already reported on [GitHub](https://github.com/miracle091/velella/issues?q=is%3Aissue) _(I've searched it)_.
           required: true
-        - label: The bug happens in the latest [Ephyra release](https://github.com/miracle091/ephyra/releases/latest).
+        - label: The bug happens in the latest [Velella release](https://github.com/miracle091/velella/releases/latest).
           required: true
         - label: This report addresses only a single issue; if you encounter multiple issues, create separate reports for each one.
           required: true
   - type: markdown
     attributes:
       value: |
-        Ephyra is a fork of Jellyfin for Android TV. Report bugs in Ephyra here, not to the Jellyfin project.
+        Velella is a fork of Jellyfin for Android TV. Report bugs in Velella here, not to the Jellyfin project.
         ## Bug information
   - type: textarea
     id: description
@@ -52,7 +52,7 @@ body:
   - type: input
     id: app-version
     attributes:
-      label: Ephyra version
+      label: Velella version
       description: Shown in Settings → About.
       placeholder: 0.5.0
     validations:

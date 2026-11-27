@@ -7,7 +7,7 @@ import org.jellyfin.androidtv.preference.constant.AppTheme
 
 class ActivityThemeTest : FunSpec({
 	test("a recreated activity gets the theme again although the view model remembers it") {
-		// Ephyra: the view model outlives a configuration change, the new activity instance does not carry the theme
+		// Velella: the view model outlives a configuration change, the new activity instance does not carry the theme
 		themeStep(AppTheme.MEDUSA, AppTheme.MEDUSA, newInstance = true, AccentColor.TEAL, AccentColor.TEAL) shouldBe ThemeStep.APPLY
 	}
 

@@ -1,8 +1,8 @@
 blank_issues_enabled: false
 contact_links:
-  - name: Ephyra wiki
-    url: https://github.com/miracle091/ephyra/wiki
+  - name: Velella wiki
+    url: https://github.com/miracle091/velella/wiki
     about: Installation, features and answers to common questions
   - name: Jellyfin server documentation
     url: https://jellyfin.org/docs/
-    about: For problems with the server itself, not with Ephyra
+    about: For problems with the server itself, not with Velella

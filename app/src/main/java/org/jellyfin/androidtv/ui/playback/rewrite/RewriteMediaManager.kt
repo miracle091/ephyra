@@ -236,10 +236,10 @@ class RewriteMediaManager(
 		private val api: ApiClient,
 		val items: List<BaseItemDto>,
 		val visibleInScreensaver: Boolean,
-		// Ephyra: the resume point of the item playback starts with
+		// Velella: the resume point of the item playback starts with
 		private val startIndex: Int = 0,
 		private val startPosition: Duration? = null,
-		// Ephyra: the tracks picked on the details screen for the item playback starts with
+		// Velella: the tracks picked on the details screen for the item playback starts with
 		private val startTracks: TrackChoice? = null,
 	) : QueueSupplier {
 		override val size: Int

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Velella: true black theme, so an OLED TV keeps its pixels off around the content -->
+<resources>
+
+    <color name="velella_black">#000000</color>
+    <color name="velella_black_raised">#141414</color>
+    <color name="velella_black_card">#0A0A0A</color>
+    <color name="velella_black_focused">#2E2E2E</color>
+
+    <!-- The Velella Dark theme with black backgrounds and near-black surfaces -->
+    <style name="Theme.Jellyfin.Black" parent="Theme.Jellyfin.Velella">
+        <!-- Colors -->
+        <item name="android:colorPrimary">@color/velella_black</item>
+        <item name="android:colorPrimaryDark">@color/velella_black</item>
+        <item name="defaultBackground">@color/velella_black</item>
+        <item name="cardImageBackground">@color/velella_black_card</item>
+        <item name="popupMenuBackground">@color/velella_black_raised</item>
+        <item name="android:colorButtonNormal">@color/velella_black_raised</item>
+        <item name="buttonDefaultNormalBackground">@color/velella_black_raised</item>
+        <item name="controlIconBackground">@color/velella_black_raised</item>
+        <item name="progressBackground">@color/velella_black_focused</item>
+
+        <!-- Tile colors -->
+        <item name="tile_port_person_bg">@color/velella_black_raised</item>
+        <item name="tile_port_video_bg">@color/velella_black_raised</item>
+        <item name="tile_land_folder_bg">@color/velella_black_raised</item>
+        <item name="tile_chapter_bg">@color/velella_black_raised</item>
+        <item name="tile_land_tv_bg">@color/velella_black_raised</item>
+        <item name="tile_port_tv_bg">@color/velella_black_raised</item>
+        <item name="tile_actors_bg">@color/velella_black_raised</item>
+        <item name="tile_land_photo_bg">@color/velella_black_raised</item>
+        <item name="tile_port_folder_bg">@color/velella_black_raised</item>
+        <item name="tile_land_series_timer_bg">@color/velella_black_raised</item>
+        <item name="tile_audio_bg">@color/velella_black_raised</item>
+        <item name="tile_artists_bg">@color/velella_black_raised</item>
+        <item name="tile_genres_bg">@color/velella_black_raised</item>
+        <item name="tile_search_bg">@color/velella_black_raised</item>
+        <item name="tile_suggestions_bg">@color/velella_black_raised</item>
+        <item name="tile_port_grid_bg">@color/velella_black_raised</item>
+        <item name="tile_letters_bg">@color/velella_black_raised</item>
+        <item name="tile_port_guide_bg">@color/velella_black_raised</item>
+        <item name="tile_port_series_timer_bg">@color/velella_black_raised</item>
+        <item name="tile_port_time_bg">@color/velella_black_raised</item>
+    </style>
+</resources>

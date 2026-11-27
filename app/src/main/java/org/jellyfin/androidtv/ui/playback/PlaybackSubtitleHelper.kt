@@ -25,7 +25,7 @@ internal fun PlaybackController.saveLastPlayedSubtitle(index: Int) {
 		videoQueueManager.setLastPlayedSubtitleLanguageIsoCode("")
 	} else {
 		val stream = findSubtitleStream(currentMediaSource, index)
-		// Ephyra: remember the exact track too, so the next episode picks it among the tracks of that language
+		// Velella: remember the exact track too, so the next episode picks it among the tracks of that language
 		if (stream != null) {
 			videoQueueManager.setLastPlayedSubtitleTrack(stream)
 		} else {

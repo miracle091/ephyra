@@ -11,7 +11,7 @@ private val DECODER_ERROR_CODES = PlaybackException.ERROR_CODE_DECODER_INIT_FAIL
 private val AUDIO_OUTPUT_ERROR_CODES = PlaybackException.ERROR_CODE_AUDIO_TRACK_INIT_FAILED until
 	PlaybackException.ERROR_CODE_DRM_UNSPECIFIED
 
-/** Ephyra: the [PlaybackError.Reason] of a Media3 [PlaybackException.errorCode]. */
+/** Velella: the [PlaybackError.Reason] of a Media3 [PlaybackException.errorCode]. */
 fun playbackErrorReason(errorCode: Int): PlaybackError.Reason = when (errorCode) {
 	in SOURCE_ERROR_CODES -> PlaybackError.Reason.SOURCE
 	in DECODER_ERROR_CODES -> PlaybackError.Reason.DECODER

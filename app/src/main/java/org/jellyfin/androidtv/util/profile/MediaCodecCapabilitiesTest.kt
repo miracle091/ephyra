@@ -18,7 +18,7 @@ class MediaCodecCapabilitiesTest(
 
 	fun supportsAV1(): Boolean = av1.supportsAv1()
 
-	// Ephyra: true only with an AV1 decoder that is not software-only (none on any Shield TV)
+	// Velella: true only with an AV1 decoder that is not software-only (none on any Shield TV)
 	fun supportsHardwareAV1(): Boolean = Av1CodecCapabilities(MediaCodecQuery(mediaCodecList, softwareCodecsEnabled = false)).supportsAv1()
 
 	fun supportsAVC(): Boolean = avc.supportsAvc()

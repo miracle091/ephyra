@@ -2,7 +2,7 @@
 <resources>
 
     <style name="Theme.Jellyfin" parent="@style/Theme.AppCompat.Leanback">
-        <!-- Ephyra: Atkinson Hyperlegible Next -->
+        <!-- Velella: Atkinson Hyperlegible Next -->
         <item name="android:fontFamily">@font/atkinson_hyperlegible_next_family</item>
         <!-- Colors -->
         <item name="android:colorPrimary">@color/grey</item>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Ephyra: the design system's music player: a 300dp cover on the left, "Now playing · Album", the title, "Artist · Year",
+<!-- Velella: the design system's music player: a 300dp cover on the left, "Now playing · Album", the title, "Artist · Year",
      the seekbar and the controls on the right, filling the screen; the queue row sits below and scrolls in on focus -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
@@ -30,9 +30,9 @@
                 android:layout_height="540dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:paddingStart="@dimen/ephyra_side_margin"
+                android:paddingStart="@dimen/velella_side_margin"
                 android:paddingTop="48dp"
-                android:paddingEnd="@dimen/ephyra_side_margin"
+                android:paddingEnd="@dimen/velella_side_margin"
                 android:paddingBottom="27dp">
 
                 <androidx.compose.ui.platform.ComposeView
@@ -129,7 +129,7 @@
 
                         <ImageButton
                             android:id="@+id/shuffleBtn"
-                            style="@style/Button.Ephyra.PlayerIcon"
+                            style="@style/Button.Velella.PlayerIcon"
                             android:src="@drawable/ic_shuffle" />
 
                         <Space
@@ -139,7 +139,7 @@
 
                         <ImageButton
                             android:id="@+id/prevBtn"
-                            style="@style/Button.Ephyra.PlayerIcon"
+                            style="@style/Button.Velella.PlayerIcon"
                             android:src="@drawable/ic_previous" />
 
                         <Space
@@ -149,7 +149,7 @@
 
                         <ImageButton
                             android:id="@+id/rewindBtn"
-                            style="@style/Button.Ephyra.PlayerIcon"
+                            style="@style/Button.Velella.PlayerIcon"
                             android:src="@drawable/ic_rewind" />
 
                         <Space
@@ -159,7 +159,7 @@
 
                         <ImageButton
                             android:id="@+id/playPauseBtn"
-                            style="@style/Button.Ephyra.PlayerIcon.Large"
+                            style="@style/Button.Velella.PlayerIcon.Large"
                             android:src="@drawable/ic_pause" />
 
                         <Space
@@ -169,7 +169,7 @@
 
                         <ImageButton
                             android:id="@+id/fastForwardBtn"
-                            style="@style/Button.Ephyra.PlayerIcon"
+                            style="@style/Button.Velella.PlayerIcon"
                             android:src="@drawable/ic_fast_forward" />
 
                         <Space
@@ -179,7 +179,7 @@
 
                         <ImageButton
                             android:id="@+id/nextBtn"
-                            style="@style/Button.Ephyra.PlayerIcon"
+                            style="@style/Button.Velella.PlayerIcon"
                             android:src="@drawable/ic_next" />
 
                         <Space
@@ -189,7 +189,7 @@
 
                         <ImageButton
                             android:id="@+id/repeatBtn"
-                            style="@style/Button.Ephyra.PlayerIcon"
+                            style="@style/Button.Velella.PlayerIcon"
                             android:src="@drawable/ic_loop" />
 
                         <Space
@@ -199,7 +199,7 @@
 
                         <ImageButton
                             android:id="@+id/albumBtn"
-                            style="@style/Button.Ephyra.PlayerIcon"
+                            style="@style/Button.Velella.PlayerIcon"
                             android:src="@drawable/ic_album" />
 
                         <Space
@@ -209,7 +209,7 @@
 
                         <ImageButton
                             android:id="@+id/artistBtn"
-                            style="@style/Button.Ephyra.PlayerIcon"
+                            style="@style/Button.Velella.PlayerIcon"
                             android:src="@drawable/ic_user" />
                     </LinearLayout>
 
@@ -247,6 +247,6 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginTop="@dimen/ephyra_clock_top"
-        android:layout_marginEnd="@dimen/ephyra_side_margin" />
+        android:layout_marginTop="@dimen/velella_clock_top"
+        android:layout_marginEnd="@dimen/velella_side_margin" />
 </RelativeLayout>

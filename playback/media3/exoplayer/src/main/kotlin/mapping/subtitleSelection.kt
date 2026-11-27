@@ -5,7 +5,7 @@ import org.jellyfin.playback.core.mediastream.MediaStreamTrack
 
 private const val EXTERNAL_SUBTITLE_PREFIX = "JF_EXTERNAL:"
 
-/** Ephyra: the id of a subtitle file loaded beside the stream, carrying its Jellyfin media stream index. */
+/** Velella: the id of a subtitle file loaded beside the stream, carrying its Jellyfin media stream index. */
 fun externalSubtitleId(streamIndex: Int) = "$EXTERNAL_SUBTITLE_PREFIX$streamIndex"
 
 /** The Jellyfin media stream index in the format id of a subtitle file loaded beside the stream, or null for the stream's own tracks. */
@@ -20,7 +20,7 @@ fun subtitleMimeType(codec: String, url: String?): String {
 		?: codec
 }
 
-/** Ephyra: what the player should show for the server's subtitle choice. */
+/** Velella: what the player should show for the server's subtitle choice. */
 sealed interface SubtitleSelection {
 	/** No subtitle. */
 	data object Off : SubtitleSelection
@@ -33,7 +33,7 @@ sealed interface SubtitleSelection {
 }
 
 /**
- * Ephyra: maps the server's subtitle choice ([wantedIndex], a Jellyfin media stream index, or null for none) to the player's text
+ * Velella: maps the server's subtitle choice ([wantedIndex], a Jellyfin media stream index, or null for none) to the player's text
  * track groups, given for each group the stream index of its external file ([groupExternalIndexes], null for the stream's own).
  *
  * An external file is found by its id. On direct play the container's own subtitles come in the same order in both lists, so the

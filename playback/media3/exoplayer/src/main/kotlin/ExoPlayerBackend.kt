@@ -53,12 +53,12 @@ import kotlin.math.roundToInt
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
-// Ephyra: it implements every function of PlayerBackend (16), more than the class threshold allows
+// Velella: it implements every function of PlayerBackend (16), more than the class threshold allows
 @Suppress("TooManyFunctions")
 @OptIn(UnstableApi::class)
 class ExoPlayerBackend(
 	private val context: Context,
-	// Ephyra: read each time a player is built, so a changed setting applies from the next playback
+	// Velella: read each time a player is built, so a changed setting applies from the next playback
 	private val exoPlayerOptions: () -> ExoPlayerOptions,
 ) : BasePlayerBackend() {
 	companion object {
@@ -81,7 +81,7 @@ class ExoPlayerBackend(
 	private var subtitleSelectionDone: PlayableMediaStream? = null
 	private var selectedTracks = SelectedTracks.NONE
 
-	// Ephyra: the player lives from first use to stop(), which releases it (decoders, buffers, libass); the views outlive it
+	// Velella: the player lives from first use to stop(), which releases it (decoders, buffers, libass); the views outlive it
 	private var instance: PlayerInstance? = null
 	private var surfaceView: PlayerSurfaceView? = null
 	private var subtitleContainer: PlayerSubtitleView? = null
@@ -120,7 +120,7 @@ class ExoPlayerBackend(
 				assHandler?.init(player)
 			}
 
-	// Ephyra: bound to its own player, so a late callback never builds a new one
+	// Velella: bound to its own player, so a late callback never builds a new one
 	inner class PlayerListener(private val exoPlayer: ExoPlayer) : Player.Listener {
 		override fun onIsPlayingChanged(isPlaying: Boolean) {
 			val state = playStateOf(isPlaying, exoPlayer.playbackState, exoPlayer.playWhenReady, exoPlayer.playbackSuppressionReason)
@@ -128,7 +128,7 @@ class ExoPlayerBackend(
 		}
 
 		override fun onPlayerError(error: PlaybackException) {
-			// Ephyra: say why, so the retry logic and the UI can act on it
+			// Velella: say why, so the retry logic and the UI can act on it
 			Timber.e(error, "Playback failed (${error.errorCodeName})")
 			listener?.onPlayError(error.toPlaybackError())
 			listener?.onPlayStateChange(PlayState.ERROR)
@@ -136,7 +136,7 @@ class ExoPlayerBackend(
 
 		override fun onVideoSizeChanged(size: VideoSize) {
 			if (size != VideoSize.UNKNOWN) {
-				// Ephyra: the displayed width, so anamorphic video (DVD, some MKV) keeps its shape instead of the stored pixel grid's
+				// Velella: the displayed width, so anamorphic video (DVD, some MKV) keeps its shape instead of the stored pixel grid's
 				val displayWidth = (size.width * size.pixelWidthHeightRatio).roundToInt()
 				listener?.onVideoSizeChange(displayWidth, size.height)
 			}
@@ -158,7 +158,7 @@ class ExoPlayerBackend(
 
 		override fun onAudioSessionIdChanged(audioSessionId: Int) {
 			audioPipeline.setAudioSessionId(audioSessionId)
-			// Ephyra: the session comes once, often before the first item is known (the player is built early): decide in playItem too
+			// Velella: the session comes once, often before the first item is known (the player is built early): decide in playItem too
 			this@ExoPlayerBackend.audioSessionId = audioSessionId
 			updateNightMode()
 		}
@@ -186,7 +186,7 @@ class ExoPlayerBackend(
 	}
 
 	/**
-	 * Ephyra: on direct play ExoPlayer would pick the audio track by its own rules (default flag, device language), so select the
+	 * Velella: on direct play ExoPlayer would pick the audio track by its own rules (default flag, device language), so select the
 	 * one the server chose (the requested track or the default from the user's language preferences). Done once per stream, as soon
 	 * as the audio tracks are known, so a track picked later in the player is not overridden. A remuxed or transcoded stream holds
 	 * only the requested track: nothing to select.
@@ -216,7 +216,7 @@ class ExoPlayerBackend(
 	}
 
 	/**
-	 * Ephyra: show the subtitle the server chose from the user's settings (or none), instead of ExoPlayer's own rules. Done once per
+	 * Velella: show the subtitle the server chose from the user's settings (or none), instead of ExoPlayer's own rules. Done once per
 	 * stream, as soon as its tracks are known, so a subtitle picked later in the player is not overridden.
 	 */
 	private fun selectServerSubtitle(tracks: Tracks) {
@@ -233,7 +233,7 @@ class ExoPlayerBackend(
 	}
 
 	/**
-	 * Ephyra: maps the subtitle [index] (or none) to the player's text tracks and selects it. When it can't be mapped, the
+	 * Velella: maps the subtitle [index] (or none) to the player's text tracks and selects it. When it can't be mapped, the
 	 * player's own choice is restored, or left untouched with [untouchedIfUnmapped] (a pick that a new stream will bring).
 	 */
 	private fun applySubtitle(
@@ -300,7 +300,7 @@ class ExoPlayerBackend(
 		return true
 	}
 
-	/** Ephyra: night mode on the player's audio session while a video plays, as in the legacy player; music keeps its dynamics. */
+	/** Velella: night mode on the player's audio session while a video plays, as in the legacy player; music keeps its dynamics. */
 	private fun updateNightMode() {
 		val enabled = instance?.options?.audioNightMode == true
 		val video = currentStream?.queueEntry?.mediaType == MediaType.Video
@@ -328,7 +328,7 @@ class ExoPlayerBackend(
 		if (surfaceView != null) attachSubtitleView(surfaceView)
 	}
 
-	/** Ephyra: a subtitle view for the current player (its libass handler), added once a player exists. */
+	/** Velella: a subtitle view for the current player (its libass handler), added once a player exists. */
 	private fun attachSubtitleView(container: PlayerSubtitleView) {
 		val current = instance ?: return
 		val view = SubtitleView(container.context).apply {
@@ -350,7 +350,7 @@ class ExoPlayerBackend(
 			setTag(item)
 			setMediaId(stream.hashCode().toString())
 			setUri(stream.url)
-			// Ephyra: subtitles the server hands out as separate files, loaded beside the stream as in the legacy player
+			// Velella: subtitles the server hands out as separate files, loaded beside the stream as in the legacy player
 			setSubtitleConfigurations(stream.tracks.filterIsInstance<MediaStreamSubtitleTrack>().mapNotNull { it.toSubtitleConfiguration() })
 		}.build()
 
@@ -370,7 +370,7 @@ class ExoPlayerBackend(
 
 		val previousStream = currentStream
 		currentStream = stream
-		// Ephyra: the server's choice until the player shows otherwise
+		// Velella: the server's choice until the player shows otherwise
 		updateSelectedTracks(SelectedTracks(stream.defaultAudioStreamIndex, stream.defaultSubtitleStreamIndex))
 		updateNightMode()
 
@@ -384,7 +384,7 @@ class ExoPlayerBackend(
 			preparedItemIndex = exoPlayer.mediaItemCount - 1
 		}
 
-		// Seek to prepared media item; Ephyra: at the entry's start position (resume) when it has one, applied once
+		// Seek to prepared media item; Velella: at the entry's start position (resume) when it has one, applied once
 		val startPosition = item.startPosition
 		item.startPosition = null
 		when {
@@ -395,7 +395,7 @@ class ExoPlayerBackend(
 			else -> exoPlayer.seekTo(preparedItemIndex, 0)
 		}
 
-		// Ephyra: a new stream of the same entry (another track) plays as another media item: move the entry's timed events to it
+		// Velella: a new stream of the same entry (another track) plays as another media item: move the entry's timed events to it
 		if (previousStream?.queueEntry === item) timedEventState.recreate(exoPlayer, lastKnownDuration)
 
 		// Update audio attributes
@@ -431,7 +431,7 @@ class ExoPlayerBackend(
 	}
 
 	override fun stop() {
-		// Ephyra: stop first so the listeners hear STOPPED, then release; the next item builds a player with the current options
+		// Velella: stop first so the listeners hear STOPPED, then release; the next item builds a player with the current options
 		instance?.let { current ->
 			current.player.stop()
 			detachSubtitleView()
@@ -463,7 +463,7 @@ class ExoPlayerBackend(
 	}
 
 	override fun setSpeed(speed: Float) {
-		// Ephyra: kept for the next player too, as PlayerState keeps it; without a player there is nothing to change yet
+		// Velella: kept for the next player too, as PlayerState keeps it; without a player there is nothing to change yet
 		this.speed = speed
 		val exoPlayer = instance?.player ?: return
 		if (!exoPlayer.isCommandAvailable(Player.COMMAND_SET_SPEED_AND_PITCH)) {
@@ -473,7 +473,7 @@ class ExoPlayerBackend(
 		exoPlayer.setPlaybackSpeed(speed)
 	}
 
-	// Ephyra: polled often (UI, play session); without a player there is nothing to report, so don't build one
+	// Velella: polled often (UI, play session); without a player there is nothing to report, so don't build one
 	override fun getPositionInfo(): PositionInfo {
 		val exoPlayer = instance?.player ?: return PositionInfo.EMPTY
 		return PositionInfo(
@@ -488,7 +488,7 @@ class ExoPlayerBackend(
 	}
 }
 
-/** Ephyra: a subtitle file handed out by the server, as a side-loaded track of the media item; null for the stream's own tracks. */
+/** Velella: a subtitle file handed out by the server, as a side-loaded track of the media item; null for the stream's own tracks. */
 @OptIn(UnstableApi::class)
 private fun MediaStreamSubtitleTrack.toSubtitleConfiguration(): MediaItem.SubtitleConfiguration? {
 	val url = externalUrl ?: return null

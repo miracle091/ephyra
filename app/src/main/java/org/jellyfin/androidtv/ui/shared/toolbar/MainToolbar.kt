@@ -33,7 +33,7 @@ import org.jellyfin.androidtv.auth.repository.UserRepository
 import org.jellyfin.androidtv.ui.NowPlayingComposable
 import org.jellyfin.androidtv.ui.base.Icon
 import org.jellyfin.androidtv.ui.base.JellyfinTheme
-import org.jellyfin.androidtv.ui.base.LocalEphyraPalette
+import org.jellyfin.androidtv.ui.base.LocalVelellaPalette
 import org.jellyfin.androidtv.ui.base.ProfilePicture
 import org.jellyfin.androidtv.ui.base.ProvideTextStyle
 import org.jellyfin.androidtv.ui.base.button.ButtonBase
@@ -54,7 +54,7 @@ import org.jellyfin.sdk.api.client.ApiClient
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinActivityViewModel
 
-// Ephyra: the zoom of a focused cover (scale-focus)
+// Velella: the zoom of a focused cover (scale-focus)
 private const val USER_FOCUS_SCALE = 1.06f
 
 enum class MainToolbarActiveButton {
@@ -134,7 +134,7 @@ private fun ToolbarUserButton(
 	val userImagePainter = rememberAsyncImagePainter(userImage)
 	val userImageState by userImagePainter.state.collectAsState()
 	val userImageVisible = userImageState is AsyncImagePainter.State.Success
-	// Ephyra: focus shows like on the covers, the accent ring and zoom over the picture, not a solid fill hiding it
+	// Velella: focus shows like on the covers, the accent ring and zoom over the picture, not a solid fill hiding it
 	val userInteractionSource = remember { MutableInteractionSource() }
 	val userFocused by userInteractionSource.collectIsFocusedAsState()
 	val userScale by animateFloatAsState(if (userFocused) USER_FOCUS_SCALE else 1f, label = "UserButtonFocusScale")
@@ -145,7 +145,7 @@ private fun ToolbarUserButton(
 	ButtonBase(
 		modifier = Modifier
 			.scale(userScale)
-			.cardFocusRing(userFocused, LocalEphyraPalette.current.accent, IconButtonDefaults.Shape),
+			.cardFocusRing(userFocused, LocalVelellaPalette.current.accent, IconButtonDefaults.Shape),
 		interactionSource = userInteractionSource,
 		onClick = {
 			if (activeButton != MainToolbarActiveButton.User) {
@@ -185,7 +185,7 @@ private fun ToolbarNavigationButtons(
 	val navigationRepository = koinInject<NavigationRepository>()
 
 	ProvideTextStyle(JellyfinTheme.typography.default.copy(fontWeight = FontWeight.Bold)) {
-		// Ephyra: icons instead of the Home and Search labels
+		// Velella: icons instead of the Home and Search labels
 		IconButton(
 			onClick = {
 				if (activeButton != MainToolbarActiveButton.Home) {

@@ -72,7 +72,7 @@ object Routes {
 	const val AUTHENTICATION_AUTO_SIGN_IN = "/authentication/auto-sign-in"
 	const val CUSTOMIZATION = "/customization"
 	const val CUSTOMIZATION_THEME = "/customization/theme"
-	const val CUSTOMIZATION_ACCENT = "/customization/accent" // Ephyra
+	const val CUSTOMIZATION_ACCENT = "/customization/accent" // Velella
 	const val CUSTOMIZATION_CLOCK = "/customization/clock"
 	const val CUSTOMIZATION_WATCHED_INDICATOR = "/customization/watch-indicators"
 	const val CUSTOMIZATION_SCREENSAVER = "/customization/screensaver"
@@ -155,7 +155,7 @@ val routes = mapOf<String, RouteComposable>(
 	Routes.CUSTOMIZATION_THEME to {
 		SettingsCustomizationThemeScreen()
 	},
-	Routes.CUSTOMIZATION_ACCENT to { // Ephyra
+	Routes.CUSTOMIZATION_ACCENT to { // Velella
 		SettingsCustomizationAccentScreen()
 	},
 	Routes.CUSTOMIZATION_CLOCK to {

@@ -4,7 +4,7 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldBeIn
 import io.kotest.matchers.ints.shouldBeGreaterThan
 import io.kotest.matchers.shouldBe
-import org.jellyfin.design.token.EphyraColorTokens
+import org.jellyfin.design.token.VelellaColorTokens
 
 class ArtToneTests : FunSpec({
 	test("a title always gets the same art tone") {
@@ -14,7 +14,7 @@ class ArtToneTests : FunSpec({
 	test("missing titles and negative hashes still get a tone") {
 		// "polygenelubricants" hashes to Int.MIN_VALUE
 		listOf(null, "", "Polly", "polygenelubricants").forEach { title ->
-			artToneFor(title) shouldBeIn EphyraColorTokens.art
+			artToneFor(title) shouldBeIn VelellaColorTokens.art
 		}
 	}
 

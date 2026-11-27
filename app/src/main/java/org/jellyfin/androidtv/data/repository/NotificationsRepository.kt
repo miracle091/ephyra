@@ -14,9 +14,9 @@ interface NotificationsRepository {
 
 	fun dismissNotification(item: AppNotification)
 	fun addDefaultNotifications()
-	// Ephyra: no "update your server soon" notice: the SDK accepts only servers 12.0+, above the old 10.11 threshold
+	// Velella: no "update your server soon" notice: the SDK accepts only servers 12.0+, above the old 10.11 threshold
 
-	// Ephyra: lets the update check (update/DailyUpdateCheck.kt) add its notice
+	// Velella: lets the update check (update/DailyUpdateCheck.kt) add its notice
 	fun addNotification(message: String, public: Boolean = false, dismiss: () -> Unit = {}): AppNotification
 }
 

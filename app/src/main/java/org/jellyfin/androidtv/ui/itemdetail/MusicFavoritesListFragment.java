@@ -69,7 +69,7 @@ public class MusicFavoritesListFragment extends Fragment implements View.OnKeyLi
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         FragmentItemListBinding binding = FragmentItemListBinding.inflate(getLayoutInflater(), container, false);
 
-        // Ephyra: the album's own hero layout instead of the shared details row
+        // Velella: the album's own hero layout instead of the shared details row
         binding.fdTitle.setText(getString(R.string.lbl_favorites));
         binding.mainImage.setImageResource(R.drawable.favorites);
         binding.fdSummaryText.setText(getString(R.string.desc_automatic_fav_songs));

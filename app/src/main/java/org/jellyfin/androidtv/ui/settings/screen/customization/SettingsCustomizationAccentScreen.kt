@@ -15,7 +15,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import org.jellyfin.androidtv.R
-import org.jellyfin.androidtv.preference.EphyraPreferences
+import org.jellyfin.androidtv.preference.VelellaPreferences
 import org.jellyfin.androidtv.preference.UserPreferences
 import org.jellyfin.androidtv.preference.constant.AccentColor
 import org.jellyfin.androidtv.ui.base.Text
@@ -30,13 +30,13 @@ import org.jellyfin.androidtv.ui.settings.compat.rememberPreference
 import org.jellyfin.androidtv.ui.settings.composable.SettingsColumn
 import org.koin.compose.koinInject
 
-/** Ephyra: Settings > Customization > Accent colour, a list of presets next to "Theme default". */
+/** Velella: Settings > Customization > Accent colour, a list of presets next to "Theme default". */
 @Composable
 fun SettingsCustomizationAccentScreen() {
 	val router = LocalRouter.current
 	val userPreferences = koinInject<UserPreferences>()
-	val ephyraPreferences = koinInject<EphyraPreferences>()
-	var accentColor by rememberPreference(ephyraPreferences, EphyraPreferences.accentColor)
+	val velellaPreferences = koinInject<VelellaPreferences>()
+	var accentColor by rememberPreference(velellaPreferences, VelellaPreferences.accentColor)
 	// "Theme default" shows the accent of the theme in use
 	val themeAccent = paletteFor(userPreferences[UserPreferences.appTheme]).accent
 
@@ -44,7 +44,7 @@ fun SettingsCustomizationAccentScreen() {
 		item {
 			ListSection(
 				overlineContent = { Text(stringResource(R.string.pref_customization).uppercase()) },
-				headingContent = { Text(stringResource(R.string.ephyra_pref_accent_color)) },
+				headingContent = { Text(stringResource(R.string.velella_pref_accent_color)) },
 			)
 		}
 

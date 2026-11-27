@@ -43,7 +43,7 @@ interface PlayerBackend : PlayerTrackSelector {
 	fun setTimedEvents(timedEvents: List<TimedEvent>)
 }
 
-/** Ephyra: switching the tracks of the playing stream, inside the player when it can. */
+/** Velella: switching the tracks of the playing stream, inside the player when it can. */
 interface PlayerTrackSelector {
 	/**
 	 * Show the audio track with the source index [index] if the playing stream carries it. Returns false when it doesn't

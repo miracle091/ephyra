@@ -14,8 +14,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import org.jellyfin.androidtv.ui.base.EphyraMonoFontFamily
-import org.jellyfin.androidtv.ui.base.LocalEphyraPalette
+import org.jellyfin.androidtv.ui.base.VelellaMonoFontFamily
+import org.jellyfin.androidtv.ui.base.LocalVelellaPalette
 import org.jellyfin.androidtv.ui.base.LocalTextStyle
 import org.jellyfin.androidtv.ui.base.Text
 
@@ -24,12 +24,12 @@ private val TileShape = RoundedCornerShape(12.dp)
 private val TileEdge = Color.White.copy(alpha = 0.10f)
 
 /**
- * Ephyra: a Quick Connect code with each character in its own tile, in groups of three ("420 420"), so it reads at a glance
+ * Velella: a Quick Connect code with each character in its own tile, in groups of three ("420 420"), so it reads at a glance
  * from the sofa.
  */
 @Composable
 fun QuickConnectCode(code: String, modifier: Modifier = Modifier) {
-	val palette = LocalEphyraPalette.current
+	val palette = LocalVelellaPalette.current
 
 	Row(
 		modifier = modifier,
@@ -52,7 +52,7 @@ fun QuickConnectCode(code: String, modifier: Modifier = Modifier) {
 								color = palette.ink,
 								fontSize = 36.sp,
 								fontWeight = FontWeight.Bold,
-								fontFamily = EphyraMonoFontFamily, // Ephyra
+								fontFamily = VelellaMonoFontFamily, // Velella
 							),
 						)
 					}

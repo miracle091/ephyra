@@ -17,12 +17,12 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import org.jellyfin.androidtv.ui.base.LocalEphyraPalette
+import org.jellyfin.androidtv.ui.base.LocalVelellaPalette
 import org.jellyfin.androidtv.ui.base.ProvideTextStyle
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.design.token.SpaceTokens
 
-// Ephyra: the shared style of the info row (details screen, home spotlight): groups divided by thin vertical lines and the
+// Velella: the shared style of the info row (details screen, home spotlight): groups divided by thin vertical lines and the
 // official rating in an outlined badge. Dimensions: divider 1dp wide and 14dp high (about 60% of the 14sp..16sp text height)
 // in ink-muted at 40% alpha with SpaceTokens.spaceSm (8dp) on both sides; badge with a 1dp ink-muted border, 4dp corners,
 // no fill, 11sp bold text in ink-muted, 6dp horizontal and 2dp vertical padding.
@@ -38,7 +38,7 @@ private object InfoRowSeparatorStyle {
 /** A thin vertical divider between two groups of an info row. */
 @Composable
 fun InfoRowSeparator(modifier: Modifier = Modifier) {
-	val palette = LocalEphyraPalette.current
+	val palette = LocalVelellaPalette.current
 
 	Spacer(
 		modifier = modifier
@@ -53,7 +53,7 @@ fun InfoRowSeparator(modifier: Modifier = Modifier) {
 /** The official rating (PG-13, VM14...) in an outlined badge with no fill. */
 @Composable
 fun InfoRowOutlinedBadge(text: String, modifier: Modifier = Modifier) {
-	val palette = LocalEphyraPalette.current
+	val palette = LocalVelellaPalette.current
 
 	ProvideTextStyle(TextStyle(color = palette.inkMuted, fontSize = 11.sp, fontWeight = FontWeight.Bold)) {
 		Row(

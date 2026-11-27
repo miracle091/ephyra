@@ -34,7 +34,7 @@ public class LeanbackOverlayFragment extends PlaybackSupportFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Ephyra: no shade over the whole picture, the controls' own top and bottom shades (ephyra_osd_scrim_*) keep them legible
+        // Velella: no shade over the whole picture, the controls' own top and bottom shades (velella_osd_scrim_*) keep them legible
         setBackgroundType(BG_NONE);
 
         PlaybackController playbackController = playbackControllerContainer.getValue().getPlaybackController();
@@ -58,7 +58,7 @@ public class LeanbackOverlayFragment extends PlaybackSupportFragment {
     @Override
     public void onStart() {
         super.onStart();
-        // Ephyra: the controls row and its shade reach the screen's bottom edge
+        // Velella: the controls row and its shade reach the screen's bottom edge
         LeanbackOverlayFragmentHelperKt.alignControlsToBottomEdge(this);
     }
 

@@ -3,7 +3,7 @@ package org.jellyfin.androidtv.benchmark
 import org.jellyfin.sdk.model.api.PlayMethod
 
 /**
- * Ephyra (debug builds only): settings suggested by the measurements, each with the numbers behind it. Never changes a setting:
+ * Velella (debug builds only): settings suggested by the measurements, each with the numbers behind it. Never changes a setting:
  * the user decides.
  */
 fun benchmarkSuggestions(decoder: List<DecoderResult>, server: List<ServerResult>): List<String> = buildList {

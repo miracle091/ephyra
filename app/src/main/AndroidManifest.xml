@@ -14,7 +14,7 @@
         tools:ignore="LeanbackUsesWifi" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
-    <!-- Ephyra: install updates from GitHub Releases (update/AppUpdater.kt) -->
+    <!-- Velella: install updates from GitHub Releases (update/AppUpdater.kt) -->
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
     <!-- Search permissions (voice to text) -->
@@ -87,11 +87,11 @@
             <meta-data
                 android:name="org.jellyfin.androidtv.SessionInitializer"
                 android:value="androidx.startup" />
-            <!-- Ephyra: daily update check -->
+            <!-- Velella: daily update check -->
             <meta-data
                 android:name="org.jellyfin.androidtv.update.UpdateCheckInitializer"
                 android:value="androidx.startup" />
-            <!-- Ephyra: one-time hint about the Shield's display settings -->
+            <!-- Velella: one-time hint about the Shield's display settings -->
             <meta-data
                 android:name="org.jellyfin.androidtv.integration.ShieldDisplayHintInitializer"
                 android:value="androidx.startup" />
@@ -143,7 +143,7 @@
 
         <activity android:name=".ui.playback.ExternalPlayerActivity" />
 
-        <!-- Ephyra: result of an update installation -->
+        <!-- Velella: result of an update installation -->
         <receiver
             android:name=".update.AppUpdateStatusReceiver"
             android:exported="false" />

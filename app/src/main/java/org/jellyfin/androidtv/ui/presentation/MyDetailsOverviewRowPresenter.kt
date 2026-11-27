@@ -29,9 +29,9 @@ import org.jellyfin.sdk.model.api.BaseItemKind
 private const val POSTER_HEIGHT_RATIO = 1.5f
 private const val PERSON_ICON_RATIO = 0.3f
 
-/** Ephyra: a poster-sized cover in the art tone of the person's [name] with the person icon, like a cast card without a picture. */
+/** Velella: a poster-sized cover in the art tone of the person's [name] with the person icon, like a cast card without a picture. */
 private fun personCover(context: Context, name: String?): Drawable {
-	val width = context.resources.getDimensionPixelSize(R.dimen.ephyra_details_cover_width)
+	val width = context.resources.getDimensionPixelSize(R.dimen.velella_details_cover_width)
 	val iconSize = (width * PERSON_ICON_RATIO).toInt()
 	val tone = artToneFor(name).toArgb().toDrawable()
 	val icon = requireNotNull(ContextCompat.getDrawable(context, R.drawable.ic_user))
@@ -61,11 +61,11 @@ class MyDetailsOverviewRowPresenter(
 				binding.fdMainInfoRow,
 				false,
 			)
-			// Ephyra: groups divided by vertical lines and the official rating as an outlined badge
+			// Velella: groups divided by vertical lines and the official rating as an outlined badge
 			binding.fdMainInfoRow.children.filterIsInstance<BaseItemInfoRowView>().forEach { it.separated = true }
-			binding.fdGenreRow.text = row.item.genres?.joinToString(" · ") // Ephyra: the spotlight's separator
+			binding.fdGenreRow.text = row.item.genres?.joinToString(" · ") // Velella: the spotlight's separator
 
-			// Ephyra: the tagline under the title, hidden when the item has none
+			// Velella: the tagline under the title, hidden when the item has none
 			val tagline = DetailsTagline.of(row.item.taglines)
 			binding.fdTagline.text = tagline
 			binding.fdTagline.isVisible = tagline != null
@@ -79,7 +79,7 @@ class MyDetailsOverviewRowPresenter(
 			binding.infoTitle3.text = row.infoItem3?.label
 			binding.infoValue3.text = row.infoItem3?.value
 
-			// Ephyra: a person without a photo gets a cover instead of a collapsed empty space
+			// Velella: a person without a photo gets a cover instead of a collapsed empty space
 			val placeholder = if (row.imageDrawable == null && row.item.type == BaseItemKind.PERSON) {
 				personCover(view.context, row.item.name)
 			} else {
@@ -89,7 +89,7 @@ class MyDetailsOverviewRowPresenter(
 
 			setSummary(row.summary)
 
-			// Ephyra: a person has no genres, but the empty genre line keeps its space so the name sits where the other details
+			// Velella: a person has no genres, but the empty genre line keeps its space so the name sits where the other details
 			// put the title, on the clock's line
 			binding.fdGenreRow.isInvisible = row.item.type == BaseItemKind.PERSON
 
@@ -102,14 +102,14 @@ class MyDetailsOverviewRowPresenter(
 
 				binding.fdButtonRow.addView(button)
 			}
-			// Ephyra: icon buttons like the album's, and no empty label/value pairs
+			// Velella: icon buttons like the album's, and no empty label/value pairs
 			showButtonIconsOnly(binding.fdButtonRow)
 			listOf(binding.infoTitle1, binding.infoTitle2, binding.infoTitle3).forEach { title ->
 				(title.parent as? View)?.isVisible = !title.text.isNullOrBlank()
 			}
 		}
 
-		/** Ephyra: shows the series' next up episode as a card beside the buttons, or hides the card when there is none. */
+		/** Velella: shows the series' next up episode as a card beside the buttons, or hides the card when there is none. */
 		fun setNextUp(episode: BaseItemDto?, onClick: ((BaseItemDto) -> Unit)?) {
 			binding.fdNextUpCard.episode = episode
 			binding.fdNextUpCard.setOnClickListener {
@@ -123,7 +123,7 @@ class MyDetailsOverviewRowPresenter(
 
 		fun setSummary(summary: String?) {
 			binding.fdSummaryText.text = summary?.let { markdownRenderer.toMarkdownSpanned(it) }
-			// Ephyra: no empty gap when there is no overview (a person without a biography): the buttons move up under the info row
+			// Velella: no empty gap when there is no overview (a person without a biography): the buttons move up under the info row
 			binding.fdSummaryText.isVisible = !summary.isNullOrBlank()
 		}
 

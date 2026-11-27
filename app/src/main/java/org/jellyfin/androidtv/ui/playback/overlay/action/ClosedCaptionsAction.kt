@@ -58,7 +58,7 @@ class ClosedCaptionsAction(
 			isChecked = playbackController.subtitleStreamIndex == -1
 		}
 
-		// Ephyra: preferred languages first
+		// Velella: preferred languages first
 		val subtitles = playbackController.currentMediaSource.mediaStreams.orEmpty().filter { it.type == MediaStreamType.SUBTITLE }
 		for (sub in subtitles.preferredLanguagesFirst { it.subtitleLanguagePreference }) {
 			add(0, sub.index, order++, sub.displayTitle).apply {

@@ -18,14 +18,14 @@ import timber.log.Timber
 import java.util.UUID
 import kotlin.random.Random
 
-/** Ephyra: the first backdrop among the titles the server returned for a library, or null when none has one. */
+/** Velella: the first backdrop among the titles the server returned for a library, or null when none has one. */
 fun libraryCardBackdrop(titles: List<BaseItemDto>): JellyfinImage? = titles.firstNotNullOfOrNull { it.itemBackdropImages.firstOrNull() }
 
-/** Ephyra: the picture of the first of [photos] (the server picks them at random) that has one, or null. */
+/** Velella: the picture of the first of [photos] (the server picks them at random) that has one, or null. */
 fun photoCardImage(photos: List<BaseItemDto>): JellyfinImage? = photos.firstNotNullOfOrNull { it.itemImages[ImageType.PRIMARY] }
 
 /**
- * Ephyra: a channel logo for the Live TV card: among the [channels] with a logo (their primary image), the one at [pick] (wrapping
+ * Velella: a channel logo for the Live TV card: among the [channels] with a logo (their primary image), the one at [pick] (wrapping
  * around), so the card changes from one start of the app to the next.
  */
 fun liveTvCardLogo(channels: List<BaseItemDto>, pick: Int): JellyfinImage? {

@@ -8,7 +8,7 @@ import org.jellyfin.sdk.model.api.PlayMethod
 import java.time.LocalTime
 import kotlin.time.Duration
 
-/** Ephyra: the server's name for how the new player's stream is delivered, for the play info line (ui/playback/PlayInfo.kt). */
+/** Velella: the server's name for how the new player's stream is delivered, for the play info line (ui/playback/PlayInfo.kt). */
 val MediaConversionMethod.playMethod: PlayMethod
 	get() = when (this) {
 		MediaConversionMethod.None -> PlayMethod.DIRECT_PLAY
@@ -19,7 +19,7 @@ val MediaConversionMethod.playMethod: PlayMethod
 private val nonHdrRanges = setOf("SDR", "UNKNOWN")
 
 /**
- * Ephyra: whether [stream] reaches the TV as HDR or Dolby Vision, to dim the controls (ui/playback/HdrControlsDim.kt): the
+ * Velella: whether [stream] reaches the TV as HDR or Dolby Vision, to dim the controls (ui/playback/HdrControlsDim.kt): the
  * source video is HDR and the server sends it as it is. A transcode is taken as SDR, as the server tone-maps HDR when it converts.
  */
 fun isHdrStream(stream: PlayableMediaStream?): Boolean {
@@ -29,7 +29,7 @@ fun isHdrStream(stream: PlayableMediaStream?): Boolean {
 }
 
 /**
- * Ephyra: the audio track playing, for the playback info panel: the one the player reports ([selectedIndex]), else the one the
+ * Velella: the audio track playing, for the playback info panel: the one the player reports ([selectedIndex]), else the one the
  * server chose for [stream], else the first. A converted stream lists the source's tracks but carries only the chosen one.
  */
 fun playingAudioTrack(stream: PlayableMediaStream, selectedIndex: Int?): MediaStreamAudioTrack? {
@@ -38,7 +38,7 @@ fun playingAudioTrack(stream: PlayableMediaStream, selectedIndex: Int?): MediaSt
 	return audioTracks.firstOrNull { it.index != null && it.index == index } ?: audioTracks.firstOrNull()
 }
 
-/** Ephyra: when the video ends if it plays on from [position] at [speed], for the "Ends at" line under the seek bar. */
+/** Velella: when the video ends if it plays on from [position] at [speed], for the "Ends at" line under the seek bar. */
 fun videoEndsAt(position: Duration, duration: Duration, speed: Float, now: LocalTime): LocalTime {
 	val remaining = (duration - position).coerceAtLeast(Duration.ZERO)
 	val atSpeed = if (speed > 0f) remaining / speed.toDouble() else remaining

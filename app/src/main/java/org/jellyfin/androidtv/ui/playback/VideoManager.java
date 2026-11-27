@@ -119,7 +119,7 @@ public class VideoManager {
 
         mExoPlayerView = view.findViewById(R.id.exoPlayerView);
         mExoPlayerView.setPlayer(mExoPlayer);
-        // Ephyra: the same subtitle look as the new player
+        // Velella: the same subtitle look as the new player
         SubtitleStyleKt.applyStyle(mExoPlayerView.getSubtitleView(), SubtitleStylePreferenceKt.subtitleStyle(userPreferences));
 
         if (assHandler != null) {
@@ -207,7 +207,7 @@ public class VideoManager {
      */
     private ExoPlayer.Builder configureExoplayerBuilder(Context context, AssHandler assHandler) {
         ExoPlayer.Builder exoPlayerBuilder = new ExoPlayer.Builder(context);
-        // Ephyra: FFmpeg, when preferred, still steps aside for formats the audio sink can pass through as bitstream
+        // Velella: FFmpeg, when preferred, still steps aside for formats the audio sink can pass through as bitstream
         DefaultRenderersFactory defaultRendererFactory = new BitstreamFirstRenderersFactory(
                 context,
                 userPreferences.get(UserPreferences.Companion.getPreferExoPlayerFfmpeg())
@@ -219,7 +219,7 @@ public class VideoManager {
         DefaultTrackSelector trackSelector = new DefaultTrackSelector(context);
         trackSelector.setParameters(trackSelector.buildUponParameters()
                 .setAudioOffloadPreferences(new TrackSelectionParameters.AudioOffloadPreferences.Builder()
-                        // Ephyra: no DSP offload on a TV box, it competes with HDMI bitstream passthrough
+                        // Velella: no DSP offload on a TV box, it competes with HDMI bitstream passthrough
                         .setAudioOffloadMode(TrackSelectionParameters.AudioOffloadPreferences.AUDIO_OFFLOAD_MODE_DISABLED)
                         .build()
                 )
@@ -604,7 +604,7 @@ public class VideoManager {
             mExoPlayer.release();
             mExoPlayer = null;
         }
-        // Ephyra: the night mode effect goes with its player
+        // Velella: the night mode effect goes with its player
         audioNightMode.release();
     }
 

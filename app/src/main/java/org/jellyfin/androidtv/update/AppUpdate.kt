@@ -1,18 +1,18 @@
 package org.jellyfin.androidtv.update
 
-import org.jellyfin.androidtv.EphyraInfo
+import org.jellyfin.androidtv.VelellaInfo
 
-/** A release of Ephyra published on GitHub Releases. */
+/** A release of Velella published on GitHub Releases. */
 data class AppUpdate(
 	val versionName: String,
 	val versionCode: Int,
 ) {
-	/** The release's APK, published by the release workflow as "ephyra-v<version>.apk" under the tag "v<version>". */
-	val apkUrl get() = "${EphyraInfo.REPOSITORY_URL}/releases/download/v$versionName/ephyra-v$versionName.apk"
+	/** The release's APK, published by the release workflow as "velella-v<version>.apk" under the tag "v<version>". */
+	val apkUrl get() = "${VelellaInfo.REPOSITORY_URL}/releases/download/v$versionName/velella-v$versionName.apk"
 
 	companion object {
 		/** The latest release's version file, written by the app's versionTxt Gradle task. */
-		const val VERSION_TXT_URL = "${EphyraInfo.REPOSITORY_URL}/releases/latest/download/version.txt"
+		const val VERSION_TXT_URL = "${VelellaInfo.REPOSITORY_URL}/releases/latest/download/version.txt"
 
 		// Semantic version with an optional pre-release part, as getVersionName() in buildSrc produces it
 		private val versionNameRegex = Regex("""\d{1,2}\.\d{1,2}\.\d{1,2}(-[0-9A-Za-z.]+)?""")

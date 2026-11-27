@@ -10,8 +10,8 @@ import java.util.UUID
 class SpotlightItemsTest : FunSpec({
 	val getString: (Int, Array<out Any>) -> String = { res, args ->
 		when (res) {
-			R.string.ephyra_runtime_hours_minutes -> "%d h %d min".format(*args)
-			R.string.ephyra_runtime_minutes -> "%d min".format(*args)
+			R.string.velella_runtime_hours_minutes -> "%d h %d min".format(*args)
+			R.string.velella_runtime_minutes -> "%d min".format(*args)
 			else -> error("unexpected string $res")
 		}
 	}

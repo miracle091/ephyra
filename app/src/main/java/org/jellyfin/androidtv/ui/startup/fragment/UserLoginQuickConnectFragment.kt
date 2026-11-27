@@ -25,7 +25,7 @@ import org.jellyfin.androidtv.auth.model.UnavailableQuickConnectState
 import org.jellyfin.androidtv.auth.model.UnknownQuickConnectState
 import org.jellyfin.androidtv.auth.repository.ServerRepository
 import org.jellyfin.androidtv.databinding.FragmentUserLoginQuickConnectBinding
-import org.jellyfin.androidtv.ui.base.EphyraTheme
+import org.jellyfin.androidtv.ui.base.VelellaTheme
 import org.jellyfin.androidtv.ui.startup.UserLoginViewModel
 import org.jellyfin.androidtv.ui.startup.composable.QuickConnectCode
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
@@ -57,8 +57,8 @@ class UserLoginQuickConnectFragment : Fragment() {
 				userLoginViewModel.quickConnectState.onEach { state ->
 					when (state) {
 						is PendingQuickConnectState -> {
-							// Ephyra: one tile per character, in groups of three
-							binding.quickConnectCode.setContent { EphyraTheme { QuickConnectCode(state.code) } }
+							// Velella: one tile per character, in groups of three
+							binding.quickConnectCode.setContent { VelellaTheme { QuickConnectCode(state.code) } }
 							binding.loading.isVisible = false
 						}
 

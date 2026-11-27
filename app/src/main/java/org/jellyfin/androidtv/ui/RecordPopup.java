@@ -246,7 +246,7 @@ public class RecordPopup {
                 .append(" @ ")
                 .append(DateTimeExtensionsKt.getTimeFormatter(mContext).format(local))
                 .append(" (")
-                // Ephyra: local is wall-clock time, so it takes the device zone (UTC put it an hour off in Italy)
+                // Velella: local is wall-clock time, so it takes the device zone (UTC put it an hour off in Italy)
                 .append(DateUtils.getRelativeTimeSpanString(local.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli(), Instant.now().toEpochMilli(), 0))
                 .append(")")
         );

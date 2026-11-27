@@ -12,7 +12,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import org.jellyfin.androidtv.R
 import org.jellyfin.androidtv.integration.LeanbackChannelWorker
-import org.jellyfin.androidtv.preference.EphyraPreferences
+import org.jellyfin.androidtv.preference.VelellaPreferences
 import org.jellyfin.androidtv.preference.UserPreferences
 import org.jellyfin.androidtv.ui.base.Icon
 import org.jellyfin.androidtv.ui.base.Text
@@ -46,12 +46,12 @@ fun SettingsCustomizationScreen() {
 		}
 
 		item { ThemeListButton(userPreferences) }
-		item { AccentListButton() } // Ephyra
+		item { AccentListButton() } // Velella
 		item { ClockListButton(userPreferences) }
 		item { WatchedIndicatorListButton(userPreferences) }
 		item { SeriesThumbnailsListButton(userPreferences) }
-		item { SpoilerBlurListButton() } // Ephyra
-		item { CompactEpisodesListButton() } // Ephyra
+		item { SpoilerBlurListButton() } // Velella
+		item { CompactEpisodesListButton() } // Velella
 		if (leanbackChannelWorkerAvailable) item { TvProviderListButton(userPreferences, workManager) }
 
 		item { ListSection(headingContent = { Text(stringResource(R.string.pref_browsing)) }) }
@@ -95,14 +95,14 @@ private fun ThemeListButton(userPreferences: UserPreferences) {
 	)
 }
 
-// Ephyra: the accent colour, apart from the theme
+// Velella: the accent colour, apart from the theme
 @Composable
 private fun AccentListButton() {
 	val router = LocalRouter.current
-	var accentColor by rememberPreference(koinInject<EphyraPreferences>(), EphyraPreferences.accentColor)
+	var accentColor by rememberPreference(koinInject<VelellaPreferences>(), VelellaPreferences.accentColor)
 
 	ListButton(
-		headingContent = { Text(stringResource(R.string.ephyra_pref_accent_color)) },
+		headingContent = { Text(stringResource(R.string.velella_pref_accent_color)) },
 		slots = ListItemSlots(
 			captionContent = { Text(stringResource(accentColor.nameRes)) },
 		),
@@ -163,7 +163,7 @@ private fun TvProviderListButton(userPreferences: UserPreferences, workManager: 
 	ListButton(
 		headingContent = { Text(stringResource(R.string.tv_provider_enabled)) },
 		slots = ListItemSlots(
-			captionContent = { Text(stringResource(R.string.ephyra_tv_provider_enabled_description)) },
+			captionContent = { Text(stringResource(R.string.velella_tv_provider_enabled_description)) },
 			trailingContent = { Checkbox(checked = tvProviderEnabled) },
 		),
 		onClick = {

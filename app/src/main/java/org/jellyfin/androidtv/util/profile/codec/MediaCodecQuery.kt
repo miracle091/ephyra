@@ -23,7 +23,7 @@ class MediaCodecQuery(
 		val decoders = mediaCodecList.codecInfos.asSequence()
 			.filter { !it.isEncoder }
 			.filter { info -> info.supportedTypes.any { it.equals(mime, ignoreCase = true) } }
-		// Ephyra: the player skips software decoders for these formats when a hardware one exists (ShieldMediaCodecSelector),
+		// Velella: the player skips software decoders for these formats when a hardware one exists (ShieldMediaCodecSelector),
 		// so the limits sent to the server must come from the hardware decoders too
 		val hardwareFirst = HARDWARE_ONLY_MIME_TYPES.any { it.equals(mime, ignoreCase = true) } && decoders.any { !it.isSoftwareCodec }
 		return if (softwareCodecsEnabled && !hardwareFirst) decoders else decoders.filter { !it.isSoftwareCodec }

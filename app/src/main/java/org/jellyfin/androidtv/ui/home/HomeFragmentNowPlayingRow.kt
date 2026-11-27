@@ -36,7 +36,7 @@ class HomeFragmentNowPlayingRow(
 			// Ensure row exists
 			if (row == null) row = ListRow(
 				HeaderItem(context.getString(R.string.lbl_now_playing)),
-				// Ephyra: as tall as the library tiles, so the square cover fits under the spotlight (upstream 140dp)
+				// Velella: as tall as the library tiles, so the square cover fits under the spotlight (upstream 140dp)
 				AudioQueueBaseRowAdapter(
 					playbackManager,
 					lifecycleScope,

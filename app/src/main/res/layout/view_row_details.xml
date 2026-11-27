@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Ephyra: the details of a film, series, episode or person after the design system's detail hero, without the backdrop: the
+<!-- Velella: the details of a film, series, episode or person after the design system's detail hero, without the backdrop: the
      poster on the left with radius-md, the genres as an accent overline, a bold title, the info row, the overview, the director,
      runtime and end time as small label/value pairs and the icon buttons on the right -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -15,9 +15,9 @@
         android:clipChildren="false"
         android:gravity="top"
         android:orientation="horizontal"
-        android:paddingStart="@dimen/ephyra_side_margin"
-        android:paddingTop="@dimen/ephyra_details_top"
-        android:paddingEnd="@dimen/ephyra_side_margin"
+        android:paddingStart="@dimen/velella_side_margin"
+        android:paddingTop="@dimen/velella_details_top"
+        android:paddingEnd="@dimen/velella_side_margin"
         android:paddingBottom="16dp">
 
         <androidx.cardview.widget.CardView
@@ -29,10 +29,10 @@
 
             <org.jellyfin.androidtv.ui.AsyncImageView
                 android:id="@+id/mainImage"
-                android:layout_width="@dimen/ephyra_details_cover_width"
+                android:layout_width="@dimen/velella_details_cover_width"
                 android:layout_height="wrap_content"
                 android:adjustViewBounds="true"
-                android:maxHeight="@dimen/ephyra_details_cover_max_height"
+                android:maxHeight="@dimen/velella_details_cover_max_height"
                 android:scaleType="fitCenter"
                 tools:srcCompat="@drawable/app_banner" />
         </androidx.cardview.widget.CardView>
@@ -47,7 +47,7 @@
 
             <TextView
                 android:id="@+id/fdGenreRow"
-                android:layout_marginEnd="@dimen/ephyra_details_toolbar_room"
+                android:layout_marginEnd="@dimen/velella_details_toolbar_room"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
@@ -61,7 +61,7 @@
 
             <TextView
                 android:id="@+id/fdTitle"
-                android:layout_marginEnd="@dimen/ephyra_details_toolbar_room"
+                android:layout_marginEnd="@dimen/velella_details_toolbar_room"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
@@ -74,7 +74,7 @@
 
             <TextView
                 android:id="@+id/fdTagline"
-                android:layout_marginEnd="@dimen/ephyra_details_toolbar_room"
+                android:layout_marginEnd="@dimen/velella_details_toolbar_room"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
@@ -111,7 +111,7 @@
                 android:textSize="14sp"
                 tools:text="Overview" />
 
-            <!-- Ephyra: the info pairs and the buttons, with a series' next up card to their right so it adds no height -->
+            <!-- Velella: the info pairs and the buttons, with a series' next up card to their right so it adds no height -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -139,14 +139,14 @@
 
                             <TextView
                                 android:id="@+id/infoTitle1"
-                                style="@style/TextAppearance.Ephyra.InfoLabel"
+                                style="@style/TextAppearance.Velella.InfoLabel"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 tools:text="Directed by" />
 
                             <TextView
                                 android:id="@+id/infoValue1"
-                                style="@style/TextAppearance.Ephyra.InfoValue"
+                                style="@style/TextAppearance.Velella.InfoValue"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 tools:text="Name" />
@@ -160,14 +160,14 @@
 
                             <TextView
                                 android:id="@+id/infoTitle2"
-                                style="@style/TextAppearance.Ephyra.InfoLabel"
+                                style="@style/TextAppearance.Velella.InfoLabel"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 tools:text="Runs" />
 
                             <TextView
                                 android:id="@+id/infoValue2"
-                                style="@style/TextAppearance.Ephyra.InfoValue"
+                                style="@style/TextAppearance.Velella.InfoValue"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 tools:text="3m" />
@@ -180,14 +180,14 @@
 
                             <TextView
                                 android:id="@+id/infoTitle3"
-                                style="@style/TextAppearance.Ephyra.InfoLabel"
+                                style="@style/TextAppearance.Velella.InfoLabel"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 tools:text="Ends" />
 
                             <TextView
                                 android:id="@+id/infoValue3"
-                                style="@style/TextAppearance.Ephyra.InfoValue"
+                                style="@style/TextAppearance.Velella.InfoValue"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 tools:text="9:18 PM" />

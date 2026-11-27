@@ -78,7 +78,7 @@ class UserLoginFragment : Fragment() {
 					val name = server?.name ?: "Jellyfin"
 					binding.subtitle.text = getString(R.string.login_connect_to, name)
 
-					// Ephyra: the plain theme background, without the server's splashscreen
+					// Velella: the plain theme background, without the server's splashscreen
 					backgroundService.clearBackgrounds()
 				}.launchIn(this)
 
@@ -110,7 +110,7 @@ class UserLoginFragment : Fragment() {
 		binding.useCredentials.isVisible = T::class != UserLoginCredentialsFragment::class
 		binding.useQuickconnect.isVisible = T::class != UserLoginQuickConnectFragment::class
 
-		// Ephyra: Quick Connect has nothing to focus, so the focus starts on "Use a password"
+		// Velella: Quick Connect has nothing to focus, so the focus starts on "Use a password"
 		if (T::class == UserLoginQuickConnectFragment::class) binding.useCredentials.requestFocus()
 	}
 }

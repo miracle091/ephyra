@@ -6,7 +6,7 @@ import androidx.media3.common.util.UnstableApi
 import org.jellyfin.androidtv.preference.constant.RefreshRateSwitchingBehavior
 
 /**
- * Ephyra: when the app switches the display mode itself (PlaybackController), Media3 must not also ask the surface
+ * Velella: when the app switches the display mode itself (PlaybackController), Media3 must not also ask the surface
  * for a frame rate, or the two requests can fight. With switching disabled, Media3 keeps its own default.
  */
 @OptIn(UnstableApi::class)

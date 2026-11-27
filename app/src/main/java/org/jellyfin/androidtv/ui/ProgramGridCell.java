@@ -49,7 +49,7 @@ public class ProgramGridCell extends RelativeLayout implements RecordingIndicato
 
         setFocusable(true);
         setBackground(GuideStyle.cellBackground(context));
-        // Ephyra: the now bar hugs the bottom edge, so the cell's rounded corners clip it
+        // Velella: the now bar hugs the bottom edge, so the cell's rounded corners clip it
         setClipToOutline(true);
 
         mProgramName = findViewById(R.id.programName);
@@ -63,7 +63,7 @@ public class ProgramGridCell extends RelativeLayout implements RecordingIndicato
         if (program.getStartDate() != null && program.getEndDate() != null) {
             LocalDateTime localStart = program.getStartDate();
             if (localStart.plusMinutes(1).isBefore(activity.getCurrentLocalStartDate())) {
-                // Ephyra: no "<<" before the name; the start time under it tells the programme began earlier
+                // Velella: no "<<" before the name; the start time under it tells the programme began earlier
                 TextView time = new TextView(context);
                 time.setTypeface(GuideStyle.monoTypeface(context));
                 time.setTextColor(Utils.getThemeColor(context, R.attr.controlIconForegroundInactive));
@@ -116,7 +116,7 @@ public class ProgramGridCell extends RelativeLayout implements RecordingIndicato
     }
 
     /**
-     * Ephyra: the programme on air gets a red dot before its name, like the player's LIVE badge, and a bar in the theme's accent
+     * Velella: the programme on air gets a red dot before its name, like the player's LIVE badge, and a bar in the theme's accent
      * that runs with the clock. Called again by the guide's ticker, so both move on to the next programme without reloading.
      */
     public void refreshNow() {
@@ -128,7 +128,7 @@ public class ProgramGridCell extends RelativeLayout implements RecordingIndicato
         if (now >= 0) {
             nowBar.setProgress(now);
             nowBar.setVisibility(View.VISIBLE);
-            mProgramName.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ephyra_guide_live_dot, 0, 0, 0);
+            mProgramName.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.velella_guide_live_dot, 0, 0, 0);
         } else {
             nowBar.setVisibility(View.GONE);
             mProgramName.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, 0, 0);
@@ -140,7 +140,7 @@ public class ProgramGridCell extends RelativeLayout implements RecordingIndicato
         view.setTextSize(10);
         view.setTextColor(Utils.getThemeColor(getContext(), R.attr.controlIconForegroundInactive));
         view.setText(text);
-        view.setBackgroundResource(R.drawable.ephyra_guide_badge);
+        view.setBackgroundResource(R.drawable.velella_guide_badge);
         int sidePadding = Utils.convertDpToPixel(getContext(), 4);
         view.setPadding(sidePadding, 0, sidePadding, 0);
         mInfoRow.addView(view);

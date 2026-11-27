@@ -9,7 +9,7 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.CaptionStyleCompat
 import androidx.media3.ui.SubtitleView
 
-/** Ephyra: the user's subtitle look, shared by both players. Colours are ARGB. */
+/** Velella: the user's subtitle look, shared by both players. Colours are ARGB. */
 data class SubtitleStyle(
 	val textColor: Int,
 	val backgroundColor: Int,

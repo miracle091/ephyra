@@ -4,10 +4,10 @@ import org.jellyfin.playback.core.queue.QueueEntry
 import org.jellyfin.sdk.model.api.BaseItemDto
 
 sealed interface DreamContent {
-	// Ephyra: a minimal clock instead of the logo and the library showcase
+	// Velella: a minimal clock instead of the logo and the library showcase
 	data object Clock : DreamContent
 	data class NowPlaying(val entry: QueueEntry, val item: BaseItemDto) : DreamContent
 
-	// Ephyra: a video left paused in the player, instead of unrelated content over it
+	// Velella: a video left paused in the player, instead of unrelated content over it
 	data class VideoPaused(val item: BaseItemDto, val positionMs: Long, val durationMs: Long) : DreamContent
 }

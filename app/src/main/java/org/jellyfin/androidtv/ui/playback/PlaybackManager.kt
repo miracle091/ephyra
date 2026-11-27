@@ -80,7 +80,7 @@ class PlaybackManager(
 		startTimeTicks: Long,
 		callback: Response<StreamInfo>
 	) = lifecycleOwner.lifecycleScope.launch {
-		// Ephyra: server 12 has no endpoint to stop an encoding (ActiveEncodings); it replaces the play session's transcode itself
+		// Velella: server 12 has no endpoint to stop an encoding (ActiveEncodings); it replaces the play session's transcode itself
 		getVideoStreamInfoInternal(options, startTimeTicks).fold(
 			onSuccess = { callback.onResponse(it) },
 			onFailure = { callback.onError(Exception(it)) },

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Ephyra: a list item of the design system: number, bold title with the artist under it and the duration, lined up with the
+<!-- Velella: a list item of the design system: number, bold title with the artist under it and the duration, lined up with the
      screen's side margin; the focused row gets a surface-3 fill (ItemRowView) and keeps its text colours -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"

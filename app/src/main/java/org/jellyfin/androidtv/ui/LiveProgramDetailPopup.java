@@ -267,10 +267,10 @@ public class LiveProgramDetailPopup {
     private android.widget.ImageButton addImgButton(LinearLayout layout, int imgResource) {
         android.widget.ImageButton btn = new android.widget.ImageButton(mContext);
         btn.setImageDrawable(ContextCompat.getDrawable(mContext, imgResource));
-        // Ephyra: the player's icon button, 48dp with a 24dp icon and an ink circle when focused
-        int size = mContext.getResources().getDimensionPixelSize(R.dimen.ephyra_osd_button);
-        int padding = (size - mContext.getResources().getDimensionPixelSize(R.dimen.ephyra_osd_icon)) / 2;
-        btn.setBackgroundResource(R.drawable.ephyra_osd_button_back);
+        // Velella: the player's icon button, 48dp with a 24dp icon and an ink circle when focused
+        int size = mContext.getResources().getDimensionPixelSize(R.dimen.velella_osd_button);
+        int padding = (size - mContext.getResources().getDimensionPixelSize(R.dimen.velella_osd_icon)) / 2;
+        btn.setBackgroundResource(R.drawable.velella_osd_button_back);
         btn.setPadding(padding, padding, padding, padding);
         btn.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);
         btn.setLayoutParams(new LinearLayout.LayoutParams(size, size));
@@ -278,15 +278,15 @@ public class LiveProgramDetailPopup {
         return btn;
     }
 
-    // Ephyra: the design system's ghost button, ink-muted until focused, then the solid ink fill
+    // Velella: the design system's ghost button, ink-muted until focused, then the solid ink fill
     private Button newButton() {
-        return new Button(mContext, null, 0, R.style.Button_Ephyra_Ghost);
+        return new Button(mContext, null, 0, R.style.Button_Velella_Ghost);
     }
 
     private void setFavoriteIcon(android.widget.ImageButton button, boolean favorite) {
         button.setImageResource(favorite ? R.drawable.ic_heart_accent : R.drawable.ic_heart);
         // the outline heart follows the focus like the other icons; the accent one keeps its colour
-        button.setImageTintList(favorite ? null : ContextCompat.getColorStateList(mContext, R.color.ephyra_osd_icon_tint));
+        button.setImageTintList(favorite ? null : ContextCompat.getColorStateList(mContext, R.color.velella_osd_icon_tint));
     }
 
     private Button addButton(LinearLayout layout, int stringResource) {

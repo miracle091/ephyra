@@ -1,7 +1,7 @@
 package org.jellyfin.androidtv.ui.playback
 
 /**
- * Ephyra: opening a live channel's stream can fail for a moment (the server answers 500 while its transcode is not ready,
+ * Velella: opening a live channel's stream can fail for a moment (the server answers 500 while its transcode is not ready,
  * mostly right after a channel switch). A live stream is retried a few times with a growing pause before the failure counts
  * as a playback error; anything else keeps the player's normal error handling.
  */

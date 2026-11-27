@@ -21,12 +21,12 @@ import org.jellyfin.sdk.model.api.UpdateUserItemDataDto
 import org.koin.java.KoinJavaComponent
 import timber.log.Timber
 
-/** Ephyra: entries added to the MENU-key menu of a card, after upstream's own (see [KeyProcessor.createItemMenu]). */
+/** Velella: entries added to the MENU-key menu of a card, after upstream's own (see [KeyProcessor.createItemMenu]). */
 enum class ItemMenuExtra(
 	@StringRes val label: Int,
 ) {
 	/** Clears the resume position only; the item stays watched or unwatched as it was. */
-	RESET_PROGRESS(R.string.ephyra_menu_reset_progress),
+	RESET_PROGRESS(R.string.velella_menu_reset_progress),
 	GO_TO_SERIES(R.string.lbl_goto_series),
 	;
 

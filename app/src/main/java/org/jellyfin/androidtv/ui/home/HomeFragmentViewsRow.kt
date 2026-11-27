@@ -19,7 +19,7 @@ class HomeFragmentViewsRow(
 	val small: Boolean,
 ) : HomeFragmentRow {
 	override fun addToRowsAdapter(context: Context, cardPresenter: CardPresenter, rowsAdapter: MutableObjectAdapter<Row>) {
-		// Ephyra: a whole number of cards fills the row (upstream 75dp and 126dp)
+		// Velella: a whole number of cards fills the row (upstream 75dp and 126dp)
 		val screenWidth = context.resources.configuration.screenWidthDp.dp
 		val count = if (small) ROW_CARDS_WIDE_SMALL else ROW_CARDS_WIDE
 		val presenter = CardPresenter(true, rowCardHeight(screenWidth, count, WIDE_ASPECT_RATIO).value.toInt())

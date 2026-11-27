@@ -47,7 +47,7 @@ fun ItemCardBaseItemOverlay(
 			.fillMaxSize()
 			.padding(Tokens.Space.spaceXs)
 	) {
-		// Ephyra: the favorite and recording marks sit in the top right corner, next to the watched badge
+		// Velella: the favorite and recording marks sit in the top right corner, next to the watched badge
 		Row(
 			modifier = Modifier.align(Alignment.TopEnd),
 			horizontalArrangement = Arrangement.spacedBy(Tokens.Space.spaceXs),
@@ -65,7 +65,7 @@ fun ItemCardBaseItemOverlay(
 		}
 	}
 
-	// Ephyra: the shared card progress bar, on the card's bottom edge instead of floating above the footer
+	// Velella: the shared card progress bar, on the card's bottom edge instead of floating above the footer
 	ProgressIndicator(
 		item = item,
 		modifier = Modifier.align(Alignment.BottomCenter),
@@ -97,7 +97,7 @@ private fun StateIndicator(
 		}
 
 		if (isFavorited) {
-			// Ephyra: a badge like the watched one, in the theme's colours instead of a red heart
+			// Velella: a badge like the watched one, in the theme's colours instead of a red heart
 			Badge(
 				modifier = modifier
 					.size(24.dp),

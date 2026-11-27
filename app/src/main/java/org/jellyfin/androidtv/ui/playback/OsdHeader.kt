@@ -8,7 +8,7 @@ import org.jellyfin.sdk.model.api.BaseItemDto
 import org.jellyfin.sdk.model.api.BaseItemKind
 
 /**
- * Ephyra: the video player's header after the design system's "Player" board, in text instead of the title logo: the series
+ * Velella: the video player's header after the design system's "Player" board, in text instead of the title logo: the series
  * and the episode number (the genres for anything else) as the overline over the episode's or film's name. For a live channel
  * the danger "LIVE" badge comes first, then the channel's number and name in the overline's place, and the programme on air moves
  * to the title block above the seek bar (bindProgramme).
@@ -24,8 +24,8 @@ object OsdHeader {
 
 		liveBadge.isVisible = isLive
 		// The channel line is 16sp bold ink next to the badge; the other overlines are the small muted caps
-		overline.setTextAppearance(if (isLive) R.style.TextAppearance_Ephyra_OsdChannel else R.style.TextAppearance_Ephyra_OsdOverline)
-		overline.minHeight = if (isLive) overline.resources.getDimensionPixelSize(R.dimen.ephyra_osd_badge_height) else 0
+		overline.setTextAppearance(if (isLive) R.style.TextAppearance_Velella_OsdChannel else R.style.TextAppearance_Velella_OsdOverline)
+		overline.minHeight = if (isLive) overline.resources.getDimensionPixelSize(R.dimen.velella_osd_badge_height) else 0
 		overline.text = overlineText
 		overline.isVisible = overlineText.isNotBlank()
 		// The live programme's title block sits above the seek bar (bindProgramme), the header keeps the channel line

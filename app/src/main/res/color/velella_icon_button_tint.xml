@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Velella: the icon of the design system's icon button: background colour on the focus fill, accent when active (a favorite),
+     ink otherwise, muted when disabled -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="?attr/controlIconForegroundInactive" android:state_enabled="false" />
+    <item android:color="?attr/defaultBackground" android:state_focused="true" />
+    <item android:color="?android:attr/colorAccent" android:state_activated="true" />
+    <item android:color="?attr/headerTextColor" />
+</selector>

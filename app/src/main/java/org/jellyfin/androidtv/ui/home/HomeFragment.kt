@@ -40,7 +40,7 @@ class HomeFragment : Fragment() {
 			// issue we add custom behavior that only allows focus exit when the current selected row is the first one. Additionally when
 			// we do switch the focus, we reset the leanback state so it won't cause weird behavior when focus is regained
 			var rowsSupportFragment by remember { mutableStateOf<HomeRowsFragment?>(null) }
-			HomeSpotlight(rowsSupportFragment) // Ephyra: spotlight above the rows
+			HomeSpotlight(rowsSupportFragment) // Velella: spotlight above the rows
 			AndroidFragment<HomeRowsFragment>(
 				modifier = Modifier
 					.focusGroup()
@@ -56,7 +56,7 @@ class HomeFragment : Fragment() {
 							}
 						}
 					}
-					.homeBottomFade() // Ephyra
+					.homeBottomFade() // Velella
 					.fillMaxSize(),
 				maxLifecycle = Lifecycle.State.RESUMED,
 				onUpdate = { fragment ->

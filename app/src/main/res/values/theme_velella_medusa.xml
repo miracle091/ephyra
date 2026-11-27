@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Velella: the Medusa theme, deep violet with a lilac accent (same colours as design/.../VelellaColorTokens.kt) -->
+<resources>
+
+    <color name="velella_medusa_bg">#120C24</color>
+    <color name="velella_medusa_surface_1">#1C1436</color>
+    <color name="velella_medusa_surface_2">#271D47</color>
+    <color name="velella_medusa_surface_3">#33285A</color>
+    <color name="velella_medusa_line_strong">#7D6CAE</color>
+    <color name="velella_medusa_ink_muted">#C4B8DE</color>
+    <color name="velella_medusa_ink_faint">#9C8FC0</color>
+    <color name="velella_medusa_accent">#B794FF</color>
+
+    <style name="Theme.Jellyfin.Velella.Medusa" parent="Theme.Jellyfin.Velella">
+        <item name="android:colorPrimary">@color/velella_medusa_bg</item>
+        <item name="android:colorPrimaryDark">@color/velella_medusa_bg</item>
+        <item name="android:colorAccent">@color/velella_medusa_accent</item>
+        <item name="defaultBackground">@color/velella_medusa_bg</item>
+        <item name="cardImageBackground">@color/velella_medusa_surface_1</item>
+        <item name="defaultSearchColor">@color/velella_medusa_accent</item>
+        <item name="android:colorButtonNormal">@color/velella_medusa_surface_2</item>
+        <item name="buttonDefaultNormalBackground">@color/velella_medusa_surface_2</item>
+        <item name="inputDefaultStrokeColor">@color/velella_medusa_line_strong</item>
+        <item name="popupMenuBackground">@color/velella_medusa_surface_2</item>
+        <item name="progressBackground">@color/velella_medusa_surface_3</item>
+        <item name="progressPrimary">@color/velella_medusa_accent</item>
+        <item name="progressSecondary">@color/velella_medusa_ink_faint</item>
+        <item name="controlIconBackground">@color/velella_medusa_surface_2</item>
+        <item name="controlIconForegroundActive">@color/velella_medusa_accent</item>
+        <item name="controlIconForegroundInactive">@color/velella_medusa_ink_muted</item>
+    </style>
+</resources>

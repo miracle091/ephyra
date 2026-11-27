@@ -36,7 +36,7 @@ class SdkPlaybackHelper(
 	private val userPreferences: UserPreferences,
 	private val playbackLauncher: PlaybackLauncher,
 	private val playbackControllerContainer: PlaybackControllerContainer,
-	// Ephyra: the new player, so a playback started while it plays a video replaces its screen
+	// Velella: the new player, so a playback started while it plays a video replaces its screen
 	private val playbackManager: PlaybackManager,
 ) : PlaybackHelper {
 	companion object {
@@ -90,7 +90,7 @@ class SdkPlaybackHelper(
 	private suspend fun getEpisodeItems(mainItem: BaseItemDto): List<BaseItemDto> {
 		val seriesId = mainItem.seriesId
 		return if (userPreferences[UserPreferences.mediaQueuingEnabled] && seriesId != null) {
-			applySeasonEnd(getEpisodeQueue(mainItem, seriesId), mainItem) // Ephyra: optional stop at the end of the season
+			applySeasonEnd(getEpisodeQueue(mainItem, seriesId), mainItem) // Velella: optional stop at the end of the season
 		} else {
 			listOf(mainItem)
 		}
@@ -113,7 +113,7 @@ class SdkPlaybackHelper(
 	}
 
 	/**
-	 * Ephyra: the episode queue starting at [mainItem] (adapted from upstream #5932). The episodes endpoint only lists the
+	 * Velella: the episode queue starting at [mainItem] (adapted from upstream #5932). The episodes endpoint only lists the
 	 * primary version of each episode, so when [mainItem] is an alternate version picked by the user it goes back at the
 	 * head of the queue, or the primary version would play instead of the picked one.
 	 */

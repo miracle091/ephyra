@@ -5,6 +5,6 @@ import androidx.annotation.DrawableRes
 data class MediaToastData(
 	@DrawableRes val icon: Int,
 	val progress: Float? = null,
-	// Ephyra: a short text under the icon (the quick seek's distance)
+	// Velella: a short text under the icon (the quick seek's distance)
 	val label: String? = null,
 )

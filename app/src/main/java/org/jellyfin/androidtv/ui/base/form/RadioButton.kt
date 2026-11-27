@@ -23,7 +23,7 @@ fun RadioButton(
 	checked: Boolean,
 	modifier: Modifier = Modifier,
 	shape: Shape = CircleShape,
-	// Ephyra: on in the theme's accent, off as a neutral outline
+	// Velella: on in the theme's accent, off as a neutral outline
 	containerColor: Color = JellyfinTheme.colorScheme.badge,
 	contentColor: Color = JellyfinTheme.colorScheme.onBadge,
 ) {

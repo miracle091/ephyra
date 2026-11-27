@@ -14,10 +14,10 @@ import org.jellyfin.sdk.model.api.MediaSegmentDto
 fun jellyfinPlugin(
 	api: ApiClient,
 	deviceProfileBuilder: () -> DeviceProfile,
-	// Ephyra: whether to skip a segment, from the user's segment settings; null for no skipping
+	// Velella: whether to skip a segment, from the user's segment settings; null for no skipping
 	skipMediaSegment: ((MediaSegmentDto) -> Boolean)? = null,
 	lifecycle: Lifecycle? = null,
-	// Ephyra: the user's "burn in subtitles when transcoding" setting
+	// Velella: the user's "burn in subtitles when transcoding" setting
 	alwaysBurnInSubtitles: () -> Boolean = { false },
 ) = playbackPlugin {
 	provide(JellyfinMediaStreamResolver(api, deviceProfileBuilder, alwaysBurnInSubtitles))

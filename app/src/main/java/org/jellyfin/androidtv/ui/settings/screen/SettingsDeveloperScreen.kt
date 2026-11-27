@@ -70,7 +70,7 @@ fun SettingsDeveloperScreen() {
 
 		item { ClearImageCacheButton() }
 
-		// Ephyra: codec benchmark, debug builds only
+		// Velella: codec benchmark, debug builds only
 		if (BuildConfig.DEBUG) item { CodecBenchmarkListButton() }
 	}
 }

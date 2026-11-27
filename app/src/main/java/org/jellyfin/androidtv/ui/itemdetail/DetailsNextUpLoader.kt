@@ -7,7 +7,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
 /**
- * Ephyra: loads the series' next up episode and shows it as the card beside the buttons; selecting it plays that episode,
+ * Velella: loads the series' next up episode and shows it as the card beside the buttons; selecting it plays that episode,
  * from where it was left when it is partly watched. An unstarted series gets its first episode, a finished one no card.
  */
 fun FullDetailsFragment.loadNextUpCard() {

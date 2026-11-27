@@ -177,7 +177,7 @@ class UserPreferences(context: Context) : SharedPreferenceStore(
 		var doviProfile8Override = enumPreference("dovi_profile_8_override", HdrOverrideMode.AUTO)
 
 		/**
-		 * Ephyra: Dolby Vision files the server tags DOVI_INVALID. Always unsupported unless set to enable.
+		 * Velella: Dolby Vision files the server tags DOVI_INVALID. Always unsupported unless set to enable.
 		 */
 		var doviInvalidOverride = enumPreference("dovi_invalid_override", HdrOverrideMode.AUTO)
 
@@ -337,7 +337,7 @@ class UserPreferences(context: Context) : SharedPreferenceStore(
 			migration(toVersion = 9) {
 				// Reset subtitle text size as we changed from fractional sizing to absolute sizing
 				remove("subtitles_text_size")
-				// Ephyra: no item backdrops behind the screens, so the old backdrop setting is not carried over
+				// Velella: no item backdrops behind the screens, so the old backdrop setting is not carried over
 			}
 		}
 	}

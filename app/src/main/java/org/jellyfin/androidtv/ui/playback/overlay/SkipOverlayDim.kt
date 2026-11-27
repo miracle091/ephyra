@@ -20,17 +20,17 @@ private const val SKIP_HIDE_15_S = 15
 private const val SKIP_HIDE_20_S = 20
 private const val SKIP_HIDE_30_S = 30
 
-/** Ephyra: the choices for how long the skip button stays on screen, in seconds; 0 keeps it until the segment ends. */
+/** Velella: the choices for how long the skip button stays on screen, in seconds; 0 keeps it until the segment ends. */
 val SkipAutoHideChoices = listOf(SKIP_HIDE_5_S, SKIP_HIDE_10_S, SKIP_HIDE_15_S, SKIP_HIDE_20_S, SKIP_HIDE_30_S, 0)
 
-/** Ephyra: how long the skip button stays on screen before it hides by itself, or null to keep it until the segment ends. */
+/** Velella: how long the skip button stays on screen before it hides by itself, or null to keep it until the segment ends. */
 fun skipAutoHideDelay(seconds: Int): Duration? = if (seconds > 0) seconds.seconds else null
 
-/** Ephyra: whether the skip button is on screen, hidden but ready to be called back, or not there at all. */
+/** Velella: whether the skip button is on screen, hidden but ready to be called back, or not there at all. */
 enum class SkipButtonState { SHOWN, RECALLABLE, NONE }
 
 /**
- * Ephyra: the skip button's state, like a streaming service's "Skip intro": shown inside a segment while the player's controls are
+ * Velella: the skip button's state, like a streaming service's "Skip intro": shown inside a segment while the player's controls are
  * closed ([enabled]); once it hid by itself ([autoHidden]) it can be called back until the segment ends.
  */
 fun skipButtonState(enabled: Boolean, autoHidden: Boolean, target: Duration?, position: Duration): SkipButtonState = when {
@@ -39,20 +39,20 @@ fun skipButtonState(enabled: Boolean, autoHidden: Boolean, target: Duration?, po
 	else -> SkipButtonState.SHOWN
 }
 
-/** Ephyra: the keys that call a hidden skip button back; left and right keep seeking. */
+/** Velella: the keys that call a hidden skip button back; left and right keep seeking. */
 fun isSkipRecallKey(keyCode: Int): Boolean = keyCode == KeyEvent.KEYCODE_DPAD_CENTER || keyCode == KeyEvent.KEYCODE_ENTER ||
 	keyCode == KeyEvent.KEYCODE_DPAD_UP || keyCode == KeyEvent.KEYCODE_DPAD_DOWN
 
-/** Ephyra: how long the skip button stays fully visible before it dims. */
+/** Velella: how long the skip button stays fully visible before it dims. */
 internal val SkipDimDelay = 3.seconds
 
-/** Ephyra: the skip button's opacity once dimmed, until it hides. */
+/** Velella: the skip button's opacity once dimmed, until it hides. */
 internal const val SKIP_DIMMED_ALPHA = 0.8f
 
 private const val SKIP_DIM_FADE_MS = 600
 
 /**
- * Ephyra: opacity of the skip button: fully visible when it appears, dimmed after [SkipDimDelay] so it stays out of the way
+ * Velella: opacity of the skip button: fully visible when it appears, dimmed after [SkipDimDelay] so it stays out of the way
  * until it hides by itself.
  */
 @Composable

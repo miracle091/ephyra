@@ -16,7 +16,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.jellyfin.androidtv.R
-import org.jellyfin.androidtv.ui.base.EphyraTheme
+import org.jellyfin.androidtv.ui.base.VelellaTheme
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.composable.InfoRowGroups
 import org.jellyfin.androidtv.ui.composable.InfoRowOutlinedBadge
@@ -138,7 +138,7 @@ fun BaseItemInfoRow(
 	includeRuntime: Boolean,
 	separated: Boolean = false,
 ) {
-	// Ephyra: the details screen shows films, series and episodes as groups divided by vertical lines
+	// Velella: the details screen shows films, series and episodes as groups divided by vertical lines
 	if (separated && item.type !in SEPARATED_EXCLUDED_KINDS) {
 		InfoRowGroups(buildSeparatedGroups(item, mediaSource, includeRuntime))
 		return
@@ -188,7 +188,7 @@ private fun InfoRowSeries(item: BaseItemDto, mediaSource: MediaSourceInfo?, incl
 	mediaSource?.let { InfoRowMediaDetails(it) }
 }
 
-// Ephyra: the server rates out of 10 (community) and 100 (critics); the badges take a fraction
+// Velella: the server rates out of 10 (community) and 100 (critics); the badges take a fraction
 internal const val COMMUNITY_RATING_SCALE = 10f
 internal const val CRITIC_RATING_SCALE = 100f
 
@@ -203,7 +203,7 @@ private val SEPARATED_EXCLUDED_KINDS = setOf(
 )
 
 /**
- * Ephyra: the groups of the separated info row: episode label, year or date, community rating, critic rating, runtime,
+ * Velella: the groups of the separated info row: episode label, year or date, community rating, critic rating, runtime,
  * series status, media details and the official rating as an outlined badge at the end. Absent data adds no group.
  */
 private fun buildSeparatedGroups(
@@ -253,7 +253,7 @@ class BaseItemInfoRowView @JvmOverloads constructor(
 			_includeRuntime.value = value
 		}
 
-	/** Ephyra: groups divided by vertical lines and an outlined official rating, used by the details screen. */
+	/** Velella: groups divided by vertical lines and an outlined official rating, used by the details screen. */
 	var separated: Boolean
 		get() = _separated.value
 		set(value) {
@@ -272,7 +272,7 @@ class BaseItemInfoRowView @JvmOverloads constructor(
 		val includeRuntime by _includeRuntime.collectAsState()
 		val separated by _separated.collectAsState()
 
-		// Ephyra: the theme's tokens for the info row items
-		EphyraTheme { item?.let { BaseItemInfoRow(it, mediaSource, includeRuntime, separated) } }
+		// Velella: the theme's tokens for the info row items
+		VelellaTheme { item?.let { BaseItemInfoRow(it, mediaSource, includeRuntime, separated) } }
 	}
 }

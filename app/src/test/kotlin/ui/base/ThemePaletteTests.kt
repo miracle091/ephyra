@@ -36,13 +36,13 @@ class ThemePaletteTests : FunSpec({
 		AppTheme.MEDUSA to "medusa",
 	).forEach { (theme, name) ->
 		test("the Leanback theme of $theme uses the same colours") {
-			val xml = File("src/main/res/values/theme_ephyra_$name.xml").readText().uppercase()
+			val xml = File("src/main/res/values/theme_velella_$name.xml").readText().uppercase()
 			val palette = paletteFor(theme)
 
 			listOf(palette.bg, palette.surface1, palette.surface2, palette.surface3, palette.accent, palette.inkMuted, palette.inkFaint)
 				.map { ">${it.hex()}<" }
 				.filterNot { it in xml } shouldBe emptyList()
-			("THEME.JELLYFIN.EPHYRA.${name.uppercase()}" in xml) shouldBe true
+			("THEME.JELLYFIN.VELELLA.${name.uppercase()}" in xml) shouldBe true
 		}
 	}
 })

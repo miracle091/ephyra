@@ -1,18 +1,18 @@
 <resources>
     <dimen name="overscan_horizontal">27dp</dimen>
     <dimen name="overscan_vertical">48dp</dimen>
-    <dimen name="ephyra_side_margin">32dp</dimen><!-- Ephyra: side margin of the home and library screens -->
-    <!-- Ephyra: the header line of every screen, set by the home toolbar: the clock row is centred 47.5dp from the top. ephyra_clock_top places the clock row (7dp + 41dp button) on it, ephyra_header_title_top centres a 32sp library title on it, ephyra_details_top centres the 11sp genre line of the details and albums on it -->
-    <dimen name="ephyra_clock_top">20dp</dimen>
-    <dimen name="ephyra_header_title_top">30dp</dimen>
-    <dimen name="ephyra_details_top">40dp</dimen>
-    <!-- Ephyra: cover of the details and albums: a 2:3 poster is 168 x 252dp, so the first row under it fits on screen without scrolling -->
-    <dimen name="ephyra_details_cover_width">168dp</dimen>
-    <dimen name="ephyra_details_cover_max_height">252dp</dimen>
-    <dimen name="ephyra_details_toolbar_room">160dp</dimen><!-- Ephyra: room kept free for the home button and clock at the top right of the details -->
-    <dimen name="ephyra_card_gap">8dp</dimen><!-- Ephyra: gap between cards, as in the home rows -->
+    <dimen name="velella_side_margin">32dp</dimen><!-- Velella: side margin of the home and library screens -->
+    <!-- Velella: the header line of every screen, set by the home toolbar: the clock row is centred 47.5dp from the top. velella_clock_top places the clock row (7dp + 41dp button) on it, velella_header_title_top centres a 32sp library title on it, velella_details_top centres the 11sp genre line of the details and albums on it -->
+    <dimen name="velella_clock_top">20dp</dimen>
+    <dimen name="velella_header_title_top">30dp</dimen>
+    <dimen name="velella_details_top">40dp</dimen>
+    <!-- Velella: cover of the details and albums: a 2:3 poster is 168 x 252dp, so the first row under it fits on screen without scrolling -->
+    <dimen name="velella_details_cover_width">168dp</dimen>
+    <dimen name="velella_details_cover_max_height">252dp</dimen>
+    <dimen name="velella_details_toolbar_room">160dp</dimen><!-- Velella: room kept free for the home button and clock at the top right of the details -->
+    <dimen name="velella_card_gap">8dp</dimen><!-- Velella: gap between cards, as in the home rows -->
 
-    <fraction name="card_scale_focus">106%</fraction><!-- Ephyra: scale-focus of the design system (upstream 115%) -->
+    <fraction name="card_scale_focus">106%</fraction><!-- Velella: scale-focus of the design system (upstream 115%) -->
 
     <!-- Set leanback card scale values -->
     <fraction name="lb_focus_zoom_factor_small">@fraction/card_scale_focus</fraction>
@@ -20,6 +20,6 @@
     <fraction name="lb_focus_zoom_factor_medium">@fraction/card_scale_focus</fraction>
     <fraction name="lb_focus_zoom_factor_large">@fraction/card_scale_focus</fraction>
 
-    <!-- Ephyra: height of the progress bar on cards and guide cells (CardProgressBar, ephyra_card_progress) -->
-    <dimen name="ephyra_card_progress_height">4dp</dimen>
+    <!-- Velella: height of the progress bar on cards and guide cells (CardProgressBar, velella_card_progress) -->
+    <dimen name="velella_card_progress_height">4dp</dimen>
 </resources>

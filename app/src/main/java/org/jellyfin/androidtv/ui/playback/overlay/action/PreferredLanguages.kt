@@ -8,7 +8,7 @@ import java.util.Locale
 import java.util.MissingResourceException
 
 /**
- * Ephyra: the audio or subtitle tracks with the user's preferred languages first (the language set on the server for the user,
+ * Velella: the audio or subtitle tracks with the user's preferred languages first (the language set on the server for the user,
  * then the TV's language), so a remux with many tracks needs fewer D-pad presses. The other tracks keep their order.
  */
 fun List<MediaStream>.preferredLanguagesFirst(serverPreference: (UserConfiguration) -> String?): List<MediaStream> {

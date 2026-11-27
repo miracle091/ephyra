@@ -54,7 +54,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.jellyfin.androidtv.R
 import org.jellyfin.androidtv.ui.base.Icon
-import org.jellyfin.androidtv.ui.base.LocalEphyraPalette
+import org.jellyfin.androidtv.ui.base.LocalVelellaPalette
 import org.jellyfin.androidtv.ui.base.LocalTextStyle
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.base.dialog.DialogBase
@@ -111,7 +111,7 @@ fun SettingsTwoPaneDialog(
 
 @Composable
 private fun BoxScope.SettingsTwoPane() {
-	val palette = LocalEphyraPalette.current
+	val palette = LocalVelellaPalette.current
 	val focusManager = LocalFocusManager.current
 	var selected by remember { mutableStateOf(sections.first().route) }
 	val sectionRequesters = remember { sections.associate { it.route to FocusRequester() } }
@@ -159,7 +159,7 @@ private fun SettingsLeftPane(
 	onSelected: (String) -> Unit,
 	enterRightPane: () -> Unit,
 ) {
-	val palette = LocalEphyraPalette.current
+	val palette = LocalVelellaPalette.current
 
 	Column(
 		modifier = Modifier
@@ -216,7 +216,7 @@ private fun RowScope.SettingsRightPane(
 	rightHasFocus: Boolean,
 	onRightFocusChanged: (Boolean) -> Unit,
 ) {
-	val palette = LocalEphyraPalette.current
+	val palette = LocalVelellaPalette.current
 
 	Box(
 		modifier = Modifier
@@ -259,7 +259,7 @@ private fun SectionButton(
 	onFocused: () -> Unit,
 	onClick: () -> Unit,
 ) {
-	val palette = LocalEphyraPalette.current
+	val palette = LocalVelellaPalette.current
 
 	ListButton(
 		onClick = onClick,

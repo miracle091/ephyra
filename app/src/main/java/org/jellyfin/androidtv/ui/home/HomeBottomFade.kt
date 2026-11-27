@@ -7,15 +7,15 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.unit.dp
-import org.jellyfin.androidtv.ui.base.LocalEphyraPalette
+import org.jellyfin.androidtv.ui.base.LocalVelellaPalette
 
 // Only the screen's edge: a taller fade dimmed the first row's card labels
 private val HomeBottomFadeHeight = 24.dp
 
-/** Ephyra: the bottom edge of the home rows fades into the theme's background, so a row cut by the screen edge fades out. */
+/** Velella: the bottom edge of the home rows fades into the theme's background, so a row cut by the screen edge fades out. */
 @Composable
 fun Modifier.homeBottomFade(): Modifier {
-	val bg = LocalEphyraPalette.current.bg
+	val bg = LocalVelellaPalette.current.bg
 	return drawWithContent {
 		drawContent()
 		val height = HomeBottomFadeHeight.toPx().coerceAtMost(size.height)

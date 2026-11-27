@@ -5,13 +5,13 @@ import kotlin.math.abs
 import kotlin.math.roundToInt
 
 /**
- * Ephyra: penalty of a non-native resolution when scaling on the device. It must outweigh any refresh rate difference
+ * Velella: penalty of a non-native resolution when scaling on the device. It must outweigh any refresh rate difference
  * (the weight in [findBestDisplayMode] subtracts both), so a native resolution mode always beats a lower resolution one
  * (upstream #5893).
  */
 const val NON_NATIVE_RESOLUTION_PENALTY = 50_000
 
-/** Ephyra: the pixel size of a display mode. */
+/** Velella: the pixel size of a display mode. */
 data class DisplaySize(val width: Int, val height: Int)
 
 /**
@@ -34,10 +34,10 @@ fun displayModeResolutionDifference(
 	RefreshRateSwitchingBehavior.DISABLED -> 0
 }
 
-/** Ephyra: a display mode as the scoring sees it ([android.view.Display.Mode] without the Android dependency). */
+/** Velella: a display mode as the scoring sees it ([android.view.Display.Mode] without the Android dependency). */
 data class DisplayModeInfo(val id: Int, val size: DisplaySize, val refreshRate: Float)
 
-/** Ephyra: the video a display mode is picked for, from the source's video stream. */
+/** Velella: the video a display mode is picked for, from the source's video stream. */
 data class VideoModeRequest(val width: Int, val height: Int, val frameRate: Float)
 
 // 720p: smaller modes are never picked
@@ -52,7 +52,7 @@ private const val DOUBLE_RATE = 2
 private const val PULLDOWN_RATE = 2.5
 
 /**
- * Ephyra: the display mode to play [video] in, shared by both players, or null when no mode fits. A mode qualifies when it is
+ * Velella: the display mode to play [video] in, shared by both players, or null when no mode fits. A mode qualifies when it is
  * HD or better, not smaller than the video, and its refresh rate is the video's frame rate, twice it or 2.5 times it (3:2
  * pulldown); among those the closest rate and resolution win (see [displayModeResolutionDifference]).
  */

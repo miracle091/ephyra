@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Velella: the video player's icon buttons, no fill until focused, then the design system's solid ink fill -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:enterFadeDuration="@integer/button_fade_duration"
+    android:exitFadeDuration="@integer/button_fade_duration">
+    <item android:state_focused="true">
+        <shape android:shape="oval">
+            <solid android:color="?attr/headerTextColor" />
+        </shape>
+    </item>
+    <item android:drawable="@android:color/transparent" />
+</selector>

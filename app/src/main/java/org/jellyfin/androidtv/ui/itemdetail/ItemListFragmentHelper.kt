@@ -107,7 +107,7 @@ private const val ICON_BUTTON_SIZE_DP = 40
 private const val ICON_BUTTON_PADDING_DP = 10
 
 /**
- * Ephyra: the album and details buttons are icon buttons like the home spotlight's: no fill until focused, the icon in ink, in
+ * Velella: the album and details buttons are icon buttons like the home spotlight's: no fill until focused, the icon in ink, in
  * the accent when active; the label stays as the content description for TalkBack.
  */
 fun showButtonIconsOnly(buttonRow: ViewGroup) {
@@ -123,7 +123,7 @@ fun showButtonIconsOnly(buttonRow: ViewGroup) {
 			maxHeight = Int.MAX_VALUE
 			setPadding(ICON_BUTTON_PADDING_DP.dp(context))
 			setBackgroundResource(R.drawable.button_icon_back)
-			ImageViewCompat.setImageTintList(this, ContextCompat.getColorStateList(context, R.color.ephyra_icon_button_tint))
+			ImageViewCompat.setImageTintList(this, ContextCompat.getColorStateList(context, R.color.velella_icon_button_tint))
 			// The play button already has the focus before it is attached: without this its fill's fade-in never ends
 			jumpDrawablesToCurrentState()
 		}

@@ -13,7 +13,7 @@ import java.time.Duration
 import java.time.LocalDateTime
 
 /**
- * Ephyra: the look of the Live TV guide after the design system, shared by the grid cells, the channel headers and the paging
+ * Velella: the look of the Live TV guide after the design system, shared by the grid cells, the channel headers and the paging
  * buttons.
  */
 object GuideStyle {
@@ -25,7 +25,7 @@ object GuideStyle {
 	@JvmStatic
 	@JvmOverloads
 	fun cellBackground(context: Context, tint: Int = 0): Drawable {
-		val base = requireNotNull(ContextCompat.getDrawable(context, R.drawable.ephyra_guide_cell)) { "Missing guide cell drawable" }
+		val base = requireNotNull(ContextCompat.getDrawable(context, R.drawable.velella_guide_cell)) { "Missing guide cell drawable" }
 		if (tint == 0) return base
 
 		val density = context.resources.displayMetrics.density

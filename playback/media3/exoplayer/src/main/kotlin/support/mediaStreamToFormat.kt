@@ -59,7 +59,7 @@ fun MediaStream.toFormats() = tracks.mapNotNull { track ->
 	when (track) {
 		is MediaStreamAudioTrack -> toFormat(stream = this, track)
 		is MediaStreamVideoTrack -> toFormat(stream = this, track)
-		// Ephyra: subtitles never decide whether the stream can play
+		// Velella: subtitles never decide whether the stream can play
 		is MediaStreamSubtitleTrack -> null
 	}
 }

@@ -2,13 +2,13 @@ package org.jellyfin.androidtv.ui.itemdetail
 
 import org.jellyfin.sdk.model.api.BaseItemDto
 
-/** Ephyra: the tagline shown under the title of the details screen. */
+/** Velella: the tagline shown under the title of the details screen. */
 object DetailsTagline {
 	/** The first non-blank tagline, or null when there is none and the line stays hidden. */
 	fun of(taglines: List<String>?): String? = taglines?.firstOrNull { it.isNotBlank() }?.trim()
 }
 
-/** Ephyra: the text and progress of the "Next up" card of a series. */
+/** Velella: the text and progress of the "Next up" card of a series. */
 object DetailsNextUp {
 	private const val PERCENT = 100.0
 

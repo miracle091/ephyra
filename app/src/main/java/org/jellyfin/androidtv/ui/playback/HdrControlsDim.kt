@@ -7,7 +7,7 @@ import org.jellyfin.sdk.model.api.PlayMethod
 import org.jellyfin.sdk.model.api.VideoRange
 
 /**
- * Ephyra: dims the player's controls while an HDR or Dolby Vision video plays, so white text and icons don't glare on an
+ * Velella: dims the player's controls while an HDR or Dolby Vision video plays, so white text and icons don't glare on an
  * HDR display.
  */
 object HdrControlsDim {

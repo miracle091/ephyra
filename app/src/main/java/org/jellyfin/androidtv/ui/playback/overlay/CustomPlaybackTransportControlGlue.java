@@ -92,11 +92,11 @@ public class CustomPlaybackTransportControlGlue extends PlaybackTransportControl
     private LinearLayout mButtonRef;
     private View mRowView;
 
-    // Ephyra: the live player's text buttons (Guide, Record, Channels) sit in a dock of their own next to the round ones
+    // Velella: the live player's text buttons (Guide, Record, Channels) sit in a dock of their own next to the round ones
     private ViewGroup mPillsDock;
     private View mRecordPill;
 
-    // Ephyra: the live player's title block above the seek bar and its lines under the times (OsdHeader.bindProgramme); the
+    // Velella: the live player's title block above the seek bar and its lines under the times (OsdHeader.bindProgramme); the
     // state is kept here because the row is created after the first call
     private View mLiveHead;
     private TextView mLiveOverline;
@@ -161,23 +161,23 @@ public class CustomPlaybackTransportControlGlue extends PlaybackTransportControl
                 if (showClock == ClockBehavior.ALWAYS || showClock == ClockBehavior.IN_VIDEO) {
                     Context context = parent.getContext();
                     mEndsText = new TextView(context);
-                    // Ephyra: the end time sits in the times row of lb_playback_transport_controls_row, found by id
-                    mEndsText.setTextAppearance(R.style.TextAppearance_Ephyra_OsdTime);
+                    // Velella: the end time sits in the times row of lb_playback_transport_controls_row, found by id
+                    mEndsText.setTextAppearance(R.style.TextAppearance_Velella_OsdTime);
                     setEndTime();
 
                     FrameLayout controlsDock = vh.view.findViewById(androidx.leanback.R.id.controls_dock);
                     mButtonRef = (LinearLayout) controlsDock.getChildAt(0);
 
-                    ViewGroup endsDock = vh.view.findViewById(R.id.ephyra_ends_dock);
+                    ViewGroup endsDock = vh.view.findViewById(R.id.velella_ends_dock);
                     endsDock.addView(mEndsText);
                 }
 
-                mPillsDock = vh.view.findViewById(R.id.ephyra_pills_dock);
-                mLiveHead = vh.view.findViewById(R.id.ephyra_live_head);
-                mLiveOverline = vh.view.findViewById(R.id.ephyra_live_overline);
-                mLiveTitle = vh.view.findViewById(R.id.ephyra_live_title);
-                mLiveNext = vh.view.findViewById(R.id.ephyra_live_next);
-                mLiveInfo = vh.view.findViewById(R.id.ephyra_live_play_info);
+                mPillsDock = vh.view.findViewById(R.id.velella_pills_dock);
+                mLiveHead = vh.view.findViewById(R.id.velella_live_head);
+                mLiveOverline = vh.view.findViewById(R.id.velella_live_overline);
+                mLiveTitle = vh.view.findViewById(R.id.velella_live_title);
+                mLiveNext = vh.view.findViewById(R.id.velella_live_next);
+                mLiveInfo = vh.view.findViewById(R.id.velella_live_play_info);
                 applyLiveInfo();
                 updatePills();
 
@@ -254,7 +254,7 @@ public class CustomPlaybackTransportControlGlue extends PlaybackTransportControl
         if (secondaryActionsAdapter.size() > 0)
             secondaryActionsAdapter.clear();
 
-        // Ephyra: the design system's order, transport on the left (previous, rewind, play, forward, next) and the
+        // Velella: the design system's order, transport on the left (previous, rewind, play, forward, next) and the
         // track, chapter, speed, quality and zoom choices on the right
         VideoPlayerAdapter playerAdapter = getPlayerAdapter();
 
@@ -305,7 +305,7 @@ public class CustomPlaybackTransportControlGlue extends PlaybackTransportControl
     }
 
     /**
-     * Ephyra: the live player's Guide, Record and Channels actions as pill buttons with a text label, after the design system's
+     * Velella: the live player's Guide, Record and Channels actions as pill buttons with a text label, after the design system's
      * "Live TV" board. Leanback's control bar spaces its buttons by the distance between their centres, which would overlap
      * wide pills, so they are views of their own in the controls row. Each is a normal focusable button for the glue's focus steps.
      */
@@ -325,19 +325,19 @@ public class CustomPlaybackTransportControlGlue extends PlaybackTransportControl
         mRecordPill = null;
         if (!live) return;
 
-        addPill(guideAction, getContext().getString(R.string.ephyra_osd_guide));
+        addPill(guideAction, getContext().getString(R.string.velella_osd_guide));
         if (record) {
             mRecordPill = addPill(recordAction, null);
             recordingStateChanged();
         }
-        addPill(channelBarChannelAction, getContext().getString(R.string.ephyra_osd_channels));
+        addPill(channelBarChannelAction, getContext().getString(R.string.velella_osd_channels));
     }
 
     private View addPill(CustomAction action, String label) {
-        View pill = LayoutInflater.from(getContext()).inflate(R.layout.ephyra_osd_pill, mPillsDock, false);
+        View pill = LayoutInflater.from(getContext()).inflate(R.layout.velella_osd_pill, mPillsDock, false);
         if (mPillsDock.getChildCount() > 0) {
             ((LinearLayout.LayoutParams) pill.getLayoutParams()).setMarginStart(
-                    getContext().getResources().getDimensionPixelSize(R.dimen.ephyra_osd_pill_gap));
+                    getContext().getResources().getDimensionPixelSize(R.dimen.velella_osd_pill_gap));
         }
         bindPill(pill, action, label);
         pill.setOnClickListener(view -> onCustomActionClicked(action, view));
@@ -352,7 +352,7 @@ public class CustomPlaybackTransportControlGlue extends PlaybackTransportControl
     }
 
     /**
-     * Ephyra: shows the live title block (programme details and name above the bar, the next programme and the play method under
+     * Velella: shows the live title block (programme details and name above the bar, the next programme and the play method under
      * the times) for a live [channel], or hides it for anything else. The Live TV board has it at the bottom, with the controls.
      */
     public void bindLiveInfo(@Nullable BaseItemDto channel, @Nullable BaseItemDto next, @Nullable StreamInfo streamInfo) {
@@ -371,7 +371,7 @@ public class CustomPlaybackTransportControlGlue extends PlaybackTransportControl
         NextProgram.bind(mLiveNext, live ? mLiveNextProgram : null);
         PlayInfo.bind(mLiveInfo, live ? mLiveStreamInfo : null);
         // a denser shade, as the title block reaches higher over the picture
-        mRowView.setBackgroundResource(live ? R.drawable.ephyra_osd_scrim_bottom_live : R.drawable.ephyra_osd_scrim_bottom);
+        mRowView.setBackgroundResource(live ? R.drawable.velella_osd_scrim_bottom_live : R.drawable.velella_osd_scrim_bottom);
     }
 
     @Override
@@ -397,7 +397,7 @@ public class CustomPlaybackTransportControlGlue extends PlaybackTransportControl
     }
 
     /**
-     * Ephyra: a live channel shows the start and the end of the programme on air under the bar, as clock times, in place of
+     * Velella: a live channel shows the start and the end of the programme on air under the bar, as clock times, in place of
      * the elapsed and total time Leanback writes.
      */
     void showLiveProgramTimes(LocalDateTime start, LocalDateTime end) {
@@ -454,9 +454,9 @@ public class CustomPlaybackTransportControlGlue extends PlaybackTransportControl
     void recordingStateChanged() {
         boolean recording = getPlayerAdapter().isRecording();
         recordAction.setIndex(recording ? RecordAction.INDEX_RECORDING : RecordAction.INDEX_INACTIVE);
-        // Ephyra: the Record pill follows in place, so it keeps the focus
+        // Velella: the Record pill follows in place, so it keeps the focus
         if (mRecordPill != null) {
-            bindPill(mRecordPill, recordAction, getContext().getString(recording ? R.string.ephyra_osd_recording : R.string.lbl_record));
+            bindPill(mRecordPill, recordAction, getContext().getString(recording ? R.string.velella_osd_recording : R.string.lbl_record));
         }
     }
 
@@ -554,7 +554,7 @@ public class CustomPlaybackTransportControlGlue extends PlaybackTransportControl
         View focused = root.findFocus();
         if (focused == null) return false;
 
-        // Ephyra: in the buttons row, left and right step to the neighbouring button by position. The geometric focus search
+        // Velella: in the buttons row, left and right step to the neighbouring button by position. The geometric focus search
         // below skipped the last button of the live controls (the guide) on the Shield
         if (direction == View.FOCUS_LEFT || direction == View.FOCUS_RIGHT) {
             View neighbour = neighbourButton(focused, direction);

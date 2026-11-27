@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Velella: the Coral theme, warm dark red with a coral accent (same colours as design/.../VelellaColorTokens.kt) -->
+<resources>
+
+    <color name="velella_coral_bg">#1A0E10</color>
+    <color name="velella_coral_surface_1">#261518</color>
+    <color name="velella_coral_surface_2">#341E22</color>
+    <color name="velella_coral_surface_3">#45292E</color>
+    <color name="velella_coral_line_strong">#A07873</color>
+    <color name="velella_coral_ink_muted">#D6BCBA</color>
+    <color name="velella_coral_ink_faint">#B0928F</color>
+    <color name="velella_coral_accent">#FF8A65</color>
+
+    <style name="Theme.Jellyfin.Velella.Coral" parent="Theme.Jellyfin.Velella">
+        <item name="android:colorPrimary">@color/velella_coral_bg</item>
+        <item name="android:colorPrimaryDark">@color/velella_coral_bg</item>
+        <item name="android:colorAccent">@color/velella_coral_accent</item>
+        <item name="defaultBackground">@color/velella_coral_bg</item>
+        <item name="cardImageBackground">@color/velella_coral_surface_1</item>
+        <item name="defaultSearchColor">@color/velella_coral_accent</item>
+        <item name="android:colorButtonNormal">@color/velella_coral_surface_2</item>
+        <item name="buttonDefaultNormalBackground">@color/velella_coral_surface_2</item>
+        <item name="inputDefaultStrokeColor">@color/velella_coral_line_strong</item>
+        <item name="popupMenuBackground">@color/velella_coral_surface_2</item>
+        <item name="progressBackground">@color/velella_coral_surface_3</item>
+        <item name="progressPrimary">@color/velella_coral_accent</item>
+        <item name="progressSecondary">@color/velella_coral_ink_faint</item>
+        <item name="controlIconBackground">@color/velella_coral_surface_2</item>
+        <item name="controlIconForegroundActive">@color/velella_coral_accent</item>
+        <item name="controlIconForegroundInactive">@color/velella_coral_ink_muted</item>
+    </style>
+</resources>

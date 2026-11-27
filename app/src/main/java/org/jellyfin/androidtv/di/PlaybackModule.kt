@@ -41,7 +41,7 @@ import org.jellyfin.androidtv.ui.playback.PlaybackManager as LegacyPlaybackManag
 val playbackModule = module {
 	single { LegacyPlaybackManager(get(), get()) }
 	single { VideoQueueManager() }
-	single { TrackPreselection() } // Ephyra: tracks picked on the details screen
+	single { TrackPreselection() } // Velella: tracks picked on the details screen
 	single<MediaManager> { RewriteMediaManager(get(), get()) }
 
 	single { PlaybackLauncher(get(), get(), get(), get()) }
@@ -75,7 +75,7 @@ fun Scope.createPlaybackManager() = playbackManager(androidContext()) {
 	}
 
 	val userPreferences = get<UserPreferences>()
-	// Ephyra: read per player, so a setting changed after the first playback still applies
+	// Velella: read per player, so a setting changed after the first playback still applies
 	val httpDataSourceFactory = get<HttpDataSource.Factory>()
 	install(exoPlayerPlugin(get()) { createExoPlayerOptions(userPreferences, httpDataSourceFactory) })
 
@@ -88,7 +88,7 @@ fun Scope.createPlaybackManager() = playbackManager(androidContext()) {
 	install(media3SessionPlugin(get(), mediaSessionOptions))
 
 	val deviceProfileBuilder = { createDeviceProfile(androidContext(), userPreferences) }
-	// Ephyra: segments skipped as the user set them up (was: intros always); "ask to skip" waits for the new player's skip button
+	// Velella: segments skipped as the user set them up (was: intros always); "ask to skip" waits for the new player's skip button
 	val mediaSegmentRepository = get<MediaSegmentRepository>()
 	install(
 		jellyfinPlugin(
@@ -106,7 +106,7 @@ fun Scope.createPlaybackManager() = playbackManager(androidContext()) {
 	defaultFastForwardAmount = { userSettingPreferences[UserSettingPreferences.skipForwardLength].milliseconds }
 }
 
-/** Ephyra: the ExoPlayer options from the user's current settings; called for every new player. */
+/** Velella: the ExoPlayer options from the user's current settings; called for every new player. */
 internal fun createExoPlayerOptions(userPreferences: UserPreferences, httpDataSourceFactory: HttpDataSource.Factory): ExoPlayerOptions {
 	val bufferLength = userPreferences[UserPreferences.bufferLength]
 	return ExoPlayerOptions(

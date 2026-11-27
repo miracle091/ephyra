@@ -25,10 +25,10 @@ interface PlayerState {
 	val repeatMode: StateFlow<RepeatMode>
 	val scrubbing: StateFlow<Boolean>
 
-	/** Ephyra: why the last playback failed, set before [playState] turns to [PlayState.ERROR] and cleared when playback resumes. */
+	/** Velella: why the last playback failed, set before [playState] turns to [PlayState.ERROR] and cleared when playback resumes. */
 	val error: StateFlow<PlaybackError?>
 
-	/** Ephyra: the audio and subtitle tracks shown now; [SelectedTracks.NONE] while nothing plays. */
+	/** Velella: the audio and subtitle tracks shown now; [SelectedTracks.NONE] while nothing plays. */
 	val selectedTracks: StateFlow<SelectedTracks>
 
 	/**

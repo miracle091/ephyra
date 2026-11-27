@@ -27,7 +27,7 @@ class AppUpdateTest : FunSpec({
 
 	test("Points at the APK of the release's own tag") {
 		AppUpdate("1.2.3", 1020399).apkUrl shouldBe
-			"https://github.com/miracle091/ephyra/releases/download/v1.2.3/ephyra-v1.2.3.apk"
-		AppUpdate.VERSION_TXT_URL shouldBe "https://github.com/miracle091/ephyra/releases/latest/download/version.txt"
+			"https://github.com/miracle091/velella/releases/download/v1.2.3/velella-v1.2.3.apk"
+		AppUpdate.VERSION_TXT_URL shouldBe "https://github.com/miracle091/velella/releases/latest/download/version.txt"
 	}
 })

@@ -11,7 +11,7 @@ import org.jellyfin.androidtv.preference.UpdatePreferences
 import kotlin.time.Duration.Companion.days
 
 /**
- * Ephyra: each time the app comes to the foreground, checks GitHub Releases if the last check is a day old, and shows
+ * Velella: each time the app comes to the foreground, checks GitHub Releases if the last check is a day old, and shows
  * a notice on the home screen when a newer version exists. Installing stays a choice in Settings, About.
  */
 class DailyUpdateCheck(
@@ -46,7 +46,7 @@ class DailyUpdateCheck(
 	private fun notify(update: AppUpdate) {
 		if (updatePreferences[UpdatePreferences.dismissedVersion] == update.versionName) return
 
-		val message = context.getString(R.string.ephyra_update_notification, update.versionName)
+		val message = context.getString(R.string.velella_update_notification, update.versionName)
 		if (notificationsRepository.notifications.value.any { it.message == message }) return
 
 		notificationsRepository.addNotification(message) {

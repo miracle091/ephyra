@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Velella: strings of the debug-only codec benchmark (benchmark/CodecBenchmarkActivity.kt); Italian in values-it,
+     other languages fall back to English, as in src/main/res/values/strings_velella.xml -->
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+    <string name="velella_benchmark_running">Clip %1$d of %2$d: %3$s</string>
+    <string name="velella_benchmark_uploaded">Report uploaded to the server as %1$s</string>
+    <string name="velella_benchmark_server">Asking the server about the clips in your libraries…</string>
+</resources>

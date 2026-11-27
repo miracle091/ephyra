@@ -8,10 +8,10 @@ import org.jellyfin.androidtv.util.ImageHelper
 import org.jellyfin.sdk.model.api.BaseItemDto
 import org.jellyfin.sdk.model.api.BaseItemKind
 
-// Ephyra: a landscape card is 130dp tall where a portrait one is 150dp
+// Velella: a landscape card is 130dp tall where a portrait one is 150dp
 private const val LANDSCAPE_HEIGHT_RATIO = 130f / 150f
 
-// Ephyra: aspect ratios below this are treated as missing
+// Velella: aspect ratios below this are treated as missing
 private const val MIN_ASPECT_RATIO = 0.1f
 
 // Items narrower than this are shown as a square when they are music or people

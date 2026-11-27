@@ -13,7 +13,7 @@ private const val MINUTES_PER_HOUR = 60
 private const val META_SEPARATOR = " · "
 
 /**
- * Ephyra: the time of day an item that runs [runtimeTicks] ends when started now. An item stopped part way through
+ * Velella: the time of day an item that runs [runtimeTicks] ends when started now. An item stopped part way through
  * ([positionTicks] inside the runtime) only counts what is left. Null when the runtime is unknown.
  */
 fun endsAt(runtimeTicks: Long?, positionTicks: Long?, now: LocalTime): LocalTime? {
@@ -22,14 +22,14 @@ fun endsAt(runtimeTicks: Long?, positionTicks: Long?, now: LocalTime): LocalTime
 	return now.plusNanos((runtime - position) * NANOS_PER_TICK)
 }
 
-/** Ephyra: the whole runtime in minutes, at least one; null when the runtime is unknown. */
+/** Velella: the whole runtime in minutes, at least one; null when the runtime is unknown. */
 fun runtimeMinutes(runtimeTicks: Long?): Int? {
 	val runtime = runtimeTicks?.takeIf { it > 0 } ?: return null
 	return ((runtime + TICKS_PER_MINUTE / 2) / TICKS_PER_MINUTE).toInt().coerceAtLeast(1)
 }
 
 /**
- * Ephyra: the meta line of an episode, "47 min · ★ 8.2 · Ends at 22:45"; every part that is unknown is left out and the line is
+ * Velella: the meta line of an episode, "47 min · ★ 8.2 · Ends at 22:45"; every part that is unknown is left out and the line is
  * null when none is known.
  */
 fun episodeMetaLine(
@@ -43,7 +43,7 @@ fun episodeMetaLine(
 	endsAt,
 ).takeIf { it.isNotEmpty() }?.joinToString(META_SEPARATOR)
 
-/** Ephyra: the title of an episode in the compact list: "1. Name", "1-2. Name" for a double episode, or the name alone. */
+/** Velella: the title of an episode in the compact list: "1. Name", "1-2. Name" for a double episode, or the name alone. */
 fun compactEpisodeTitle(indexNumber: Int?, indexNumberEnd: Int?, name: String?): String {
 	val title = name.orEmpty()
 	val number = when {
@@ -54,14 +54,14 @@ fun compactEpisodeTitle(indexNumber: Int?, indexNumberEnd: Int?, name: String?):
 	return if (title.isBlank()) number else "$number. $title"
 }
 
-/** Ephyra: the meta line of an episode with the strings and the 12/24 hour format of the device. */
+/** Velella: the meta line of an episode with the strings and the 12/24 hour format of the device. */
 fun BaseItemDto.episodeMetaLine(context: Context, now: LocalTime = LocalTime.now()): String? {
 	val minutes = runtimeMinutes(runTimeTicks)
 	val runtimeText = minutes?.let { total ->
 		val hours = total / MINUTES_PER_HOUR
 		val rest = total % MINUTES_PER_HOUR
-		if (hours > 0) context.getString(R.string.ephyra_runtime_hours_minutes, hours, rest)
-		else context.getString(R.string.ephyra_runtime_minutes, rest)
+		if (hours > 0) context.getString(R.string.velella_runtime_hours_minutes, hours, rest)
+		else context.getString(R.string.velella_runtime_minutes, rest)
 	}
 	val endsAtText = endsAt(runTimeTicks, userData?.playbackPositionTicks, now)?.let {
 		context.getString(R.string.lbl_playback_control_ends, context.getTimeFormatter().format(it))

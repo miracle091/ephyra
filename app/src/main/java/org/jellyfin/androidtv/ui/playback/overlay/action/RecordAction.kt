@@ -23,7 +23,7 @@ class RecordAction(
 	}
 
 	/**
-	 * Ephyra: the player's buttons tint their icon (ink, background colour when focused). The set state keeps the design
+	 * Velella: the player's buttons tint their icon (ink, background colour when focused). The set state keeps the design
 	 * system's danger colour of ic_record_red, so its drawable ignores the tint.
 	 */
 	private class UntintedDrawable(drawable: Drawable) : InsetDrawable(drawable, 0) {

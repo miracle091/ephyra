@@ -48,11 +48,11 @@ class VideoPlayerFragment : Fragment() {
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 
-		// Create a queue from the items added to the legacy video queue; Ephyra: starting at the launcher's item and resume point,
+		// Create a queue from the items added to the legacy video queue; Velella: starting at the launcher's item and resume point,
 		// applied when that entry's stream starts (a seek here would land before the stream is known)
 		val startIndex = videoQueueManager.getCurrentMediaPosition().coerceAtLeast(0)
 		val startPosition = arguments?.getInt(EXTRA_POSITION)?.milliseconds
-		// Ephyra: the tracks picked on the details screen, used once
+		// Velella: the tracks picked on the details screen, used once
 		val items = videoQueueManager.getCurrentVideoQueue()
 		val startTracks = items.getOrNull(startIndex)?.let { item -> trackPreselection.take(item.id, item.playedMediaSource?.id) }
 		val queueSupplier = RewriteMediaManager.BaseItemQueueSupplier(
@@ -84,7 +84,7 @@ class VideoPlayerFragment : Fragment() {
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
 
-		// Ephyra: the display mode follows each entry's video (frame rate and size of the source), as in the legacy player
+		// Velella: the display mode follows each entry's video (frame rate and size of the source), as in the legacy player
 		val behavior = userPreferences[UserPreferences.refreshRateSwitchingBehavior]
 		@OptIn(ExperimentalCoroutinesApi::class)
 		playbackManager.queue.entry
@@ -117,7 +117,7 @@ class VideoPlayerFragment : Fragment() {
 	override fun onDestroy() {
 		super.onDestroy()
 
-		// Ephyra: give the display its previous mode back
+		// Velella: give the display its previous mode back
 		activity?.resetDisplayMode()
 	}
 }

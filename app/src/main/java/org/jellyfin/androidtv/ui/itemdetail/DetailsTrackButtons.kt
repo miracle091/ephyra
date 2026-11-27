@@ -18,7 +18,7 @@ import org.jellyfin.sdk.model.api.MediaStreamType
 import org.koin.java.KoinJavaComponent
 
 /**
- * Ephyra: "Audio" and "Subtitles" buttons on the details screen of a video, so the tracks are picked before playback and the
+ * Velella: "Audio" and "Subtitles" buttons on the details screen of a video, so the tracks are picked before playback and the
  * server builds the right stream at once (see [TrackPreselection]). Only for the built-in players (legacy and new), which read the
  * pick; an external player chooses its own tracks.
  */

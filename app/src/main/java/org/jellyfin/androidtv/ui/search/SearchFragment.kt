@@ -58,7 +58,7 @@ class SearchFragment : Fragment() {
 
 		LaunchedEffect(Unit) {
 			val extraQuery = arguments?.getString(EXTRA_QUERY)
-			// Ephyra: back from a result the screen is rebuilt with the previous query; the results take the focus once they are
+			// Velella: back from a result the screen is rebuilt with the previous query; the results take the focus once they are
 			// shown again, so the keyboard (which opens whenever the text field is focused) stays closed
 			var focusRestoredResults = extraQuery.isNullOrBlank() && query.text.isNotBlank()
 			if (!extraQuery.isNullOrBlank()) {

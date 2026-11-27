@@ -36,13 +36,13 @@ private val MenuWidth = 360.dp
 private val MenuMaxHeight = 420.dp
 private const val MENU_OFFSET_Y = -5
 
-/** Ephyra: a menu button's icon from a drawable, for [VideoPlayerMenuButton]. */
+/** Velella: a menu button's icon from a drawable, for [VideoPlayerMenuButton]. */
 @Composable
 fun MenuIcon(@DrawableRes icon: Int, contentDescription: String) =
 	Icon(imageVector = ImageVector.vectorResource(icon), contentDescription = contentDescription)
 
 /**
- * Ephyra: a round button of the video player's controls that opens a list to pick one of [options] (audio, subtitles, chapters,
+ * Velella: a round button of the video player's controls that opens a list to pick one of [options] (audio, subtitles, chapters,
  * quality), like the legacy player's popup menus: the [selected] one is checked and focused when the list opens. [icon] is the
  * button's content ([MenuIcon], or the quality button's badge). A non-null [onOpenRequest] opens the list as a remote key asked
  * (Captions, Audio track) and is then called to clear the request.

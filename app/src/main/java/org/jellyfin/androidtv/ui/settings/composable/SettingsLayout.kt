@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.focus.focusRestorer
 import androidx.compose.ui.unit.dp
-import org.jellyfin.androidtv.ui.base.LocalEphyraPalette
+import org.jellyfin.androidtv.ui.base.LocalVelellaPalette
 
 /** Width of the left pane (title and sections) of the two-pane settings. */
 internal val SettingsLeftPaneWidth = 300.dp
@@ -32,7 +32,7 @@ fun SettingsLayout(
 		modifier = modifier
 			.fillMaxSize()
 			.padding(start = SettingsLeftPaneWidth)
-			.background(LocalEphyraPalette.current.surface1)
+			.background(LocalVelellaPalette.current.surface1)
 			.clipToBounds()
 			.padding(SettingsRightPanePadding)
 			.focusRestorer(),

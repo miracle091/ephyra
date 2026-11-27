@@ -36,7 +36,7 @@ object ItemRepository {
 	)
 
 	/**
-	 * Ephyra: the fields of the library grid's pages: what the cards and the focused item's info row show (media sources
+	 * Velella: the fields of the library grid's pages: what the cards and the focused item's info row show (media sources
 	 * for the resolution and codec badges, counts and run times). Chapters, trickplay, media streams, paths, overviews and
 	 * taglines are left out: they make most of the response and the grid never shows them; the details screen and
 	 * playback fetch the full item.

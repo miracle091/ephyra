@@ -9,7 +9,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import timber.log.Timber
 
-/** Ephyra: receives the result of an [AppUpdater] installation from PackageInstaller. */
+/** Velella: receives the result of an [AppUpdater] installation from PackageInstaller. */
 class AppUpdateStatusReceiver : BroadcastReceiver(), KoinComponent {
 	private val appUpdater by inject<AppUpdater>()
 

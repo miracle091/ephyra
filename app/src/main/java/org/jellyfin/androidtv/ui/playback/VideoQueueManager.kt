@@ -41,20 +41,20 @@ class VideoQueueManager {
 		if (_lastPlayedSubtitleTrack?.language != isoCode) _lastPlayedSubtitleTrack = null
 	}
 
-	/** Ephyra: the exact audio track last played in this queue, to pick between tracks of the same language. */
+	/** Velella: the exact audio track last played in this queue, to pick between tracks of the same language. */
 	fun getLastPlayedAudioTrack(): TrackInfo? = _lastPlayedAudioTrack
 
-	/** Ephyra: the exact subtitle track last played in this queue, to pick between tracks of the same language. */
+	/** Velella: the exact subtitle track last played in this queue, to pick between tracks of the same language. */
 	fun getLastPlayedSubtitleTrack(): TrackInfo? = _lastPlayedSubtitleTrack
 
-	/** Ephyra: remembers [stream] (language and exact track) as the audio track to carry to the next episodes. */
+	/** Velella: remembers [stream] (language and exact track) as the audio track to carry to the next episodes. */
 	fun setLastPlayedAudioTrack(stream: MediaStream) {
 		val language = stream.language ?: return
 		_lastPlayedAudioLanguageIsoCode = language
 		_lastPlayedAudioTrack = stream.toTrackInfo()
 	}
 
-	/** Ephyra: remembers [stream] (language and exact track) as the subtitle track to carry to the next episodes. */
+	/** Velella: remembers [stream] (language and exact track) as the subtitle track to carry to the next episodes. */
 	fun setLastPlayedSubtitleTrack(stream: MediaStream) {
 		_lastPlayedSubtitleLanguageIsoCode = stream.language
 		_lastPlayedSubtitleTrack = stream.toTrackInfo().takeIf { stream.language != null }

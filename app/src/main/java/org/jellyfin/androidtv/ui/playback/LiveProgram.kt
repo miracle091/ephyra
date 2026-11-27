@@ -4,7 +4,7 @@ import java.time.Duration
 import java.time.LocalDateTime
 
 /**
- * Ephyra: the progress of the programme on air in the live TV player. The seek bar and the two times under it show the
+ * Velella: the progress of the programme on air in the live TV player. The seek bar and the two times under it show the
  * programme's own start, end and elapsed share, never the position of the (time-shifted) stream.
  */
 object LiveProgram {

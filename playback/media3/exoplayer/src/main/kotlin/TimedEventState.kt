@@ -94,7 +94,7 @@ class TimedEventState {
 	}
 
 	/**
-	 * Ephyra: creates every event's messages again for the media item playing now. A message is bound to the media item current
+	 * Velella: creates every event's messages again for the media item playing now. A message is bound to the media item current
 	 * when it was created, so a new stream of the same entry (another track) would never reach the old ones. [knownDuration] stands
 	 * in while the new item's duration is not known yet (same content, same duration).
 	 */

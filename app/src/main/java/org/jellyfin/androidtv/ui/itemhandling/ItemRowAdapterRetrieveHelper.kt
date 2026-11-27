@@ -133,7 +133,7 @@ fun ItemRowAdapter.retrieveLiveTvSeriesTimers(
 							GridButton(
 								LiveTvOption.LIVE_TV_SCHEDULE_OPTION_ID,
 								context.getString(R.string.lbl_schedule),
-								iconRes = R.drawable.ic_calendar, // Ephyra
+								iconRes = R.drawable.ic_calendar, // Velella
 							)
 						)
 
@@ -141,7 +141,7 @@ fun ItemRowAdapter.retrieveLiveTvSeriesTimers(
 							GridButton(
 								LiveTvOption.LIVE_TV_SERIES_OPTION_ID,
 								context.getString(R.string.lbl_series),
-								iconRes = R.drawable.ic_tv_timer, // Ephyra
+								iconRes = R.drawable.ic_tv_timer, // Velella
 							)
 						)
 					}

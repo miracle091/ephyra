@@ -14,7 +14,7 @@ import org.jellyfin.sdk.model.api.BaseItemDto;
 import java.time.LocalDateTime;
 
 /**
- * Ephyra: a channel of the player's quick channel changer, in the look of the Live TV guide (GuideStyle): a surface-2 cell with
+ * Velella: a channel of the player's quick channel changer, in the look of the Live TV guide (GuideStyle): a surface-2 cell with
  * the ink ring on focus, mono times and the red dot before the programme on air.
  */
 public class ChannelCardView extends FrameLayout {
@@ -25,7 +25,7 @@ public class ChannelCardView extends FrameLayout {
     public ChannelCardView(Context context) {
         super(context);
         setBackground(GuideStyle.cellBackground(context));
-        // Ephyra: the progress bar hugs the bottom edge, so the cell's rounded corners clip it
+        // Velella: the progress bar hugs the bottom edge, so the cell's rounded corners clip it
         setClipToOutline(true);
         binding.time.setTypeface(GuideStyle.monoTypeface(context));
     }
@@ -51,7 +51,7 @@ public class ChannelCardView extends FrameLayout {
 
     private void updateDisplay(BaseItemDto program) {
         binding.program.setText(program.getName());
-        binding.program.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ephyra_guide_live_dot, 0, 0, 0);
+        binding.program.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.velella_guide_live_dot, 0, 0, 0);
 
         if (program.getStartDate() != null && program.getEndDate() != null) {
             binding.time.setText(new StringBuilder()

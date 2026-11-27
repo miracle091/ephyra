@@ -22,8 +22,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
-import org.jellyfin.androidtv.ui.base.EphyraTheme
-import org.jellyfin.androidtv.ui.base.LocalEphyraPalette
+import org.jellyfin.androidtv.ui.base.VelellaTheme
+import org.jellyfin.androidtv.ui.base.LocalVelellaPalette
 import org.jellyfin.androidtv.ui.base.LocalTextStyle
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.composable.rememberCurrentTime
@@ -42,7 +42,7 @@ private const val CLOCK_DRIFT_Y_STRIDE = 5
 private const val CLOCK_DRIFT_Y_POINTS = 12
 
 /**
- * Ephyra: where the clock sits at the given minute, as an offset from the centre in dp. It walks a fixed loop of points spread
+ * Velella: where the clock sits at the given minute, as an offset from the centre in dp. It walks a fixed loop of points spread
  * over the whole drift area, so no pixel keeps the same content for long and two consecutive points are never the same.
  */
 fun clockDriftOffset(step: Int): Pair<Int, Int> {
@@ -58,10 +58,10 @@ private fun driftOnAxis(step: Int, amplitude: Int, stride: Int, points: Int): Fl
 	return amplitude * (((step * stride) % points) - half) / half
 }
 
-/** Ephyra: the screensaver: the theme's background with a large clock and the date, moving slowly. */
+/** Velella: the screensaver: the theme's background with a large clock and the date, moving slowly. */
 @Composable
-fun DreamContentClock() = EphyraTheme {
-	val palette = LocalEphyraPalette.current
+fun DreamContentClock() = VelellaTheme {
+	val palette = LocalVelellaPalette.current
 	val context = LocalContext.current
 	val datePattern = remember(context) { DateFormat.getBestDateTimePattern(context.locale, "EEEEdMMMM") }
 	val time by rememberCurrentTime()

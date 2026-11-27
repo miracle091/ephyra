@@ -17,13 +17,13 @@ data class PlayableMediaStream(
 	val queueEntry: QueueEntry,
 	val url: String,
 	/**
-	 * Ephyra: index (see [MediaStreamAudioTrack.index]) of the audio track the server chose for this stream, or null when unknown.
+	 * Velella: index (see [MediaStreamAudioTrack.index]) of the audio track the server chose for this stream, or null when unknown.
 	 * Only meaningful for a stream that is not converted: a remuxed or transcoded stream carries just the requested track.
 	 */
 	val defaultAudioStreamIndex: Int? = null,
-	/** Ephyra: the server's id of the media source (version) this stream plays, for the play session reports. */
+	/** Velella: the server's id of the media source (version) this stream plays, for the play session reports. */
 	val mediaSourceId: String? = null,
-	/** Ephyra: index of the subtitle track the server chose from the user's settings, or null for none. */
+	/** Velella: index of the subtitle track the server chose from the user's settings, or null for none. */
 	val defaultSubtitleStreamIndex: Int? = null,
 ) : MediaStream
 
@@ -40,11 +40,11 @@ data class MediaStreamAudioTrack(
 	val bitrate: Int,
 	val channels: Int,
 	val sampleRate: Int,
-	/** Ephyra: index of the track in the source (Jellyfin media stream index), or null when unknown. */
+	/** Velella: index of the track in the source (Jellyfin media stream index), or null when unknown. */
 	val index: Int? = null,
-	/** Ephyra: whether the track lives in a separate file, so it is not one of the container's own tracks. */
+	/** Velella: whether the track lives in a separate file, so it is not one of the container's own tracks. */
 	val isExternal: Boolean = false,
-	/** Ephyra: the server's display name (language, codec, channels), for the player's audio menu. */
+	/** Velella: the server's display name (language, codec, channels), for the player's audio menu. */
 	val title: String? = null,
 ) : MediaStreamTrack
 
@@ -54,11 +54,11 @@ data class MediaStreamVideoTrack(
 	val width: Int,
 	val height: Int,
 	val videoRange: String?,
-	/** Ephyra: the source's real frame rate, used to pick the display mode, or null when unknown. */
+	/** Velella: the source's real frame rate, used to pick the display mode, or null when unknown. */
 	val frameRate: Float? = null,
 ) : MediaStreamTrack
 
-/** Ephyra: a subtitle track of the source. */
+/** Velella: a subtitle track of the source. */
 data class MediaStreamSubtitleTrack(
 	override val codec: String,
 	/** Index of the track in the source (Jellyfin media stream index). */

@@ -38,7 +38,7 @@ private val supportedAudioCodecs = arrayOf(
 	Codec.Audio.DTS,
 	Codec.Audio.EAC3,
 	Codec.Audio.FLAC,
-	// Ephyra: no MLP, neither Media3's extractors nor the FFmpeg extension play it: the server converts it
+	// Velella: no MLP, neither Media3's extractors nor the FFmpeg extension play it: the server converts it
 	Codec.Audio.MP2,
 	Codec.Audio.MP3,
 	Codec.Audio.OPUS,
@@ -51,7 +51,7 @@ private val supportedAudioCodecs = arrayOf(
 	Codec.Audio.VORBIS,
 )
 
-// Ephyra: the server encodes audio to the first allowed codec: a 5.1 Dolby bitstream beats AAC (the bitstream settings filter it)
+// Velella: the server encodes audio to the first allowed codec: a 5.1 Dolby bitstream beats AAC (the bitstream settings filter it)
 private val hlsMpegTsAudioCodecs = arrayOf(
 	Codec.Audio.AC3,
 	Codec.Audio.EAC3,
@@ -70,7 +70,7 @@ private val hlsFmp4AudioCodecs = arrayOf(
 	Codec.Audio.DTS,
 )
 
-// Ephyra: direct play containers whose video rotation Media3 does not apply reliably (everything except the MP4 family and HLS)
+// Velella: direct play containers whose video rotation Media3 does not apply reliably (everything except the MP4 family and HLS)
 internal val rotationUnawareContainers = listOf(
 	Codec.Container.ASF,
 	Codec.Container.MKV,
@@ -100,7 +100,7 @@ private fun UserPreferences.getHdrRangeTypesFor(mode: HdrOverrideMode): Set<Vide
 
 private fun UserPreferences.isBitstreamAudioEnabled(context: Context, format: BitstreamAudioFormat): Boolean =
 	when (this[format.preference]) {
-		// Ephyra: a sink that refuses the bitstream is not the end when a platform decoder can play the format
+		// Velella: a sink that refuses the bitstream is not the end when a platform decoder can play the format
 		BitstreamAudioMode.AUTO -> isPassthroughAudioAvailable(context, format.mimeType) || hasPlatformAudioDecoder(format.mimeType)
 		BitstreamAudioMode.ENABLE -> true
 		BitstreamAudioMode.DISABLE -> false

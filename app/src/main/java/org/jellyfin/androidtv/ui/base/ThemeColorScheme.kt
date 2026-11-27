@@ -5,33 +5,33 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import org.jellyfin.androidtv.preference.EphyraPreferences
+import org.jellyfin.androidtv.preference.VelellaPreferences
 import org.jellyfin.androidtv.preference.UserPreferences
 import org.jellyfin.androidtv.preference.constant.AccentColor
 import org.jellyfin.androidtv.preference.constant.AppTheme
-import org.jellyfin.design.token.EphyraColorTokens
-import org.jellyfin.design.token.EphyraPalette
+import org.jellyfin.design.token.VelellaColorTokens
+import org.jellyfin.design.token.VelellaPalette
 import org.koin.compose.koinInject
 
-/** Ephyra: the design system tokens of the current theme, for colours [ColorScheme] has no field for. */
-val LocalEphyraPalette = staticCompositionLocalOf { EphyraColorTokens.dark }
+/** Velella: the design system tokens of the current theme, for colours [ColorScheme] has no field for. */
+val LocalVelellaPalette = staticCompositionLocalOf { VelellaColorTokens.dark }
 
-/** Ephyra: the design system tokens of the user's [AppTheme]. */
-fun paletteFor(theme: AppTheme): EphyraPalette = when (theme) {
-	AppTheme.DARK -> EphyraColorTokens.dark
-	AppTheme.BLACK -> EphyraColorTokens.black
-	AppTheme.ABYSS -> EphyraColorTokens.abyss
-	AppTheme.CORAL -> EphyraColorTokens.coral
-	AppTheme.MEDUSA -> EphyraColorTokens.medusa
+/** Velella: the design system tokens of the user's [AppTheme]. */
+fun paletteFor(theme: AppTheme): VelellaPalette = when (theme) {
+	AppTheme.DARK -> VelellaColorTokens.dark
+	AppTheme.BLACK -> VelellaColorTokens.black
+	AppTheme.ABYSS -> VelellaColorTokens.abyss
+	AppTheme.CORAL -> VelellaColorTokens.coral
+	AppTheme.MEDUSA -> VelellaColorTokens.medusa
 }
 
 /**
- * Ephyra: the Compose colours of the Ephyra design system for the user's [AppTheme].
+ * Velella: the Compose colours of the Velella design system for the user's [AppTheme].
  */
-fun colorSchemeFor(theme: AppTheme): ColorScheme = ephyraColorScheme(paletteFor(theme))
+fun colorSchemeFor(theme: AppTheme): ColorScheme = velellaColorScheme(paletteFor(theme))
 
-/** Ephyra: the [palette] with the accent tokens of the user's [accent] choice; [AccentColor.THEME] keeps the theme's own. */
-fun EphyraPalette.withAccent(accent: AccentColor, resolve: (colorRes: Int) -> Color): EphyraPalette {
+/** Velella: the [palette] with the accent tokens of the user's [accent] choice; [AccentColor.THEME] keeps the theme's own. */
+fun VelellaPalette.withAccent(accent: AccentColor, resolve: (colorRes: Int) -> Color): VelellaPalette {
 	val color = accent.accent ?: return this
 	return copy(
 		accent = resolve(color),
@@ -41,31 +41,31 @@ fun EphyraPalette.withAccent(accent: AccentColor, resolve: (colorRes: Int) -> Co
 }
 
 /**
- * Ephyra: [JellyfinTheme] with the colours of [theme] and the user's accent colour, which also provides its tokens as
- * [LocalEphyraPalette].
+ * Velella: [JellyfinTheme] with the colours of [theme] and the user's accent colour, which also provides its tokens as
+ * [LocalVelellaPalette].
  */
 @Composable
-fun EphyraTheme(theme: AppTheme, content: @Composable () -> Unit) {
-	val ephyraPreferences = koinInject<EphyraPreferences>()
+fun VelellaTheme(theme: AppTheme, content: @Composable () -> Unit) {
+	val velellaPreferences = koinInject<VelellaPreferences>()
 	val context = LocalContext.current
-	val palette = paletteFor(theme).withAccent(ephyraPreferences[EphyraPreferences.accentColor]) { Color(context.getColor(it)) }
-	CompositionLocalProvider(LocalEphyraPalette provides palette) {
-		JellyfinTheme(colorScheme = ephyraColorScheme(palette), content = content)
+	val palette = paletteFor(theme).withAccent(velellaPreferences[VelellaPreferences.accentColor]) { Color(context.getColor(it)) }
+	CompositionLocalProvider(LocalVelellaPalette provides palette) {
+		JellyfinTheme(colorScheme = velellaColorScheme(palette), content = content)
 	}
 }
 
-/** Ephyra: [EphyraTheme] with the user's theme setting, for Compose views outside [org.jellyfin.androidtv.ui.browsing.MainActivity]. */
+/** Velella: [VelellaTheme] with the user's theme setting, for Compose views outside [org.jellyfin.androidtv.ui.browsing.MainActivity]. */
 @Composable
-fun EphyraTheme(content: @Composable () -> Unit) {
+fun VelellaTheme(content: @Composable () -> Unit) {
 	val userPreferences = koinInject<UserPreferences>()
-	EphyraTheme(userPreferences[UserPreferences.appTheme], content)
+	VelellaTheme(userPreferences[UserPreferences.appTheme], content)
 }
 
 /**
- * The design system's mapping from [ColorScheme] fields to its tokens. Focus is a solid [EphyraPalette.ink] fill with
- * [EphyraPalette.bg] content.
+ * The design system's mapping from [ColorScheme] fields to its tokens. Focus is a solid [VelellaPalette.ink] fill with
+ * [VelellaPalette.bg] content.
  */
-fun ephyraColorScheme(palette: EphyraPalette): ColorScheme = with(palette) {
+fun velellaColorScheme(palette: VelellaPalette): ColorScheme = with(palette) {
 	ColorScheme(
 		background = bg,
 		onBackground = ink,

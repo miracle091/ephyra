@@ -35,8 +35,8 @@ fun SettingsHomeScreen() {
 			)
 		}
 
-		item { HomeSpotlightListButton() } // Ephyra
-		item { HomePlaylistsListButton() } // Ephyra
+		item { HomeSpotlightListButton() } // Velella
+		item { HomePlaylistsListButton() } // Velella
 
 		itemsIndexed(userSettingPreferences.homesections) { index, section ->
 			ListButton(

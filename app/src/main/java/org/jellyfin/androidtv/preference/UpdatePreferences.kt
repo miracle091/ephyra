@@ -6,9 +6,9 @@ import org.jellyfin.preference.longPreference
 import org.jellyfin.preference.store.SharedPreferenceStore
 import org.jellyfin.preference.stringPreference
 
-/** Ephyra: settings and state of the update check (update/DailyUpdateCheck.kt). */
+/** Velella: settings and state of the update check (update/DailyUpdateCheck.kt). */
 class UpdatePreferences(context: Context) : SharedPreferenceStore(
-	sharedPreferences = context.getSharedPreferences("ephyra_update", Context.MODE_PRIVATE)
+	sharedPreferences = context.getSharedPreferences("velella_update", Context.MODE_PRIVATE)
 ) {
 	companion object {
 		/** Check GitHub Releases for a new version at most once a day. */

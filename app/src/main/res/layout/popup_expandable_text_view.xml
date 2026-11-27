@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Ephyra: the full overview in the design system's dialog: a centred surface-2 card with radius-lg over the scrim, the text in
+<!-- Velella: the full overview in the design system's dialog: a centred surface-2 card with radius-lg over the scrim, the text in
      the muted colour, the hint under the card -->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -15,7 +15,7 @@
         android:id="@+id/scroll_container"
         android:layout_width="640dp"
         android:layout_height="wrap_content"
-        android:background="@drawable/ephyra_dialog_back"
+        android:background="@drawable/velella_dialog_back"
         android:clickable="true"
         android:focusable="true"
         android:focusedByDefault="true"

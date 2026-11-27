@@ -3,7 +3,7 @@ package org.jellyfin.androidtv.benchmark
 import android.net.Uri
 
 /**
- * Ephyra (debug builds only): Jellyfin's standard test clips (https://repo.jellyfin.org/test-videos/, CC BY-SA 4.0), one moderate
+ * Velella (debug builds only): Jellyfin's standard test clips (https://repo.jellyfin.org/test-videos/, CC BY-SA 4.0), one moderate
  * 1080p and one heavy 4K file per format. 8K files are left out: no Shield outputs 8K.
  */
 data class BenchmarkClip(val folder: String, val fileName: String) {

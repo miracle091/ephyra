@@ -38,18 +38,18 @@ import org.jellyfin.sdk.model.api.RepeatMode as SdkRepeatMode
 
 private const val QUEUE_PEEK_COUNT = 15
 
-// Ephyra: the legacy player's reporting rhythm (progress every 3 s while playing, every 15 s while paused to keep the session)
+// Velella: the legacy player's reporting rhythm (progress every 3 s while playing, every 15 s while paused to keep the session)
 private val SAMPLE_INTERVAL = 1.seconds
 private val PROGRESS_INTERVAL_PLAYING = 3.seconds
 private val PROGRESS_INTERVAL_PAUSED = 15.seconds
 
-/** Ephyra: what a report is about: the queue entry, its stream (the play session) and its item. */
+/** Velella: what a report is about: the queue entry, its stream (the play session) and its item. */
 private data class PlaySession(val entry: QueueEntry, val stream: PlayableMediaStream, val item: BaseItemDto)
 
 class PlaySessionService(
 	private val api: ApiClient,
 ) : PlayerService() {
-	// Ephyra: every start gets its stop, also when the queue is cleared or moves on (see PlaySessionTracker)
+	// Velella: every start gets its stop, also when the queue is cleared or moves on (see PlaySessionTracker)
 	private val tracker = PlaySessionTracker<PlaySession>()
 	private val mutex = Mutex()
 	private var lastReport = TimeSource.Monotonic.markNow()
@@ -58,7 +58,7 @@ class PlaySessionService(
 		state.playState.onEach { sync() }.launchIn(coroutineScope)
 		manager.queue.entry.onEach { sync() }.launchIn(coroutineScope)
 
-		// Ephyra: periodic progress, and a start as soon as the next entry's stream is known (no play state change then)
+		// Velella: periodic progress, and a start as soon as the next entry's stream is known (no play state change then)
 		coroutineScope.launch {
 			while (isActive) {
 				delay(SAMPLE_INTERVAL)

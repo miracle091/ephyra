@@ -85,7 +85,7 @@ class HomeRowsFragment : RowsSupportFragment(), AudioEventListener, View.OnKeyLi
 	private val notificationsRow by lazy { NotificationsHomeFragmentRow(lifecycleScope, notificationsRepository) }
 	private val nowPlaying by lazy { HomeFragmentNowPlayingRow(lifecycleScope, playbackManager, mediaManager) }
 
-	// Ephyra: rows line up at a fixed line from the top, so the spotlight never hides the first row's title
+	// Velella: rows line up at a fixed line from the top, so the spotlight never hides the first row's title
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
 		verticalGridView?.alignHomeRows()
@@ -140,7 +140,7 @@ class HomeRowsFragment : RowsSupportFragment(), AudioEventListener, View.OnKeyLi
 
 			// Add sections to layout
 			withContext(Dispatchers.Main) {
-				// Ephyra: a whole number of posters fills the row (upstream 150dp)
+				// Velella: a whole number of posters fills the row (upstream 150dp)
 				val screenWidth = resources.configuration.screenWidthDp.dp
 				val cardPresenter = CardPresenter(true, rowCardHeight(screenWidth, ROW_CARDS_POSTER, POSTER_ASPECT_RATIO).value.toInt())
 
@@ -260,7 +260,7 @@ class HomeRowsFragment : RowsSupportFragment(), AudioEventListener, View.OnKeyLi
 				val itemRowAdapter = row.adapter as? ItemRowAdapter
 				itemRowAdapter?.loadMoreItemsIfNeeded(itemRowAdapter.indexOf(item))
 
-				backgroundService.clearBackgrounds() // Ephyra: no backdrop behind the home rows, the spotlight has its own
+				backgroundService.clearBackgrounds() // Velella: no backdrop behind the home rows, the spotlight has its own
 			}
 		}
 	}
@@ -279,7 +279,7 @@ private suspend fun createSectionRow(
 	HomeSectionType.RESUME_AUDIO -> helper.loadResumeAudio()
 	HomeSectionType.ACTIVE_RECORDINGS -> helper.loadLatestLiveTvRecordings()
 	HomeSectionType.NEXT_UP -> helper.loadNextUp()
-	// Ephyra: only what is on now; the guide and recordings buttons live in the Live TV library
+	// Velella: only what is on now; the guide and recordings buttons live in the Live TV library
 	HomeSectionType.LIVE_TV -> if (liveTvAccess) helper.loadOnNow() else null
 	HomeSectionType.NONE -> null
 }

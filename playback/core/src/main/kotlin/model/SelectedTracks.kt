@@ -1,7 +1,7 @@
 package org.jellyfin.playback.core.model
 
 /**
- * Ephyra: the audio and subtitle tracks the player shows, by their index in the source (Jellyfin media stream index); null when
+ * Velella: the audio and subtitle tracks the player shows, by their index in the source (Jellyfin media stream index); null when
  * unknown for audio, or when no subtitle is shown.
  */
 data class SelectedTracks(

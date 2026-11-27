@@ -13,7 +13,7 @@ import coil3.serviceLoaderEnabled
 import coil3.svg.SvgDecoder
 import coil3.util.Logger
 import org.jellyfin.androidtv.BuildConfig
-import org.jellyfin.androidtv.EphyraInfo
+import org.jellyfin.androidtv.VelellaInfo
 import org.jellyfin.androidtv.auth.repository.ServerRepository
 import org.jellyfin.androidtv.auth.repository.UserRepository
 import org.jellyfin.androidtv.auth.repository.UserRepositoryImpl
@@ -94,7 +94,7 @@ val appModule = module {
 
 			// Add client info
 			val clientName = buildString {
-				append(EphyraInfo.CLIENT_NAME)
+				append(VelellaInfo.CLIENT_NAME)
 				if (BuildConfig.DEBUG) append(" (debug)")
 			}
 			clientInfo = ClientInfo(clientName, BuildConfig.VERSION_NAME)
@@ -187,7 +187,7 @@ val appModule = module {
 	viewModel { StillWatchingViewModel(get(), get(), get(), get()) }
 	viewModel { PhotoPlayerViewModel(get(), get()) }
 	viewModel { SearchViewModel(get()) }
-	viewModel { DreamViewModel(get(), get()) } // Ephyra: playback, and the player for the long pause screen
+	viewModel { DreamViewModel(get(), get()) } // Velella: playback, and the player for the long pause screen
 	viewModel { SettingsViewModel() }
 	viewModel { SettingsLibrariesScreenViewModel(get()) }
 
@@ -201,7 +201,7 @@ val appModule = module {
 
 	factory { (context: Context) -> SearchFragmentDelegate(context, get()) }
 
-	// Ephyra: updates from GitHub Releases
+	// Velella: updates from GitHub Releases
 	single {
 		val httpClient = AppUpdater.httpClient(get<OkHttpFactory>().createClient(get<HttpClientOptions>()))
 		AppUpdater(androidContext(), httpClient, ProcessLifecycleOwner.get().lifecycleScope)

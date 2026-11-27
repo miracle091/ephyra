@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Ephyra: a day of the guide's date picker, a guide cell: its focus state follows the FriendlyDateButton that holds it -->
+<!-- Velella: a day of the guide's date picker, a guide cell: its focus state follows the FriendlyDateButton that holds it -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="150dp"
     android:layout_height="wrap_content"
-    android:background="@drawable/ephyra_guide_cell"
+    android:background="@drawable/velella_guide_cell"
     android:duplicateParentState="true"
     android:gravity="center"
     android:padding="12dp">

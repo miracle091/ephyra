@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Ephyra: the REC symbol of ic_record inside a second, fainter ring, for a series recording. White, so callers tint it. -->
+<!-- Velella: the REC symbol of ic_record inside a second, fainter ring, for a series recording. White, so callers tint it. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="24dp"
     android:height="24dp"

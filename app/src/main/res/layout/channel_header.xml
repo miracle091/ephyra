@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Ephyra: a channel of the Live TV guide, the number in mono over the name, the logo on the right. The cell background and its
+<!-- Velella: a channel of the Live TV guide, the number in mono over the name, the logo on the right. The cell background and its
      focus state come from GuideChannelHeader -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"

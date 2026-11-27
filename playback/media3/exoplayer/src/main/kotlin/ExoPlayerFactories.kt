@@ -25,7 +25,7 @@ import org.jellyfin.playback.media3.exoplayer.shield.BitstreamFirstRenderersFact
 import org.jellyfin.playback.media3.exoplayer.shield.ShieldLoadControl
 import org.jellyfin.playback.media3.exoplayer.shield.ShieldMediaCodecSelector
 
-/** Ephyra: the media source factory, with libass parsing of ASS/SSA subtitles when [assHandler] is set. */
+/** Velella: the media source factory, with libass parsing of ASS/SSA subtitles when [assHandler] is set. */
 @OptIn(UnstableApi::class)
 internal fun buildMediaSourceFactory(
 	context: Context,
@@ -58,7 +58,7 @@ internal fun buildMediaSourceFactory(
 }
 
 /**
- * Ephyra: the renderers: the default audio sink plus a tee that measures the loudness for the music player's backdrop
+ * Velella: the renderers: the default audio sink plus a tee that measures the loudness for the music player's backdrop
  * (AudioLevel); when FFmpeg is preferred it still steps aside for formats the sink can pass through as bitstream. With
  * [assHandler] set, libass draws the ASS/SSA subtitles.
  */
@@ -92,7 +92,7 @@ internal fun buildRenderersFactory(
 	return if (assHandler != null) AssRenderersFactory(assHandler, renderersFactory) else renderersFactory
 }
 
-/** Ephyra: the Shield's buffers, with the user's durations where set. */
+/** Velella: the Shield's buffers, with the user's durations where set. */
 @OptIn(UnstableApi::class)
 internal fun buildLoadControl(context: Context, options: ExoPlayerOptions): LoadControl = ShieldLoadControl.build(
 	context,
@@ -103,13 +103,13 @@ internal fun buildLoadControl(context: Context, options: ExoPlayerOptions): Load
 		?: DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS,
 )
 
-/** Ephyra: the track selector, with audio offload off. */
+/** Velella: the track selector, with audio offload off. */
 @OptIn(UnstableApi::class)
 internal fun buildTrackSelector(context: Context): DefaultTrackSelector = DefaultTrackSelector(context).apply {
 	setParameters(buildUponParameters().apply {
 		setAudioOffloadPreferences(
 			TrackSelectionParameters.AudioOffloadPreferences.DEFAULT.buildUpon().apply {
-				// Ephyra: a mains-powered TV box gains nothing from DSP offload, and offload is preferred over HDMI bitstream
+				// Velella: a mains-powered TV box gains nothing from DSP offload, and offload is preferred over HDMI bitstream
 				// passthrough when the platform offers both (DefaultAudioSink.getFormatSupport), so keep it off
 				setAudioOffloadMode(TrackSelectionParameters.AudioOffloadPreferences.AUDIO_OFFLOAD_MODE_DISABLED)
 			}.build()

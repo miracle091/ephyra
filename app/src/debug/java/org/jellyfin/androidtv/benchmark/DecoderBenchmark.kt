@@ -21,7 +21,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 /**
- * Ephyra (debug builds only): plays one clip straight from its URL, with the decoder choice of the app's players
+ * Velella (debug builds only): plays one clip straight from its URL, with the decoder choice of the app's players
  * ([ShieldMediaCodecSelector], decoder fallback, FFmpeg only where the platform has no decoder), and measures the result.
  * Runs on the main thread, as ExoPlayer requires.
  */

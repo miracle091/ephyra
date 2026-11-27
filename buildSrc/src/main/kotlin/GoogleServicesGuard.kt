@@ -5,7 +5,7 @@ import org.gradle.api.artifacts.result.ResolvedComponentResult
 import org.gradle.api.artifacts.result.ResolvedDependencyResult
 
 /**
- * Dependency groups Ephyra must never ship: Google Play Services, Firebase, Play Core and the Cast stack.
+ * Dependency groups Velella must never ship: Google Play Services, Firebase, Play Core and the Cast stack.
  * The app runs on GMS-free builds, so any of these is a bug even when it arrives transitively.
  */
 private val forbiddenGroups = listOf(

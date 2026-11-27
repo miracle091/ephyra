@@ -76,7 +76,7 @@ fun SettingsPlaybackPlayerScreen() {
 		if (externalPlayerApps.isEmpty()) {
 			item {
 				ListMessage {
-					Text(stringResource(R.string.ephyra_video_player_external_empty))
+					Text(stringResource(R.string.velella_video_player_external_empty))
 				}
 			}
 		}

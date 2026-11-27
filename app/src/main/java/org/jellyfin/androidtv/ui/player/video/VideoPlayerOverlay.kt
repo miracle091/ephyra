@@ -19,7 +19,7 @@ import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.unit.dp
-import org.jellyfin.androidtv.ui.base.EphyraTheme
+import org.jellyfin.androidtv.ui.base.VelellaTheme
 import org.jellyfin.androidtv.ui.composable.rememberQueueEntry
 import org.jellyfin.androidtv.ui.playback.HdrControlsDim
 import org.jellyfin.androidtv.ui.playback.overlay.SkipButtonState
@@ -38,7 +38,7 @@ import org.jellyfin.playback.jellyfin.queue.baseItemFlow
 import org.koin.compose.koinInject
 import kotlin.time.Duration
 
-/** Ephyra: the playback keys' [action]; the play/pause key and centre play, go on from a pause, or pause while playing. */
+/** Velella: the playback keys' [action]; the play/pause key and centre play, go on from a pause, or pause while playing. */
 private fun PlaybackManager.perform(action: VideoPlayerKeyAction) {
 	when (action) {
 		VideoPlayerKeyAction.PLAY -> state.unpause()
@@ -56,7 +56,7 @@ private fun PlaybackManager.perform(action: VideoPlayerKeyAction) {
 	}
 }
 
-// Ephyra: the legacy player's margins (ephyra_side_margin, ephyra_safe_y, ephyra_osd_padding_bottom); the bottom one is 2dp more
+// Velella: the legacy player's margins (velella_side_margin, velella_safe_y, velella_osd_padding_bottom); the bottom one is 2dp more
 // because these buttons are 44dp against the legacy 48dp, so their centres stay where the legacy ones were
 private val VideoOverlayPadding = PaddingValues(start = 32.dp, top = 27.dp, end = 32.dp, bottom = 7.dp)
 
@@ -72,18 +72,18 @@ fun VideoPlayerOverlay(
 	val entry by rememberQueueEntry(playbackManager)
 	val item = entry?.run { baseItemFlow.collectAsState(baseItem) }?.value
 	val stream = entry?.run { mediaStreamFlow.collectAsState(mediaStream) }?.value
-	// Ephyra: white text and icons glare on an HDR display, so the controls are dimmed then (HdrControlsDim)
+	// Velella: white text and icons glare on an HDR display, so the controls are dimmed then (HdrControlsDim)
 	val controlsAlpha = if (isHdrStream(stream)) HdrControlsDim.HDR_ALPHA else 1f
 
-	// Ephyra: the trickplay thumbnails are downloaded as playback starts, so scrubbing shows them at once
+	// Velella: the trickplay thumbnails are downloaded as playback starts, so scrubbing shows them at once
 	PrefetchTrickplay(item, stream?.mediaSourceId, entry?.startPosition ?: Duration.ZERO)
 
-	// Ephyra: the legacy player's keys (VideoPlayerKeyAction.kt); Captions and Audio track show the controls with that menu open
+	// Velella: the legacy player's keys (VideoPlayerKeyAction.kt); Captions and Audio track show the controls with that menu open
 	var menuRequest by remember { mutableStateOf<VideoPlayerKeyAction?>(null) }
 	val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
-	// Ephyra: the skip button of an "ask to skip" segment takes its keys first, as in the legacy player
+	// Velella: the skip button of an "ask to skip" segment takes its keys first, as in the legacy player
 	val skipSegment = rememberSkipSegment(playbackManager, item, visibilityState.visible)
-	// Ephyra: left and right with the controls hidden add up to one seek (QuickSeek.kt)
+	// Velella: left and right with the controls hidden add up to one seek (QuickSeek.kt)
 	val quickSeek = rememberQuickSeek(playbackManager, mediaToastRegistry)
 
 	val onKey = { keyCode: Int ->
@@ -132,7 +132,7 @@ fun VideoPlayerOverlay(
 	}
 }
 
-/** The playback info panel when asked for, Ephyra's skip button and the toasts, over the video. */
+/** The playback info panel when asked for, Velella's skip button and the toasts, over the video. */
 @Composable
 private fun BoxScope.VideoPlayerOverlayExtras(
 	playbackManager: PlaybackManager,
@@ -150,9 +150,9 @@ private fun BoxScope.VideoPlayerOverlayExtras(
 		)
 	}
 
-	// Ephyra: the legacy player's skip button, in the user's theme colours, at the bottom right
+	// Velella: the legacy player's skip button, in the user's theme colours, at the bottom right
 	Box(modifier = Modifier.align(Alignment.BottomEnd)) {
-		EphyraTheme {
+		VelellaTheme {
 			SkipOverlayComposable(visible = skipSegment.state == SkipButtonState.SHOWN)
 		}
 	}

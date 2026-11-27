@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Velella: the Abyss theme, deep teal with a mint accent (same colours as design/.../VelellaColorTokens.kt) -->
+<resources>
+
+    <color name="velella_abyss_bg">#06171A</color>
+    <color name="velella_abyss_surface_1">#0D2428</color>
+    <color name="velella_abyss_surface_2">#15333A</color>
+    <color name="velella_abyss_surface_3">#1F444C</color>
+    <color name="velella_abyss_line_strong">#5E8A8E</color>
+    <color name="velella_abyss_ink_muted">#B0CCCC</color>
+    <color name="velella_abyss_ink_faint">#86A6A8</color>
+    <color name="velella_abyss_accent">#3DDCB4</color>
+
+    <style name="Theme.Jellyfin.Velella.Abyss" parent="Theme.Jellyfin.Velella">
+        <item name="android:colorPrimary">@color/velella_abyss_bg</item>
+        <item name="android:colorPrimaryDark">@color/velella_abyss_bg</item>
+        <item name="android:colorAccent">@color/velella_abyss_accent</item>
+        <item name="defaultBackground">@color/velella_abyss_bg</item>
+        <item name="cardImageBackground">@color/velella_abyss_surface_1</item>
+        <item name="defaultSearchColor">@color/velella_abyss_accent</item>
+        <item name="android:colorButtonNormal">@color/velella_abyss_surface_2</item>
+        <item name="buttonDefaultNormalBackground">@color/velella_abyss_surface_2</item>
+        <item name="inputDefaultStrokeColor">@color/velella_abyss_line_strong</item>
+        <item name="popupMenuBackground">@color/velella_abyss_surface_2</item>
+        <item name="progressBackground">@color/velella_abyss_surface_3</item>
+        <item name="progressPrimary">@color/velella_abyss_accent</item>
+        <item name="progressSecondary">@color/velella_abyss_ink_faint</item>
+        <item name="controlIconBackground">@color/velella_abyss_surface_2</item>
+        <item name="controlIconForegroundActive">@color/velella_abyss_accent</item>
+        <item name="controlIconForegroundInactive">@color/velella_abyss_ink_muted</item>
+    </style>
+</resources>

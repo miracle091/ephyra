@@ -4,7 +4,7 @@ import org.jellyfin.playback.core.mediastream.MediaStreamAudioTrack
 import org.jellyfin.playback.core.mediastream.MediaStreamTrack
 
 /**
- * Ephyra: position, among the audio tracks ExoPlayer exposes for a directly played file, of the audio track with the Jellyfin
+ * Velella: position, among the audio tracks ExoPlayer exposes for a directly played file, of the audio track with the Jellyfin
  * media stream index [streamIndex]. The container's own audio tracks come in the same order in both lists, so the position among
  * the non-external audio tracks (sorted by stream index) is the position among the player's audio track groups.
  *

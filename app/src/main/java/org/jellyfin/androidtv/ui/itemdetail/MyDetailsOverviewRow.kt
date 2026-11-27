@@ -16,7 +16,7 @@ class MyDetailsOverviewRow @JvmOverloads constructor(
 ) : Row() {
 	var selectedMediaSourceIndex: Int = 0
 
-	/** Ephyra: the series' next up episode shown as a card beside the buttons, and what a click on it does. */
+	/** Velella: the series' next up episode shown as a card beside the buttons, and what a click on it does. */
 	var nextUpEpisode: BaseItemDto? = null
 	var onNextUpClick: ((BaseItemDto) -> Unit)? = null
 

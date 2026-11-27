@@ -11,7 +11,7 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import org.jellyfin.androidtv.R
-import org.jellyfin.androidtv.ui.base.LocalEphyraPalette
+import org.jellyfin.androidtv.ui.base.LocalVelellaPalette
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.util.sdk.getProgramSubText
 import org.jellyfin.androidtv.util.sdk.isNew
@@ -52,8 +52,8 @@ internal fun InfoRowBoxSet(item: BaseItemDto, mediaSource: MediaSourceInfo?, inc
 
 @Composable
 private fun InfoRowLiveBadge() {
-	// Ephyra: the design system's danger badge, like the player's LIVE badge
-	val palette = LocalEphyraPalette.current
+	// Velella: the design system's danger badge, like the player's LIVE badge
+	val palette = LocalVelellaPalette.current
 	InfoRowItem(
 		contentDescription = null,
 		colors = palette.danger to palette.onDanger,

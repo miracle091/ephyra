@@ -28,27 +28,27 @@ import org.jellyfin.sdk.model.api.CollectionType
 import org.koin.compose.koinInject
 import java.util.UUID
 
-/** Ephyra: what a library card shows while its backdrop is looked up, then the backdrop (null when the library has none). */
+/** Velella: what a library card shows while its backdrop is looked up, then the backdrop (null when the library has none). */
 sealed interface LibraryCardBackdrop {
 	data object Loading : LibraryCardBackdrop
 	data class Ready(val image: JellyfinImage?) : LibraryCardBackdrop
 }
 
-/** Ephyra: libraries (Movies, Shows, Music...) show a title's backdrop on their card instead of the server's image with the name on it. */
+/** Velella: libraries (Movies, Shows, Music...) show a title's backdrop on their card instead of the server's image with the name on it. */
 fun isLibraryCard(item: BaseItemDto?): Boolean = item?.type == BaseItemKind.USER_VIEW || item?.type == BaseItemKind.COLLECTION_FOLDER
 
-/** Ephyra: the Live TV library holds channels, not titles: its card shows a channel's logo instead of the newest title's backdrop. */
+/** Velella: the Live TV library holds channels, not titles: its card shows a channel's logo instead of the newest title's backdrop. */
 fun isLiveTvLibraryCard(item: BaseItemDto?): Boolean = isLibraryCard(item) && item?.collectionType == CollectionType.LIVETV
 
-/** Ephyra: the icon of a library card without a backdrop: the REC symbol for the server's recordings folders, else [defaultIcon]. */
+/** Velella: the icon of a library card without a backdrop: the REC symbol for the server's recordings folders, else [defaultIcon]. */
 fun libraryCardIcon(libraryId: UUID, recordingFolderIds: Collection<UUID>, defaultIcon: Int, recordingIcon: Int): Int =
 	if (libraryId in recordingFolderIds) recordingIcon else defaultIcon
 
-/** Ephyra: a photo library has no titles with a backdrop: its card shows one of its photos, a new one at each start of the app. */
+/** Velella: a photo library has no titles with a backdrop: its card shows one of its photos, a new one at each start of the app. */
 fun isPhotoLibraryCard(item: BaseItemDto?): Boolean = isLibraryCard(item) && item?.collectionType == CollectionType.PHOTOS
 
 /**
- * Ephyra: the key a library's backdrop is kept under. Users of a server share library ids but not what they may see
+ * Velella: the key a library's backdrop is kept under. Users of a server share library ids but not what they may see
  * (parental ratings, hidden folders), so the user is part of it.
  */
 fun libraryBackdropKey(userId: UUID?, libraryId: UUID): Pair<UUID?, UUID> = userId to libraryId
@@ -60,7 +60,7 @@ private val libraryBackdrops = HashMap<Pair<UUID?, UUID>, LibraryCardBackdrop.Re
 private val recordingFolders = HashMap<UUID?, Set<UUID>>()
 
 /**
- * Ephyra: the ids of the server's live TV recordings folders. The Recordings library is a plain collection folder without a
+ * Velella: the ids of the server's live TV recordings folders. The Recordings library is a plain collection folder without a
  * collection type, so only the server can tell it apart from other folders.
  */
 @Composable
@@ -76,7 +76,7 @@ private fun rememberRecordingFolderIds(): State<Set<UUID>> {
 	}
 }
 
-/** Ephyra: the backdrop for a library card, from the title added most recently to the library. */
+/** Velella: the backdrop for a library card, from the title added most recently to the library. */
 @Composable
 fun rememberLibraryCardBackdrop(library: BaseItemDto): State<LibraryCardBackdrop> {
 	val api = koinInject<ApiClient>()
@@ -96,7 +96,7 @@ fun rememberLibraryCardBackdrop(library: BaseItemDto): State<LibraryCardBackdrop
 	}
 }
 
-/** Ephyra: a library card's picture: the backdrop when there is one, else the card's colour tone; nothing while loading. */
+/** Velella: a library card's picture: the backdrop when there is one, else the card's colour tone; nothing while loading. */
 @Composable
 fun LibraryCardImage(library: BaseItemDto, title: String?, iconRes: Int, size: DpSize, aspectRatio: Float) {
 	val backdrop by rememberLibraryCardBackdrop(library)
@@ -124,14 +124,14 @@ fun LibraryCardImage(library: BaseItemDto, title: String?, iconRes: Int, size: D
 					modifier = Modifier.fillMaxSize(),
 				)
 			} else {
-				// Ephyra: the icon always shows, so a library without backdrops (Recordings...) is not a bare colour
+				// Velella: the icon always shows, so a library without backdrops (Recordings...) is not a bare colour
 				ArtToneCover(title, libraryCardIcon(library.id, recordingFolderIds, iconRes, R.drawable.ic_record), alwaysShowIcon = true)
 			}
 		}
 	}
 }
 
-/** Ephyra: a channel logo (usually a transparent picture) whole and centred on the card's colour tone, not cropped to fill the card. */
+/** Velella: a channel logo (usually a transparent picture) whole and centred on the card's colour tone, not cropped to fill the card. */
 @Composable
 private fun LiveTvCardLogo(logo: JellyfinImage, title: String?, size: DpSize) {
 	val api = koinInject<ApiClient>()

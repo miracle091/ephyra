@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Velella: the video player's icons, ink, in the background colour on the focused ink fill -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="?attr/defaultBackground" android:state_focused="true" />
+    <item android:color="?attr/headerTextColor" />
+</selector>

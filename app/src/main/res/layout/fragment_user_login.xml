@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Ephyra: sign in like the "Users" board of the design system: centred title and server, the login method in a 640dp column,
+<!-- Velella: sign in like the "Users" board of the design system: centred title and server, the login method in a 640dp column,
      ghost buttons at the bottom -->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingHorizontal="@dimen/ephyra_side_margin"
+    android:paddingHorizontal="@dimen/velella_side_margin"
     android:paddingTop="48dp"
     android:paddingBottom="@dimen/overscan_vertical"
     tools:context=".ui.startup.StartupActivity">
@@ -61,28 +61,28 @@
 
         <Button
             android:id="@+id/use_credentials"
-            style="@style/Button.Ephyra.Ghost"
+            style="@style/Button.Velella.Ghost"
             android:layout_width="wrap_content"
             android:layout_height="40dp"
             android:layout_marginEnd="8dp"
-            android:drawableStart="@drawable/ic_ephyra_lock"
+            android:drawableStart="@drawable/ic_velella_lock"
             android:text="@string/action_use_password" />
 
         <Button
             android:id="@+id/use_quickconnect"
-            style="@style/Button.Ephyra.Ghost"
+            style="@style/Button.Velella.Ghost"
             android:layout_width="wrap_content"
             android:layout_height="40dp"
             android:layout_marginEnd="8dp"
-            android:drawableStart="@drawable/ic_ephyra_qr_code"
+            android:drawableStart="@drawable/ic_velella_qr_code"
             android:text="@string/action_use_quickconnect" />
 
         <Button
             android:id="@+id/cancel"
-            style="@style/Button.Ephyra.Ghost"
+            style="@style/Button.Velella.Ghost"
             android:layout_width="wrap_content"
             android:layout_height="40dp"
-            android:drawableStart="@drawable/ic_ephyra_close"
+            android:drawableStart="@drawable/ic_velella_close"
             android:text="@string/btn_cancel"
             tools:ignore="ButtonOrder" />
     </LinearLayout>

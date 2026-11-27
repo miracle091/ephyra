@@ -34,10 +34,10 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.jellyfin.androidtv.R
-import org.jellyfin.androidtv.preference.EphyraPreferences
-import org.jellyfin.androidtv.ui.base.EphyraTheme
+import org.jellyfin.androidtv.preference.VelellaPreferences
+import org.jellyfin.androidtv.ui.base.VelellaTheme
 import org.jellyfin.androidtv.ui.base.Icon
-import org.jellyfin.androidtv.ui.base.LocalEphyraPalette
+import org.jellyfin.androidtv.ui.base.LocalVelellaPalette
 import org.jellyfin.androidtv.ui.base.LocalTextStyle
 import org.jellyfin.androidtv.ui.base.Text
 import org.koin.compose.koinInject
@@ -51,15 +51,15 @@ fun SkipOverlayComposable(
 	Box(
 		contentAlignment = Alignment.BottomEnd,
 		modifier = Modifier
-			// Ephyra: the controls' safe area (ephyra_side_margin, ephyra_safe_y)
+			// Velella: the controls' safe area (velella_side_margin, velella_safe_y)
 			.padding(end = 32.dp, bottom = 27.dp)
 	) {
 		AnimatedVisibility(visible, enter = fadeIn(), exit = fadeOut()) {
-			val palette = LocalEphyraPalette.current
-			// Ephyra: the player's text pills (ephyra_osd_pill.xml): solid surface-2, a full pill, 48dp high, ink content
+			val palette = LocalVelellaPalette.current
+			// Velella: the player's text pills (velella_osd_pill.xml): solid surface-2, a full pill, 48dp high, ink content
 			Row(
 				modifier = Modifier
-					.alpha(skipButtonAlpha(visible)) // Ephyra: dims after a few seconds
+					.alpha(skipButtonAlpha(visible)) // Velella: dims after a few seconds
 					.height(48.dp)
 					.clip(CircleShape)
 					.background(palette.surface2)
@@ -71,7 +71,7 @@ fun SkipOverlayComposable(
 					imageVector = ImageVector.vectorResource(R.drawable.ic_control_select),
 					contentDescription = null,
 					modifier = Modifier.size(24.dp),
-					// Ephyra: a multi-colour drawable (disc, arrows, centre dot from the theme); a tint would flatten it into a solid disc
+					// Velella: a multi-colour drawable (disc, arrows, centre dot from the theme); a tint would flatten it into a solid disc
 					tint = Color.Unspecified,
 				)
 
@@ -97,7 +97,7 @@ class SkipOverlayView @JvmOverloads constructor(
 	private val _currentPosition = MutableStateFlow(Duration.ZERO)
 	private val _targetPosition = MutableStateFlow<Duration?>(null)
 	private val _skipUiEnabled = MutableStateFlow(true)
-	// Ephyra: hidden by itself after a while, but the segment is kept so the button can be called back
+	// Velella: hidden by itself after a while, but the segment is kept so the button can be called back
 	private val _autoHidden = MutableStateFlow(false)
 
 	var currentPosition: Duration
@@ -138,11 +138,11 @@ class SkipOverlayView @JvmOverloads constructor(
 	val visible: Boolean
 		get() = state == SkipButtonState.SHOWN
 
-	/** Ephyra: whether a key would call the button back (it hid by itself and the segment still lasts). */
+	/** Velella: whether a key would call the button back (it hid by itself and the segment still lasts). */
 	val recallable: Boolean
 		get() = state == SkipButtonState.RECALLABLE
 
-	/** Ephyra: shows the button again for another auto-hide period. */
+	/** Velella: shows the button again for another auto-hide period. */
 	fun recall() {
 		_autoHidden.value = false
 	}
@@ -158,19 +158,19 @@ class SkipOverlayView @JvmOverloads constructor(
 			derivedStateOf { visible }
 		}
 
-		// Ephyra: the user's choice of how long the button stays (no delay: until the segment ends)
-		val preferences = koinInject<EphyraPreferences>()
-		val autoHideDelay = skipAutoHideDelay(preferences[EphyraPreferences.skipAutoHideSeconds])
+		// Velella: the user's choice of how long the button stays (no delay: until the segment ends)
+		val preferences = koinInject<VelellaPreferences>()
+		val autoHideDelay = skipAutoHideDelay(preferences[VelellaPreferences.skipAutoHideSeconds])
 
-		// Auto hide; Ephyra: only hides, the segment stays so a key calls the button back
+		// Auto hide; Velella: only hides, the segment stays so a key calls the button back
 		LaunchedEffect(skipUiEnabled, targetPosition, autoHidden, autoHideDelay) {
 			if (autoHidden || targetPosition == null || autoHideDelay == null) return@LaunchedEffect
 			delay(autoHideDelay)
 			_autoHidden.value = true
 		}
 
-		// Ephyra: the user's theme colours
-		EphyraTheme {
+		// Velella: the user's theme colours
+		VelellaTheme {
 			SkipOverlayComposable(visible)
 		}
 	}

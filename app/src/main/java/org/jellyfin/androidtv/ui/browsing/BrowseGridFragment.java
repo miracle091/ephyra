@@ -222,7 +222,7 @@ public class BrowseGridFragment extends Fragment implements View.OnKeyListener {
         mGridViewHolder = mGridPresenter.onCreateViewHolder(binding.rowsFragment);
         if (mGridViewHolder instanceof HorizontalGridPresenter.ViewHolder) {
             mGridView = ((HorizontalGridPresenter.ViewHolder) mGridViewHolder).getGridView();
-            mGridView.setGravity(Gravity.TOP); // Ephyra: right below the title, not centred
+            mGridView.setGravity(Gravity.TOP); // Velella: right below the title, not centred
             ViewGroup.MarginLayoutParams titleMargin = (ViewGroup.MarginLayoutParams) binding.title.getLayoutParams();
             ViewGroup.MarginLayoutParams clockMargin = (ViewGroup.MarginLayoutParams) binding.clock.getLayoutParams();
             mGridView.setPadding(titleMargin.getMarginStart(), mGridPaddingTop, clockMargin.getMarginEnd(), mGridPaddingTop); // prevent initial card cutoffs
@@ -233,7 +233,7 @@ public class BrowseGridFragment extends Fragment implements View.OnKeyListener {
         }
         mGridView.setHorizontalSpacing(mGridItemSpacingHorizontal);
         mGridView.setVerticalSpacing(mGridItemSpacingVertical);
-        // Ephyra: the focused card's zoom and ring may draw past the grid's top edge instead of being cut
+        // Velella: the focused card's zoom and ring may draw past the grid's top edge instead of being cut
         mGridView.setClipChildren(false);
         mGridView.setClipToPadding(false);
         binding.rowsFragment.setClipChildren(false);
@@ -545,9 +545,9 @@ public class BrowseGridFragment extends Fragment implements View.OnKeyListener {
             mDirty = true;
         }
         mCardHeight = cardHeightInt;
-        // Ephyra: at least the home's gap between cards, the 6% focus scale alone leaves 1 to 3dp
-        mGridItemSpacingHorizontal = Math.max(spacingHorizontalInt, getResources().getDimensionPixelSize(R.dimen.ephyra_card_gap));
-        mGridItemSpacingVertical = Math.max(spacingVerticalInt, getResources().getDimensionPixelSize(R.dimen.ephyra_card_gap));
+        // Velella: at least the home's gap between cards, the 6% focus scale alone leaves 1 to 3dp
+        mGridItemSpacingHorizontal = Math.max(spacingHorizontalInt, getResources().getDimensionPixelSize(R.dimen.velella_card_gap));
+        mGridItemSpacingVertical = Math.max(spacingVerticalInt, getResources().getDimensionPixelSize(R.dimen.velella_card_gap));
         mGridPaddingLeft = paddingLeftInt;
         mGridPaddingTop = paddingTopInt;
     }
@@ -919,7 +919,7 @@ public class BrowseGridFragment extends Fragment implements View.OnKeyListener {
         public void run() {
             if (!getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) return;
 
-            backgroundService.getValue().clearBackgrounds(); // Ephyra: no backdrop behind the library grids
+            backgroundService.getValue().clearBackgrounds(); // Velella: no backdrop behind the library grids
             setItem(mCurrentItem);
         }
     };

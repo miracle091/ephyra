@@ -15,7 +15,7 @@ import org.jellyfin.androidtv.ui.shared.toolbar.ToolbarClock
 
 @Composable
 fun PlayerHeader(
-	// Ephyra: the video player places the clock as the legacy player did
+	// Velella: the video player places the clock as the legacy player did
 	clockModifier: Modifier = Modifier,
 	spacing: Dp = 12.dp,
 	content: @Composable ColumnScope.() -> Unit,

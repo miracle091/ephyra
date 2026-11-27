@@ -35,9 +35,9 @@ import coil3.compose.AsyncImage
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.jellyfin.androidtv.R
 import org.jellyfin.androidtv.constant.ImageType
-import org.jellyfin.androidtv.ui.base.EphyraTheme
+import org.jellyfin.androidtv.ui.base.VelellaTheme
 import org.jellyfin.androidtv.ui.base.JellyfinTheme
-import org.jellyfin.androidtv.ui.base.LocalEphyraPalette
+import org.jellyfin.androidtv.ui.base.LocalVelellaPalette
 import org.jellyfin.androidtv.ui.base.LocalTextStyle
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.composable.item.ArtToneCover
@@ -53,7 +53,7 @@ private val CastImageSize = 120.dp
 private const val MARQUEE_DELAY_MS = 1500
 
 /**
- * Ephyra: the compact cast card of the details screens: a square 120dp picture with rounded corners and, under it, the person's
+ * Velella: the compact cast card of the details screens: a square 120dp picture with rounded corners and, under it, the person's
  * name and role in two small lines. More people fit in a row than with the poster-shaped cards. Focus ring and click behaviour
  * are the covers': the row handles the click and the ring is drawn here.
  */
@@ -93,7 +93,7 @@ class CastCardPresenter : Presenter() {
 				val current by item.collectAsState()
 				val isFocused by focused.collectAsState()
 
-				EphyraTheme { current?.let { CastCard(it, isFocused) } }
+				VelellaTheme { current?.let { CastCard(it, isFocused) } }
 			}
 
 			focused.value = view.isFocused
@@ -116,7 +116,7 @@ class CastCardPresenter : Presenter() {
 private fun CastCard(item: BaseRowItem, focused: Boolean) {
 	val api = koinInject<ApiClient>()
 	val context = LocalContext.current
-	val palette = LocalEphyraPalette.current
+	val palette = LocalVelellaPalette.current
 	val shape = JellyfinTheme.shapes.medium
 	val imageSize = with(LocalDensity.current) { CastImageSize.roundToPx() }
 

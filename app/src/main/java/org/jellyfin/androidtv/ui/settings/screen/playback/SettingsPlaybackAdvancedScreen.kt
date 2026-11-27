@@ -208,7 +208,7 @@ private fun LazyListScope.audioItems(userPreferences: UserPreferences) {
 			preference = UserPreferences.audioNightMode,
 			heading = R.string.pref_audio_night_mode,
 			key = "audio_night_mode",
-			caption = R.string.ephyra_audio_night_mode_content,
+			caption = R.string.velella_audio_night_mode_content,
 		)
 	}
 
@@ -218,7 +218,7 @@ private fun LazyListScope.audioItems(userPreferences: UserPreferences) {
 			preference = UserPreferences.preferExoPlayerFfmpeg,
 			heading = R.string.prefer_exoplayer_ffmpeg,
 			key = "prefer_exoplayer_ffmpeg",
-			caption = R.string.ephyra_prefer_ffmpeg_content,
+			caption = R.string.velella_prefer_ffmpeg_content,
 		)
 	}
 }

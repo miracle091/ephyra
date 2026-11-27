@@ -31,7 +31,7 @@ import coil3.request.transformations
 import coil3.size.Dimension
 import coil3.size.Size
 import org.jellyfin.androidtv.integration.dream.formatPlaybackTime
-import org.jellyfin.androidtv.ui.base.LocalEphyraPalette
+import org.jellyfin.androidtv.ui.base.LocalVelellaPalette
 import org.jellyfin.androidtv.ui.base.LocalTextStyle
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.util.coil.SubsetTransformation
@@ -50,7 +50,7 @@ private val PreviewGap = 12.dp
 private val PreviewShape = RoundedCornerShape(8.dp)
 
 /**
- * Ephyra: the request for a trickplay tile image, signed as the legacy player did. The preview and the prefetch build it the same
+ * Velella: the request for a trickplay tile image, signed as the legacy player did. The preview and the prefetch build it the same
  * way, so the image cache on disk keys both by the same URL.
  */
 private fun ApiClient.trickplayTileRequest(context: Context, itemId: UUID, mediaSourceId: UUID, width: Int, index: Int) =
@@ -72,7 +72,7 @@ private fun ApiClient.trickplayTileRequest(context: Context, itemId: UUID, media
 		)
 
 /**
- * Ephyra: downloads the trickplay tile images of [item] into the image cache on disk when playback starts, one at a time from the
+ * Velella: downloads the trickplay tile images of [item] into the image cache on disk when playback starts, one at a time from the
  * one at [startPosition], so the first thumbnail while scrubbing shows at once. They are decoded as small as possible and kept
  * out of the memory cache: only the downloaded file matters. Leaving the player stops it.
  */
@@ -98,7 +98,7 @@ fun PrefetchTrickplay(item: BaseItemDto?, mediaSourceId: String?, startPosition:
 }
 
 /**
- * Ephyra: the trickplay thumbnail of [position] with its time, drawn above the seek bar at [fraction] of its width while
+ * Velella: the trickplay thumbnail of [position] with its time, drawn above the seek bar at [fraction] of its width while
  * scrubbing, as the legacy player's thumbnails row did. It takes no room in the layout: it is placed over the video, kept
  * inside the seek bar's width. Nothing shows when the item has no trickplay thumbnails for [mediaSourceId].
  */
@@ -115,7 +115,7 @@ fun TrickplayPreview(
 	val sourceUuid = mediaSourceId?.toUUIDOrNull() ?: return
 	val tile = trickplayTile(position, info)
 	val context = LocalContext.current
-	val palette = LocalEphyraPalette.current
+	val palette = LocalVelellaPalette.current
 	val height = PreviewWidth * info.height / info.width.coerceAtLeast(1)
 
 	val itemId = requireNotNull(item).id

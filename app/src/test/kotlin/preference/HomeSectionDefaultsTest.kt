@@ -5,7 +5,7 @@ import io.kotest.matchers.shouldBe
 import org.jellyfin.androidtv.constant.HomeSectionType
 
 class HomeSectionDefaultsTest : FunSpec({
-	// Ephyra: a lighter home by default; users who set their sections (here or in the web client) keep them
+	// Velella: a lighter home by default; users who set their sections (here or in the web client) keep them
 	test("the default home has libraries, continue watching, live TV, next up and latest, nothing else") {
 		val defaults = with(UserSettingPreferences) {
 			listOf(homesection0, homesection1, homesection2, homesection3, homesection4, homesection5, homesection6, homesection7)

@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import org.jellyfin.androidtv.ui.base.Icon
-import org.jellyfin.androidtv.ui.base.LocalEphyraPalette
+import org.jellyfin.androidtv.ui.base.LocalVelellaPalette
 import org.jellyfin.androidtv.ui.base.LocalTextStyle
 import org.jellyfin.androidtv.ui.base.ProvideTextStyle
 
@@ -39,8 +39,8 @@ fun InfoRowItem(
 	// Content
 	content: @Composable RowScope.() -> Unit,
 ) {
-	// Ephyra: plain items in ink-muted like the home's meta line, neutral badges as the design system's badge
-	val palette = LocalEphyraPalette.current
+	// Velella: plain items in ink-muted like the home's meta line, neutral badges as the design system's badge
+	val palette = LocalVelellaPalette.current
 	val (backgroundColor, foregroundColor) = when (colors) {
 		InfoRowColors.Transparent -> Color.Transparent to palette.inkMuted
 		InfoRowColors.Default -> palette.surface2 to palette.inkMuted

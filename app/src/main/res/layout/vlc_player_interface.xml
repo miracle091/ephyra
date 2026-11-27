@@ -45,7 +45,7 @@
         android:layout_width="fill_parent"
         android:layout_height="225dp"
         android:layout_gravity="bottom"
-        android:background="@drawable/ephyra_osd_scrim_bottom"
+        android:background="@drawable/velella_osd_scrim_bottom"
         android:visibility="gone">
 
         <LinearLayout
@@ -57,28 +57,28 @@
             android:orientation="horizontal" />
     </FrameLayout>
 
-    <!-- Ephyra: the header of the design system's "Player" board over a top shade: the overline (series and episode, or
+    <!-- Velella: the header of the design system's "Player" board over a top shade: the overline (series and episode, or
          genres), the bold title and the play method in ink-muted (OsdHeader.kt, PlayInfo.kt), the clock on the right -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/topPanel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="top"
-        android:background="@drawable/ephyra_osd_scrim_top"
+        android:background="@drawable/velella_osd_scrim_top"
         android:clickable="false"
-        android:paddingHorizontal="@dimen/ephyra_side_margin"
-        android:paddingTop="@dimen/ephyra_safe_y"
+        android:paddingHorizontal="@dimen/velella_side_margin"
+        android:paddingTop="@dimen/velella_safe_y"
         android:paddingBottom="96dp"
         android:visibility="gone">
 
-        <!-- Ephyra: the live player's danger badge (OsdHeader.kt), gone for everything else -->
+        <!-- Velella: the live player's danger badge (OsdHeader.kt), gone for everything else -->
         <TextView
-            android:id="@+id/ephyra_live_badge"
-            style="@style/TextAppearance.Ephyra.OsdBadge"
+            android:id="@+id/velella_live_badge"
+            style="@style/TextAppearance.Velella.OsdBadge"
             android:layout_width="wrap_content"
-            android:layout_height="@dimen/ephyra_osd_badge_height"
-            android:background="@drawable/ephyra_osd_live_badge"
-            android:drawableStart="@drawable/ephyra_osd_live_dot"
+            android:layout_height="@dimen/velella_osd_badge_height"
+            android:background="@drawable/velella_osd_live_badge"
+            android:drawableStart="@drawable/velella_osd_live_dot"
             android:drawablePadding="4dp"
             android:gravity="center"
             android:paddingHorizontal="6dp"
@@ -89,7 +89,7 @@
 
         <TextView
             android:id="@+id/item_overline"
-            style="@style/TextAppearance.Ephyra.OsdOverline"
+            style="@style/TextAppearance.Velella.OsdOverline"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
@@ -98,7 +98,7 @@
             android:gravity="center_vertical"
             android:maxLines="1"
             app:layout_constraintEnd_toStartOf="@id/textClock"
-            app:layout_constraintStart_toEndOf="@id/ephyra_live_badge"
+            app:layout_constraintStart_toEndOf="@id/velella_live_badge"
             app:layout_goneMarginStart="0dp"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Series · S2:E4" />
@@ -119,10 +119,10 @@
             app:layout_constraintTop_toBottomOf="@id/item_overline"
             tools:text="Title" />
 
-        <!-- Ephyra: play method and the server's transcode reasons (ui/playback/PlayInfo.kt); the live player shows it above the
+        <!-- Velella: play method and the server's transcode reasons (ui/playback/PlayInfo.kt); the live player shows it above the
              controls instead, with the title block -->
         <TextView
-            android:id="@+id/ephyra_play_info"
+            android:id="@+id/velella_play_info"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"

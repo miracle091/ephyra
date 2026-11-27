@@ -15,7 +15,7 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 class PlaybackInfoTimeoutTest : FunSpec({
-	val clientInfo = ClientInfo("Ephyra", "1.0")
+	val clientInfo = ClientInfo("Velella", "1.0")
 	val deviceInfo = DeviceInfo("device-id", "Shield")
 	val api = mockk<ApiClient> {
 		every { baseUrl } returns "http://server:8096"

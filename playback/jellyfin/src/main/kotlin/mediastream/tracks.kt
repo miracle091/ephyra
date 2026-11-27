@@ -49,7 +49,7 @@ private fun getVideoTrack(stream: MediaStream) = MediaStreamVideoTrack(
 	frameRate = stream.realFrameRate,
 )
 
-// Ephyra: only a track the server hands out as a separate file gets a URL; embedded, HLS and burnt-in ones come with the stream
+// Velella: only a track the server hands out as a separate file gets a URL; embedded, HLS and burnt-in ones come with the stream
 private fun getSubtitleTrack(stream: MediaStream, createUrl: (path: String) -> String) = MediaStreamSubtitleTrack(
 	codec = stream.codec.orEmpty(),
 	index = stream.index,
@@ -63,7 +63,7 @@ private fun getSubtitleTrack(stream: MediaStream, createUrl: (path: String) -> S
 		?.let(createUrl),
 )
 
-/** Ephyra: these tracks with the subtitle [index] burnt into the picture, so the player doesn't load its file as well. */
+/** Velella: these tracks with the subtitle [index] burnt into the picture, so the player doesn't load its file as well. */
 fun List<MediaStreamTrack>.withBurntInSubtitle(index: Int?) = map { track ->
 	if (track is MediaStreamSubtitleTrack && track.index == index) track.copy(externalUrl = null) else track
 }

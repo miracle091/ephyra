@@ -47,7 +47,7 @@ class ServerFragment : Fragment() {
 	companion object {
 		const val ARG_SERVER_ID = "server_id"
 
-		// Ephyra: the width of a UserCardView, a 128dp avatar with 16dp on each side
+		// Velella: the width of a UserCardView, a 128dp avatar with 16dp on each side
 		private const val USER_TILE_WIDTH_DP = 160
 	}
 
@@ -99,7 +99,7 @@ class ServerFragment : Fragment() {
 			}.launchIn(lifecycleScope)
 		}
 		binding.users.adapter = userAdapter
-		// Ephyra: the avatars stay centred on the screen while they fit (a Leanback grid can't wrap its content)
+		// Velella: the avatars stay centred on the screen while they fit (a Leanback grid can't wrap its content)
 		binding.users.addOnLayoutChangeListener { view, _, _, _, _, _, _, _, _ ->
 			val tileWidth = (USER_TILE_WIDTH_DP * resources.displayMetrics.density).toInt()
 			val side = ((view.width - userAdapter.itemCount * tileWidth) / 2).coerceAtLeast(0)
@@ -113,7 +113,7 @@ class ServerFragment : Fragment() {
 
 				binding.users.isFocusable = users.any()
 				binding.noUsersWarning.isVisible = users.isEmpty()
-				// Ephyra: the focus starts on the first user, or on Add account without users
+				// Velella: the focus starts on the first user, or on Add account without users
 				if (users.any()) binding.users.requestFocus() else binding.addUserButton.requestFocus()
 			}.launchIn(viewLifecycleOwner.lifecycleScope)
 
@@ -138,8 +138,8 @@ class ServerFragment : Fragment() {
 	}
 
 	private fun onServerChange(server: Server) {
-		// Ephyra: the server shows as a subtitle under the title, a ghost button changes it
-		binding.subtitle.text = getString(R.string.ephyra_server_subtitle, server.name, server.address.substringAfter("://"))
+		// Velella: the server shows as a subtitle under the title, a ghost button changes it
+		binding.subtitle.text = getString(R.string.velella_server_subtitle, server.name, server.address.substringAfter("://"))
 
 		binding.addUserButton.setOnClickListener {
 			navigateFragment<UserLoginFragment>(

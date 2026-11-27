@@ -27,7 +27,7 @@ import org.koin.compose.koinInject
 fun SplashScreen() {
 	val backgroundService = koinInject<BackgroundService>()
 
-	// Ephyra: the plain theme background, without the server's splashscreen
+	// Velella: the plain theme background, without the server's splashscreen
 	LaunchedEffect(Unit) { backgroundService.clearBackgrounds() }
 
 	AppBackground()

@@ -2,7 +2,7 @@ package org.jellyfin.androidtv.benchmark
 
 import java.util.Locale
 
-/** Ephyra (debug builds only): what one clip did in the decoder pass. */
+/** Velella (debug builds only): what one clip did in the decoder pass. */
 data class DecoderResult(
 	val clip: String,
 	val decoder: String? = null,

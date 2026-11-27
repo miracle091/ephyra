@@ -15,7 +15,7 @@ import org.jellyfin.sdk.model.api.PlaybackInfoDto
 import org.jellyfin.sdk.model.api.TranscodeReason
 import java.net.URLDecoder
 
-/** Ephyra (debug builds only): what the server decides for one clip, when the clip is in one of the user's libraries. */
+/** Velella (debug builds only): what the server decides for one clip, when the clip is in one of the user's libraries. */
 data class ServerResult(
 	val clip: String,
 	val playMethod: PlayMethod? = null,
@@ -25,7 +25,7 @@ data class ServerResult(
 )
 
 /**
- * Ephyra (debug builds only): asks the server how it would deliver each test clip to this device, with the device profile the
+ * Velella (debug builds only): asks the server how it would deliver each test clip to this device, with the device profile the
  * players send. Nothing is played. The clips must be in a library; the server names them all "Test Jellyfin", so they are
  * matched by file name.
  */

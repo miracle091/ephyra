@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Ephyra mark, single colour (the name is upstream's, kept so the code that uses it stays unchanged) -->
+<!-- Velella mark, single colour (the name is upstream's, kept so the code that uses it stays unchanged) -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="24dp"
     android:height="24dp"

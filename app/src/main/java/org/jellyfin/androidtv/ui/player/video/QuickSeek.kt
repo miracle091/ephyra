@@ -18,7 +18,7 @@ import java.util.Locale
 
 private val CENTRE_KEYS = setOf(KeyEvent.KEYCODE_DPAD_CENTER, KeyEvent.KEYCODE_ENTER)
 
-/** Ephyra: the quick seek's next target from [current]: one fast forward or rewind step, kept between the start and the end. */
+/** Velella: the quick seek's next target from [current]: one fast forward or rewind step, kept between the start and the end. */
 fun quickSeekTarget(
 	current: Duration,
 	forward: Boolean,
@@ -30,7 +30,7 @@ fun quickSeekTarget(
 	return next.coerceIn(Duration.ZERO, duration.coerceAtLeast(Duration.ZERO))
 }
 
-/** Ephyra: the quick seek's distance from where it started, signed, as m:ss or h:mm:ss ("+1:30", "−0:20"). */
+/** Velella: the quick seek's distance from where it started, signed, as m:ss or h:mm:ss ("+1:30", "−0:20"). */
 fun quickSeekLabel(offset: Duration): String {
 	val sign = if (offset.isNegative()) "−" else "+"
 	return offset.absoluteValue.toComponents { hours, minutes, seconds, _ ->
@@ -40,7 +40,7 @@ fun quickSeekLabel(offset: Duration): String {
 }
 
 /**
- * Ephyra: left and right while the controls are hidden. Each press moves a target by the user's fast forward or rewind amount and
+ * Velella: left and right while the controls are hidden. Each press moves a target by the user's fast forward or rewind amount and
  * shows it in a toast (the distance, and the target on the ring); one seek follows [SEEK_COMMIT_DELAY] after the last press, so a
  * transcode restarts once. Centre during that wait seeks at once.
  */

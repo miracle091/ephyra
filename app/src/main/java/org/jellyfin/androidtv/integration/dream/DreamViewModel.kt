@@ -18,11 +18,11 @@ class DreamViewModel(
 	private val playbackManager: PlaybackManager,
 	private val playbackControllerContainer: PlaybackControllerContainer,
 ) : ViewModel() {
-	// Ephyra: a video paused in the player, else what is playing, else the clock (no library showcase)
+	// Velella: a video paused in the player, else what is playing, else the clock (no library showcase)
 	val content: Flow<DreamContent> = playbackManager.queue.entry.map(::contentFor)
 
 	/**
-	 * Ephyra: the content right now, for the screensaver's first frame. The view model outlives each showing, so a held value would
+	 * Velella: the content right now, for the screensaver's first frame. The view model outlives each showing, so a held value would
 	 * be the last showing's (or the clock) and fade into the right one a second later.
 	 */
 	fun currentContent(): DreamContent = contentFor(playbackManager.queue.entry.value)
@@ -48,7 +48,7 @@ class DreamViewModel(
 	}
 }
 
-/** Ephyra: the new player's paused video for the screensaver, or null when it plays no video or isn't paused. */
+/** Velella: the new player's paused video for the screensaver, or null when it plays no video or isn't paused. */
 internal fun pausedVideoContent(playState: PlayState, entry: QueueEntry?, position: () -> PositionInfo): DreamContent.VideoPaused? {
 	if (playState != PlayState.PAUSED || entry?.mediaType != MediaType.Video) return null
 	val item = entry.baseItem ?: return null

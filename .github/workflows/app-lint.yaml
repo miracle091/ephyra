@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-      - ephyra/main # Ephyra: the fork's default branch
+      - velella/main # Velella: the fork's default branch
       - release-*
   pull_request:
 
@@ -26,7 +26,7 @@ jobs:
           java-version-file: .tools-versions
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@3f5f9adaf7d9fecd50b5935e54106014257a94e6 # v6.4.0
-      # Ephyra: Android lint runs only locally and in the release workflow; its code-scanning alerts were mostly upstream's
+      # Velella: Android lint runs only locally and in the release workflow; its code-scanning alerts were mostly upstream's
       - name: Run detekt task
         run: ./gradlew detekt
       - name: Upload Detekt SARIF

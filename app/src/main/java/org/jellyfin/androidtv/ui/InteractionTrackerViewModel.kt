@@ -20,7 +20,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 
-// Ephyra: a video left paused gets the long pause screen sooner than the screensaver's own timeout
+// Velella: a video left paused gets the long pause screen sooner than the screensaver's own timeout
 val LongPauseDelay = 2.minutes
 
 fun screensaverDelay(timeout: Duration, videoPaused: Boolean): Duration = if (videoPaused) LongPauseDelay else timeout
@@ -28,7 +28,7 @@ fun screensaverDelay(timeout: Duration, videoPaused: Boolean): Duration = if (vi
 class InteractionTrackerViewModel(
 	private val userPreferences: UserPreferences,
 	private val playbackControllerContainer: PlaybackControllerContainer,
-	// Ephyra: the new player, so a video paused there counts too
+	// Velella: the new player, so a video paused there counts too
 	private val playbackManager: PlaybackManager,
 ) : ViewModel() {
 	// Screensaver

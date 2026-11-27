@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-      - ephyra/main # Ephyra: the fork's default branch
+      - velella/main # Velella: the fork's default branch
       - release-*
   pull_request:
 

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Ephyra: one variable font file (wght axis) exposed as the four weights the app uses, for XML text styles -->
+<!-- Velella: one variable font file (wght axis) exposed as the four weights the app uses, for XML text styles -->
 <font-family xmlns:android="http://schemas.android.com/apk/res/android">
     <font
         android:font="@font/atkinson_hyperlegible_next"

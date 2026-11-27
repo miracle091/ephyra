@@ -10,7 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import androidx.fragment.app.replace
 import org.jellyfin.androidtv.R
-import org.jellyfin.androidtv.ui.base.EphyraTheme
+import org.jellyfin.androidtv.ui.base.VelellaTheme
 import org.jellyfin.androidtv.ui.shared.toolbar.StartupToolbar
 
 class StartupToolbarFragment : Fragment() {
@@ -21,8 +21,8 @@ class StartupToolbarFragment : Fragment() {
 	): View = ComposeView(requireContext()).apply {
 		setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
 		setContent {
-			// Ephyra: the theme's colours, the startup screens have no EphyraTheme around them
-			EphyraTheme {
+			// Velella: the theme's colours, the startup screens have no VelellaTheme around them
+			VelellaTheme {
 				StartupToolbar(
 					openHelp = {
 						parentFragmentManager.commit {

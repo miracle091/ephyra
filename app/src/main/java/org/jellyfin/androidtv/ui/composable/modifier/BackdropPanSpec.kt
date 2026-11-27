@@ -1,7 +1,7 @@
 package org.jellyfin.androidtv.ui.composable.modifier
 
 /**
- * Ephyra: the numbers of the slow backdrop pan ("Ken Burns") of the home spotlight and the long pause screen. Pure, so it can be
+ * Velella: the numbers of the slow backdrop pan ("Ken Burns") of the home spotlight and the long pause screen. Pure, so it can be
  * tested; [backdropPan] applies it.
  */
 object BackdropPanSpec {

@@ -4,7 +4,7 @@ import org.jellyfin.sdk.model.api.MediaStream
 import org.jellyfin.sdk.model.api.MediaStreamType
 
 /**
- * Ephyra: what identifies an audio or subtitle track from one episode to the next. [index] is kept for the current file only:
+ * Velella: what identifies an audio or subtitle track from one episode to the next. [index] is kept for the current file only:
  * matching ignores it, since it changes from file to file.
  */
 data class TrackInfo(
@@ -22,7 +22,7 @@ private const val TITLE_SCORE = 2
 private const val CODEC_SCORE = 1
 
 /**
- * Ephyra: the index of the candidate that best matches [wanted], or null when no candidate has its language.
+ * Velella: the index of the candidate that best matches [wanted], or null when no candidate has its language.
  * The language decides first; among the tracks in that language the forced flag counts most, then the title, then the codec.
  * A tie goes to [preferredIndex] (the track already requested), then to the first track.
  */
@@ -44,7 +44,7 @@ fun matchTrack(candidates: List<TrackInfo>, wanted: TrackInfo, preferredIndex: I
 }
 
 /**
- * Ephyra: the audio track of [streams] that matches the last audio track played in the queue, or null when there is none
+ * Velella: the audio track of [streams] that matches the last audio track played in the queue, or null when there is none
  * or nothing has that language.
  */
 fun preferredAudioIndex(queue: VideoQueueManager, streams: List<MediaStream>?): Int? {
@@ -56,7 +56,7 @@ fun preferredAudioIndex(queue: VideoQueueManager, streams: List<MediaStream>?): 
 }
 
 /**
- * Ephyra: the subtitle track of [streams] that matches the last subtitle track played in the queue, or null when there is none
+ * Velella: the subtitle track of [streams] that matches the last subtitle track played in the queue, or null when there is none
  * or nothing has that language. [requestedIndex] wins ties.
  */
 fun preferredSubtitleIndex(queue: VideoQueueManager, streams: List<MediaStream>?, requestedIndex: Int?): Int? {

@@ -66,7 +66,7 @@ public class VideoPlayerAdapter extends PlayerAdapter {
 
     @Override
     public long getDuration() {
-        // Ephyra: a live channel's bar is the programme on air
+        // Velella: a live channel's bar is the programme on air
         if (playbackController.isLiveTv()) {
             long programLength = LiveProgram.durationMs(playbackController.getCurrentProgramStart(), playbackController.getCurrentProgramEnd());
             if (programLength > 0) return programLength;
@@ -115,7 +115,7 @@ public class VideoPlayerAdapter extends PlayerAdapter {
         showLiveProgramTimes();
     }
 
-    // Ephyra: Leanback writes mm:ss into the two times under the bar; a live channel shows the programme's clock times
+    // Velella: Leanback writes mm:ss into the two times under the bar; a live channel shows the programme's clock times
     private void showLiveProgramTimes() {
         if (playbackController.isLiveTv() && leanbackOverlayFragment != null && leanbackOverlayFragment.getPlayerGlue() != null) {
             leanbackOverlayFragment.getPlayerGlue().showLiveProgramTimes(playbackController.getCurrentProgramStart(), playbackController.getCurrentProgramEnd());

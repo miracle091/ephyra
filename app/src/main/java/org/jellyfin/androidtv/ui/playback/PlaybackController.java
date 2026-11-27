@@ -124,20 +124,20 @@ public class PlaybackController implements PlaybackControllerNotifiable {
     private int playbackRetries = 0;
     private long lastPlaybackError = 0;
 
-    // Ephyra: live streams are retried with a pause before an error counts (LiveStreamRetry)
+    // Velella: live streams are retried with a pause before an error counts (LiveStreamRetry)
     private int liveStreamRetries = 0;
     private final Runnable liveRetryRunnable = () -> {
         if (mFragment == null || !hasInitializedVideoManager()) return;
         play(mCurrentPosition);
     };
-    // Ephyra: a live stream that stays in BUFFERING (the player neither plays nor reports an error) counts as failed
+    // Velella: a live stream that stays in BUFFERING (the player neither plays nor reports an error) counts as failed
     private final Runnable liveBufferTimeoutRunnable = this::onLiveBufferTimeout;
-    // Ephyra: when the programme on air was last looked up, to refresh it once its end time has passed
+    // Velella: when the programme on air was last looked up, to refresh it once its end time has passed
     private long lastProgramRefresh = 0;
-    // Ephyra: the live stream of a failed attempt stays open on the server until the retry has its own (see stopForLiveRetry)
+    // Velella: the live stream of a failed attempt stays open on the server until the retry has its own (see stopForLiveRetry)
     private BaseItemDto retiredLiveItem = null;
     private StreamInfo retiredLiveStream = null;
-    // Ephyra: the programme after the one on air, for the "Next:" line of the live player's header
+    // Velella: the programme after the one on air, for the "Next:" line of the live player's header
     private BaseItemDto mNextProgram = null;
 
     private RefreshRateSwitchingBehavior refreshRateSwitchingBehavior = RefreshRateSwitchingBehavior.DISABLED;
@@ -273,7 +273,7 @@ public class PlaybackController implements PlaybackControllerNotifiable {
     }
 
     /**
-     * Ephyra: stops the failed live stream locally and opens it again after a short pause, a few times, before the failure
+     * Velella: stops the failed live stream locally and opens it again after a short pause, a few times, before the failure
      * counts as a playback error. The server's live stream and transcode are not closed meanwhile. Returns false when this
      * is not a live stream or the attempts are used up.
      */
@@ -291,7 +291,7 @@ public class PlaybackController implements PlaybackControllerNotifiable {
     }
 
     /**
-     * Ephyra: like stop(), but without telling the server that playback ended. Reporting the stop closes the channel's live
+     * Velella: like stop(), but without telling the server that playback ended. Reporting the stop closes the channel's live
      * stream and kills its transcode, so every retry made the server start the same transcode from scratch (and it answered
      * HTTP 500 right after a channel switch). The stream of the failed attempt is kept in retiredLiveStream and reported
      * stopped once the retry has opened its own, so the server never counts zero viewers in between.
@@ -315,7 +315,7 @@ public class PlaybackController implements PlaybackControllerNotifiable {
         }
     }
 
-    /** Ephyra: starts the wait for a live stream that was just handed to the player (LiveStreamRetry.bufferTimeoutMs). */
+    /** Velella: starts the wait for a live stream that was just handed to the player (LiveStreamRetry.bufferTimeoutMs). */
     private void armLiveBufferTimeout() {
         cancelLiveBufferTimeout();
         long timeout = LiveStreamRetry.bufferTimeoutMs(isLiveTv);
@@ -328,7 +328,7 @@ public class PlaybackController implements PlaybackControllerNotifiable {
     }
 
     /**
-     * Ephyra: the live stream never left BUFFERING (the server accepted it but sends nothing playable). It goes through the
+     * Velella: the live stream never left BUFFERING (the server accepted it but sends nothing playable). It goes through the
      * live retry like a failed stream, and when the attempts are used up the player closes with the error message.
      */
     private void onLiveBufferTimeout() {
@@ -379,7 +379,7 @@ public class PlaybackController implements PlaybackControllerNotifiable {
         }
     }
 
-    // Ephyra: the mode choice is shared with the new player (ui/player/display)
+    // Velella: the mode choice is shared with the new player (ui/player/display)
     private void setRefreshRate(@Nullable MediaStream videoStream) {
         if (videoStream == null || mFragment == null || videoStream.getRealFrameRate() == null || videoStream.getWidth() == null || videoStream.getHeight() == null) {
             Timber.w("No video stream details to pick a display mode");
@@ -552,20 +552,20 @@ public class PlaybackController implements PlaybackControllerNotifiable {
             internalOptions.setSubtitleStreamIndex(forcedSubtitleIndex);
         }
         MediaSourceInfo currentMediaSource = getCurrentMediaSource();
-        // Ephyra: Media3 cannot read Blu-ray transport streams, so they skip the direct play attempt that would fail first
+        // Velella: Media3 cannot read Blu-ray transport streams, so they skip the direct play attempt that would fail first
         if (currentMediaSource != null && BluRayTransportStream.isBluRayTransportStream(currentMediaSource.getPath())) {
             internalOptions.setEnableDirectPlay(false);
         }
         Integer restartAudioIndex = peekRestartAudioIndex(item);
         if (restartAudioIndex != null) {
-            // Ephyra: a restart of this very item (subtitle change) keeps the audio track the user is hearing
+            // Velella: a restart of this very item (subtitle change) keeps the audio track the user is hearing
             internalOptions.setAudioStreamIndex(restartAudioIndex);
         } else if (forcedAudioLanguage != null) {
-            // Ephyra: the audio stream matching the language (and title/codec) of the last played track
+            // Velella: the audio stream matching the language (and title/codec) of the last played track
             Integer matchingIndex = TrackInfoKt.preferredAudioIndex(videoQueueManager.getValue(), currentMediaSource.getMediaStreams());
             if (matchingIndex != null) internalOptions.setAudioStreamIndex(matchingIndex);
         }
-        // Ephyra: tracks picked on the details screen
+        // Velella: tracks picked on the details screen
         TrackPreselectionKt.applyTrackPreselection(internalOptions, item, currentMediaSource);
         if (!isLiveTv && currentMediaSource != null) {
             internalOptions.setMediaSourceId(currentMediaSource.getId());
@@ -597,7 +597,7 @@ public class PlaybackController implements PlaybackControllerNotifiable {
                 @Override
                 public void onError(Exception exception) {
                     if (!isActive()) return;
-                    // Ephyra: the server can fail for a moment right after a channel switch
+                    // Velella: the server can fail for a moment right after a channel switch
                     Timber.e(exception, "Unable to get the live stream info");
                     if (scheduleLiveStreamRetry()) return;
                     handlePlaybackInfoError(exception);
@@ -656,7 +656,7 @@ public class PlaybackController implements PlaybackControllerNotifiable {
         }
 
         mCurrentOptions.setAudioStreamIndex(null); // reset audio stream index to allow auto selection on new item
-        // Ephyra: a restart of the same item (audio switch on a transcode, subtitle baking change) keeps the track the user picked,
+        // Velella: a restart of the same item (audio switch on a transcode, subtitle baking change) keeps the track the user picked,
         // or onPrepared falls back to the first track of that language and undoes the switch (upstream #5798).
         // Only when the server builds the stream (transcode or direct stream), which then carries just that track: on direct play
         // onPrepared must still ask the player to switch, and a preset index would make switchAudioStream think it is already playing.
@@ -669,7 +669,7 @@ public class PlaybackController implements PlaybackControllerNotifiable {
 
         mStartPosition = position;
         mCurrentStreamInfo = response;
-        // Ephyra: the retry has its own live stream now, the one of the failed attempt can go
+        // Velella: the retry has its own live stream now, the one of the failed attempt can go
         reportRetiredLiveStream();
         mCurrentOptions.setMediaSourceId(response.getMediaSource().getId());
 
@@ -694,7 +694,7 @@ public class PlaybackController implements PlaybackControllerNotifiable {
             } else if (response.getMediaSource().getMediaStreams() != null) {
                 // Find subtitle stream matching saved language, keeping the requested stream if it matches
                 // (e.g. when playback restarts to switch between baked and non-baked subtitles)
-                // Ephyra: the exact track of the last episode wins among the tracks of that language (TrackInfo.kt)
+                // Velella: the exact track of the last episode wins among the tracks of that language (TrackInfo.kt)
                 Integer requestedIndex = mCurrentOptions.getSubtitleStreamIndex();
                 mCurrentOptions.setSubtitleStreamIndex(TrackInfoKt.preferredSubtitleIndex(
                         videoQueueManager.getValue(), response.getMediaSource().getMediaStreams(), requestedIndex));
@@ -703,7 +703,7 @@ public class PlaybackController implements PlaybackControllerNotifiable {
             // No saved preference, use server default
             mCurrentOptions.setSubtitleStreamIndex(response.getMediaSource().getDefaultSubtitleStreamIndex());
         }
-        // Ephyra: a subtitle the server burns in is on screen whatever was picked above; remember it, or an audio switch on this
+        // Velella: a subtitle the server burns in is on screen whatever was picked above; remember it, or an audio switch on this
         // transcode asks for no subtitle and the restarted stream loses it
         mCurrentOptions.setSubtitleStreamIndex(StreamRules.shownSubtitleIndex(response.getSubtitleDeliveryMethod(),
                 response.getMediaSource().getDefaultSubtitleStreamIndex(), mCurrentOptions.getSubtitleStreamIndex()));
@@ -726,7 +726,7 @@ public class PlaybackController implements PlaybackControllerNotifiable {
 
         if (mVideoManager != null) {
             mVideoManager.setMediaStreamInfo(api.getValue(), response);
-            // Ephyra: the video path is set, a live stream has a limited time to start playing
+            // Velella: the video path is set, a live stream has a limited time to start playing
             armLiveBufferTimeout();
         }
 
@@ -800,15 +800,15 @@ public class PlaybackController implements PlaybackControllerNotifiable {
         if (info == null)
             return null;
 
-        // Ephyra: language first, then the title/codec of the last played track (TrackInfo.kt)
+        // Velella: language first, then the title/codec of the last played track (TrackInfo.kt)
         return TrackInfoKt.preferredAudioIndex(videoQueueManager.getValue(), info.getMediaStreams());
     }
 
-    // Ephyra: audio track to keep when the stream of the current item is rebuilt (see startItem)
+    // Velella: audio track to keep when the stream of the current item is rebuilt (see startItem)
     private UUID mRestartAudioItemId = null;
     private Integer mRestartAudioIndex = null;
 
-    /** Ephyra: call before stop() when the current item will be requested again, so the audio track in use survives the restart. */
+    /** Velella: call before stop() when the current item will be requested again, so the audio track in use survives the restart. */
     protected void keepAudioForRestart() {
         BaseItemDto item = getCurrentlyPlayingItem();
         Integer audioIndex = mCurrentOptions != null ? mCurrentOptions.getAudioStreamIndex() : null;
@@ -857,7 +857,7 @@ public class PlaybackController implements PlaybackControllerNotifiable {
             return;
         }
 
-        // Ephyra: remember the exact track, not only its language, so the next episode picks the same one
+        // Velella: remember the exact track, not only its language, so the next episode picks the same one
         videoQueueManager.getValue().setLastPlayedAudioTrack(currentMediaSource.getMediaStreams().get(index));
 
         int currAudioIndex = getAudioStreamIndex();
@@ -1141,7 +1141,7 @@ public class PlaybackController implements PlaybackControllerNotifiable {
                 if (program != null) {
                     mCurrentProgramEnd = program.getEndDate();
                     mCurrentProgramStart = program.getStartDate();
-                    // Ephyra: the header, the record button and the times follow the programme on air
+                    // Velella: the header, the record button and the times follow the programme on air
                     BaseItemDto current = getCurrentlyPlayingItem();
                     if (current != null && current.getId().equals(updatedChannel.getId())) {
                         List<BaseItemDto> items = new ArrayList<>(mItems);
@@ -1156,7 +1156,7 @@ public class PlaybackController implements PlaybackControllerNotifiable {
         }
     }
 
-    /** Ephyra: fetches the programme after the one on air and shows it in the header, unless the channel changed meanwhile. */
+    /** Velella: fetches the programme after the one on air and shows it in the header, unless the channel changed meanwhile. */
     private void loadNextProgramFor(UUID channelId, @Nullable LocalDateTime after) {
         if (after == null) {
             mNextProgram = null;
@@ -1186,7 +1186,7 @@ public class PlaybackController implements PlaybackControllerNotifiable {
         return mCurrentProgramEnd;
     }
 
-    /** Ephyra: looks the next programme up once the one on air has ended, at most every 15 seconds. */
+    /** Velella: looks the next programme up once the one on air has ended, at most every 15 seconds. */
     private void refreshProgramWhenEnded() {
         long now = Instant.now().toEpochMilli();
         if (!LiveProgram.hasEnded(mCurrentProgramEnd, LocalDateTime.now()) || now - lastProgramRefresh < 15000) return;
@@ -1327,7 +1327,7 @@ public class PlaybackController implements PlaybackControllerNotifiable {
 
     @Override
     public void onPrepared() {
-        // Ephyra: stop() clears the stream info, but the player can still report isPlaying afterwards
+        // Velella: stop() clears the stream info, but the player can still report isPlaying afterwards
         // (late callback after stop/end of playback, upstream #5938): nothing to prepare then
         if (mCurrentStreamInfo == null) {
             Timber.w("onPrepared ignored: no current stream info (state %s)", mPlaybackState);
@@ -1348,7 +1348,7 @@ public class PlaybackController implements PlaybackControllerNotifiable {
             startReportLoop();
         }
 
-        // Ephyra: the exact method, so a direct stream (server remux, audio possibly re-encoded) is not logged as direct play
+        // Velella: the exact method, so a direct stream (server remux, audio possibly re-encoded) is not logged as direct play
         Timber.i("Play method: %s", mCurrentStreamInfo.getPlayMethod());
 
         if (mPlaybackState == PlaybackState.PAUSED) {

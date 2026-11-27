@@ -38,14 +38,14 @@ import org.koin.compose.koinInject
 import timber.log.Timber
 
 /**
- * Ephyra: the legacy player's round menu buttons on the right of the controls, in its order: subtitles (when the source has any),
+ * Velella: the legacy player's round menu buttons on the right of the controls, in its order: subtitles (when the source has any),
  * audio (with more than one track), chapters (when the item has any) and quality (the maximum bitrate; picking one asks the server
  * for a new stream under it, from the current position).
  */
 @Composable
 fun VideoPlayerMenus(
 	playbackManager: PlaybackManager,
-	// Ephyra: the menu its remote key asked for (Captions, Audio track); a request for a menu the video lacks is just dropped
+	// Velella: the menu its remote key asked for (Captions, Audio track); a request for a menu the video lacks is just dropped
 	menuRequest: VideoPlayerKeyAction? = null,
 	onMenuRequestHandled: () -> Unit = {},
 	userPreferences: UserPreferences = koinInject(),
@@ -101,7 +101,7 @@ fun VideoPlayerMenus(
 	QualityMenuButton(playbackManager, userPreferences)
 }
 
-/** Ephyra: the quality (maximum bitrate) menu; picking one asks the server for a new stream under it, from the current position. */
+/** Velella: the quality (maximum bitrate) menu; picking one asks the server for a new stream under it, from the current position. */
 @Composable
 private fun QualityMenuButton(playbackManager: PlaybackManager, userPreferences: UserPreferences) {
 	val context = LocalContext.current
@@ -121,7 +121,7 @@ private fun QualityMenuButton(playbackManager: PlaybackManager, userPreferences:
 }
 
 /**
- * Ephyra: the quality button shows the tier of the chosen maximum bitrate ("4K", "HD", "SD") in a small frame instead of an icon,
+ * Velella: the quality button shows the tier of the chosen maximum bitrate ("4K", "HD", "SD") in a small frame instead of an icon,
  * so it reads as quality and not as a screen, in the button's content colour (dark on the focused button).
  */
 @Composable

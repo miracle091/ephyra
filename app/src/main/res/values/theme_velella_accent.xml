@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Velella: the accent presets of Settings > Customization > Accent colour. Each overlay is applied over the user's theme and
+     replaces only the attributes that carry the accent; the colours are read by preference/constant/AccentColor.kt.
+     On every dark theme each accent has at least 4.5:1 against the surfaces and 7:1 against dark text on top of it. -->
+<resources>
+
+    <!-- _on is the text on a fill in the accent, _soft the dark tint behind an active button (Compose palette only) -->
+    <color name="velella_accent_violet">#A58BFF</color>
+    <color name="velella_accent_violet_on">#110E1A</color>
+    <color name="velella_accent_violet_soft">#322A4D</color>
+    <color name="velella_accent_blue">#5C9DFF</color>
+    <color name="velella_accent_blue_on">#09101A</color>
+    <color name="velella_accent_blue_soft">#1C2F4D</color>
+    <color name="velella_accent_teal">#2CC5C0</color>
+    <color name="velella_accent_teal_on">#041413</color>
+    <color name="velella_accent_teal_soft">#0D3B3A</color>
+    <color name="velella_accent_green">#5FD068</color>
+    <color name="velella_accent_green_on">#0A150A</color>
+    <color name="velella_accent_green_soft">#1D3E1F</color>
+    <color name="velella_accent_amber">#FFB93B</color>
+    <color name="velella_accent_amber_on">#1A1306</color>
+    <color name="velella_accent_amber_soft">#4D3812</color>
+    <color name="velella_accent_coral">#FF7F6B</color>
+    <color name="velella_accent_coral_on">#1A0D0B</color>
+    <color name="velella_accent_coral_soft">#4D2620</color>
+    <color name="velella_accent_red">#FF6B6B</color>
+    <color name="velella_accent_red_on">#1A0B0B</color>
+    <color name="velella_accent_red_soft">#4D2020</color>
+
+    <!-- Empty parent of the presets below (dotted names need it) -->
+    <style name="ThemeOverlay.Velella.Accent" parent="" />
+
+    <style name="ThemeOverlay.Velella.Accent.Violet">
+        <item name="android:colorAccent">@color/velella_accent_violet</item>
+        <item name="defaultSearchColor">@color/velella_accent_violet</item>
+        <item name="progressPrimary">@color/velella_accent_violet</item>
+        <item name="controlIconForegroundActive">@color/velella_accent_violet</item>
+    </style>
+
+    <style name="ThemeOverlay.Velella.Accent.Blue">
+        <item name="android:colorAccent">@color/velella_accent_blue</item>
+        <item name="defaultSearchColor">@color/velella_accent_blue</item>
+        <item name="progressPrimary">@color/velella_accent_blue</item>
+        <item name="controlIconForegroundActive">@color/velella_accent_blue</item>
+    </style>
+
+    <style name="ThemeOverlay.Velella.Accent.Teal">
+        <item name="android:colorAccent">@color/velella_accent_teal</item>
+        <item name="defaultSearchColor">@color/velella_accent_teal</item>
+        <item name="progressPrimary">@color/velella_accent_teal</item>
+        <item name="controlIconForegroundActive">@color/velella_accent_teal</item>
+    </style>
+
+    <style name="ThemeOverlay.Velella.Accent.Green">
+        <item name="android:colorAccent">@color/velella_accent_green</item>
+        <item name="defaultSearchColor">@color/velella_accent_green</item>
+        <item name="progressPrimary">@color/velella_accent_green</item>
+        <item name="controlIconForegroundActive">@color/velella_accent_green</item>
+    </style>
+
+    <style name="ThemeOverlay.Velella.Accent.Amber">
+        <item name="android:colorAccent">@color/velella_accent_amber</item>
+        <item name="defaultSearchColor">@color/velella_accent_amber</item>
+        <item name="progressPrimary">@color/velella_accent_amber</item>
+        <item name="controlIconForegroundActive">@color/velella_accent_amber</item>
+    </style>
+
+    <style name="ThemeOverlay.Velella.Accent.Coral">
+        <item name="android:colorAccent">@color/velella_accent_coral</item>
+        <item name="defaultSearchColor">@color/velella_accent_coral</item>
+        <item name="progressPrimary">@color/velella_accent_coral</item>
+        <item name="controlIconForegroundActive">@color/velella_accent_coral</item>
+    </style>
+
+    <style name="ThemeOverlay.Velella.Accent.Red">
+        <item name="android:colorAccent">@color/velella_accent_red</item>
+        <item name="defaultSearchColor">@color/velella_accent_red</item>
+        <item name="progressPrimary">@color/velella_accent_red</item>
+        <item name="controlIconForegroundActive">@color/velella_accent_red</item>
+    </style>
+</resources>

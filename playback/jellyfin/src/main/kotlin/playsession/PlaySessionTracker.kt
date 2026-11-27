@@ -3,7 +3,7 @@ package org.jellyfin.playback.jellyfin.playsession
 import org.jellyfin.playback.core.model.PlayState
 import kotlin.time.Duration
 
-/** Ephyra: a report [PlaySessionTracker] asks the server for. */
+/** Velella: a report [PlaySessionTracker] asks the server for. */
 sealed interface PlaySessionReport<out T> {
 	val session: T
 
@@ -13,7 +13,7 @@ sealed interface PlaySessionReport<out T> {
 }
 
 /**
- * Ephyra: decides which playback reports to send, so every start gets its stop. The session that was started is kept here
+ * Velella: decides which playback reports to send, so every start gets its stop. The session that was started is kept here
  * rather than read back from the queue, because stopping the player clears the queue before the stop report could read it,
  * and moving to the next entry while playing changes no play state. [T] is the reported session (entry, stream and item).
  */

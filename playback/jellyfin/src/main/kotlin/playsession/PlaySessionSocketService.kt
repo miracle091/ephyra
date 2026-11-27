@@ -40,7 +40,7 @@ class PlaySessionSocketService(
 		subscribeTrackControl(coroutineScope)
 	}
 
-	// Ephyra: track changes from another client (the web dashboard's remote control); ignored while the new player plays nothing
+	// Velella: track changes from another client (the web dashboard's remote control); ignored while the new player plays nothing
 	private fun subscribeTrackControl(coroutineScope: CoroutineScope) {
 		api.webSocket.subscribeGeneralCommand(GeneralCommandType.SET_AUDIO_STREAM_INDEX).onEach { message ->
 			val index = message["index"]?.toIntOrNull() ?: return@onEach

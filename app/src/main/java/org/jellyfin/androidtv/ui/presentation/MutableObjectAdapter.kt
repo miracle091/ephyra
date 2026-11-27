@@ -31,7 +31,7 @@ open class MutableObjectAdapter<T : Any> : ObjectAdapter, Iterable<T> {
 		notifyItemRangeInserted(data.size - 1, 1)
 	}
 
-	/** Ephyra: appends [elements] with a single insertion notice, without the diff of [replaceAll]. */
+	/** Velella: appends [elements] with a single insertion notice, without the diff of [replaceAll]. */
 	fun addAll(elements: Collection<T>) {
 		if (elements.isEmpty()) return
 

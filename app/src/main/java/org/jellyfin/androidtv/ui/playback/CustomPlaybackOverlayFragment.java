@@ -481,7 +481,7 @@ public class CustomPlaybackOverlayFragment extends Fragment implements LiveTvGui
                     leanbackOverlayFragment.hideOverlay();
                 }
 
-                // Ephyra: a skip button that hid by itself comes back on centre, up or down while its segment lasts
+                // Velella: a skip button that hid by itself comes back on centre, up or down while its segment lasts
                 if (binding.skipOverlay.getRecallable() && SkipOverlayDimKt.isSkipRecallKey(keyCode)) {
                     binding.skipOverlay.recall();
                     return true;
@@ -1251,14 +1251,14 @@ public class CustomPlaybackOverlayFragment extends Fragment implements LiveTvGui
             // set other information
             tvGuideBinding.guideCurrentTitle.setText(current.getName());
 
-            // Ephyra: the overline and title in text, after the design system's board, instead of the title logo
-            OsdHeader.bind(current, binding.itemOverline, binding.itemTitle, binding.ephyraLiveBadge);
+            // Velella: the overline and title in text, after the design system's board, instead of the title logo
+            OsdHeader.bind(current, binding.itemOverline, binding.itemTitle, binding.velellaLiveBadge);
             updateNextProgram();
-            // Ephyra: how the server delivers this stream and why; the live player shows it with its title block above the controls
+            // Velella: how the server delivers this stream and why; the live player shows it with its title block above the controls
             boolean liveItem = current.getType() == BaseItemKind.TV_CHANNEL;
             StreamInfo streamInfo = playbackControllerContainer.getValue().getPlaybackController().getCurrentStreamInfo();
-            PlayInfo.bind(binding.ephyraPlayInfo, liveItem ? null : streamInfo);
-            // Ephyra: dimmer controls during HDR playback
+            PlayInfo.bind(binding.velellaPlayInfo, liveItem ? null : streamInfo);
+            // Velella: dimmer controls during HDR playback
             HdrControlsDim.apply(playbackControllerContainer.getValue().getPlaybackController().getCurrentStreamInfo(),
                     binding.topPanel, binding.leanbackFragment);
 
@@ -1271,7 +1271,7 @@ public class CustomPlaybackOverlayFragment extends Fragment implements LiveTvGui
     }
 
     /**
-     * Ephyra: the live title block, its "Next:" line and play method above the controls (the glue hides them outside live TV and
+     * Velella: the live title block, its "Next:" line and play method above the controls (the glue hides them outside live TV and
      * the Next line when nothing follows).
      */
     public void updateNextProgram() {

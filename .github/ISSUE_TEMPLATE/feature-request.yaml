@@ -1,5 +1,5 @@
 name: Feature request
-description: Request a new feature for Ephyra
+description: Request a new feature for Velella
 labels:
   - enhancement
 body:
@@ -9,9 +9,9 @@ body:
       label: "This request respects the following points:"
       description: All conditions are **required**.
       options:
-        - label: This request is **not** already on [GitHub](https://github.com/miracle091/ephyra/issues?q=is%3Aissue+label%3Aenhancement) _(I've searched it)_.
+        - label: This request is **not** already on [GitHub](https://github.com/miracle091/velella/issues?q=is%3Aissue+label%3Aenhancement) _(I've searched it)_.
           required: true
-        - label: The feature works without Google Play Services, as Ephyra also runs on GMS-free builds.
+        - label: The feature works without Google Play Services, as Velella also runs on GMS-free builds.
           required: true
   - type: textarea
     id: problem

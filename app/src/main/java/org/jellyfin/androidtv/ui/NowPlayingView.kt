@@ -137,7 +137,7 @@ private fun NowPlayingCover(item: BaseItemDto, api: ApiClient, progress: () -> F
 	)
 }
 
-// Ephyra: the progress ring goes around the cover instead of over its edge, where the clip cut half of it
+// Velella: the progress ring goes around the cover instead of over its edge, where the clip cut half of it
 private fun Modifier.progressRing(fillColor: Color, progress: () -> Float) = drawWithContent {
 	val width = 3.dp.toPx()
 	val inset = width / 2

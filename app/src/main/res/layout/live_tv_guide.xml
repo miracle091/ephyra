@@ -10,7 +10,7 @@
         android:layout_height="match_parent"
         android:id="@+id/channelScroller"
         android:layout_gravity="top|start|center"
-        android:layout_marginStart="@dimen/ephyra_side_margin"
+        android:layout_marginStart="@dimen/velella_side_margin"
         android:layout_marginTop="210sp"
         android:focusable="false"
         android:focusableInTouchMode="false"
@@ -73,7 +73,7 @@
         android:id="@+id/displayDate"
         android:layout_above="@+id/programVScroller"
         android:layout_alignParentStart="true"
-        android:layout_marginStart="@dimen/ephyra_side_margin"
+        android:layout_marginStart="@dimen/velella_side_margin"
         android:gravity="center_vertical"
         android:paddingStart="4dp"
         android:textColor="?attr/controlIconForegroundInactive"
@@ -85,16 +85,16 @@
         android:layout_height="wrap_content"
         android:id="@+id/clock"
         android:layout_alignTop="@+id/title"
-        android:layout_marginTop="@dimen/ephyra_safe_y"
-        android:layout_marginEnd="@dimen/ephyra_side_margin"
+        android:layout_marginTop="@dimen/velella_safe_y"
+        android:layout_marginEnd="@dimen/velella_side_margin"
         android:layout_alignParentEnd="true" />
 
     <org.jellyfin.androidtv.ui.AsyncImageView
         android:layout_width="150sp"
         android:layout_height="150sp"
         android:id="@+id/programImage"
-        android:layout_marginStart="@dimen/ephyra_side_margin"
-        android:layout_marginTop="@dimen/ephyra_safe_y" />
+        android:layout_marginStart="@dimen/velella_side_margin"
+        android:layout_marginTop="@dimen/velella_safe_y" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -141,64 +141,64 @@
         android:maxLines="5"
         android:fontFamily="@font/atkinson_hyperlegible_next_family" />
 
-    <!-- Ephyra: the video player's icon button (48dp, 24dp icon, solid ink circle when focused) -->
+    <!-- Velella: the video player's icon button (48dp, 24dp icon, solid ink circle when focused) -->
     <ImageButton
         android:id="@+id/optionsButton"
-        style="@style/Button.Ephyra.PlayerIcon"
-        android:layout_width="@dimen/ephyra_osd_button"
-        android:layout_height="@dimen/ephyra_osd_button"
+        style="@style/Button.Velella.PlayerIcon"
+        android:layout_width="@dimen/velella_osd_button"
+        android:layout_height="@dimen/velella_osd_button"
         android:layout_above="@+id/timelineHScroller"
         android:layout_marginBottom="8dp"
-        android:background="@drawable/ephyra_osd_button_back"
+        android:background="@drawable/velella_osd_button_back"
         android:contentDescription="@null"
         android:src="@drawable/ic_settings"
-        android:tint="@color/ephyra_osd_icon_tint"
+        android:tint="@color/velella_osd_icon_tint"
         android:layout_alignParentEnd="true"
         android:layout_marginEnd="20dp"
     />
 
-    <!-- Ephyra: the video player's icon button (48dp, 24dp icon, solid ink circle when focused) -->
+    <!-- Velella: the video player's icon button (48dp, 24dp icon, solid ink circle when focused) -->
     <ImageButton
         android:id="@+id/filterButton"
-        style="@style/Button.Ephyra.PlayerIcon"
-        android:layout_width="@dimen/ephyra_osd_button"
-        android:layout_height="@dimen/ephyra_osd_button"
+        style="@style/Button.Velella.PlayerIcon"
+        android:layout_width="@dimen/velella_osd_button"
+        android:layout_height="@dimen/velella_osd_button"
         android:layout_above="@+id/timelineHScroller"
         android:layout_marginBottom="8dp"
-        android:background="@drawable/ephyra_osd_button_back"
+        android:background="@drawable/velella_osd_button_back"
         android:contentDescription="@null"
         android:src="@drawable/ic_filter"
-        android:tint="@color/ephyra_osd_icon_tint"
+        android:tint="@color/velella_osd_icon_tint"
         android:layout_toStartOf="@id/optionsButton"
     />
 
-    <!-- Ephyra: the video player's icon button (48dp, 24dp icon, solid ink circle when focused) -->
+    <!-- Velella: the video player's icon button (48dp, 24dp icon, solid ink circle when focused) -->
     <ImageButton
         android:id="@+id/dateButton"
-        style="@style/Button.Ephyra.PlayerIcon"
-        android:layout_width="@dimen/ephyra_osd_button"
-        android:layout_height="@dimen/ephyra_osd_button"
+        style="@style/Button.Velella.PlayerIcon"
+        android:layout_width="@dimen/velella_osd_button"
+        android:layout_height="@dimen/velella_osd_button"
         android:layout_above="@+id/timelineHScroller"
         android:layout_marginBottom="8dp"
-        android:background="@drawable/ephyra_osd_button_back"
+        android:background="@drawable/velella_osd_button_back"
         android:contentDescription="@null"
         android:src="@drawable/ic_calendar"
-        android:tint="@color/ephyra_osd_icon_tint"
+        android:tint="@color/velella_osd_icon_tint"
         android:layout_toStartOf="@+id/filterButton"
     />
 
-    <!-- Ephyra: the video player's icon button (48dp, 24dp icon, solid ink circle when focused) -->
+    <!-- Velella: the video player's icon button (48dp, 24dp icon, solid ink circle when focused) -->
     <ImageButton
         android:id="@+id/resetButton"
-        style="@style/Button.Ephyra.PlayerIcon"
-        android:layout_width="@dimen/ephyra_osd_button"
-        android:layout_height="@dimen/ephyra_osd_button"
+        style="@style/Button.Velella.PlayerIcon"
+        android:layout_width="@dimen/velella_osd_button"
+        android:layout_height="@dimen/velella_osd_button"
         android:layout_above="@+id/timelineHScroller"
         android:layout_marginBottom="8dp"
-        android:background="@drawable/ephyra_osd_button_back"
+        android:background="@drawable/velella_osd_button_back"
         android:contentDescription="@null"
         android:src="@drawable/ic_time"
-        android:tint="@color/ephyra_osd_icon_tint"
+        android:tint="@color/velella_osd_icon_tint"
         android:visibility="gone"
         android:layout_toStartOf="@+id/dateButton"
     />

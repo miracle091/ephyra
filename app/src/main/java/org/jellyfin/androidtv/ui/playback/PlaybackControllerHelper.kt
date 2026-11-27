@@ -40,7 +40,7 @@ fun PlaybackController.getLiveTvChannel(
 	}
 }
 
-/** Ephyra: whether [mediaSource] has an audio stream with this [index]. */
+/** Velella: whether [mediaSource] has an audio stream with this [index]. */
 fun hasAudioStream(mediaSource: MediaSourceInfo?, index: Int): Boolean =
 	mediaSource?.mediaStreams.orEmpty().any { it.type == MediaStreamType.AUDIO && it.index == index }
 
@@ -140,10 +140,10 @@ private fun PlaybackController.addAskToSkipAction(mediaSegment: MediaSegmentDto)
 		.send()
 }
 
-/** Ephyra: [channel] with [program] as the programme on air, for the live player's header and record button. */
+/** Velella: [channel] with [program] as the programme on air, for the live player's header and record button. */
 fun withCurrentProgram(channel: BaseItemDto, program: BaseItemDto): BaseItemDto = channel.copy(currentProgram = program)
 
-/** Ephyra: looks up the programme that follows the one ending at [after] on a channel, for the live player's "Next:" line. */
+/** Velella: looks up the programme that follows the one ending at [after] on a channel, for the live player's "Next:" line. */
 fun PlaybackController.loadNextProgram(
 	channelId: UUID,
 	after: LocalDateTime,

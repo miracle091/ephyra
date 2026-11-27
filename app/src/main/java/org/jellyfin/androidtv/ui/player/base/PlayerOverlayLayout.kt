@@ -55,10 +55,10 @@ fun PlayerOverlayLayout(
 	visibilityState: PlayerOverlayVisibilityState = rememberPlayerOverlayVisibility(),
 	header: (@Composable () -> Unit)? = null,
 	controls: (@Composable () -> Unit)? = null,
-	// Ephyra: the video player keeps the legacy player's margins, the other players the default overscan
+	// Velella: the video player keeps the legacy player's margins, the other players the default overscan
 	contentPadding: PaddingValues = overscanPaddingValues,
 ) {
-	// Ephyra: the layout takes the focus when it opens and whenever the controls hide (their focused button leaves); with no focus
+	// Velella: the layout takes the focus when it opens and whenever the controls hide (their focused button leaves); with no focus
 	// the first key press only gave it the focus and did nothing else
 	val rootFocus = remember { FocusRequester() }
 	LaunchedEffect(visibilityState.visible) {

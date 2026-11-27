@@ -28,7 +28,7 @@ import org.koin.android.ext.android.inject
 import timber.log.Timber
 
 /**
- * Ephyra (debug builds only): plays each of Jellyfin's test clips for a few seconds and reports which decoder ran and how
+ * Velella (debug builds only): plays each of Jellyfin's test clips for a few seconds and reports which decoder ran and how
  * smoothly, so the settings can be chosen from measurements on this device. Opened from the developer settings.
  */
 class CodecBenchmarkActivity : FragmentActivity() {
@@ -76,15 +76,15 @@ class CodecBenchmarkActivity : FragmentActivity() {
 	private suspend fun runBenchmark() {
 		val benchmark = DecoderBenchmark(this)
 		val results = benchmarkClips.mapIndexed { index, clip ->
-			status.text = getString(R.string.ephyra_benchmark_running, index + 1, benchmarkClips.size, clip.label)
+			status.text = getString(R.string.velella_benchmark_running, index + 1, benchmarkClips.size, clip.label)
 			benchmark.run(clip, surfaceView).also { Timber.i("Codec benchmark: %s", it) }
 		}
 
-		status.text = getString(R.string.ephyra_benchmark_server)
+		status.text = getString(R.string.velella_benchmark_server)
 		val serverResults = runServerPass()
 
 		val markdown = buildString {
-			appendLine("# Ephyra codec benchmark")
+			appendLine("# Velella codec benchmark")
 			appendLine()
 			appendLine("- App: ${BuildConfig.VERSION_NAME}")
 			appendLine("- Device: ${Build.MANUFACTURER} ${Build.MODEL} (${Build.DEVICE}), Android ${Build.VERSION.RELEASE}")
@@ -136,7 +136,7 @@ class CodecBenchmarkActivity : FragmentActivity() {
 		if (api.accessToken == null) return
 		try {
 			val fileName = withContext(Dispatchers.IO) { api.systemApi.logFile(markdown).content.fileName }
-			report.append("\n${getString(R.string.ephyra_benchmark_uploaded, fileName)}")
+			report.append("\n${getString(R.string.velella_benchmark_uploaded, fileName)}")
 		} catch (error: CancellationException) {
 			throw error
 		} catch (@Suppress("TooGenericExceptionCaught") error: Exception) {

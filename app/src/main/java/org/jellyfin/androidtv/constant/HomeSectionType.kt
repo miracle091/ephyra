@@ -4,7 +4,7 @@ import org.jellyfin.androidtv.R
 import org.jellyfin.preference.PreferenceEnum
 
 /**
- * All possible homesections, "synced" with jellyfin-web (Ephyra: without "resumebook", the app has no books).
+ * All possible homesections, "synced" with jellyfin-web (Velella: without "resumebook", the app has no books).
  *
  * https://github.com/jellyfin/jellyfin-web/blob/master/src/components/homesections/homesections.js
  */

@@ -4,17 +4,17 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
-import org.jellyfin.androidtv.preference.EphyraPreferences
+import org.jellyfin.androidtv.preference.VelellaPreferences
 import org.jellyfin.sdk.model.api.CollectionType
 
 class UserViewsRepositoryTest : FunSpec({
 	fun repository(showPlaylists: Boolean) = UserViewsRepositoryImpl(
 		api = mockk(relaxed = true),
-		ephyraPreferences = mockk { every { this@mockk[EphyraPreferences.homePlaylists] } returns showPlaylists },
+		velellaPreferences = mockk { every { this@mockk[VelellaPreferences.homePlaylists] } returns showPlaylists },
 	)
 
 	test("playlists are left out of the home's libraries by default") {
-		EphyraPreferences.homePlaylists.defaultValue shouldBe false
+		VelellaPreferences.homePlaylists.defaultValue shouldBe false
 		repository(showPlaylists = false).isShownInMyMedia(CollectionType.PLAYLISTS) shouldBe false
 	}
 

@@ -53,7 +53,7 @@ class SocketPlaybackDependencies(
 	val mediaManager: MediaManager,
 	val playbackControllerContainer: PlaybackControllerContainer,
 	val playbackHelper: PlaybackHelper,
-	// Ephyra: the new player, so a video playing there is not interrupted either
+	// Velella: the new player, so a video playing there is not interrupted either
 	val playbackManager: PlaybackManager,
 )
 

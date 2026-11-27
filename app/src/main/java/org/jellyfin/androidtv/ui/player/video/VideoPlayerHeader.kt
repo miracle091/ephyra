@@ -11,7 +11,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
-import org.jellyfin.androidtv.ui.base.LocalEphyraPalette
+import org.jellyfin.androidtv.ui.base.LocalVelellaPalette
 import org.jellyfin.androidtv.ui.base.LocalTextStyle
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.playback.OsdHeader
@@ -22,7 +22,7 @@ import org.jellyfin.playback.core.mediastream.PlayableMediaStream
 import org.jellyfin.sdk.model.api.BaseItemDto
 
 /**
- * Ephyra: the video player's header as in the legacy player (OsdHeader): the series and episode number (the genres for anything
+ * Velella: the video player's header as in the legacy player (OsdHeader): the series and episode number (the genres for anything
  * else) as the overline over the name, then how the server delivers the stream and why (PlayInfo).
  */
 @Composable
@@ -31,7 +31,7 @@ fun VideoPlayerHeader(
 	item: BaseItemDto?,
 	stream: PlayableMediaStream?,
 ) {
-	val palette = LocalEphyraPalette.current
+	val palette = LocalVelellaPalette.current
 	val context = LocalContext.current
 
 	// The legacy header: the text keeps 24dp from the clock, the clock sits 8dp lower than the title block

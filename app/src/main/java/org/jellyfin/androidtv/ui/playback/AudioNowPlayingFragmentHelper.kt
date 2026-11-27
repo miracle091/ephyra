@@ -45,9 +45,9 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.jellyfin.androidtv.R
-import org.jellyfin.androidtv.ui.base.EphyraTheme
+import org.jellyfin.androidtv.ui.base.VelellaTheme
 import org.jellyfin.androidtv.ui.base.Icon
-import org.jellyfin.androidtv.ui.base.LocalEphyraPalette
+import org.jellyfin.androidtv.ui.base.LocalVelellaPalette
 import org.jellyfin.androidtv.ui.base.LocalTextStyle
 import org.jellyfin.androidtv.ui.composable.AsyncImage
 import org.jellyfin.androidtv.ui.composable.AsyncImageSource
@@ -73,7 +73,7 @@ import org.jellyfin.sdk.model.api.BaseItemDto
 import org.jellyfin.sdk.model.api.ImageType
 import org.koin.compose.koinInject
 
-/** Ephyra: the line under the song title, "Artist · Year". */
+/** Velella: the line under the song title, "Artist · Year". */
 fun nowPlayingSubtitle(item: BaseItemDto, artistName: String): String =
 	listOfNotNull(artistName.ifBlank { null }, item.productionYear?.toString()).joinToString(" · ")
 
@@ -92,7 +92,7 @@ private const val BACKDROP_PULSE_SMOOTHING = 0.18f
 private const val BACKDROP_PULSE_SCALE = 0.15f
 private const val BACKDROP_PULSE_SCRIM_LIFT = 0.35f
 
-/** Ephyra: the loudness of the playing music, smoothed, 0 to 1; it eases back to 0 when playback is not running. */
+/** Velella: the loudness of the playing music, smoothed, 0 to 1; it eases back to 0 when playback is not running. */
 @Composable
 private fun rememberBackdropPulse(playbackManager: PlaybackManager): Animatable<Float, AnimationVector1D> {
 	val playState by remember { playbackManager.state.playState }.collectAsState()
@@ -112,7 +112,7 @@ private fun rememberBackdropPulse(playbackManager: PlaybackManager): Animatable<
 }
 
 /**
- * Ephyra: the player's moving backdrop, the cover's blurhash (already a soft blur, also on Android 11 where Compose can't blur)
+ * Velella: the player's moving backdrop, the cover's blurhash (already a soft blur, also on Android 11 where Compose can't blur)
  * slowly zooming and drifting under the theme's scrim and a gradient into the background colour. While music plays it breathes
  * with the loudness ([AudioLevel]): it grows and the scrim lifts a little on loud passages. The pulse is read once a frame and
  * only redraws the backdrop's layers, never recomposes.
@@ -122,8 +122,8 @@ fun initializeBackdropView(
 	playbackManager: PlaybackManager,
 ) {
 	backdropView.setContent {
-		EphyraTheme {
-			val palette = LocalEphyraPalette.current
+		VelellaTheme {
+			val palette = LocalVelellaPalette.current
 			val entry by rememberQueueEntry(playbackManager)
 			val baseItem = entry?.run { baseItemFlow.collectAsState(baseItem).value }
 			val cover = baseItem?.itemImages[ImageType.PRIMARY] ?: baseItem?.albumPrimaryImage ?: baseItem?.parentImages[ImageType.PRIMARY]
@@ -217,7 +217,7 @@ fun initializePreviewView(
 
 		AnimatedContent(cover) { cover ->
 			if (cover != null) {
-				// Ephyra: the cover fills the square with radius-lg, as in the design system's player
+				// Velella: the cover fills the square with radius-lg, as in the design system's player
 				Box(
 					modifier = Modifier
 						.fillMaxSize()

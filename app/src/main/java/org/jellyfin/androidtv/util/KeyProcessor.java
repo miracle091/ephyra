@@ -249,7 +249,7 @@ public class KeyProcessor {
                 }
             }
 
-            // Ephyra: reset progress, go to series
+            // Velella: reset progress, go to series
             ItemMenuExtra.addTo(menu.getMenu(), item, order);
         }
 
@@ -346,7 +346,7 @@ public class KeyProcessor {
                     return true;
             }
 
-            // Ephyra: entries of ItemMenuExtra
+            // Velella: entries of ItemMenuExtra
             return ItemMenuExtra.onClick(menuItem.getItemId(), item, activity);
         }
     };

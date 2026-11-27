@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Ephyra: replaces Leanback's layout of the same name with the design system's icon button: the focusable @id/button is the
+<!-- Velella: replaces Leanback's layout of the same name with the design system's icon button: the focusable @id/button is the
      round 48dp container and the icon inside follows its focus, ink on nothing, background colour on the ink fill. Leanback
      reads @id/button as a plain View, @id/icon as an ImageView and @id/label as a TextView -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -8,21 +8,21 @@
 
     <FrameLayout
         android:id="@+id/button"
-        android:layout_width="@dimen/ephyra_osd_button"
-        android:layout_height="@dimen/ephyra_osd_button"
-        android:background="@drawable/ephyra_osd_button_back"
+        android:layout_width="@dimen/velella_osd_button"
+        android:layout_height="@dimen/velella_osd_button"
+        android:background="@drawable/velella_osd_button_back"
         android:clickable="true"
         android:focusable="true">
 
         <ImageView
             android:id="@+id/icon"
-            android:layout_width="@dimen/ephyra_osd_icon"
-            android:layout_height="@dimen/ephyra_osd_icon"
+            android:layout_width="@dimen/velella_osd_icon"
+            android:layout_height="@dimen/velella_osd_icon"
             android:layout_gravity="center"
             android:contentDescription="@null"
             android:duplicateParentState="true"
             android:scaleType="fitCenter"
-            android:tint="@color/ephyra_osd_icon_tint" />
+            android:tint="@color/velella_osd_icon_tint" />
     </FrameLayout>
 
     <TextView

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Velella: the Dark theme of the Velella design system (same colours as design/.../VelellaColorTokens.kt) -->
+<resources>
+
+    <color name="velella_bg">#0A0F24</color>
+    <color name="velella_surface_1">#121A36</color>
+    <color name="velella_surface_2">#1B2547</color>
+    <color name="velella_surface_3">#26315A</color>
+    <color name="velella_line_strong">#6B78A8</color>
+    <color name="velella_ink">#F2F4FA</color>
+    <color name="velella_ink_muted">#B4BCD6</color>
+    <color name="velella_ink_faint">#8C96B8</color>
+    <color name="velella_accent">#2BB5E8</color>
+
+    <style name="Theme.Jellyfin.Velella" parent="Theme.Jellyfin">
+        <!-- Colors -->
+        <item name="android:colorPrimary">@color/velella_bg</item>
+        <item name="android:colorPrimaryDark">@color/velella_bg</item>
+        <item name="android:colorAccent">@color/velella_accent</item>
+        <item name="defaultBackground">@color/velella_bg</item>
+        <item name="cardImageBackground">@color/velella_surface_1</item>
+        <item name="defaultSearchColor">@color/velella_accent</item>
+        <item name="headerTextColor">@color/velella_ink</item>
+
+        <!-- Buttons: a solid ink fill on focus -->
+        <item name="android:colorButtonNormal">@color/velella_surface_2</item>
+        <item name="buttonDefaultNormalBackground">@color/velella_surface_2</item>
+        <item name="buttonDefaultHighlightBackground">@color/velella_ink</item>
+
+        <!-- Inputs -->
+        <item name="inputDefaultStrokeColor">@color/velella_line_strong</item>
+        <item name="inputDefaultHighlightBackground">@color/velella_ink</item>
+
+        <item name="popupMenuBackground">@color/velella_surface_2</item>
+
+        <!-- Progress Bar -->
+        <item name="progressBackground">@color/velella_surface_3</item>
+        <item name="progressPrimary">@color/velella_accent</item>
+        <item name="progressSecondary">@color/velella_ink_faint</item>
+
+        <!-- Rounding: covers, inputs and menus radius-md, everything pressable a pill -->
+        <item name="cardRounding">12dp</item>
+        <item name="buttonRounding">999dp</item>
+        <item name="inputRounding">12dp</item>
+        <item name="popupMenuRounding">12dp</item>
+
+        <!-- Control icons -->
+        <item name="controlIconBackground">@color/velella_surface_2</item>
+        <item name="controlIconForegroundActive">@color/velella_accent</item>
+        <item name="controlIconForegroundInactive">@color/velella_ink_muted</item>
+
+        <!-- Side margin of the browse rows (Leanback 56dp) -->
+        <item name="browsePaddingStart">@dimen/velella_side_margin</item>
+        <item name="browsePaddingEnd">@dimen/velella_side_margin</item>
+    </style>
+
+    <!-- Launch window of the startup screen: the theme's background from the first frame instead of black, until the user's
+         theme is applied in onCreate -->
+    <style name="Theme.Jellyfin.Launch" parent="Theme.Jellyfin">
+        <item name="android:windowBackground">@color/velella_bg</item>
+    </style>
+</resources>

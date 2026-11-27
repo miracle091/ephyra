@@ -16,13 +16,13 @@ import org.jellyfin.sdk.model.api.SortOrder
 import timber.log.Timber
 import java.util.UUID
 
-/** Ephyra: how many titles the home spotlight takes in turn. */
+/** Velella: how many titles the home spotlight takes in turn. */
 const val SPOTLIGHT_SIZE = 5
 
 private const val TICKS_PER_MINUTE = 600_000_000L
 private const val MINUTES_PER_HOUR = 60
 
-/** Ephyra: the films and series added most recently that the user has not watched, with a backdrop to show. */
+/** Velella: the films and series added most recently that the user has not watched, with a backdrop to show. */
 suspend fun loadSpotlightItems(api: ApiClient): List<BaseItemDto> = withContext(Dispatchers.IO) {
 	try {
 		api.libraryApi.getItems(
@@ -45,7 +45,7 @@ suspend fun loadSpotlightItems(api: ApiClient): List<BaseItemDto> = withContext(
 }
 
 /**
- * Ephyra: what Play starts. For a series, the server's next up episode (the one in progress, else the first not watched), so
+ * Velella: what Play starts. For a series, the server's next up episode (the one in progress, else the first not watched), so
  * playback resumes there and the queue goes on from it; when there is none, the series itself (from the first episode).
  */
 suspend fun loadSpotlightPlayTarget(api: ApiClient, item: BaseItemDto): UUID {
@@ -63,22 +63,22 @@ suspend fun loadSpotlightPlayTarget(api: ApiClient, item: BaseItemDto): UUID {
 	return spotlightPlayTarget(item, nextUp)
 }
 
-/** Ephyra: the next up episode of a series when there is one, else the item itself. */
+/** Velella: the next up episode of a series when there is one, else the item itself. */
 fun spotlightPlayTarget(item: BaseItemDto, nextUp: BaseItemDto?): UUID =
 	nextUp?.takeIf { item.type == BaseItemKind.SERIES && it.seriesId == item.id }?.id ?: item.id
 
-/** Ephyra: the line above the title: the spotlight label, then the first genre ("SPOTLIGHT · THRILLER"). */
+/** Velella: the line above the title: the spotlight label, then the first genre ("SPOTLIGHT · THRILLER"). */
 fun spotlightOverline(label: String, item: BaseItemDto): String =
 	listOfNotNull(label, item.genres?.firstOrNull()).joinToString(" · ")
 
-/** Ephyra: the running time of a film ("2 h 46 min"), null for anything else or when unknown. */
+/** Velella: the running time of a film ("2 h 46 min"), null for anything else or when unknown. */
 fun spotlightRuntime(item: BaseItemDto, getString: (Int, Array<out Any>) -> String): String? =
 	item.runTimeTicks?.takeIf { item.type == BaseItemKind.MOVIE && it > 0 }?.let { ticks ->
 		val minutes = (ticks / TICKS_PER_MINUTE).toInt()
 		val hours = minutes / MINUTES_PER_HOUR
-		if (hours > 0) getString(R.string.ephyra_runtime_hours_minutes, arrayOf(hours, minutes % MINUTES_PER_HOUR))
-		else getString(R.string.ephyra_runtime_minutes, arrayOf(minutes))
+		if (hours > 0) getString(R.string.velella_runtime_hours_minutes, arrayOf(hours, minutes % MINUTES_PER_HOUR))
+		else getString(R.string.velella_runtime_minutes, arrayOf(minutes))
 	}
 
-/** Ephyra: the first non blank tagline, or null so the spotlight shows no line. */
+/** Velella: the first non blank tagline, or null so the spotlight shows no line. */
 fun spotlightTagline(item: BaseItemDto): String? = item.taglines?.firstOrNull { it.isNotBlank() }?.trim()

@@ -2,7 +2,7 @@ package org.jellyfin.androidtv.preference.store
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.jellyfin.androidtv.EphyraInfo
+import org.jellyfin.androidtv.VelellaInfo
 import org.jellyfin.preference.Preference
 import org.jellyfin.preference.PreferenceEnum
 import org.jellyfin.preference.migration.MigrationContext
@@ -18,7 +18,7 @@ import timber.log.Timber
 @Suppress("TooManyFunctions")
 abstract class DisplayPreferencesStore(
 	protected var displayPreferencesId: String,
-	protected var app: String = EphyraInfo.DISPLAY_PREFERENCES_CLIENT,
+	protected var app: String = VelellaInfo.DISPLAY_PREFERENCES_CLIENT,
 	private val api: ApiClient,
 ) : AsyncPreferenceStore<Unit, Unit>() {
 	private var displayPreferencesDto: DisplayPreferencesDto? = null

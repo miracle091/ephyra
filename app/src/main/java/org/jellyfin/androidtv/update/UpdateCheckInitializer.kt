@@ -7,7 +7,7 @@ import androidx.startup.Initializer
 import org.jellyfin.androidtv.BuildConfig
 import org.jellyfin.androidtv.di.KoinInitializer
 
-/** Ephyra: starts [DailyUpdateCheck] in release builds; debug builds have their own application id. */
+/** Velella: starts [DailyUpdateCheck] in release builds; debug builds have their own application id. */
 @Suppress("unused")
 class UpdateCheckInitializer : Initializer<Unit> {
 	override fun create(context: Context) {

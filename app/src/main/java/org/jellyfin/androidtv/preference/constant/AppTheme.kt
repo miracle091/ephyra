@@ -11,25 +11,25 @@ enum class AppTheme(
 	 */
 	DARK(R.string.pref_theme_dark),
 
-	// Ephyra: no Emerald and Muted purple themes; a saved value of either reads as the default, DARK
+	// Velella: no Emerald and Muted purple themes; a saved value of either reads as the default, DARK
 
 	/**
-	 * Ephyra: true black backgrounds, for OLED TVs
+	 * Velella: true black backgrounds, for OLED TVs
 	 */
-	BLACK(R.string.ephyra_pref_theme_black),
+	BLACK(R.string.velella_pref_theme_black),
 
 	/**
-	 * Ephyra: deep teal with a mint accent
+	 * Velella: deep teal with a mint accent
 	 */
-	ABYSS(R.string.ephyra_pref_theme_abyss),
+	ABYSS(R.string.velella_pref_theme_abyss),
 
 	/**
-	 * Ephyra: warm dark red with a coral accent
+	 * Velella: warm dark red with a coral accent
 	 */
-	CORAL(R.string.ephyra_pref_theme_coral),
+	CORAL(R.string.velella_pref_theme_coral),
 
 	/**
-	 * Ephyra: deep violet with a lilac accent
+	 * Velella: deep violet with a lilac accent
 	 */
-	MEDUSA(R.string.ephyra_pref_theme_medusa),
+	MEDUSA(R.string.velella_pref_theme_medusa),
 }

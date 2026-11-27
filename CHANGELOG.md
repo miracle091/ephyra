@@ -1,11 +1,12 @@
 # Changelog
 
-All notable changes to Ephyra are listed here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
+All notable changes to Velella are listed here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html). While the version is 0.x, a minor
 release may change behaviour or settings.
 
-Ephyra is a fork of [Jellyfin for Android TV](https://github.com/jellyfin/jellyfin-androidtv). This file lists only
-the fork's own changes, the commits prefixed `ephyra:`; upstream's history up to the fork point (tag
+Velella is a fork of [Jellyfin for Android TV](https://github.com/jellyfin/jellyfin-androidtv). This file lists only
+the fork's own changes, the commits prefixed `velella:` (`ephyra:` up to 0.5.0, when the app was called Ephyra);
+upstream's history up to the fork point (tag
 `upstream-fork-point`) is in the git log. Together with [`FORK.md`](FORK.md) it is the change notice required by
 section 2(a) of the GPL-2.0.
 
@@ -18,15 +19,20 @@ section 2(a) of the GPL-2.0.
 
 ### Changed
 
-- The issue and pull request templates are written for Ephyra: they point to this repository and the wiki instead of
+- Ephyra is now called Velella, with a new logo (a velella's float and sail) and the application id
+  `com.velella.app`, so it is no longer confused with [midasvo/ephyra](https://github.com/midasvo/ephyra), another
+  Jellyfin client. It installs as a new app: sign in again and set it up anew, then uninstall Ephyra. The server
+  lists it as "Velella" and keeps its per-library view settings under the client id `velella`; the release APK is
+  `velella-v<version>.apk` and the repository moves to `miracle091/velella`.
+- The issue and pull request templates are written for Velella: they point to this repository and the wiki instead of
   Jellyfin's forum and repository, and ask for the Shield model, the system version and, for playback bugs, the TV.
 - The detekt and Android lint configurations live in `config/` (`config/detekt.yaml`, `config/android-lint.xml`).
 - detekt fails the build on any issue, as `maxIssues: 0` intends: upstream's `ignoreFailures` only reported them to
   code scanning, so 11 warnings had slipped back in since the cleanup; they are fixed (the new player's backend
   factories split out of `createPlayer`, track selection in its own interface, shorter lines, named constants).
 - `FORK.md` keeps the origin, the license and the change notice; the per-change table moved to this changelog and
-  the user documentation to the [wiki](https://github.com/miracle091/ephyra/wiki).
-- detekt warnings cut from 574 to 0: Ephyra's own code fixed (named constants, split helpers and files, shorter
+  the user documentation to the [wiki](https://github.com/miracle091/velella/wiki).
+- detekt warnings cut from 574 to 0: Velella's own code fixed (named constants, split helpers and files, shorter
   parameter lists), upstream's mechanical warnings fixed (hashCode next to equals, explicit locale, unused
   parameters, long lines, file names matching their declaration).
 - Upstream's long and complex functions split without behaviour changes (device profile, legacy subtitle switch,
@@ -318,9 +324,9 @@ section 2(a) of the GPL-2.0.
 
 - Upstream's publish jobs (repo.jellyfin.org).
 
-[Unreleased]: https://github.com/miracle091/ephyra/compare/v0.5.0...HEAD
-[0.5.0]: https://github.com/miracle091/ephyra/compare/v0.4.0...v0.5.0
-[0.4.0]: https://github.com/miracle091/ephyra/compare/v0.3.0...v0.4.0
-[0.3.0]: https://github.com/miracle091/ephyra/compare/v0.2.0...v0.3.0
-[0.2.0]: https://github.com/miracle091/ephyra/compare/v0.1.0...v0.2.0
-[0.1.0]: https://github.com/miracle091/ephyra/compare/upstream-fork-point...v0.1.0
+[Unreleased]: https://github.com/miracle091/velella/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/miracle091/velella/compare/v0.4.0...v0.5.0
+[0.4.0]: https://github.com/miracle091/velella/compare/v0.3.0...v0.4.0
+[0.3.0]: https://github.com/miracle091/velella/compare/v0.2.0...v0.3.0
+[0.2.0]: https://github.com/miracle091/velella/compare/v0.1.0...v0.2.0
+[0.1.0]: https://github.com/miracle091/velella/compare/upstream-fork-point...v0.1.0

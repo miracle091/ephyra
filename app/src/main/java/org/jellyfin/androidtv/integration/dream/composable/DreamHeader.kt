@@ -19,7 +19,7 @@ fun DreamHeader(
 ) = Box(
 	modifier = Modifier
 		.fillMaxWidth()
-		// Ephyra: the home toolbar's measures, so the clock stays where it was when the screensaver starts
+		// Velella: the home toolbar's measures, so the clock stays where it was when the screensaver starts
 		.height(95.dp)
 		.padding(horizontal = 24.dp, vertical = 27.dp),
 ) {

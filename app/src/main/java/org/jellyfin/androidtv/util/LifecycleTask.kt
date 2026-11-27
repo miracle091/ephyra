@@ -8,7 +8,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 /**
- * Ephyra: drop-in replacement for AsyncTask in the remaining Java screens. The work runs in [scope] (pass the view's
+ * Velella: drop-in replacement for AsyncTask in the remaining Java screens. The work runs in [scope] (pass the view's
  * lifecycle scope), so it stops when the screen goes away instead of keeping it in memory, and [onPostExecute] never
  * runs on a dead screen.
  */

@@ -8,11 +8,11 @@ import org.jellyfin.sdk.model.serializer.toUUIDOrNull
 import org.koin.java.KoinJavaComponent
 import java.util.UUID
 
-/** Ephyra: subtitle index that means "no subtitles", as the server reads it (shared with the new player). */
+/** Velella: subtitle index that means "no subtitles", as the server reads it (shared with the new player). */
 const val SUBTITLES_OFF = org.jellyfin.playback.jellyfin.SUBTITLES_OFF
 
 /**
- * Ephyra: the audio and subtitle tracks picked on the details screen for one item, used once when that item starts playing.
+ * Velella: the audio and subtitle tracks picked on the details screen for one item, used once when that item starts playing.
  * Null means "not picked": the player chooses as usual.
  */
 data class TrackChoice(
@@ -22,7 +22,7 @@ data class TrackChoice(
 	val subtitleIndex: Int? = null,
 )
 
-/** Ephyra: holds the last [TrackChoice] made on the details screen (one item at a time). */
+/** Velella: holds the last [TrackChoice] made on the details screen (one item at a time). */
 class TrackPreselection {
 	private var choice: TrackChoice? = null
 
@@ -42,12 +42,12 @@ class TrackPreselection {
 	fun take(itemId: UUID, mediaSourceId: String?): TrackChoice? = choiceFor(itemId, mediaSourceId)?.also { choice = null }
 }
 
-/** Ephyra: the media source the legacy player picks for [this] item: the one with the item's id, or the first. */
+/** Velella: the media source the legacy player picks for [this] item: the one with the item's id, or the first. */
 val BaseItemDto.playedMediaSource: MediaSourceInfo?
 	get() = mediaSources?.let { sources -> sources.firstOrNull { it.id?.toUUIDOrNull() == id } ?: sources.firstOrNull() }
 
 /**
- * Ephyra: puts the tracks picked on the details screen for [item] into the request [options], so the server builds the stream
+ * Velella: puts the tracks picked on the details screen for [item] into the request [options], so the server builds the stream
  * with them from the start. The languages are saved as the "last played" ones too, as a pick in the player would, so the
  * player keeps the picked subtitle once the stream starts and the next episodes follow the same languages.
  */

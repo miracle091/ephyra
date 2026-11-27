@@ -26,7 +26,7 @@ class TextUnderButton @JvmOverloads constructor(
 		if (AndroidVersion.isAtLeastO) defaultFocusHighlightEnabled = false
 	}
 
-	// Ephyra: icon-only buttons keep their label only as the content description, also when it changes later
+	// Velella: icon-only buttons keep their label only as the content description, also when it changes later
 	var labelVisible = true
 		set(value) {
 			field = value

@@ -37,7 +37,7 @@ fun Logo(modifier: Modifier = Modifier) {
 @Composable
 fun Toolbar(
 	modifier: Modifier = Modifier,
-	// Ephyra: the logo's drawing has an empty strip on the left, so the mark lines up with the home's user button
+	// Velella: the logo's drawing has an empty strip on the left, so the mark lines up with the home's user button
 	start: @Composable () -> Unit = { Logo(Modifier.offset(x = (-15).dp)) },
 	center: @Composable () -> Unit = {},
 	end: @Composable () -> Unit = { ToolbarClock() },
@@ -45,7 +45,7 @@ fun Toolbar(
 	ToolbarLayout(
 		modifier = modifier
 			.height(95.dp)
-			// Ephyra: narrower side margin than the 48dp overscan, lined up with the rows
+			// Velella: narrower side margin than the 48dp overscan, lined up with the rows
 			.padding(horizontal = 24.dp, vertical = 27.dp),
 		start = start,
 		center = center,
@@ -61,7 +61,7 @@ fun ToolbarClock(
 	Text(
 		text = currentTime,
 		style = LocalTextStyle.current.merge(color = Color.White, fontSize = 20.sp),
-		// Ephyra: with the toolbar's 24dp the clock ends 32dp from the edge, like the clock of the library and details screens
+		// Velella: with the toolbar's 24dp the clock ends 32dp from the edge, like the clock of the library and details screens
 		modifier = modifier.padding(end = 8.dp),
 	)
 }

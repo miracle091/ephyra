@@ -14,7 +14,7 @@ import org.koin.compose.koinInject
 fun DreamHost() {
 	val viewModel = koinViewModel<DreamViewModel>()
 	val userPreferences = koinInject<UserPreferences>()
-	// Ephyra: starts from the content of this moment, so a paused video does not open on the clock
+	// Velella: starts from the content of this moment, so a paused video does not open on the clock
 	val content by viewModel.content.collectAsState(initial = remember { viewModel.currentContent() })
 
 	DreamView(

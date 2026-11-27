@@ -1,6 +1,6 @@
 <!--
-Title: "ephyra: " and a short title in the imperative mood (ephyra: Fix X, not Fixed X).
-Read https://github.com/miracle091/ephyra/wiki/Contributing first: add the change to the [Unreleased] section of
+Title: "velella: " and a short title in the imperative mood (velella: Fix X, not Fixed X).
+Read https://github.com/miracle091/velella/wiki/Contributing first: add the change to the [Unreleased] section of
 CHANGELOG.md and run ./gradlew assembleDebug detekt lint test before opening the pull request.
 -->
 

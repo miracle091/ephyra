@@ -4,7 +4,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import org.jellyfin.androidtv.preference.EphyraPreferences
+import org.jellyfin.androidtv.preference.VelellaPreferences
 import org.jellyfin.sdk.api.client.ApiClient
 import org.jellyfin.sdk.api.client.extensions.userViewApi
 import org.jellyfin.sdk.model.api.BaseItemDto
@@ -21,7 +21,7 @@ interface UserViewsRepository {
 
 class UserViewsRepositoryImpl(
 	private val api: ApiClient,
-	private val ephyraPreferences: EphyraPreferences,
+	private val velellaPreferences: VelellaPreferences,
 ) : UserViewsRepository {
 	override val views = flow {
 		val views by api.userViewApi.getUserViews()
@@ -31,9 +31,9 @@ class UserViewsRepositoryImpl(
 	}.flowOn(Dispatchers.IO)
 
 	override fun isSupported(collectionType: CollectionType?) = collectionType !in unsupportedCollectionTypes
-	// Ephyra: the home's "My media" row leaves out playlists unless the setting (off by default) shows them
+	// Velella: the home's "My media" row leaves out playlists unless the setting (off by default) shows them
 	override fun isShownInMyMedia(collectionType: CollectionType?) = isSupported(collectionType) &&
-		(collectionType != CollectionType.PLAYLISTS || ephyraPreferences[EphyraPreferences.homePlaylists])
+		(collectionType != CollectionType.PLAYLISTS || velellaPreferences[VelellaPreferences.homePlaylists])
 	override fun allowViewSelection(collectionType: CollectionType?) = collectionType !in disallowViewSelectionCollectionTypes
 	override fun allowGridView(collectionType: CollectionType?) = collectionType !in disallowGridViewCollectionTypes
 
@@ -45,7 +45,7 @@ class UserViewsRepositoryImpl(
 
 		private val disallowViewSelectionCollectionTypes = arrayOf(
 			CollectionType.LIVETV,
-			// Ephyra: music opens as a grid like movies and shows, so it gets their options
+			// Velella: music opens as a grid like movies and shows, so it gets their options
 			CollectionType.PHOTOS,
 		)
 

@@ -28,15 +28,15 @@ fun DreamView(
 		label = "DreamContentTransition"
 	) { content ->
 		when (content) {
-			DreamContent.Clock -> DreamContentClock() // Ephyra
+			DreamContent.Clock -> DreamContentClock() // Velella
 			is DreamContent.NowPlaying -> DreamContentNowPlaying(content)
-			is DreamContent.VideoPaused -> DreamContentPaused(content) // Ephyra
+			is DreamContent.VideoPaused -> DreamContentPaused(content) // Velella
 		}
 	}
 
 	// Header overlay
 	DreamHeader(
-		// Ephyra: the clock screen is the clock already; the long pause screen always shows it, as the player does
+		// Velella: the clock screen is the clock already; the long pause screen always shows it, as the player does
 		showClock = content is DreamContent.VideoPaused || (showClock && content !is DreamContent.Clock),
 	)
 }

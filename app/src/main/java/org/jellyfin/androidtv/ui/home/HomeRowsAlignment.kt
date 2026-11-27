@@ -8,7 +8,7 @@ import org.jellyfin.androidtv.util.dp
 private const val HOME_ROW_KEYLINE_DP = 118
 
 /**
- * Ephyra: the selected home row's cards start at a fixed line from the top, instead of being centred. When the spotlight makes
+ * Velella: the selected home row's cards start at a fixed line from the top, instead of being centred. When the spotlight makes
  * the rows short, centring scrolled the first row's title out of sight; the low edge keeps the first row where it starts.
  */
 fun VerticalGridView.alignHomeRows() {

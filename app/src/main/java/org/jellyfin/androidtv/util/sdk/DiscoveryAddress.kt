@@ -30,7 +30,7 @@ private fun parseUri(address: String): URI? = try {
 }
 
 /**
- * Ephyra: the address to use for a server found by local discovery. A server in a Docker bridge network announces its container
+ * Velella: the address to use for a server found by local discovery. A server in a Docker bridge network announces its container
  * address (http://172.23.0.2:8096), which other devices cannot reach. When the announced host is an IPv4 address outside every
  * network of this device, and the address the reply came from ([endpointAddress]) is inside one, the reply's address is used with
  * the same scheme and port. Host names (and so HTTPS certificates) and reachable addresses are kept as announced.
@@ -48,7 +48,7 @@ fun discoveredServerAddress(address: String, endpointAddress: String?, localNetw
 	return URI(uri.scheme, uri.userInfo, endpointAddress, uri.port, uri.path, uri.query, uri.fragment).toString()
 }
 
-/** Ephyra: the IPv4 networks of this device's active interfaces, loopback excluded. Blocking: call it off the main thread. */
+/** Velella: the IPv4 networks of this device's active interfaces, loopback excluded. Blocking: call it off the main thread. */
 fun localNetworks(): List<LocalNetwork> = NetworkInterface.getNetworkInterfaces()?.toList().orEmpty()
 	.filter { it.isUp && !it.isLoopback }
 	.flatMap { it.interfaceAddresses }

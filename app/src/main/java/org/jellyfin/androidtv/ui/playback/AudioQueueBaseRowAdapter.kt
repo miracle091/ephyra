@@ -18,7 +18,7 @@ private const val UPCOMING_ITEMS_COUNT = 100
 class AudioQueueBaseRowAdapter @JvmOverloads constructor(
 	private val playbackManager: PlaybackManager,
 	lifecycleScope: LifecycleCoroutineScope,
-	// Ephyra: the home passes its own row height, so the card fits under the spotlight
+	// Velella: the home passes its own row height, so the card fits under the spotlight
 	@Suppress("MagicNumber") cardHeight: Int = 140,
 ) : MutableObjectAdapter<AudioQueueBaseRowItem>(CardPresenter(true, cardHeight)) {
 	init {

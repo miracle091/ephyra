@@ -1,4 +1,4 @@
-// Ephyra: generates the app's baseline profile on a connected device, see StartupBaselineProfile
+// Velella: generates the app's baseline profile on a connected device, see StartupBaselineProfile
 plugins {
 	alias(libs.plugins.android.test)
 	alias(libs.plugins.androidx.baselineprofile)

@@ -36,7 +36,7 @@ private class Fixture(checkResult: AppUpdateState, vararg stored: Pair<Preferenc
 	}
 	val appUpdater = mockk<AppUpdater> { coEvery { check(any()) } returns checkResult }
 	val context = mockk<Context> {
-		every { getString(any(), *anyVararg()) } answers { "Ephyra ${(args[1] as Array<*>)[0]} is available" }
+		every { getString(any(), *anyVararg()) } answers { "Velella ${(args[1] as Array<*>)[0]} is available" }
 	}
 	val dailyCheck = DailyUpdateCheck(context, appUpdater, preferences, notificationsRepository) { NOW }
 }
@@ -46,7 +46,7 @@ class DailyUpdateCheckTest : FunSpec({
 		val fixture = Fixture(AppUpdateState.Available(UPDATE), UpdatePreferences.lastCheck to NOW - 1.days.inWholeMilliseconds)
 		fixture.dailyCheck.checkIfDue()
 
-		fixture.notifications.value.map { it.message } shouldBe listOf("Ephyra 9.0.0 is available")
+		fixture.notifications.value.map { it.message } shouldBe listOf("Velella 9.0.0 is available")
 		fixture.values[UpdatePreferences.lastCheck.key] shouldBe NOW
 	}
 

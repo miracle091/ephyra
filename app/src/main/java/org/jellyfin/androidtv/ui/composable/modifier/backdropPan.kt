@@ -16,7 +16,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 
 /**
- * Ephyra: pans and zooms the content very slowly (see [BackdropPanSpec]), only with a layer transform: no re-layout, no new
+ * Velella: pans and zooms the content very slowly (see [BackdropPanSpec]), only with a layer transform: no re-layout, no new
  * decode. The progress is read while drawing, so the frames do not recompose. It stops while the lifecycle is below RESUMED and
  * goes on from where it was; [key] restarts it (another title). [direction] comes from [BackdropPanSpec.direction]. [activeState] is
  * the lowest state that pans: a dream (the long pause screen) never gets past STARTED.

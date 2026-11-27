@@ -10,7 +10,7 @@ import java.nio.ByteOrder
 import kotlin.math.sqrt
 
 /**
- * Ephyra: the loudness of the audio being played, from 0 to 1, for visuals that follow the music (the music player's backdrop).
+ * Velella: the loudness of the audio being played, from 0 to 1, for visuals that follow the music (the music player's backdrop).
  * It reads the decoded PCM through a [TeeAudioProcessor], so it needs no permission; it stays at 0 for passthrough or offloaded
  * audio, which never reaches the processors.
  */

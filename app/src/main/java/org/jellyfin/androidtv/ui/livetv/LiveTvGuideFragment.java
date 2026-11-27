@@ -102,11 +102,11 @@ public class LiveTvGuideFragment extends Fragment implements LiveTvGuide, View.O
     private Handler mHandler = new Handler();
 
     private final Lazy<CustomMessageRepository> customMessageRepository = inject(CustomMessageRepository.class);
-    private final Lazy<LiveTvPreferences> liveTvPreferences = inject(LiveTvPreferences.class); // Ephyra
+    private final Lazy<LiveTvPreferences> liveTvPreferences = inject(LiveTvPreferences.class); // Velella
     private final Lazy<PlaybackHelper> playbackHelper = inject(PlaybackHelper.class);
     private final Lazy<ImageHelper> imageHelper = inject(ImageHelper.class);
     private final Lazy<PlaybackLauncher> playbackLauncher = inject(PlaybackLauncher.class);
-    private final Lazy<BackgroundService> backgroundService = inject(BackgroundService.class); // Ephyra
+    private final Lazy<BackgroundService> backgroundService = inject(BackgroundService.class); // Velella
     private MutableStateFlow<Boolean> showOptions;
     private MutableStateFlow<Boolean> showFilterOptions;
 
@@ -220,7 +220,7 @@ public class LiveTvGuideFragment extends Fragment implements LiveTvGuide, View.O
         mCurrentGuideStart = LocalDateTime.now();
         fillTimeLine(mCurrentGuideStart, getGuideHours());
         TvManager.loadAllChannels(this, ndx -> {
-            // Ephyra: a last channel past the first page is centred in its page, unless the user turned that off
+            // Velella: a last channel past the first page is centred in its page, unless the user turned that off
             ndx = GuideStartHelperKt.guideStartIndex(ndx, PAGE_SIZE, shouldRestoreLastChannel());
 
             mAllChannels = TvManager.getAllChannels();
@@ -247,7 +247,7 @@ public class LiveTvGuideFragment extends Fragment implements LiveTvGuide, View.O
     public void onResume() {
         super.onResume();
 
-        // Ephyra: the video player switches the app background off (BackgroundService.disable) and only a call that sets or
+        // Velella: the video player switches the app background off (BackgroundService.disable) and only a call that sets or
         // clears the backgrounds switches it back on; the guide sets none, so coming back from the player left it black
         backgroundService.getValue().clearBackgrounds();
 
@@ -258,7 +258,7 @@ public class LiveTvGuideFragment extends Fragment implements LiveTvGuide, View.O
         mHandler.postDelayed(nowTicker, NOW_TICK_MS);
     }
 
-    // Ephyra: moves the on-air bars with the clock while the guide is open, without reloading it
+    // Velella: moves the on-air bars with the clock while the guide is open, without reloading it
     private static final long NOW_TICK_MS = 30_000L;
     private final Runnable nowTicker = new Runnable() {
         @Override
@@ -281,11 +281,11 @@ public class LiveTvGuideFragment extends Fragment implements LiveTvGuide, View.O
         if (TvManager.shouldForceReload() || mCurrentGuideStart.plusMinutes(30).isBefore(LocalDateTime.now()) || mChannels.getChildCount() == 0) {
             load();
 
-            mFirstFocusChannelId = GuideStartHelperKt.guideFocusChannelId(TvManager.getLastLiveTvChannel(), shouldRestoreLastChannel()); // Ephyra
+            mFirstFocusChannelId = GuideStartHelperKt.guideFocusChannelId(TvManager.getLastLiveTvChannel(), shouldRestoreLastChannel()); // Velella
         }
     }
 
-    // Ephyra
+    // Velella
     private boolean shouldRestoreLastChannel() {
         return liveTvPreferences.getValue().get(LiveTvPreferences.Companion.getRestoreLastChannel());
     }

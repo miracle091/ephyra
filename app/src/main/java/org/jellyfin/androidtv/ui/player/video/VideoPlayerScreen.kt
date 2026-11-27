@@ -55,7 +55,7 @@ fun VideoPlayerScreen() {
 	val mediaToastRegistry = remember { MediaToastRegistry(coroutineScope) }
 	rememberPlaybackManagerMediaToastEmitter(playbackManager, mediaToastRegistry)
 
-	// Ephyra: the user's zoom mode for the picture; subtitles stay inside the whole (fitted) picture so none is cut off
+	// Velella: the user's zoom mode for the picture; subtitles stay inside the whole (fitted) picture so none is cut off
 	val userPreferences = koinInject<UserPreferences>()
 	val zoomMode = remember { userPreferences[UserPreferences.playerZoomMode] }
 

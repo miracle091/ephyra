@@ -44,11 +44,11 @@ enum class HdrFormat(
 		videoRangeTypes = setOf(VideoRangeType.DOVI_WITH_HDR10, VideoRangeType.DOVI_WITH_HDR10_PLUS),
 		preference = UserPreferences.doviProfile8Override,
 	),
-	// Ephyra: files the server tags DOVI_INVALID (mostly profile 8 with a non-standard compatibility id, such as Blu-ray rips converted
+	// Velella: files the server tags DOVI_INVALID (mostly profile 8 with a non-standard compatibility id, such as Blu-ray rips converted
 	// from profile 7). Auto and disable keep sending them to the server as unsupported; enable lets them direct play.
 	DOVI_INVALID(
-		nameRes = R.string.ephyra_dovi_invalid,
-		descriptionRes = R.string.ephyra_dovi_invalid_description,
+		nameRes = R.string.velella_dovi_invalid,
+		descriptionRes = R.string.velella_dovi_invalid_description,
 		videoRangeTypes = setOf(VideoRangeType.DOVI_INVALID),
 		preference = UserPreferences.doviInvalidOverride,
 	),

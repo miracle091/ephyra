@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Ephyra: the "Users" board of the design system: centred title and server, 96dp avatars, ghost buttons at the bottom -->
+<!-- Velella: the "Users" board of the design system: centred title and server, 96dp avatars, ghost buttons at the bottom -->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:clipChildren="false"
     android:clipToPadding="false"
-    android:paddingHorizontal="@dimen/ephyra_side_margin"
+    android:paddingHorizontal="@dimen/velella_side_margin"
     android:paddingBottom="@dimen/overscan_vertical">
 
     <TextView
@@ -95,7 +95,7 @@
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/add_user_button"
-            style="@style/Button.Ephyra.Ghost"
+            style="@style/Button.Velella.Ghost"
             android:layout_width="wrap_content"
             android:layout_height="40dp"
             android:layout_marginEnd="8dp"
@@ -104,10 +104,10 @@
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/server_button"
-            style="@style/Button.Ephyra.Ghost"
+            style="@style/Button.Velella.Ghost"
             android:layout_width="wrap_content"
             android:layout_height="40dp"
             android:drawableStart="@drawable/ic_switch_users"
-            android:text="@string/ephyra_change_server" />
+            android:text="@string/velella_change_server" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

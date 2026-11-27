@@ -13,7 +13,7 @@ import kotlinx.coroutines.withContext
 import org.jellyfin.androidtv.R
 import org.jellyfin.androidtv.data.querying.GetSpecialsRequest
 import org.jellyfin.androidtv.data.repository.ItemRepository
-import org.jellyfin.androidtv.preference.EphyraPreferences
+import org.jellyfin.androidtv.preference.VelellaPreferences
 import org.jellyfin.androidtv.ui.itemhandling.BaseRowItem
 import org.jellyfin.androidtv.ui.itemhandling.ItemRowAdapter
 import org.jellyfin.androidtv.ui.presentation.CardPresenter
@@ -33,13 +33,13 @@ import timber.log.Timber
 import kotlin.coroutines.cancellation.CancellationException
 
 class GenericFolderFragment : EnhancedBrowseFragment() {
-	private val ephyraPreferences by inject<EphyraPreferences>()
+	private val velellaPreferences by inject<VelellaPreferences>()
 	private val api by inject<ApiClient>()
 
-	// Ephyra: the row of the season's episodes in the standard layout, which shows their meta line
+	// Velella: the row of the season's episodes in the standard layout, which shows their meta line
 	private var episodesRowDef: BrowseRowDef? = null
 
-	private val showsCompactEpisodes get() = ephyraPreferences[EphyraPreferences.compactEpisodeList]
+	private val showsCompactEpisodes get() = velellaPreferences[VelellaPreferences.compactEpisodeList]
 
 	companion object {
 		private const val ROW_PAGE_SIZE = 100
@@ -62,7 +62,7 @@ class GenericFolderFragment : EnhancedBrowseFragment() {
 			).contains(mFolder.type)
 		) return
 
-		// Ephyra: split in two helpers to keep this method short
+		// Velella: split in two helpers to keep this method short
 		if (showSpecialViewTypes.contains(mFolder.type)) addSpecialViewRows()
 
 		val byName = GetItemsRequest(
@@ -75,7 +75,7 @@ class GenericFolderFragment : EnhancedBrowseFragment() {
 		}
 
 		val compactEpisodes = mFolder.type == BaseItemKind.SEASON && showsCompactEpisodes
-		// Ephyra: the compact list loads the episodes itself, one row each
+		// Velella: the compact list loads the episodes itself, one row each
 		if (!compactEpisodes) mRows.add(BrowseRowDef(header, byName, ROW_PAGE_SIZE).also { episodesRowDef = it })
 
 		if (mFolder.type == BaseItemKind.SEASON) addSeasonRows()
@@ -130,7 +130,7 @@ class GenericFolderFragment : EnhancedBrowseFragment() {
 		}
 	}
 
-	// Ephyra: the compact list needs rows that can hold one episode each, to move between episodes with up and down
+	// Velella: the compact list needs rows that can hold one episode each, to move between episodes with up and down
 	override fun createRowPresenterSelector(): PresenterSelector {
 		if (!showsCompactEpisodes) return super.createRowPresenterSelector()
 
@@ -139,7 +139,7 @@ class GenericFolderFragment : EnhancedBrowseFragment() {
 			.addClassPresenter(ListRow::class.java, PositionableListRowPresenter())
 	}
 
-	// Ephyra: the cards of the episodes show their runtime, rating and end time under the title
+	// Velella: the cards of the episodes show their runtime, rating and end time under the title
 	override fun getPresenterSelector(def: BrowseRowDef, defaultSelector: PresenterSelector): PresenterSelector {
 		if (def !== episodesRowDef) return defaultSelector
 

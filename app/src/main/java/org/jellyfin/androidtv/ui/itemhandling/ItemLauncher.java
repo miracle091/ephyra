@@ -54,7 +54,7 @@ public class ItemLauncher {
         switch (collectionType) {
             case MOVIES:
             case TVSHOWS:
-            case MUSIC: // Ephyra: music opens as a grid of albums like movies and shows, the rows screen stays an option
+            case MUSIC: // Velella: music opens as a grid of albums like movies and shows, the rows screen stays an option
                 LibraryPreferences displayPreferences = preferencesRepository.getValue().getLibraryPreferences(baseItem.getDisplayPreferencesId());
                 boolean enableSmartScreen = displayPreferences.get(LibraryPreferences.Companion.getEnableSmartScreen());
 

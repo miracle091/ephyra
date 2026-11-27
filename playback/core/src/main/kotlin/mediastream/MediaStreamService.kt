@@ -49,7 +49,7 @@ internal class MediaStreamService(
 		return mediaStream != null
 	}
 
-	// Ephyra: a cancelled request (newer reload, other entry) is rethrown, not taken for a failed one
+	// Velella: a cancelled request (newer reload, other entry) is rethrown, not taken for a failed one
 	private suspend fun QueueEntry.resolveMediaStream(): PlayableMediaStream? = mediaStreamResolvers.firstNotNullOfOrNull { resolver ->
 		runCatching {
 			withContext(Dispatchers.IO) {
@@ -96,7 +96,7 @@ internal class MediaStreamService(
 	}
 
 	/**
-	 * Ephyra: asks the resolvers again for the current entry's stream (with the entry's new requests, like another audio track) and
+	 * Velella: asks the resolvers again for the current entry's stream (with the entry's new requests, like another audio track) and
 	 * plays it on from the current position, paused if it was. The play session moves to the new stream, so the server gets a stop
 	 * for the old one. A newer reload or another entry cancels it; on failure the current stream plays on.
 	 */
@@ -138,7 +138,7 @@ internal class MediaStreamService(
 }
 
 /**
- * Ephyra: the reload of [entry]'s stream. The new stream is asked for first ([resolve], with [position] as the entry's start, so
+ * Velella: the reload of [entry]'s stream. The new stream is asked for first ([resolve], with [position] as the entry's start, so
  * a transcode starts there) and replaces the old one, then [play]s, only if it came and [entry] still is the current entry
  * ([isCurrent]) with its old stream; otherwise the old stream plays on and the start is forgotten. Returns whether it replaced it.
  */

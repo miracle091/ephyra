@@ -14,10 +14,10 @@ data class ExoPlayerOptions(
 	val maxBufferDuration: Duration? = null,
 	val bufferForPlaybackDuration: Duration? = null,
 	val bufferForPlaybackAfterRebufferDuration: Duration? = null,
-	/** Ephyra: a `C.VIDEO_CHANGE_FRAME_RATE_STRATEGY_*` value; OFF when the app switches the display mode itself. */
+	/** Velella: a `C.VIDEO_CHANGE_FRAME_RATE_STRATEGY_*` value; OFF when the app switches the display mode itself. */
 	val videoChangeFrameRateStrategy: Int = C.VIDEO_CHANGE_FRAME_RATE_STRATEGY_ONLY_IF_SEAMLESS,
-	/** Ephyra: the user's look for text subtitles; null keeps Media3's default. */
+	/** Velella: the user's look for text subtitles; null keeps Media3's default. */
 	val subtitleStyle: SubtitleStyle? = null,
-	/** Ephyra: narrow the loudness range of the player's audio (decoded audio only; bitstream passthrough is left alone). */
+	/** Velella: narrow the loudness range of the player's audio (decoded audio only; bitstream passthrough is left alone). */
 	val audioNightMode: Boolean = false,
 )

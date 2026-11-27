@@ -9,7 +9,7 @@ import org.jellyfin.androidtv.util.AndroidVersion
 import org.jellyfin.androidtv.util.profile.ShieldDevice
 
 /**
- * Ephyra: on a Shield TV connected to an HDR display, shows once on the home screen where to turn on the Shield's own content
+ * Velella: on a Shield TV connected to an HDR display, shows once on the home screen where to turn on the Shield's own content
  * matching, a system setting the app can neither read nor change.
  */
 class ShieldDisplayHint(
@@ -22,7 +22,7 @@ class ShieldDisplayHint(
 	fun showIfNeeded() {
 		if (hintPreferences[HintPreferences.shieldDisplayHintDismissed] || !isShieldTv() || !displaySupportsHdr()) return
 
-		notificationsRepository.addNotification(context.getString(R.string.ephyra_shield_display_hint)) {
+		notificationsRepository.addNotification(context.getString(R.string.velella_shield_display_hint)) {
 			hintPreferences[HintPreferences.shieldDisplayHintDismissed] = true
 		}
 	}

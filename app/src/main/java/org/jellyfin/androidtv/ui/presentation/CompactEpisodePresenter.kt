@@ -39,7 +39,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import org.jellyfin.androidtv.R
 import org.jellyfin.androidtv.constant.ImageType
 import org.jellyfin.androidtv.ui.base.JellyfinTheme
-import org.jellyfin.androidtv.ui.base.LocalEphyraPalette
+import org.jellyfin.androidtv.ui.base.LocalVelellaPalette
 import org.jellyfin.androidtv.ui.base.LocalTextStyle
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.composable.AsyncImage
@@ -59,7 +59,7 @@ import org.jellyfin.sdk.api.client.ApiClient
 import org.jellyfin.sdk.model.api.BaseItemDto
 import org.koin.compose.koinInject
 
-// The browsePaddingStart/End of the Ephyra themes, and room for the focus ring on both sides
+// The browsePaddingStart/End of the Velella themes, and room for the focus ring on both sides
 private const val ROW_SIDE_MARGIN_DP = 32
 private const val ROW_RING_ROOM_DP = 8
 
@@ -68,11 +68,11 @@ private val ThumbnailHeight = ThumbnailWidth / WIDE_ASPECT_RATIO
 
 private const val OVERVIEW_MAX_LINES = 3
 
-/** Ephyra: a row of the season screen that holds one episode of the compact list (see [CompactEpisodePresenter]). */
+/** Velella: a row of the season screen that holds one episode of the compact list (see [CompactEpisodePresenter]). */
 class CompactEpisodeRow(header: HeaderItem?, adapter: ObjectAdapter) : ListRow(header, adapter)
 
 /**
- * Ephyra: an episode as a horizontal row of the compact episode list: the picture on the left (with its progress bar and the
+ * Velella: an episode as a horizontal row of the compact episode list: the picture on the left (with its progress bar and the
  * spoiler blur) and on the right the numbered title, the meta line and the plot. A row of the list holds one episode, so up and
  * down on the D-pad move between episodes.
  */
@@ -139,7 +139,7 @@ class CompactEpisodePresenter : Presenter() {
 private fun CompactEpisodeContent(item: BaseRowItem?, focused: Boolean) {
 	val baseItem = item?.baseItem ?: return
 	val context = LocalContext.current
-	val palette = LocalEphyraPalette.current
+	val palette = LocalVelellaPalette.current
 	val shape = JellyfinTheme.shapes.medium
 
 	val title = remember(baseItem) { compactEpisodeTitle(baseItem.indexNumber, baseItem.indexNumberEnd, baseItem.name) }
@@ -199,7 +199,7 @@ private fun CompactEpisodeThumbnail(baseItem: BaseItemDto, image: JellyfinImage?
 
 @Composable
 private fun CompactEpisodeTexts(title: String, meta: String?, overview: String?, modifier: Modifier) {
-	val palette = LocalEphyraPalette.current
+	val palette = LocalVelellaPalette.current
 
 	Column(
 		verticalArrangement = Arrangement.spacedBy(Tokens.Space.spaceXs),

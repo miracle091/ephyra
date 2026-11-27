@@ -4,7 +4,7 @@ import java.time.LocalTime
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
-/** Ephyra: where a paused video stands, for the long pause screen. */
+/** Velella: where a paused video stands, for the long pause screen. */
 data class PausedVideoProgress(
 	val fraction: Float,
 	val remaining: Duration,

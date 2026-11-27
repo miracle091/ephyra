@@ -34,7 +34,7 @@ fun MediaToasts(mediaToastRegistry: MediaToastRegistry) {
 						modifier = Modifier.fillMaxSize()
 					)
 				} else {
-					// Ephyra: a smaller icon with the label under it
+					// Velella: a smaller icon with the label under it
 					Column(
 						horizontalAlignment = Alignment.CenterHorizontally,
 						verticalArrangement = Arrangement.Center,

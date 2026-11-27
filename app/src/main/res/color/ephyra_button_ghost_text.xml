@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Ephyra: the ghost button's text and icon, muted until focused -->
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:color="?attr/defaultBackground" android:state_enabled="true" android:state_focused="true" />
-    <item android:color="?attr/controlIconForegroundInactive" />
-</selector>

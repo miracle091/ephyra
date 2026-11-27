@@ -22,7 +22,7 @@ import kotlin.time.Duration
 
 class MediaSegmentService(
 	private val api: ApiClient,
-	// Ephyra: the user's action for each segment (Settings, media segments) decides, not a fixed set of types
+	// Velella: the user's action for each segment (Settings, media segments) decides, not a fixed set of types
 	private val shouldSkip: (MediaSegmentDto) -> Boolean,
 ) : PlayerService() {
 	companion object {
@@ -45,7 +45,7 @@ class MediaSegmentService(
 		// BaseItem doesn't exist
 		val baseItem = entry.baseItem ?: return
 
-		// Get via API; Ephyra: a failed request no longer ends the collection, so later entries still get their segments
+		// Get via API; Velella: a failed request no longer ends the collection, so later entries still get their segments
 		runCatching { api.mediaSegmentApi.getItemSegments(baseItem.id).content.items }
 			.onSuccess { entry.mediaSegments = it }
 			.onFailure { error ->

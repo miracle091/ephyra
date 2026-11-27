@@ -30,7 +30,7 @@ sealed interface AppUpdateState {
 }
 
 /**
- * Ephyra: updates the app from GitHub Releases, for sideloaded installs without a store. Android installs the update
+ * Velella: updates the app from GitHub Releases, for sideloaded installs without a store. Android installs the update
  * only when it is signed with the same key as the installed app, and asks the user to confirm.
  */
 class AppUpdater(

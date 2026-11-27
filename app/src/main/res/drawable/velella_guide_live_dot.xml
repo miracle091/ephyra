@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Velella: the dot before the name of a programme on air in the Live TV guide, in the danger colour of the player's LIVE badge -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
+    <solid android:color="@color/velella_osd_danger" />
+    <size android:width="10dp" android:height="10dp" />
+</shape>

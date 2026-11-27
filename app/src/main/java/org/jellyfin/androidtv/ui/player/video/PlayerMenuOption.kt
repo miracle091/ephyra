@@ -8,23 +8,23 @@ import org.jellyfin.sdk.model.api.ChapterInfo
 import org.jellyfin.sdk.model.extensions.ticks
 import kotlin.time.Duration
 
-/** Ephyra: one entry of a menu of the video player's controls: what picking it selects, and its label. */
+/** Velella: one entry of a menu of the video player's controls: what picking it selects, and its label. */
 data class PlayerMenuOption<T>(val value: T, val label: String)
 
-/** Ephyra: the audio tracks of the source by their index, labelled with the server's display name as in the legacy player. */
+/** Velella: the audio tracks of the source by their index, labelled with the server's display name as in the legacy player. */
 fun audioMenuOptions(tracks: Collection<MediaStreamTrack>): List<PlayerMenuOption<Int>> =
 	tracks.filterIsInstance<MediaStreamAudioTrack>().mapNotNull { track ->
 		val index = track.index ?: return@mapNotNull null
 		PlayerMenuOption(index, track.title ?: track.codec.uppercase())
 	}
 
-/** Ephyra: "none" ([noneLabel], a null index) then the subtitle tracks of the source, as in the legacy player. */
+/** Velella: "none" ([noneLabel], a null index) then the subtitle tracks of the source, as in the legacy player. */
 fun subtitleMenuOptions(tracks: Collection<MediaStreamTrack>, noneLabel: String): List<PlayerMenuOption<Int?>> =
 	listOf(PlayerMenuOption<Int?>(null, noneLabel)) + tracks.filterIsInstance<MediaStreamSubtitleTrack>().map { track ->
 		PlayerMenuOption(track.index, track.title ?: track.language ?: track.codec.uppercase())
 	}
 
-/** Ephyra: the chapters by their start, labelled with their name and start time (only the time when they have no name). */
+/** Velella: the chapters by their start, labelled with their name and start time (only the time when they have no name). */
 fun chapterMenuOptions(chapters: List<ChapterInfo>): List<PlayerMenuOption<Duration>> = chapters.map { chapter ->
 	val start = chapter.startPositionTicks.ticks
 	val time = formatPlaybackTime(start.inWholeMilliseconds)
@@ -36,7 +36,7 @@ private const val UHD_MIN_MBPS = 40.0
 private const val HD_MIN_MBPS = 8.0
 
 /**
- * Ephyra: the quality tier the quality button shows in place of an icon for the maximum bitrate [value] (the preference's Mbps,
+ * Velella: the quality tier the quality button shows in place of an icon for the maximum bitrate [value] (the preference's Mbps,
  * "20" or "0.72"): "4K" from 40 Mbps, "HD" from 8 Mbps, "SD" below, the rough bitrates those resolutions need.
  */
 fun qualityTierText(value: String): String {
@@ -48,6 +48,6 @@ fun qualityTierText(value: String): String {
 	}
 }
 
-/** Ephyra: the chapter playing at [position]: the last one that started at or before it. */
+/** Velella: the chapter playing at [position]: the last one that started at or before it. */
 fun currentChapter(options: List<PlayerMenuOption<Duration>>, position: Duration): Duration? =
 	options.lastOrNull { it.value <= position }?.value

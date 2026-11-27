@@ -11,7 +11,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.sp
 import org.jellyfin.androidtv.ui.base.JellyfinTheme
-import org.jellyfin.androidtv.ui.base.LocalEphyraPalette
+import org.jellyfin.androidtv.ui.base.LocalVelellaPalette
 import org.jellyfin.androidtv.ui.base.ProvideTextStyle
 import org.jellyfin.design.Tokens
 
@@ -49,8 +49,8 @@ private fun ItemPreviewMetadata(
 		modifier = Modifier.padding(spacing),
 		verticalArrangement = Arrangement.spacedBy(spacing),
 	) {
-		// Ephyra: captions readable from the sofa, on the spotlight's scale (14 for the title, 12 for the details) and the theme's ink
-		val palette = LocalEphyraPalette.current
+		// Velella: captions readable from the sofa, on the spotlight's scale (14 for the title, 12 for the details) and the theme's ink
+		val palette = LocalVelellaPalette.current
 		title?.let { content ->
 			ProvideTextStyle(
 				value = JellyfinTheme.typography.default.copy(

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Velella: a text button of the live player's controls (CustomPlaybackTransportControlGlue.updatePills): icon and label in a pill.
+     It carries Leanback's @id/button so the glue's left and right focus steps count it with the round buttons -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/button"
+    android:layout_width="wrap_content"
+    android:layout_height="@dimen/velella_osd_button"
+    android:background="@drawable/velella_osd_pill_back"
+    android:clickable="true"
+    android:focusable="true"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingStart="16dp"
+    android:paddingEnd="20dp">
+
+    <ImageView
+        android:id="@+id/icon"
+        android:layout_width="@dimen/velella_osd_icon"
+        android:layout_height="@dimen/velella_osd_icon"
+        android:contentDescription="@null"
+        android:duplicateParentState="true"
+        android:scaleType="fitCenter"
+        android:tint="@color/velella_osd_icon_tint" />
+
+    <TextView
+        android:id="@+id/label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:duplicateParentState="true"
+        android:maxLines="1"
+        android:textColor="@color/velella_osd_icon_tint"
+        android:textSize="14sp"
+        android:textStyle="bold" />
+</LinearLayout>

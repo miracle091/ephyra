@@ -5,7 +5,7 @@ import android.media.MediaCodecList
 import android.util.Range
 import kotlinx.serialization.json.Json
 import org.jellyfin.androidtv.BuildConfig
-import org.jellyfin.androidtv.EphyraInfo
+import org.jellyfin.androidtv.VelellaInfo
 import org.jellyfin.androidtv.preference.UserPreferences
 import org.jellyfin.androidtv.util.AndroidVersion
 import org.jellyfin.androidtv.util.appendCodeBlock
@@ -35,9 +35,9 @@ fun createDeviceProfileReport(
 ) = buildMarkdown {
 	// Header
 	appendLine("---")
-	appendLine("client: ${EphyraInfo.CLIENT_NAME}")
+	appendLine("client: ${VelellaInfo.CLIENT_NAME}")
 	appendLine("client_version: ${BuildConfig.VERSION_NAME}")
-	appendLine("client_repository: ${EphyraInfo.REPOSITORY_URL}")
+	appendLine("client_repository: ${VelellaInfo.REPOSITORY_URL}")
 	appendLine("type: media_capabilities_report")
 	appendLine("format: markdown")
 	appendLine("---")

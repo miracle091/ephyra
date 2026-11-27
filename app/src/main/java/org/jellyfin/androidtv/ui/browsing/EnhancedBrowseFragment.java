@@ -287,12 +287,12 @@ public class EnhancedBrowseFragment extends Fragment implements RowLoader, View.
         if (mRowsFragment != null) mRowsFragment.setAdapter(mRowsAdapter);
     }
 
-    // Ephyra: lets a screen give some of its rows another row presenter, e.g. the compact episodes of a season
+    // Velella: lets a screen give some of its rows another row presenter, e.g. the compact episodes of a season
     protected PresenterSelector createRowPresenterSelector() {
         return new SinglePresenterSelector(new PositionableListRowPresenter());
     }
 
-    // Ephyra: lets a screen give one row its own presenters, e.g. the episodes of a season
+    // Velella: lets a screen give one row its own presenters, e.g. the episodes of a season
     protected PresenterSelector getPresenterSelector(BrowseRowDef def, PresenterSelector defaultSelector) {
         return defaultSelector;
     }
@@ -501,7 +501,7 @@ public class EnhancedBrowseFragment extends Fragment implements RowLoader, View.
             ItemRowAdapter adapter = (ItemRowAdapter) ((ListRow) row).getAdapter();
             adapter.loadMoreItemsIfNeeded(adapter.indexOf(rowItem));
 
-            backgroundService.getValue().clearBackgrounds(); // Ephyra: no backdrop behind the library rows
+            backgroundService.getValue().clearBackgrounds(); // Velella: no backdrop behind the library rows
         }
     }
 }

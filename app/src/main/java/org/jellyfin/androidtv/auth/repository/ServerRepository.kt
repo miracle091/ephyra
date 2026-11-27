@@ -89,7 +89,7 @@ class ServerRepositoryImpl(
 		jellyfin.discovery
 			.discoverLocalServers()
 			.map { info ->
-				// Ephyra: the SDK puts the address the reply came from in endpointAddress; use it when the announced one is unreachable
+				// Velella: the SDK puts the address the reply came from in endpointAddress; use it when the announced one is unreachable
 				val address = discoveredServerAddress(info.address, info.endpointAddress, networks)
 				if (address != info.address) Timber.i("Discovered server %s announces %s, using %s", info.name, info.address, address)
 				info.copy(address = address).toServer()

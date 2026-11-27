@@ -40,7 +40,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import org.jellyfin.androidtv.R
 import org.jellyfin.androidtv.constant.ImageType
 import org.jellyfin.androidtv.ui.base.JellyfinTheme
-import org.jellyfin.androidtv.ui.base.LocalEphyraPalette
+import org.jellyfin.androidtv.ui.base.LocalVelellaPalette
 import org.jellyfin.androidtv.ui.base.LocalTextStyle
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.composable.AsyncImage
@@ -63,12 +63,12 @@ import org.jellyfin.sdk.api.client.ApiClient
 import org.jellyfin.sdk.model.api.BaseItemKind
 import org.koin.compose.koinInject
 
-// Ephyra: the design system's card overlay shade, rgba(5, 8, 20)
+// Velella: the design system's card overlay shade, rgba(5, 8, 20)
 private val CARD_SHADE = Color(red = 5, green = 8, blue = 20)
 
 private const val DEFAULT_CARD_HEIGHT_DP = 150
 
-// Ephyra: where the card overlay shade starts and how opaque it is at the bottom
+// Velella: where the card overlay shade starts and how opaque it is at the bottom
 private const val SHADE_START = 0.4f
 private const val SHADE_END_ALPHA = 0.86f
 
@@ -83,11 +83,11 @@ class CardPresenter(
 	constructor(showInfo: Boolean) : this(showInfo, DEFAULT_CARD_HEIGHT_DP)
 	constructor() : this(true)
 
-	/** Ephyra: episodes show their meta line (runtime, rating, end time) under the title instead of their season and number. */
+	/** Velella: episodes show their meta line (runtime, rating, end time) under the title instead of their season and number. */
 	var episodeTiming = false
 
 	/**
-	 * Ephyra: when set, the height in dp of portrait cards, whatever the item asks for; landscape cards keep their usual 130:150
+	 * Velella: when set, the height in dp of portrait cards, whatever the item asks for; landscape cards keep their usual 130:150
 	 * ratio to it.
 	 */
 	var cardHeight: Int? = null
@@ -228,7 +228,7 @@ private fun BaseRowItem.getDisplayConfig(imageType: ImageType, uniformAspect: Bo
 private fun CardViewHolderContent(
 	item: BaseRowItem?,
 	focused: Boolean,
-	// Ephyra: the presenter carries the card options (info, image type, heights, episode timing)
+	// Velella: the presenter carries the card options (info, image type, heights, episode timing)
 	presenter: CardPresenter,
 ) {
 	val imageType = presenter.imageType
@@ -238,7 +238,7 @@ private fun CardViewHolderContent(
 
 	val title = remember(item, context) { item?.getCardName(context) }
 	val subtitle = remember(item, context) { item?.getSubText(context) }
-	// Ephyra: the end time is worked out when the card is bound, so it is fresh each time the screen is shown
+	// Velella: the end time is worked out when the card is bound, so it is fresh each time the screen is shown
 	val meta = remember(item, context, episodeTiming) {
 		item?.baseItem?.takeIf { episodeTiming && it.type == BaseItemKind.EPISODE }?.episodeMetaLine(context)
 	}
@@ -255,9 +255,9 @@ private fun CardViewHolderContent(
 			overlay = { CardOverlay(item, title, !usePreview && item.showCardInfoOverlay, focused) },
 			modifier = Modifier
 				.size(size)
-				.cardFocusRing( // Ephyra
+				.cardFocusRing( // Velella
 					focused = focused,
-					ring = LocalEphyraPalette.current.accent,
+					ring = LocalVelellaPalette.current.accent,
 					shape = JellyfinTheme.shapes.medium,
 				)
 		)
@@ -281,14 +281,14 @@ private fun CardImage(
 ) {
 	val image = displayConfig.image
 
-	CardPlaceholder() // Ephyra
-	val library = item.baseItem?.takeIf(::isLibraryCard) // Ephyra
+	CardPlaceholder() // Velella
+	val library = item.baseItem?.takeIf(::isLibraryCard) // Velella
 	if (library != null) {
-		// Ephyra: Live TV shows a programme on air, with the TV icon when none has a picture
+		// Velella: Live TV shows a programme on air, with the TV icon when none has a picture
 		val iconRes = if (isLiveTvLibraryCard(library)) R.drawable.ic_tv else displayConfig.iconRes
 		LibraryCardImage(library, title, iconRes, size, aspectRatio)
 	} else if (image != null && hidesEpisodeSpoiler(item.baseItem, image)) {
-		EpisodeSpoilerImage(image, aspectRatio, Modifier.fillMaxSize()) // Ephyra
+		EpisodeSpoilerImage(image, aspectRatio, Modifier.fillMaxSize()) // Velella
 	} else if (image != null) {
 		val api = koinInject<ApiClient>()
 		val localDensity = LocalDensity.current
@@ -314,13 +314,13 @@ private fun CardImage(
 				.fillMaxSize()
 		)
 	} else {
-		ArtToneCover(title, displayConfig.iconRes) // Ephyra
+		ArtToneCover(title, displayConfig.iconRes) // Velella
 	}
 }
 
 @Composable
 private fun CardOverlay(item: BaseRowItem, title: String?, showInfo: Boolean, focused: Boolean) {
-	// Ephyra: the design system's card overlay, a bottom shade under the bold title, instead of a grey box
+	// Velella: the design system's card overlay, a bottom shade under the bold title, instead of a grey box
 	if (showInfo && title != null) {
 		Box(
 			modifier = Modifier
@@ -345,7 +345,7 @@ private fun CardFooterTitle(title: String, focused: Boolean) {
 		maxLines = 1,
 		overflow = TextOverflow.Ellipsis,
 		style = LocalTextStyle.current.merge(
-			color = LocalEphyraPalette.current.ink,
+			color = LocalVelellaPalette.current.ink,
 			fontSize = 18.sp,
 			fontWeight = FontWeight.Bold,
 			lineHeight = 22.sp,
@@ -382,7 +382,7 @@ private fun CardPreview(
 		},
 		subtitle = if (subtitle == null && meta == null) null else {
 			{
-				// Ephyra: the episode's meta line goes under its name
+				// Velella: the episode's meta line goes under its name
 				Column {
 					listOfNotNull(subtitle, meta).forEach { text ->
 						Text(

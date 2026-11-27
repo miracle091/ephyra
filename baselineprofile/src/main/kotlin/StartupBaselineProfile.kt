@@ -37,7 +37,7 @@ class StartupBaselineProfile {
 	}
 
 	private companion object {
-		const val TARGET_APP_ID = "com.ephyra.app"
+		const val TARGET_APP_ID = "com.velella.app"
 		const val DPAD_ROWS = 6
 		const val DPAD_CARDS = 10
 	}

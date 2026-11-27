@@ -46,9 +46,9 @@ import org.jellyfin.androidtv.R
 import org.jellyfin.androidtv.integration.dream.formatPlaybackTime
 import org.jellyfin.androidtv.integration.dream.model.DreamContent
 import org.jellyfin.androidtv.integration.dream.pausedVideoProgress
-import org.jellyfin.androidtv.ui.base.EphyraTheme
+import org.jellyfin.androidtv.ui.base.VelellaTheme
 import org.jellyfin.androidtv.ui.base.Icon
-import org.jellyfin.androidtv.ui.base.LocalEphyraPalette
+import org.jellyfin.androidtv.ui.base.LocalVelellaPalette
 import org.jellyfin.androidtv.ui.base.LocalTextStyle
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.composable.modifier.BackdropPanSpec
@@ -83,16 +83,16 @@ private val SafeY = 27.dp
 // The header's width, as the home spotlight's text block
 private val HeaderWidth = 520.dp
 
-// The player's times (TextAppearance.Ephyra.OsdTime): 14sp with even-width digits
+// The player's times (TextAppearance.Velella.OsdTime): 14sp with even-width digits
 private val TimeStyle = TextStyle(fontSize = 14.sp, fontFeatureSettings = "tnum")
 
 /**
- * Ephyra: the screensaver over a video left paused, laid out as the video player's controls: the header at the top left, the
+ * Velella: the screensaver over a video left paused, laid out as the video player's controls: the header at the top left, the
  * progress with the times at the bottom. The title's backdrop is dimmed; any key closes the screensaver and brings the player back.
  */
 @Composable
-fun DreamContentPaused(content: DreamContent.VideoPaused) = EphyraTheme {
-	val palette = LocalEphyraPalette.current
+fun DreamContentPaused(content: DreamContent.VideoPaused) = VelellaTheme {
+	val palette = LocalVelellaPalette.current
 	var late by remember { mutableStateOf(false) }
 	LaunchedEffect(content) {
 		delay(BurnInDelay)
@@ -143,7 +143,7 @@ fun DreamContentPaused(content: DreamContent.VideoPaused) = EphyraTheme {
 
 		// The way back, centred on the screen on the times' line (same type and bottom margin), between the position and the duration
 		Text(
-			text = stringResource(R.string.ephyra_paused_hint),
+			text = stringResource(R.string.velella_paused_hint),
 			style = TimeStyle.merge(color = palette.inkFaint, textAlign = TextAlign.Center),
 			maxLines = 1,
 			modifier = Modifier
@@ -162,7 +162,7 @@ private fun PausedPicture(item: BaseItemDto, modifier: Modifier) {
 		model = image.getUrl(api, maxWidth = maxWidth),
 		contentDescription = null,
 		contentScale = ContentScale.Crop,
-		// Ephyra: the slow pan also keeps the picture moving against burn-in; a dream never gets past STARTED
+		// Velella: the slow pan also keeps the picture moving against burn-in; a dream never gets past STARTED
 		modifier = modifier
 			.fillMaxSize()
 			.backdropPan(BackdropPanSpec.direction(item.id.hashCode()), key = item.id, activeState = Lifecycle.State.STARTED),
@@ -172,7 +172,7 @@ private fun PausedPicture(item: BaseItemDto, modifier: Modifier) {
 /** The player's header (OsdHeader): the overline, the title, then the pause in place of the play method and the end time. */
 @Composable
 private fun PausedHeader(item: BaseItemDto, endsAt: String, modifier: Modifier) {
-	val palette = LocalEphyraPalette.current
+	val palette = LocalVelellaPalette.current
 	val context = LocalContext.current
 	val overline = remember(item) { OsdHeader.overlineOf(item, item.getSeasonEpisodeName(context)) }
 
@@ -203,7 +203,7 @@ private fun PausedHeader(item: BaseItemDto, endsAt: String, modifier: Modifier) 
 			modifier = Modifier.padding(top = 4.dp),
 		) {
 			Icon(painterResource(R.drawable.ic_pause), contentDescription = null, tint = palette.accent, modifier = Modifier.size(14.dp))
-			Text(text = stringResource(R.string.ephyra_paused), style = LocalTextStyle.current.merge(color = palette.accent, fontSize = 14.sp))
+			Text(text = stringResource(R.string.velella_paused), style = LocalTextStyle.current.merge(color = palette.accent, fontSize = 14.sp))
 		}
 		Row(
 			horizontalArrangement = Arrangement.spacedBy(6.dp),
@@ -222,7 +222,7 @@ private fun PausedHeader(item: BaseItemDto, endsAt: String, modifier: Modifier) 
 /** The player's seek bar with the position and the duration under it. */
 @Composable
 private fun PausedProgress(content: DreamContent.VideoPaused, fraction: Float, modifier: Modifier) {
-	val palette = LocalEphyraPalette.current
+	val palette = LocalVelellaPalette.current
 
 	Column(modifier = modifier.fillMaxWidth()) {
 		PausedProgressBar(fraction)
@@ -240,7 +240,7 @@ private fun PausedProgress(content: DreamContent.VideoPaused, fraction: Float, m
 
 @Composable
 private fun PausedProgressBar(fraction: Float) {
-	val palette = LocalEphyraPalette.current
+	val palette = LocalVelellaPalette.current
 	val shape = RoundedCornerShape(2.dp)
 	Box(
 		Modifier

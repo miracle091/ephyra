@@ -18,7 +18,7 @@ private const val EQ_GAIN_HIGH = 0.03f
 private val NIGHTMODE_EQ_GAINS = floatArrayOf(0f, EQ_GAIN_LOW, EQ_GAIN_HIGH, EQ_GAIN_LOW, 0f)
 
 /**
- * Ephyra: audio night mode (a limiter that narrows the loudness range, plus a light mid boost) on one player's audio session,
+ * Velella: audio night mode (a limiter that narrows the loudness range, plus a light mid boost) on one player's audio session,
  * shared by both players. Released with the player, so no effect outlives its playback.
  */
 class AudioNightMode internal constructor(private val createEffect: (audioSessionId: Int) -> AudioEffect) {

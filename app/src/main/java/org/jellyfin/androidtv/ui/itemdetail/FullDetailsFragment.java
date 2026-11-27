@@ -131,8 +131,8 @@ public class FullDetailsFragment extends Fragment implements RecordingIndicatorV
     private RowsSupportFragment mRowsFragment;
     private MutableObjectAdapter<Row> mRowsAdapter;
 
-    MyDetailsOverviewRowPresenter mDorPresenter; // Ephyra: package-private for FullDetailsFragmentHelper
-    MyDetailsOverviewRow mDetailsOverviewRow; // Ephyra: package-private for FullDetailsFragmentHelper
+    MyDetailsOverviewRowPresenter mDorPresenter; // Velella: package-private for FullDetailsFragmentHelper
+    MyDetailsOverviewRow mDetailsOverviewRow; // Velella: package-private for FullDetailsFragmentHelper
     private CustomListRowPresenter mListRowPresenter;
 
     private Handler mLoopHandler = new Handler();
@@ -228,7 +228,7 @@ public class FullDetailsFragment extends Fragment implements RecordingIndicatorV
     public void onResume() {
         super.onResume();
 
-        // Ephyra: the video player disables the app background; turn it back on (plain, no backdrop) when coming back
+        // Velella: the video player disables the app background; turn it back on (plain, no backdrop) when coming back
         backgroundService.getValue().clearBackgrounds();
 
         ClockBehavior clockBehavior = userPreferences.getValue().get(UserPreferences.Companion.getClockBehavior());
@@ -236,7 +236,7 @@ public class FullDetailsFragment extends Fragment implements RecordingIndicatorV
             startClock();
         }
 
-        // Ephyra: details opened for a channel show what was on air then; once that programme is over, load the one on air now
+        // Velella: details opened for a channel show what was on air then; once that programme is over, load the one on air now
         if (mChannelId != null && ProgramOnAirKt.hasProgramEnded(mProgramInfo, LocalDateTime.now())) {
             mProgramInfo = null;
             loadItem(null);
@@ -439,7 +439,7 @@ public class FullDetailsFragment extends Fragment implements RecordingIndicatorV
 
             mDetailsOverviewRow = new MyDetailsOverviewRow(item);
 
-            // Ephyra: the poster, not the title logo, beside the details
+            // Velella: the poster, not the title logo, beside the details
             String primaryImageUrl = imageHelper.getValue().getPrimaryImageUrl(mBaseItem, false, null, Utils.convertDpToPixel(requireContext(), 300));
 
             mDetailsOverviewRow.setSummary(item.getOverview());
@@ -451,7 +451,7 @@ public class FullDetailsFragment extends Fragment implements RecordingIndicatorV
 
                     BaseItemPerson director = BaseItemExtensionsKt.getFirstPerson(item, PersonKind.DIRECTOR);
 
-                    // Ephyra: a column without a value is not added (programmes and recordings have no director); the row hides it
+                    // Velella: a column without a value is not added (programmes and recordings have no director); the row hides it
                     if (item.getType() == BaseItemKind.SERIES) {
                         mDetailsOverviewRow.setInfoItem1(new InfoItem(
                                 getString(R.string.lbl_seasons),
@@ -499,7 +499,7 @@ public class FullDetailsFragment extends Fragment implements RecordingIndicatorV
         if (!getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) return;
 
         mBaseItem = item;
-        backgroundService.getValue().clearBackgrounds(); // Ephyra: plain background behind the details, no backdrop
+        backgroundService.getValue().clearBackgrounds(); // Velella: plain background behind the details, no backdrop
         if (mBaseItem != null) {
             if (mChannelId != null) {
                 mBaseItem = JavaCompat.copyWithParentId(mBaseItem, mChannelId);
@@ -599,7 +599,7 @@ public class FullDetailsFragment extends Fragment implements RecordingIndicatorV
 
                 break;
             case SERIES:
-                // Ephyra: the next up episode is the card beside the buttons, so the Next up row is gone
+                // Velella: the next up episode is the card beside the buttons, so the Next up row is gone
 
                 ItemRowAdapter seasonsAdapter = new ItemRowAdapter(requireContext(), BrowsingUtils.createSeasonsRequest(mBaseItem.getId()), DetailsRowPresentersKt.createFirstRowCardPresenter(), adapter);
                 addItemRow(adapter, seasonsAdapter, 1, getString(R.string.lbl_seasons));
@@ -795,7 +795,7 @@ public class FullDetailsFragment extends Fragment implements RecordingIndicatorV
                 }
             });
             mDetailsOverviewRow.addAction(playButton);
-            // Ephyra: the next up episode as a card beside the buttons
+            // Velella: the next up episode as a card beside the buttons
             if (isSeries) DetailsNextUpLoaderKt.loadNextUpCard(this);
 
             if (isSeries && !isStarted) {
@@ -857,7 +857,7 @@ public class FullDetailsFragment extends Fragment implements RecordingIndicatorV
             });
             mDetailsOverviewRow.addAction(mVersionsButton);
         }
-        // Ephyra: pick audio and subtitles before playback
+        // Velella: pick audio and subtitles before playback
         for (TextUnderButton button : DetailsTrackButtons.create(requireContext(), () -> mBaseItem, buttonSize)) {
             mDetailsOverviewRow.addAction(button);
         }
@@ -984,7 +984,7 @@ public class FullDetailsFragment extends Fragment implements RecordingIndicatorV
             });
             favButton.setActivated(userData.isFavorite());
             mDetailsOverviewRow.addAction(favButton);
-            // Ephyra: a person's page opens on its button like the other details, not on the biography
+            // Velella: a person's page opens on its button like the other details, not on the biography
             if (mBaseItem.getType() == BaseItemKind.PERSON) favButton.post(favButton::requestFocus);
         }
 
@@ -1013,7 +1013,7 @@ public class FullDetailsFragment extends Fragment implements RecordingIndicatorV
             mDetailsOverviewRow.addAction(goToSeriesButton);
         }
 
-        // Ephyra: delete only live TV recordings, never library media; the button shows once the server confirms it is a recording
+        // Velella: delete only live TV recordings, never library media; the button shows once the server confirms it is a recording
         deleteButton = TextUnderButton.create(requireContext(), R.drawable.ic_delete, buttonSize, 0, getString(R.string.lbl_delete), new View.OnClickListener() {
             @Override
             public void onClick(View v) {

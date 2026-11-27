@@ -32,7 +32,7 @@ fun PlaybackInfoOverlay(
 
 	val selectedTracks by playbackManager.state.selectedTracks.collectAsState()
 	val videoTrack = stream.tracks.filterIsInstance<MediaStreamVideoTrack>().firstOrNull()
-	// Ephyra: the track playing, not the source's first one
+	// Velella: the track playing, not the source's first one
 	val audioTrack = playingAudioTrack(stream, selectedTracks.audioIndex)
 
 	Column(

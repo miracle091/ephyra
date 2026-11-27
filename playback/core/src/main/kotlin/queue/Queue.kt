@@ -31,7 +31,7 @@ interface Queue {
 
 	/**
 	 * Add a supplier of queue items to the end of the queue. Will automatically fetch the first item if there is no current entry;
-	 * Ephyra: the item at [startIndex] instead, so a queue can start in the middle and still go back.
+	 * Velella: the item at [startIndex] instead, so a queue can start in the middle and still go back.
 	 */
 	fun addSupplier(supplier: QueueSupplier, startIndex: Int = 0)
 

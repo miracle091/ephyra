@@ -59,7 +59,7 @@ fun SearchTextInput(
 		)
 	) {
 		BasicTextField(
-			// Ephyra: the text field keeps up and down for its cursor, so on a remote focus could never leave it upwards (to the
+			// Velella: the text field keeps up and down for its cursor, so on a remote focus could never leave it upwards (to the
 			// toolbar) and the D-pad seemed dead; up and down move the focus instead
 			modifier = modifier.onPreviewKeyEvent { event ->
 				val direction = when (event.key) {
@@ -85,10 +85,10 @@ fun SearchTextInput(
 				showKeyboardOnFocus = true,
 			),
 			textStyle = LocalTextStyle.current,
-			// Ephyra: the cursor takes the text colour; the field's own colour made it invisible on the filled field
+			// Velella: the cursor takes the text colour; the field's own colour made it invisible on the filled field
 			cursorBrush = SolidColor(color.second),
 			decorationBox = { innerTextField ->
-				// Ephyra: a filled field like the sign-in inputs (surface-2, solid ink when focused, the 12dp input radius), so the
+				// Velella: a filled field like the sign-in inputs (surface-2, solid ink when focused, the 12dp input radius), so the
 				// focused field and its text are visible in every theme
 				Row(
 					verticalAlignment = Alignment.CenterVertically,

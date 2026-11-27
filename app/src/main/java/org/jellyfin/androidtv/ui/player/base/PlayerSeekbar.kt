@@ -23,9 +23,9 @@ fun PlayerSeekbar(
 	modifier: Modifier = Modifier,
 	colors: SeekbarColors = SeekbarDefaults.colors(),
 	playbackManager: PlaybackManager = koinInject<PlaybackManager>(),
-	// Ephyra: the position picked while scrubbing with the arrows, null when not scrubbing (for the trickplay thumbnail)
+	// Velella: the position picked while scrubbing with the arrows, null when not scrubbing (for the trickplay thumbnail)
 	onScrubPositionChange: ((Duration?) -> Unit)? = null,
-	// Ephyra: the video player keeps a smaller knob without the focus, like the legacy one
+	// Velella: the video player keeps a smaller knob without the focus, like the legacy one
 	knobAlwaysVisible: Boolean = false,
 ) {
 	val playState by playbackManager.state.playState.collectAsState()

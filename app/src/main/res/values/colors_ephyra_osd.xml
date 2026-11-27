@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Ephyra: the design system's danger tokens (design/.../EphyraColorTokens.kt, the same in every theme) for the player's XML -->
-<resources>
-    <color name="ephyra_osd_danger">#FF7A7A</color>
-    <color name="ephyra_osd_on_danger">#2A0606</color>
-</resources>

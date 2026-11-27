@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Velella: the design system's dialog card, surface-2 (popupMenuBackground in every Velella theme) with radius-lg -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="?attr/popupMenuBackground" />
+    <corners android:radius="20dp" />
+</shape>

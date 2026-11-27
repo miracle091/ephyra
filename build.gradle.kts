@@ -1,7 +1,7 @@
 plugins {
 	alias(libs.plugins.android.application) apply false
 	alias(libs.plugins.android.library) apply false
-	// Ephyra: baseline profile (:baselineprofile module)
+	// Velella: baseline profile (:baselineprofile module)
 	alias(libs.plugins.android.test) apply false
 	alias(libs.plugins.androidx.baselineprofile) apply false
 	alias(libs.plugins.detekt)
@@ -22,7 +22,7 @@ java {
 
 detekt {
 	buildUponDefaultConfig = true
-	// Ephyra: fail the build on any issue (maxIssues: 0 in config/detekt.yaml); upstream only reported them to code scanning
+	// Velella: fail the build on any issue (maxIssues: 0 in config/detekt.yaml); upstream only reported them to code scanning
 	ignoreFailures = false
 	config.setFrom(files("$rootDir/config/detekt.yaml"))
 	basePath = rootDir.absolutePath

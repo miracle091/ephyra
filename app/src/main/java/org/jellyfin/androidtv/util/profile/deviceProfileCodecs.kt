@@ -159,7 +159,7 @@ private fun DeviceProfileBuilder.addMaxResolutionProfiles(mediaTest: MediaCodecC
 	}
 }
 
-// Ephyra: rotated video. MediaCodecVideoRenderer hands the rotation to the decoder (MediaFormat.KEY_ROTATION), which needs the
+// Velella: rotated video. MediaCodecVideoRenderer hands the rotation to the decoder (MediaFormat.KEY_ROTATION), which needs the
 // extractor to read it. The MP4 family extractor does (display matrix in tkhd). The Matroska extractor reads ProjectionPoseRoll, but
 // whether its sign matches what phones and ffmpeg write is unverified, and the other containers carry no rotation Media3 understands.
 // For those the server handles any rotation (remux or transcode). A missing rotation counts as 0 (isRequired = false).
@@ -185,7 +185,7 @@ private fun DeviceProfileBuilder.addAudioProfiles(downMixAudio: Boolean) {
 		}
 	}
 
-	// Ephyra: Media3's MPEG-TS extractor has no reader for TrueHD (Blu-ray stream type 0x83), so the track would be missing:
+	// Velella: Media3's MPEG-TS extractor has no reader for TrueHD (Blu-ray stream type 0x83), so the track would be missing:
 	// a condition no stream meets makes the server remux or convert TrueHD in TS
 	codecProfile {
 		type = CodecType.VIDEO_AUDIO

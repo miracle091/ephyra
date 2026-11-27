@@ -2,7 +2,7 @@ package org.jellyfin.androidtv.ui.playback
 
 import org.jellyfin.sdk.model.api.SubtitleDeliveryMethod
 
-/** Ephyra: small rules the legacy player applies to the stream the server offers. */
+/** Velella: small rules the legacy player applies to the stream the server offers. */
 object StreamRules {
 	/**
 	 * The subtitle actually on screen: one the server burns into the video ([SubtitleDeliveryMethod.ENCODE] on [serverIndex])

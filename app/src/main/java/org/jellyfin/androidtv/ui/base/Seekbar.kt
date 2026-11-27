@@ -60,10 +60,10 @@ object SeekbarDefaults {
 
 private const val SEEK_STEP_DIVISOR = 100
 
-/** Ephyra: how long after the last arrow press a seek starts, so scrubbing restarts a transcode once (also the video quick seek). */
+/** Velella: how long after the last arrow press a seek starts, so scrubbing restarts a transcode once (also the video quick seek). */
 val SEEK_COMMIT_DELAY = 600.milliseconds
 
-// Ephyra: how long the picked position stays drawn after its seek, until the player reports it
+// Velella: how long the picked position stays drawn after its seek, until the player reports it
 private val SEEK_SETTLE_DELAY = 300.milliseconds
 
 private val CommitKeys = setOf(Key.DirectionCenter, Key.Enter, Key.NumPadEnter)
@@ -90,7 +90,7 @@ data class SeekbarCallbacks(
 )
 
 /**
- * Ephyra: how a [Seekbar] looks: its [colors], and whether it keeps a smaller knob without the focus ([knobAlwaysVisible], like
+ * Velella: how a [Seekbar] looks: its [colors], and whether it keeps a smaller knob without the focus ([knobAlwaysVisible], like
  * the legacy Leanback seek bar) or shows the knob only with the focus.
  */
 @Immutable
@@ -159,7 +159,7 @@ private fun SeekbarBar(
 	val scrub = remember { SeekbarScrub(coroutineScope) { currentCallbacks } }
 	val visibleProgress = scrub.progressOverride ?: state.progress
 	val knobAlpha by animateFloatAsState(if (focused || style.knobAlwaysVisible) 1f else 0f)
-	// Ephyra: the knob's radius in bar heights: half the focused size without the focus (twice the Leanback knob, readable from
+	// Velella: the knob's radius in bar heights: half the focused size without the focus (twice the Leanback knob, readable from
 	// across the room), large with it
 	val knobScale by animateFloatAsState(if (focused || !style.knobAlwaysVisible) KNOB_SCALE_FOCUSED else KNOB_SCALE_UNFOCUSED)
 	DisposableEffect(scrub) { onDispose { scrub.dispose() } }
@@ -178,7 +178,7 @@ private const val KNOB_SCALE_FOCUSED = 2f
 private const val KNOB_SCALE_UNFOCUSED = 1f
 
 /**
- * Ephyra: scrubbing a [Seekbar] with the arrows. Each press moves the drawn position ([progressOverride], reported with onScrub);
+ * Velella: scrubbing a [Seekbar] with the arrows. Each press moves the drawn position ([progressOverride], reported with onScrub);
  * one seek follows [SEEK_COMMIT_DELAY] after the last press, or at once with centre, then the picked position stays drawn a
  * moment until the player reports it. If the bar leaves the screen first, the seek still happens and scrubbing ends.
  */

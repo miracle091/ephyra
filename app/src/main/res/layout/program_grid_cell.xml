@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Ephyra: a programme of the Live TV guide, name over the tags; the programme on air gets a red dot before its name and an accent bar on the bottom edge. The cell
+<!-- Velella: a programme of the Live TV guide, name over the tags; the programme on air gets a red dot before its name and an accent bar on the bottom edge. The cell
      background and its focus state come from ProgramGridCell -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
@@ -54,11 +54,11 @@
         android:id="@+id/nowBar"
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/ephyra_card_progress_height"
+        android:layout_height="@dimen/velella_card_progress_height"
         android:layout_alignParentBottom="true"
         android:layout_marginHorizontal="2dp"
         android:layout_marginBottom="2dp"
         android:max="1000"
-        android:progressDrawable="@drawable/ephyra_card_progress"
+        android:progressDrawable="@drawable/velella_card_progress"
         android:visibility="gone" />
 </RelativeLayout>

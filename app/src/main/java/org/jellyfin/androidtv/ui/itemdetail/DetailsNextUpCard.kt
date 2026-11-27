@@ -32,9 +32,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import org.jellyfin.androidtv.R
-import org.jellyfin.androidtv.ui.base.EphyraTheme
+import org.jellyfin.androidtv.ui.base.VelellaTheme
 import org.jellyfin.androidtv.ui.base.JellyfinTheme
-import org.jellyfin.androidtv.ui.base.LocalEphyraPalette
+import org.jellyfin.androidtv.ui.base.LocalVelellaPalette
 import org.jellyfin.androidtv.ui.base.LocalTextStyle
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.composable.item.ArtToneCover
@@ -56,7 +56,7 @@ private val CardWidth = 160.dp
 private val CardHeight = 90.dp // 16:9
 
 /**
- * Ephyra: the "Next up" card of a series' details, a 16:9 card beside the action buttons with the next episode's picture, a
+ * Velella: the "Next up" card of a series' details, a 16:9 card beside the action buttons with the next episode's picture, a
  * "Next: S1:E3 · Title" caption and the progress bar of a partly watched episode. It is a focusable view like the covers, with
  * the same accent ring and zoom; a click is handled by the view's click listener. Hidden while [episode] is null.
  */
@@ -93,21 +93,21 @@ class DetailsNextUpCard @JvmOverloads constructor(
 	override fun Content() {
 		val item = _episode ?: return
 
-		EphyraTheme { NextUpCard(item, focused) }
+		VelellaTheme { NextUpCard(item, focused) }
 	}
 }
 
 @Composable
 private fun NextUpCard(item: BaseItemDto, focused: Boolean) {
 	val api = koinInject<ApiClient>()
-	val palette = LocalEphyraPalette.current
+	val palette = LocalVelellaPalette.current
 	val context = LocalContext.current
 	val shape = JellyfinTheme.shapes.medium
 	val scale by animateFloatAsState(if (focused) CARD_FOCUS_SCALE else 1f, label = "NextUpCardFocusScale")
 	val maxWidth = with(LocalDensity.current) { CardWidth.roundToPx() * 2 }
 
 	val title = DetailsNextUp.title(item.getSeasonEpisodeName(context), item.name)
-	val caption = stringResource(R.string.ephyra_next_up_card, title)
+	val caption = stringResource(R.string.velella_next_up_card, title)
 	val image = item.itemImages[ImageType.PRIMARY] ?: item.itemImages[ImageType.THUMB]
 	val progress = DetailsNextUp.progress(item)
 

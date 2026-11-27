@@ -139,7 +139,7 @@ fun FullDetailsFragment.getLiveTvChannel(
 	}
 }
 
-/** Ephyra: shows the delete button only for a live TV recording the server lets this user delete (see [canDeleteFromTv]). */
+/** Velella: shows the delete button only for a live TV recording the server lets this user delete (see [canDeleteFromTv]). */
 fun FullDetailsFragment.showDeleteButtonForRecording() {
 	val item = mBaseItem
 	if (item.canDelete != true) return

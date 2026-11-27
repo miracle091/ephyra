@@ -23,7 +23,7 @@ import org.jellyfin.sdk.model.extensions.inWholeTicks
 class JellyfinMediaStreamResolver(
 	private val api: ApiClient,
 	private val deviceProfileBuilder: () -> DeviceProfile,
-	// Ephyra: read for each request, so a changed setting applies from the next stream
+	// Velella: read for each request, so a changed setting applies from the next stream
 	private val alwaysBurnInSubtitles: () -> Boolean = { false },
 ) : MediaStreamResolver {
 	companion object {
@@ -35,7 +35,7 @@ class JellyfinMediaStreamResolver(
 		if (baseItem == null || !supportedMediaTypes.contains(baseItem.mediaType)) return null
 
 		var mediaInfo = getPlaybackInfo(baseItem, queueEntry, queueEntry.mediaSourceId)
-		// Ephyra: Media3 can't read Blu-ray transport streams, and the path is only known from the answer: ask again without direct play
+		// Velella: Media3 can't read Blu-ray transport streams, and the path is only known from the answer: ask again without direct play
 		if (mediaInfo.mediaSource.supportsDirectPlay && isBluRayTransportStream(mediaInfo.mediaSource.path)) {
 			mediaInfo = getPlaybackInfo(baseItem, queueEntry, mediaInfo.mediaSource.id, enableDirectPlay = false)
 		}
@@ -99,13 +99,13 @@ class JellyfinMediaStreamResolver(
 			itemId = item.id,
 			data = PlaybackInfoDto(
 				mediaSourceId = mediaSourceId,
-				// Ephyra: where playback starts (resume, or a new stream for another track), so a transcode starts there
+				// Velella: where playback starts (resume, or a new stream for another track), so a transcode starts there
 				startTimeTicks = queueEntry.startPosition?.inWholeTicks,
-				// Ephyra: the requested audio track; without one the server picks from the user's language preferences
+				// Velella: the requested audio track; without one the server picks from the user's language preferences
 				audioStreamIndex = queueEntry.audioStreamIndex,
-				// Ephyra: the requested subtitle (-1 for none), so the server picks its delivery (file, manifest or burnt in)
+				// Velella: the requested subtitle (-1 for none), so the server picks its delivery (file, manifest or burnt in)
 				subtitleStreamIndex = queueEntry.subtitleStreamIndex,
-				// Ephyra: the user's "burn in subtitles when transcoding" setting, as in the legacy player
+				// Velella: the user's "burn in subtitles when transcoding" setting, as in the legacy player
 				alwaysBurnInSubtitleWhenTranscoding = alwaysBurnInSubtitles(),
 				deviceProfile = profile,
 				enableDirectPlay = enableDirectPlay,
@@ -144,7 +144,7 @@ class JellyfinMediaStreamResolver(
 	): PlayableMediaStream {
 		val defaultSubtitleStreamIndex = mediaSource.defaultSubtitleStreamIndex?.takeIf { it >= 0 }
 		val tracks = getTracks { path -> api.createUrl(path, ignorePathParameters = true) }
-		// Ephyra: with "burn in when transcoding" the server burns the subtitle in but still lists it as a file: don't load it again
+		// Velella: with "burn in when transcoding" the server burns the subtitle in but still lists it as a file: don't load it again
 		val burntIn = conversionMethod == MediaConversionMethod.Transcode && alwaysBurnInSubtitles()
 		return PlayableMediaStream(
 			identifier = playSessionId,

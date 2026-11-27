@@ -8,7 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import org.jellyfin.androidtv.BuildConfig
-import org.jellyfin.androidtv.EphyraInfo
+import org.jellyfin.androidtv.VelellaInfo
 import org.jellyfin.androidtv.R
 import org.jellyfin.androidtv.ui.base.Icon
 import org.jellyfin.androidtv.ui.base.Text
@@ -40,14 +40,14 @@ fun SettingsAboutScreen(launchedFromLogin: Boolean = false) {
 
 		item {
 			CopyInfoButton(
-				heading = stringResource(R.string.ephyra_app_version),
-				caption = "${EphyraInfo.VERSION_PREFIX} ${BuildConfig.VERSION_NAME} ${BuildConfig.BUILD_TYPE}",
+				heading = stringResource(R.string.velella_app_version),
+				caption = "${VelellaInfo.VERSION_PREFIX} ${BuildConfig.VERSION_NAME} ${BuildConfig.BUILD_TYPE}",
 				icon = R.drawable.ic_jellyfin,
 				focusKey = "version",
 			)
 		}
 
-		// Ephyra: debug builds have their own application id, so a release could not update them
+		// Velella: debug builds have their own application id, so a release could not update them
 		if (!BuildConfig.DEBUG) item { AppUpdateListButton() }
 		if (!BuildConfig.DEBUG) item { DailyUpdateCheckListButton() }
 

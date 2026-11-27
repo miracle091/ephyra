@@ -35,7 +35,7 @@ fun isPassthroughAudioAvailable(context: Context, mimetype: String): Boolean {
 }
 
 /**
- * Ephyra: "can pass through" and "can decode" are different questions. A device whose HDMI sink refuses an AC3/E-AC3/DTS/TrueHD
+ * Velella: "can pass through" and "can decode" are different questions. A device whose HDMI sink refuses an AC3/E-AC3/DTS/TrueHD
  * bitstream can still play it when the platform has a hardware or vendor MediaCodec decoder for the format (the player then outputs
  * PCM). Software-only platform decoders and the bundled FFmpeg decoder do not count: those formats are left to the server to transcode.
  */

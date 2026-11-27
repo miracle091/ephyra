@@ -6,7 +6,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import org.jellyfin.androidtv.R
-import org.jellyfin.androidtv.preference.EphyraPreferences
+import org.jellyfin.androidtv.preference.VelellaPreferences
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.base.list.ListButton
 import org.jellyfin.androidtv.ui.base.list.ListItemSlots
@@ -33,12 +33,12 @@ fun SettingsPlaybackMediaSegmentsScreen() {
 		}
 
 		item {
-			// Ephyra: how long the skip button stays on screen
-			val ephyraPreferences = koinInject<EphyraPreferences>()
-			val skipAutoHideSeconds by rememberPreference(ephyraPreferences, EphyraPreferences.skipAutoHideSeconds)
+			// Velella: how long the skip button stays on screen
+			val velellaPreferences = koinInject<VelellaPreferences>()
+			val skipAutoHideSeconds by rememberPreference(velellaPreferences, VelellaPreferences.skipAutoHideSeconds)
 
 			ListButton(
-				headingContent = { Text(stringResource(R.string.ephyra_pref_skip_auto_hide)) },
+				headingContent = { Text(stringResource(R.string.velella_pref_skip_auto_hide)) },
 				slots = ListItemSlots(
 					captionContent = { Text(skipAutoHideLabel(skipAutoHideSeconds)) },
 				),

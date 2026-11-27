@@ -55,9 +55,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jellyfin.androidtv.R
 import org.jellyfin.androidtv.data.repository.ItemMutationRepository
-import org.jellyfin.androidtv.preference.EphyraPreferences
+import org.jellyfin.androidtv.preference.VelellaPreferences
 import org.jellyfin.androidtv.ui.base.Icon
-import org.jellyfin.androidtv.ui.base.LocalEphyraPalette
+import org.jellyfin.androidtv.ui.base.LocalVelellaPalette
 import org.jellyfin.androidtv.ui.base.LocalTextStyle
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.base.button.IconButton
@@ -114,14 +114,14 @@ private val BackdropFadeVertical = Brush.verticalGradient(
 )
 
 /**
- * Ephyra: the spotlight at the top of the home screen (the `DetailHero` "feature" of the design in guide 5.1e): recent films and
+ * Velella: the spotlight at the top of the home screen (the `DetailHero` "feature" of the design in guide 5.1e): recent films and
  * series not watched yet, one at a time, with Play, Details and Favorite. It shows while the first home row is selected and
  * stops rotating while it has the focus.
  */
 @Composable
 fun HomeSpotlight(rowsFragment: HomeRowsFragment?, modifier: Modifier = Modifier) {
-	val preferences = koinInject<EphyraPreferences>()
-	if (!preferences[EphyraPreferences.homeSpotlight]) return
+	val preferences = koinInject<VelellaPreferences>()
+	if (!preferences[VelellaPreferences.homeSpotlight]) return
 
 	val api = koinInject<ApiClient>()
 	val items by produceState(emptyList<BaseItemDto>(), api) { value = loadSpotlightItems(api) }
@@ -153,7 +153,7 @@ fun HomeSpotlight(rowsFragment: HomeRowsFragment?, modifier: Modifier = Modifier
 				.fillMaxWidth(BACKDROP_WIDTH)
 				.fillMaxHeight(),
 		) { shown ->
-			// Ephyra: the pan alternates its side from title to title and each title's pan goes on through the crossfade
+			// Velella: the pan alternates its side from title to title and each title's pan goes on through the crossfade
 			SpotlightBackdrop(shown, api, BackdropPanSpec.direction(items.indexOfFirst { it.id == shown.id }))
 		}
 
@@ -229,9 +229,9 @@ private fun SpotlightTexts(item: BaseItemDto) {
 	val resources = LocalResources.current
 
 	Text(
-		text = spotlightOverline(stringResource(R.string.ephyra_spotlight), item).uppercase(),
+		text = spotlightOverline(stringResource(R.string.velella_spotlight), item).uppercase(),
 		style = LocalTextStyle.current.merge(
-			color = LocalEphyraPalette.current.accent,
+			color = LocalVelellaPalette.current.accent,
 			fontSize = 11.sp,
 			fontWeight = FontWeight.Bold,
 			letterSpacing = 1.sp,
@@ -240,7 +240,7 @@ private fun SpotlightTexts(item: BaseItemDto) {
 	Text(
 		text = item.name.orEmpty(),
 		style = LocalTextStyle.current.merge(
-			color = LocalEphyraPalette.current.ink,
+			color = LocalVelellaPalette.current.ink,
 			fontSize = 28.sp,
 			fontWeight = FontWeight.Bold,
 			lineHeight = 34.sp,
@@ -248,11 +248,11 @@ private fun SpotlightTexts(item: BaseItemDto) {
 		maxLines = 1,
 		overflow = TextOverflow.Ellipsis,
 	)
-	// Ephyra: the tagline, one line, when the title has one
+	// Velella: the tagline, one line, when the title has one
 	spotlightTagline(item)?.let { tagline ->
 		Text(
 			text = tagline,
-			style = LocalTextStyle.current.merge(color = LocalEphyraPalette.current.inkMuted, fontSize = 14.sp),
+			style = LocalTextStyle.current.merge(color = LocalVelellaPalette.current.inkMuted, fontSize = 14.sp),
 			maxLines = 1,
 			overflow = TextOverflow.Ellipsis,
 		)
@@ -303,7 +303,7 @@ private fun SpotlightButtons(item: BaseItemDto, playFocusRequester: FocusRequest
 		IconButton(onClick = { navigationRepository.navigate(Destinations.itemDetails(item.id)) }) {
 			Icon(
 				painterResource(R.drawable.ic_info),
-				contentDescription = stringResource(R.string.ephyra_spotlight_details),
+				contentDescription = stringResource(R.string.velella_spotlight_details),
 				modifier = Modifier.size(20.dp),
 			)
 		}
@@ -323,7 +323,7 @@ private fun SpotlightButtons(item: BaseItemDto, playFocusRequester: FocusRequest
 				contentDescription = stringResource(R.string.lbl_favorite),
 				modifier = Modifier.size(20.dp),
 				// A favorite shows in the theme's accent instead of red
-				tint = if (favorite) LocalEphyraPalette.current.accent else LocalTextStyle.current.color,
+				tint = if (favorite) LocalVelellaPalette.current.accent else LocalTextStyle.current.color,
 			)
 		}
 	}
@@ -334,7 +334,7 @@ private fun SpotlightMetaText(text: String) {
 	Text(
 		text = text,
 		style = LocalTextStyle.current.merge(
-			color = LocalEphyraPalette.current.inkMuted,
+			color = LocalVelellaPalette.current.inkMuted,
 			fontSize = 14.sp,
 			fontWeight = FontWeight.Medium,
 		),

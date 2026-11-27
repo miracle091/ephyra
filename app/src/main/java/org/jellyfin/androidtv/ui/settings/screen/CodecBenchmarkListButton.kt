@@ -15,16 +15,16 @@ import org.jellyfin.androidtv.ui.navigation.focus.focusKey
 /** The benchmark activity exists in debug builds only (app/src/debug), so it is started by name. */
 private const val CODEC_BENCHMARK_ACTIVITY = "org.jellyfin.androidtv.benchmark.CodecBenchmarkActivity"
 
-/** Ephyra: opens the codec benchmark (guide 7.1); shown in debug builds only. */
+/** Velella: opens the codec benchmark (guide 7.1); shown in debug builds only. */
 @Composable
 fun CodecBenchmarkListButton() {
 	val context = LocalContext.current
 	ListButton(
-		headingContent = { Text(stringResource(R.string.ephyra_benchmark_title)) },
+		headingContent = { Text(stringResource(R.string.velella_benchmark_title)) },
 		slots = ListItemSlots(
-			captionContent = { Text(stringResource(R.string.ephyra_benchmark_description)) },
+			captionContent = { Text(stringResource(R.string.velella_benchmark_description)) },
 		),
 		onClick = { context.startActivity(Intent().setComponent(ComponentName(context, CODEC_BENCHMARK_ACTIVITY))) },
-		modifier = Modifier.focusKey("ephyra_codec_benchmark"),
+		modifier = Modifier.focusKey("velella_codec_benchmark"),
 	)
 }

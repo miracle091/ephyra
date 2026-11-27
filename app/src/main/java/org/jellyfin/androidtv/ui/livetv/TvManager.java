@@ -113,7 +113,7 @@ public class TvManager {
         int ndx = 0;
         if (allChannels != null) {
             channelIds = new UUID[allChannels.size()];
-            // Ephyra: fill the ids even without a last channel (the guide asks programmes for them), and return the 0-based index
+            // Velella: fill the ids even without a last channel (the guide asks programmes for them), and return the 0-based index
             UUID last = getLastLiveTvChannel();
             for (int i = 0; i < allChannels.size(); i++) {
                 UUID id = allChannels.get(i).getId();
@@ -196,7 +196,7 @@ public class TvManager {
                 .append(" @ ")
                 .append(DateTimeExtensionsKt.getTimeFormatter(context).format(local))
                 .append(" (")
-                // Ephyra: local is wall-clock time, so it takes the device zone (UTC put it an hour off in Italy)
+                // Velella: local is wall-clock time, so it takes the device zone (UTC put it an hour off in Italy)
                 .append(DateUtils.getRelativeTimeSpanString(local.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli(), Instant.now().toEpochMilli(), 0))
                 .append(")")
         );

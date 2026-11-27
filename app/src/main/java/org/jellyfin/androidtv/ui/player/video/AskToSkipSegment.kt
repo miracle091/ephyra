@@ -7,7 +7,7 @@ import org.jellyfin.sdk.model.api.MediaSegmentDto
 import kotlin.time.Duration
 
 /**
- * Ephyra: where the skip button jumps to at [position]: the end of the segment playing there that the user set to "ask to skip"
+ * Velella: where the skip button jumps to at [position]: the end of the segment playing there that the user set to "ask to skip"
  * ([actionOf], the segment settings), or null outside such a segment.
  */
 fun askToSkipTarget(
