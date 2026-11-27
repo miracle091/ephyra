@@ -85,6 +85,7 @@ private val ICON_SIZE = 24.dp
 private fun VideoSeekbar(
 	playbackManager: PlaybackManager,
 	focusRequester: FocusRequester,
+	downFocusRequester: FocusRequester,
 ) = Box(
 	contentAlignment = Alignment.Center,
 	modifier = Modifier
@@ -113,6 +114,12 @@ private fun VideoSeekbar(
 			.fillMaxWidth()
 			.height(barHeight)
 			.onFocusChanged { focused = it.isFocused }
+			// Velella: down from the seek bar goes to play/pause; the 2D focus search picked a button by distance (Next)
+			.onPreviewKeyEvent { event ->
+				val down = event.type == KeyEventType.KeyDown && event.key == Key.DirectionDown
+				if (down) downFocusRequester.requestFocus()
+				down
+			}
 			.focusRequester(focusRequester)
 	)
 
@@ -143,6 +150,7 @@ fun VideoPlayerControls(
 ) {
 	val playState by playbackManager.state.playState.collectAsState()
 	val seekbarFocus = remember { FocusRequester() }
+	val playPauseFocus = remember { FocusRequester() }
 
 	// Velella: as in the legacy player, the seek bar comes first in a 24dp row, the times and the end time 8dp under it, then the
 	// buttons 16dp lower, their centres 56dp apart (the legacy 48dp buttons with 8dp gaps; these are 44dp, so 12dp gaps and 2dp
@@ -151,7 +159,7 @@ fun VideoPlayerControls(
 		verticalArrangement = Arrangement.Bottom,
 		modifier = modifier,
 	) {
-		VideoSeekbar(playbackManager, seekbarFocus)
+		VideoSeekbar(playbackManager, seekbarFocus, playPauseFocus)
 
 		PositionRow(playbackManager, Modifier.padding(top = 8.dp))
 
@@ -171,7 +179,7 @@ fun VideoPlayerControls(
 		) {
 			PreviousEntryButton(playbackManager)
 			RewindButton(playbackManager)
-			PlayPauseButton(playbackManager, playState)
+			PlayPauseButton(playbackManager, playState, playPauseFocus)
 			FastForwardButton(playbackManager)
 			NextEntryButton(playbackManager)
 
@@ -187,8 +195,8 @@ fun VideoPlayerControls(
 private fun PlayPauseButton(
 	playbackManager: PlaybackManager,
 	playState: PlayState,
+	focusRequester: FocusRequester,
 ) {
-	val focusRequester = remember { FocusRequester() }
 	IconButton(
 		onClick = {
 			when (playState) {
