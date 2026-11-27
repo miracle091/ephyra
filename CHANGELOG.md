@@ -102,6 +102,10 @@ section 2(a) of the GPL-2.0.
 - The new player shows the legacy player's Next up and Still watching screens over the last picture when an episode
   ends, with the same settings, countdowns and watched-episode count; Cancel closes the player. It also closes by
   itself when the queue ends, instead of staying on a black screen.
+- The new player asks the server for live TV channels as the legacy one does: the request opens the channel's
+  stream, waits up to 2 minutes while the server tunes it and follows the "direct play live TV" setting. Live
+  channels, `.strm` files and other remote sources are no longer refused (a remote HTTP source plays from its own
+  address); sources Media3 can't read directly go through the server.
 - The new player tells the server which version (media source) and audio track it plays, and knows the subtitle
   tracks of the stream.
 - The new player loads subtitles the server hands out as separate files and shows the subtitle the server picks

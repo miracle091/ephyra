@@ -18,16 +18,27 @@ import org.jellyfin.sdk.api.client.extensions.audioApi
 import org.jellyfin.sdk.api.client.extensions.mediaInfoApi
 import org.jellyfin.sdk.model.api.BaseItemDto
 import org.jellyfin.sdk.model.api.DeviceProfile
-import org.jellyfin.sdk.model.api.MediaProtocol
 import org.jellyfin.sdk.model.api.MediaType
 import org.jellyfin.sdk.model.api.PlaybackInfoDto
 import org.jellyfin.sdk.model.extensions.inWholeTicks
 
+/**
+ * Velella: the user's settings and client for the PlaybackInfo requests, read for each request so a changed setting applies from
+ * the next stream.
+ */
+class StreamRequestOptions(
+	/** The "burn in subtitles when transcoding" setting. */
+	val alwaysBurnInSubtitles: () -> Boolean = { false },
+	/** The client for PlaybackInfo requests, which may wait longer than the default while the server tunes a channel; null for the app's. */
+	val playbackInfoApi: (() -> ApiClient)? = null,
+	/** The "direct play live TV" setting; off sends channels through the server's transcode. */
+	val liveTvDirectPlay: () -> Boolean = { true },
+)
+
 class JellyfinMediaStreamResolver(
 	private val api: ApiClient,
 	private val deviceProfileBuilder: () -> DeviceProfile,
-	// Velella: read for each request, so a changed setting applies from the next stream
-	private val alwaysBurnInSubtitles: () -> Boolean = { false },
+	private val options: StreamRequestOptions = StreamRequestOptions(),
 ) : MediaStreamResolver {
 	companion object {
 		private val supportedMediaTypes = arrayOf(MediaType.VIDEO, MediaType.AUDIO)
@@ -37,20 +48,14 @@ class JellyfinMediaStreamResolver(
 		val baseItem = queueEntry.baseItem
 		if (baseItem == null || !supportedMediaTypes.contains(baseItem.mediaType)) return null
 
-		// Velella: after playback errors the entry asks for a heavier conversion (retry chain in MediaStreamService)
-		val enableDirectPlay = queueEntry.streamFallback.allowsDirectPlay
-		var mediaInfo = getPlaybackInfo(baseItem, queueEntry, queueEntry.mediaSourceId, enableDirectPlay)
-		// Velella: Media3 can't read Blu-ray transport streams, and the path is only known from the answer: ask again without direct play
-		if (mediaInfo.mediaSource.supportsDirectPlay && isBluRayTransportStream(mediaInfo.mediaSource.path)) {
-			mediaInfo = getPlaybackInfo(baseItem, queueEntry, mediaInfo.mediaSource.id, enableDirectPlay = false)
-		}
-
+		val mediaInfo = requestMediaInfo(baseItem, queueEntry)
 		return when {
 			// Direct play video
-			mediaInfo.mediaSource.supportsDirectPlay && baseItem.mediaType == MediaType.VIDEO -> mediaInfo.toStream(
+			mediaInfo.mediaSource.canDirectPlay && baseItem.mediaType == MediaType.VIDEO -> mediaInfo.toStream(
 				queueEntry = queueEntry,
 				conversionMethod = MediaConversionMethod.None,
-				url = api.videoApi.getVideoStreamUrl(
+				// Velella: a remote HTTP source plays from where it is, as in the legacy player
+				url = mediaInfo.mediaSource.remoteDirectUrl ?: api.videoApi.getVideoStreamUrl(
 					itemId = baseItem.id,
 					container = mediaInfo.mediaSource.container,
 					mediaSourceId = mediaInfo.mediaSource.id,
@@ -61,7 +66,7 @@ class JellyfinMediaStreamResolver(
 			)
 
 			// Direct play audio
-			mediaInfo.mediaSource.supportsDirectPlay && baseItem.mediaType == MediaType.AUDIO -> mediaInfo.toStream(
+			mediaInfo.mediaSource.canDirectPlay && baseItem.mediaType == MediaType.AUDIO -> mediaInfo.toStream(
 				queueEntry = queueEntry,
 				conversionMethod = MediaConversionMethod.None,
 				url = api.audioApi.getAudioStreamUrl(
@@ -93,6 +98,19 @@ class JellyfinMediaStreamResolver(
 		}
 	}
 
+	private suspend fun requestMediaInfo(baseItem: BaseItemDto, queueEntry: QueueEntry): MediaInfo {
+		// Velella: after playback errors the entry asks for a heavier conversion (retry chain in MediaStreamService)
+		val isLive = baseItem.isLiveTvChannel
+		val enableDirectPlay = queueEntry.streamFallback.allowsDirectPlay && (!isLive || options.liveTvDirectPlay())
+		val mediaSourceId = if (isLive) null else queueEntry.mediaSourceId
+		val mediaInfo = getPlaybackInfo(baseItem, queueEntry, mediaSourceId, enableDirectPlay)
+		// Velella: Media3 can't read Blu-ray transport streams, and the path is only known from the answer: ask again without direct play
+		if (mediaInfo.mediaSource.canDirectPlay && isBluRayTransportStream(mediaInfo.mediaSource.path)) {
+			return getPlaybackInfo(baseItem, queueEntry, mediaInfo.mediaSource.id, enableDirectPlay = false)
+		}
+		return mediaInfo
+	}
+
 	private suspend fun getPlaybackInfo(
 		item: BaseItemDto,
 		queueEntry: QueueEntry,
@@ -100,25 +118,27 @@ class JellyfinMediaStreamResolver(
 		enableDirectPlay: Boolean = true,
 	): MediaInfo {
 		val profile = deviceProfileBuilder()
-		val response by api.mediaInfoApi.getPostedPlaybackInfo(
+		val isLive = item.isLiveTvChannel
+		val response by (options.playbackInfoApi?.invoke() ?: api).mediaInfoApi.getPostedPlaybackInfo(
 			itemId = item.id,
 			data = PlaybackInfoDto(
 				mediaSourceId = mediaSourceId,
-				// Velella: where playback starts (resume, or a new stream for another track), so a transcode starts there
-				startTimeTicks = queueEntry.startPosition?.inWholeTicks,
+				// Velella: where playback starts (resume, or a new stream for another track), so a transcode starts there; live starts now
+				startTimeTicks = if (isLive) null else queueEntry.startPosition?.inWholeTicks,
 				// Velella: the requested audio track; without one the server picks from the user's language preferences
 				audioStreamIndex = queueEntry.audioStreamIndex,
 				// Velella: the requested subtitle (-1 for none), so the server picks its delivery (file, manifest or burnt in)
 				subtitleStreamIndex = queueEntry.subtitleStreamIndex,
 				// Velella: the user's "burn in subtitles when transcoding" setting, as in the legacy player
-				alwaysBurnInSubtitleWhenTranscoding = alwaysBurnInSubtitles(),
+				alwaysBurnInSubtitleWhenTranscoding = options.alwaysBurnInSubtitles(),
 				deviceProfile = profile,
 				enableDirectPlay = enableDirectPlay,
 				enableDirectStream = queueEntry.streamFallback.allowsDirectStream,
 				enableTranscoding = true,
 				allowVideoStreamCopy = true,
 				allowAudioStreamCopy = true,
-				autoOpenLiveStream = false,
+				// Velella: a live channel's stream is opened by this request, as in the legacy player
+				autoOpenLiveStream = isLive,
 			)
 		)
 
@@ -126,11 +146,7 @@ class JellyfinMediaStreamResolver(
 			error("Failed to get media info for item ${item.id} source ${mediaSourceId}: ${response.errorCode}")
 		}
 
-		val mediaSource = response.mediaSources
-			// Filter out invalid streams (like strm files)
-			.filter { it.protocol == MediaProtocol.FILE && !it.isRemote }
-			// Select first media source
-			.firstOrNull { mediaSourceId == null || it.id == mediaSourceId }
+		val mediaSource = selectMediaSource(response.mediaSources, mediaSourceId)
 
 		requireNotNull(mediaSource) {
 			"Failed to get media info for item ${item.id} source ${mediaSourceId}: media source missing in response"
@@ -150,7 +166,7 @@ class JellyfinMediaStreamResolver(
 		val defaultSubtitleStreamIndex = mediaSource.defaultSubtitleStreamIndex?.takeIf { it >= 0 }
 		val tracks = getTracks { path -> api.createUrl(path, ignorePathParameters = true) }
 		// Velella: with "burn in when transcoding" the server burns the subtitle in but still lists it as a file: don't load it again
-		val burntIn = conversionMethod == MediaConversionMethod.Transcode && alwaysBurnInSubtitles()
+		val burntIn = conversionMethod == MediaConversionMethod.Transcode && options.alwaysBurnInSubtitles()
 		return PlayableMediaStream(
 			identifier = playSessionId,
 			conversionMethod = conversionMethod,

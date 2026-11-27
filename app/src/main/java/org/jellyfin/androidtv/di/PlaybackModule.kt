@@ -13,22 +13,27 @@ import org.jellyfin.androidtv.preference.UserPreferences
 import org.jellyfin.androidtv.preference.UserSettingPreferences
 import org.jellyfin.androidtv.ui.browsing.MainActivity
 import org.jellyfin.androidtv.ui.playback.MediaManager
+import org.jellyfin.androidtv.ui.playback.PLAYBACK_INFO_TIMEOUT
 import org.jellyfin.androidtv.ui.playback.PlaybackLauncher
 import org.jellyfin.androidtv.ui.playback.TrackPreselection
 import org.jellyfin.androidtv.ui.playback.VideoQueueManager
 import org.jellyfin.androidtv.ui.playback.rewrite.RewriteMediaManager
 import org.jellyfin.androidtv.ui.playback.segment.MediaSegmentAction
 import org.jellyfin.androidtv.ui.playback.segment.MediaSegmentRepository
+import org.jellyfin.androidtv.ui.playback.withResponseTimeout
 import org.jellyfin.androidtv.ui.player.base.subtitleStyle
 import org.jellyfin.androidtv.ui.player.display.videoChangeFrameRateStrategy
 import org.jellyfin.androidtv.util.AndroidVersion
 import org.jellyfin.androidtv.util.profile.createDeviceProfile
 import org.jellyfin.playback.core.playbackManager
 import org.jellyfin.playback.jellyfin.jellyfinPlugin
+import org.jellyfin.playback.jellyfin.mediastream.StreamRequestOptions
 import org.jellyfin.playback.media3.exoplayer.ExoPlayerOptions
 import org.jellyfin.playback.media3.exoplayer.exoPlayerPlugin
 import org.jellyfin.playback.media3.session.MediaSessionOptions
 import org.jellyfin.playback.media3.session.media3SessionPlugin
+import org.jellyfin.sdk.Jellyfin
+import org.jellyfin.sdk.api.client.ApiClient
 import org.jellyfin.sdk.api.client.HttpClientOptions
 import org.jellyfin.sdk.api.okhttp.OkHttpFactory
 import org.koin.android.ext.koin.androidContext
@@ -90,13 +95,20 @@ fun Scope.createPlaybackManager() = playbackManager(androidContext()) {
 	val deviceProfileBuilder = { createDeviceProfile(androidContext(), userPreferences) }
 	// Velella: segments skipped as the user set them up (was: intros always); "ask to skip" waits for the new player's skip button
 	val mediaSegmentRepository = get<MediaSegmentRepository>()
+	val api = get<ApiClient>()
+	val jellyfin = get<Jellyfin>()
 	install(
 		jellyfinPlugin(
-			get(),
+			api,
 			deviceProfileBuilder,
 			skipMediaSegment = { segment -> mediaSegmentRepository.getMediaSegmentAction(segment) == MediaSegmentAction.SKIP },
 			lifecycle = ProcessLifecycleOwner.get().lifecycle,
-			alwaysBurnInSubtitles = { userPreferences[UserPreferences.subtitlesBurnDuringTranscode] },
+			streamRequestOptions = StreamRequestOptions(
+				alwaysBurnInSubtitles = { userPreferences[UserPreferences.subtitlesBurnDuringTranscode] },
+				// Velella: as in the legacy player, the server may take longer than the default timeout to tune a channel
+				playbackInfoApi = { api.withResponseTimeout(jellyfin, PLAYBACK_INFO_TIMEOUT) },
+				liveTvDirectPlay = { userPreferences[UserPreferences.liveTvDirectPlayEnabled] },
+			),
 		)
 	)
 

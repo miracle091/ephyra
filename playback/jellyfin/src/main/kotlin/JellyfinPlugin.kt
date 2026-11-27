@@ -5,6 +5,7 @@ import org.jellyfin.playback.core.plugin.playbackPlugin
 import org.jellyfin.playback.jellyfin.lyrics.LyricsPlayerService
 import org.jellyfin.playback.jellyfin.mediasegment.MediaSegmentService
 import org.jellyfin.playback.jellyfin.mediastream.JellyfinMediaStreamResolver
+import org.jellyfin.playback.jellyfin.mediastream.StreamRequestOptions
 import org.jellyfin.playback.jellyfin.playsession.PlaySessionService
 import org.jellyfin.playback.jellyfin.playsession.PlaySessionSocketService
 import org.jellyfin.sdk.api.client.ApiClient
@@ -17,10 +18,10 @@ fun jellyfinPlugin(
 	// Velella: whether to skip a segment, from the user's segment settings; null for no skipping
 	skipMediaSegment: ((MediaSegmentDto) -> Boolean)? = null,
 	lifecycle: Lifecycle? = null,
-	// Velella: the user's "burn in subtitles when transcoding" setting
-	alwaysBurnInSubtitles: () -> Boolean = { false },
+	// Velella: the user's stream settings (subtitle burn-in, live TV direct play) and the client for PlaybackInfo requests
+	streamRequestOptions: StreamRequestOptions = StreamRequestOptions(),
 ) = playbackPlugin {
-	provide(JellyfinMediaStreamResolver(api, deviceProfileBuilder, alwaysBurnInSubtitles))
+	provide(JellyfinMediaStreamResolver(api, deviceProfileBuilder, streamRequestOptions))
 
 	val playSessionService = PlaySessionService(api)
 	provide(playSessionService)
