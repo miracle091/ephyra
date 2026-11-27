@@ -22,7 +22,6 @@ import org.jellyfin.sdk.model.api.request.GetAlbumArtistsRequest
 import org.jellyfin.sdk.model.api.request.GetArtistsRequest
 import org.jellyfin.sdk.model.api.request.GetItemsRequest
 import org.jellyfin.sdk.model.api.request.GetLiveTvChannelsRequest
-import org.jellyfin.sdk.model.api.request.GetRecommendedProgramsRequest
 import org.jellyfin.sdk.model.api.request.GetRecordingsRequest
 
 fun ItemRowAdapter.retrieveTrailers(api: ApiClient, query: GetTrailersRequest) {
@@ -53,34 +52,6 @@ fun ItemRowAdapter.retrieveTrailers(api: ApiClient, query: GetTrailersRequest) {
 	}
 }
 
-fun ItemRowAdapter.retrieveLiveTvRecommendedPrograms(
-	api: ApiClient,
-	query: GetRecommendedProgramsRequest
-) {
-	ProcessLifecycleOwner.get().lifecycleScope.launch {
-		runCatching {
-			val response = withContext(Dispatchers.IO) {
-				api.liveTvApi.getRecommendedPrograms(query).content
-			}
-
-			setItems(
-				items = response.items,
-				transform = { item, _ ->
-					BaseItemDtoBaseRowItem(
-						item,
-						false,
-						isStaticHeight,
-					)
-				}
-			)
-
-			if (response.items.isEmpty()) removeRow()
-		}.fold(
-			onSuccess = { notifyRetrieveFinished() },
-			onFailure = { error -> notifyRetrieveFinished(error as? Exception) }
-		)
-	}
-}
 
 fun ItemRowAdapter.retrieveLiveTvRecordings(api: ApiClient, query: GetRecordingsRequest) {
 	ProcessLifecycleOwner.get().lifecycleScope.launch {
@@ -306,35 +277,6 @@ fun ItemRowAdapter.retrieveItems(
 			)
 
 			if (itemsLoaded == 0) removeRow()
-		}.fold(
-			onSuccess = { notifyRetrieveFinished() },
-			onFailure = { error -> notifyRetrieveFinished(error as? Exception) }
-		)
-	}
-}
-
-fun ItemRowAdapter.retrievePremieres(
-	api: ApiClient,
-	query: GetItemsRequest,
-) {
-	ProcessLifecycleOwner.get().lifecycleScope.launch {
-		runCatching {
-			val response = withContext(Dispatchers.IO) {
-				api.libraryApi.getItems(query).content
-			}
-
-			setItems(
-				items = response.items,
-				transform = { item, _ ->
-					BaseItemDtoBaseRowItem(
-						item,
-						preferParentThumb,
-						isStaticHeight,
-					)
-				}
-			)
-
-			if (response.items.isEmpty()) removeRow()
 		}.fold(
 			onSuccess = { notifyRetrieveFinished() },
 			onFailure = { error -> notifyRetrieveFinished(error as? Exception) }

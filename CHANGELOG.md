@@ -175,9 +175,11 @@ section 2(a) of the GPL-2.0.
 - The home's On now row and its Live TV home section (the Live TV screen's spotlight shows what is on air; a home slot
   set to it falls back to its default), and the Recordings card among the home's libraries (the Live TV screen opens
   the recordings); the libraries row is called "Libraries" ("Library" with only one)
-  instead of "My media" and the Next up row "Next episode".
+  instead of "My media" and the Next up row "Next episode", also in the TV shows library.
 - Trailers no longer open the YouTube app or a browser, and the app no longer declares that it looks for apps that open
   YouTube links.
+- Dead code: the recommended-programmes rows (`QueryType.LiveTvProgram`, left without a caller once the On now rows
+  went) and the `SimilarSeries` and `Premieres` row types no screen creates.
 - Dead code: functions and members with no caller (`PopoverMenu.kt`, `ItemRowAdapter.setSiblingRow`,
   `GuideFilters.isMovies`, `HorizontalGridPresenter.enableChildRoundedCorners`, `DisplayPreferencesStore.clearCache`,
   `ImageHelper.getLogoImageUrl`, `MenuBuilder.subMenu`, `toHtmlSpanned`, `createSeriesGetNextUpRequest`).

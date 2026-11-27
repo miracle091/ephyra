@@ -44,10 +44,8 @@ class HomeFragmentBrowseRowDefRow(
 				rowsAdapter,
 			)
 			QueryType.Views -> ItemRowAdapter(context, GetUserViewsRequest, cardPresenter, rowsAdapter)
-			QueryType.SimilarSeries -> ItemRowAdapter(context, browseRowDef.similarQuery, QueryType.SimilarSeries, cardPresenter, rowsAdapter)
 			QueryType.SimilarMovies -> ItemRowAdapter(context, browseRowDef.similarQuery, QueryType.SimilarMovies, cardPresenter, rowsAdapter)
 			QueryType.LiveTvChannel -> ItemRowAdapter(context, browseRowDef.tvChannelQuery, LIVE_TV_CHANNEL_CHUNK_SIZE, cardPresenter, rowsAdapter)
-			QueryType.LiveTvProgram -> ItemRowAdapter(context, browseRowDef.programQuery, cardPresenter, rowsAdapter)
 			QueryType.LiveTvRecording -> ItemRowAdapter(context, browseRowDef.recordingQuery, browseRowDef.chunkSize, cardPresenter, rowsAdapter)
 			QueryType.Resume -> ItemRowAdapter(
 				context,

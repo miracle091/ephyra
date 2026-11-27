@@ -6,7 +6,6 @@ enum class QueryType {
 	Views,
 	Season,
 	Upcoming,
-	SimilarSeries,
 	SimilarMovies,
 	StaticPeople,
 	StaticChapters,
@@ -15,7 +14,6 @@ enum class QueryType {
 	AdditionalParts,
 	Trailers,
 	LiveTvChannel,
-	LiveTvProgram,
 	LiveTvRecording,
 	StaticItems,
 	Artists,
@@ -23,6 +21,5 @@ enum class QueryType {
 	AudioPlaylists,
 	LatestItems,
 	SeriesTimer,
-	Premieres,
 	Resume,
 }

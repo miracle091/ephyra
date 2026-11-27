@@ -151,7 +151,7 @@
         <item quantity="one">Library</item>
         <item quantity="other">Libraries</item>
     </plurals>
-    <string name="velella_home_next_up_row">Next episode</string>
+    <string name="velella_next_up_row">Next episode</string>
     <string name="velella_livetv_guide">TV guide</string>
     <string name="velella_livetv_recordings">Recordings</string>
     <string name="velella_livetv_scheduled">Scheduled</string>

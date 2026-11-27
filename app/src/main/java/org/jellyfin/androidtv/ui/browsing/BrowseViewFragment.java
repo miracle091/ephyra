@@ -60,9 +60,9 @@ public class BrowseViewFragment extends EnhancedBrowseFragment {
                 //Resume
                 mRows.add(new BrowseRowDef(getString(R.string.lbl_continue_watching), BrowsingUtils.createResumeItemsRequest(mFolder.getId(), BaseItemKind.EPISODE), 0, new ChangeTriggerType[]{ChangeTriggerType.TvPlayback}));
 
-                //Next up
+                // Velella: "Next episode", like the home (upstream "Next up")
                 GetNextUpRequest getNextUpRequest = BrowsingUtils.createGetNextUpRequest(mFolder.getId());
-                mRows.add(new BrowseRowDef(getString(R.string.lbl_next_up), getNextUpRequest, new ChangeTriggerType[]{ChangeTriggerType.TvPlayback}));
+                mRows.add(new BrowseRowDef(getString(R.string.velella_next_up_row), getNextUpRequest, new ChangeTriggerType[]{ChangeTriggerType.TvPlayback}));
 
                 //Latest content added
                 mRows.add(new BrowseRowDef(getString(R.string.lbl_latest), BrowsingUtils.createLatestMediaRequest(mFolder.getId(), BaseItemKind.EPISODE, true), new ChangeTriggerType[]{ChangeTriggerType.LibraryUpdated}));

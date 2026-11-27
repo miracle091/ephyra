@@ -10,7 +10,6 @@ import org.jellyfin.sdk.model.api.request.GetItemsRequest;
 import org.jellyfin.sdk.model.api.request.GetLatestMediaRequest;
 import org.jellyfin.sdk.model.api.request.GetLiveTvChannelsRequest;
 import org.jellyfin.sdk.model.api.request.GetNextUpRequest;
-import org.jellyfin.sdk.model.api.request.GetRecommendedProgramsRequest;
 import org.jellyfin.sdk.model.api.request.GetRecordingsRequest;
 import org.jellyfin.sdk.model.api.request.GetResumeItemsRequest;
 import org.jellyfin.sdk.model.api.request.GetSimilarItemsRequest;
@@ -22,7 +21,6 @@ public class BrowseRowDef {
     private GetSimilarItemsRequest similarQuery;
     private GetLatestMediaRequest latestItemsQuery;
     private GetLiveTvChannelsRequest tvChannelQuery;
-    private GetRecommendedProgramsRequest programQuery;
     private GetRecordingsRequest recordingQuery;
     private GetSeriesTimersRequest seriesTimerQuery;
 
@@ -114,12 +112,6 @@ public class BrowseRowDef {
         this.queryType = QueryType.LiveTvChannel;
     }
 
-    public BrowseRowDef(String header, GetRecommendedProgramsRequest query) {
-        headerText = header;
-        this.programQuery = query;
-        this.queryType = QueryType.LiveTvProgram;
-    }
-
     public BrowseRowDef(String header, GetRecordingsRequest query) {
         this(header, query, 0);
     }
@@ -181,10 +173,6 @@ public class BrowseRowDef {
 
     public GetLiveTvChannelsRequest getTvChannelQuery() {
         return tvChannelQuery;
-    }
-
-    public GetRecommendedProgramsRequest getProgramQuery() {
-        return programQuery;
     }
 
     public GetRecordingsRequest getRecordingQuery() { return recordingQuery; }

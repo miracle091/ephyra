@@ -142,7 +142,7 @@
         <item quantity="many">Librerie</item>
         <item quantity="other">Librerie</item>
     </plurals>
-    <string name="velella_home_next_up_row">Prossimo episodio</string>
+    <string name="velella_next_up_row">Prossimo episodio</string>
     <string name="velella_livetv_guide">Guida TV</string>
     <string name="velella_livetv_recordings">Registrazioni</string>
     <string name="velella_livetv_scheduled">Programmate</string>

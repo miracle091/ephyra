@@ -42,7 +42,6 @@ import org.jellyfin.sdk.model.api.request.GetItemsRequest;
 import org.jellyfin.sdk.model.api.request.GetLatestMediaRequest;
 import org.jellyfin.sdk.model.api.request.GetLiveTvChannelsRequest;
 import org.jellyfin.sdk.model.api.request.GetNextUpRequest;
-import org.jellyfin.sdk.model.api.request.GetRecommendedProgramsRequest;
 import org.jellyfin.sdk.model.api.request.GetRecordingsRequest;
 import org.jellyfin.sdk.model.api.request.GetResumeItemsRequest;
 import org.jellyfin.sdk.model.api.request.GetSeasonsRequest;
@@ -66,7 +65,6 @@ public class ItemRowAdapter extends MutableObjectAdapter<Object> {
     private GetAdditionalPartsRequest mAdditionalPartsQuery;
     private GetTrailersRequest mTrailersQuery;
     private GetLiveTvChannelsRequest mTvChannelQuery;
-    private GetRecommendedProgramsRequest mTvProgramQuery;
     private GetRecordingsRequest mTvRecordingQuery;
     private GetArtistsRequest mArtistsQuery;
     private GetAlbumArtistsRequest mAlbumArtistsQuery;
@@ -278,15 +276,6 @@ public class ItemRowAdapter extends MutableObjectAdapter<Object> {
         mTvChannelQuery = query;
         this.chunkSize = chunkSize;
         queryType = QueryType.LiveTvChannel;
-    }
-
-    public ItemRowAdapter(Context context, GetRecommendedProgramsRequest query, Presenter presenter, MutableObjectAdapter<Row> parent) {
-        super(presenter);
-        this.context = context;
-        mParent = parent;
-        mTvProgramQuery = query;
-        queryType = QueryType.LiveTvProgram;
-        staticHeight = true;
     }
 
     public ItemRowAdapter(Context context, GetRecordingsRequest query, int chunkSize, Presenter presenter, MutableObjectAdapter<Row> parent) {
@@ -586,15 +575,11 @@ public class ItemRowAdapter extends MutableObjectAdapter<Object> {
             case Views:
                 ItemRowAdapterHelperKt.retrieveUserViews(this, api.getValue(), userViewsRepository.getValue());
                 break;
-            case SimilarSeries:
             case SimilarMovies:
                 ItemRowAdapterHelperKt.retrieveSimilarItems(this, api.getValue(), mSimilarQuery);
                 break;
             case LiveTvChannel:
                 ItemRowAdapterHelperKt.retrieveLiveTvChannels(this, api.getValue(), mTvChannelQuery, 0, chunkSize);
-                break;
-            case LiveTvProgram:
-                ItemRowAdapterHelperKt.retrieveLiveTvRecommendedPrograms(this, api.getValue(), mTvProgramQuery);
                 break;
             case LiveTvRecording:
                 ItemRowAdapterHelperKt.retrieveLiveTvRecordings(this, api.getValue(), mTvRecordingQuery);
@@ -629,9 +614,6 @@ public class ItemRowAdapter extends MutableObjectAdapter<Object> {
                 break;
             case AudioPlaylists:
                 retrieveAudioPlaylists(mQuery);
-                break;
-            case Premieres:
-                ItemRowAdapterHelperKt.retrievePremieres(this, api.getValue(), mQuery);
                 break;
             case SeriesTimer:
                 boolean canManageRecordings = Utils.canManageRecordings(KoinJavaComponent.<UserRepository>get(UserRepository.class).getCurrentUser().getValue());

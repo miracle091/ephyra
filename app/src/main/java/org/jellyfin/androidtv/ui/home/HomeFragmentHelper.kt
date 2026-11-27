@@ -70,7 +70,7 @@ class HomeFragmentHelper(
 		)
 
 		// Velella: upstream "Next up"
-		val title = context.getString(R.string.velella_home_next_up_row)
+		val title = context.getString(R.string.velella_next_up_row)
 		return HomeFragmentBrowseRowDefRow(BrowseRowDef(title, query, arrayOf(ChangeTriggerType.TvPlayback)))
 	}
 
