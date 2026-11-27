@@ -1209,6 +1209,8 @@ public class FullDetailsFragment extends Fragment implements RecordingIndicatorV
             } else {
                 mCurrentItem = (BaseRowItem) item;
             }
+            // The selected position, not the row of the event: a cast row reports a selection while it loads
+            FullDetailsFragmentHelperKt.updateToolbarVisibility(FullDetailsFragment.this, mRowsFragment.getSelectedPosition() <= 0);
         }
     }
 

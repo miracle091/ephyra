@@ -160,6 +160,8 @@ section 2(a) of the GPL-2.0.
   `10d01122a`).
 - Display settings work for folders that are not libraries, fast scrolling in a library grid keeps the focus, and lazy
   lists remember their focus (upstream `388e641a5`, `971257d77` and `1dc9390fb`).
+- The home button, clock and now playing bug of the details screen fade out while a row below the details is selected,
+  so they no longer sit on top of the cards that scroll up under them.
 - Leaving the new player refreshes the details screen below, as the legacy player does: the resume point, the
   watched state and the episode played last show at once, and the focus moves to Resume or Play.
 - The new player skips media segments as set in Settings (intro, outro, recap, preview, commercial) instead of always
