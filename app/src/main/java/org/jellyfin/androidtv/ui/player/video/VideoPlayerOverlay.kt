@@ -65,15 +65,20 @@ fun VideoPlayerOverlay(
 	modifier: Modifier = Modifier,
 	playbackManager: PlaybackManager = koinInject(),
 	mediaToastRegistry: MediaToastRegistry,
+	liveTvSwitch: LiveTvSwitch? = null,
 ) {
-	val visibilityState = rememberPlayerOverlayVisibility()
 	var showPlaybackInfo by remember { mutableStateOf(false) }
 
 	val entry by rememberQueueEntry(playbackManager)
 	val item = entry?.run { baseItemFlow.collectAsState(baseItem) }?.value
 	val stream = entry?.run { mediaStreamFlow.collectAsState(mediaStream) }?.value
+	// Velella: closing the live channel bar or a new channel gives the overlay the focus back
+	val channelBar = remember { ChannelBarState() }
+	val visibilityState = rememberPlayerOverlayVisibility(focusKey = channelBar.closings to item?.id)
 	// Velella: white text and icons glare on an HDR display, so the controls are dimmed then (HdrControlsDim)
 	val controlsAlpha = if (isHdrStream(stream)) HdrControlsDim.HDR_ALPHA else 1f
+	// Velella: a live channel's programmes and buttons (null for anything else)
+	val live = rememberLiveControls(item, stream, visibilityState, channelBar, liveTvSwitch)
 
 	// Velella: the trickplay thumbnails are downloaded as playback starts, so scrubbing shows them at once
 	PrefetchTrickplay(item, stream?.mediaSourceId, entry?.startPosition ?: Duration.ZERO)
@@ -86,9 +91,11 @@ fun VideoPlayerOverlay(
 	// Velella: left and right with the controls hidden add up to one seek (QuickSeek.kt)
 	val quickSeek = rememberQuickSeek(playbackManager, mediaToastRegistry)
 
-	val onKey = { keyCode: Int ->
+	val onKey = onKey@{ keyCode: Int ->
+		liveOverlayKey(keyCode, live, channelBar.isOpen, visibilityState.visible)?.let { return@onKey it }
+
 		val skipAction = skipKeyAction(skipSegment.state, keyCode)
-		val action = if (skipAction == null) videoPlayerKeyAction(keyCode, visibilityState.visible) else null
+		val action = if (skipAction == null) videoPlayerKeyAction(keyCode, visibilityState.visible)?.unlessSeekingLive(live) else null
 		when (action) {
 			null -> skipAction?.let(skipSegment.onKey)
 			VideoPlayerKeyAction.STOP -> backDispatcher?.onBackPressed()
@@ -110,23 +117,22 @@ fun VideoPlayerOverlay(
 			visibilityState = visibilityState,
 			contentPadding = VideoOverlayPadding,
 			header = {
-				Column(modifier = Modifier.alpha(controlsAlpha)) {
-					VideoPlayerHeader(
-						item = item,
-						stream = stream,
+				Column(modifier = Modifier.alpha(controlsAlpha)) { VideoPlayerHeader(item, stream, live?.info) }
+			},
+			controls = {
+				Box(modifier = Modifier.alpha(controlsAlpha)) {
+					VideoPlayerControls(
+						playbackManager = playbackManager,
+						onPlaybackInfoClick = { showPlaybackInfo = !showPlaybackInfo },
+						menuRequest = menuRequest,
+						onMenuRequestHandled = { menuRequest = null },
+						live = live,
 					)
 				}
 			},
-			controls = {
-				VideoPlayerControls(
-					playbackManager = playbackManager,
-					onPlaybackInfoClick = { showPlaybackInfo = !showPlaybackInfo },
-					menuRequest = menuRequest,
-					onMenuRequestHandled = { menuRequest = null },
-					modifier = Modifier.alpha(controlsAlpha),
-				)
-			},
 		)
+
+		LiveChannelBarHost(channelBar, live)
 
 		VideoPlayerOverlayExtras(playbackManager, showPlaybackInfo, skipSegment, mediaToastRegistry)
 	}

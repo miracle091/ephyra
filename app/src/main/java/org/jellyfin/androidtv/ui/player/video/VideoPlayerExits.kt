@@ -7,6 +7,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import org.jellyfin.androidtv.R
 import org.jellyfin.playback.core.PlaybackManager
 import org.jellyfin.playback.core.model.PlaybackFailure
@@ -22,6 +24,8 @@ import timber.log.Timber
 fun VideoPlayerExits(
 	playbackManager: PlaybackManager,
 	onClose: () -> Unit,
+	// Velella: the queue is empty for a moment while it is rebuilt for another live TV channel: no end of the queue then
+	switchingChannel: StateFlow<Boolean> = MutableStateFlow(false),
 ) {
 	val context = LocalContext.current
 	val lifecycleOwner = LocalLifecycleOwner.current
@@ -47,7 +51,7 @@ fun VideoPlayerExits(
 			playbackManager.queue.entry.collect { entry ->
 				if (entry != null) {
 					played = true
-				} else if (played) {
+				} else if (played && !switchingChannel.value) {
 					Timber.i("Queue ended, closing the player")
 					onClose()
 				}

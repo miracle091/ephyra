@@ -31,7 +31,7 @@ class ReloadEntryStreamTests : FunSpec({
 			reloadEntryStream(entry, 12.minutes, isCurrent = { true }, resolve = { startAtRequest = entry.startPosition; new }) { played++ }
 		}
 
-		reloaded shouldBe true
+		reloaded shouldBe StreamReload(replaced = true)
 		startAtRequest shouldBe 12.minutes
 		entry.mediaStream shouldBe new
 		entry.startPosition shouldBe 12.minutes
@@ -47,22 +47,23 @@ class ReloadEntryStreamTests : FunSpec({
 
 		val reloaded = runBlocking { reloadEntryStream(entry, 12.minutes, isCurrent = { true }, resolve = { null }) { played++ } }
 
-		reloaded shouldBe false
+		reloaded shouldBe StreamReload(replaced = false, unused = null)
 		entry.mediaStream shouldBe old
 		entry.startPosition shouldBe null
 		played shouldBe 0
 	}
 
-	test("playback that moved on (stop, another entry) is not taken back") {
+	test("playback that moved on (stop, another entry) is not taken back, and the unused stream is handed back") {
 		val entry = QueueEntry()
 		val old = stream(entry, "old").also { entry.mediaStream = it }
+		val new = stream(entry, "new")
 		var played = 0
 
 		val reloaded = runBlocking {
-			reloadEntryStream(entry, 12.minutes, isCurrent = { false }, resolve = { stream(entry, "new") }) { played++ }
+			reloadEntryStream(entry, 12.minutes, isCurrent = { false }, resolve = { new }) { played++ }
 		}
 
-		reloaded shouldBe false
+		reloaded shouldBe StreamReload(replaced = false, unused = new)
 		entry.mediaStream shouldBe old
 		entry.startPosition shouldBe null
 		played shouldBe 0
@@ -80,7 +81,8 @@ class ReloadEntryStreamTests : FunSpec({
 			}
 		}
 
-		reloaded shouldBe false
+		reloaded.replaced shouldBe false
+		reloaded.unused?.identifier shouldBe "new"
 		entry.mediaStream shouldBe newer
 		played shouldBe 0
 	}
@@ -91,7 +93,7 @@ class ReloadEntryStreamTests : FunSpec({
 
 		val reloaded = runBlocking { reloadEntryStream(entry, 12.minutes, isCurrent = { true }, resolve = { asked++; null }) {} }
 
-		reloaded shouldBe false
+		reloaded shouldBe StreamReload(replaced = false)
 		asked shouldBe 0
 	}
 

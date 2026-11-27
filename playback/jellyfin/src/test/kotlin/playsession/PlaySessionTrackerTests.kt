@@ -89,4 +89,35 @@ class PlaySessionTrackerTests : FunSpec({
 		)
 		tracker.update("film", PlayState.STOPPED, 7.seconds).shouldBeEmpty()
 	}
+
+	test("a stream that never played is abandoned when a retry's stream replaces it, so its live stream can be closed") {
+		val tracker = PlaySessionTracker<String>()
+		tracker.update("channel, stream 1", PlayState.PAUSED, 0.seconds).shouldBeEmpty()
+		tracker.update("channel, stream 1", PlayState.PAUSED, 0.seconds).shouldBeEmpty()
+
+		tracker.update("channel, stream 2", PlayState.PAUSED, 0.seconds) shouldContainExactly listOf(
+			PlaySessionReport.Abandon("channel, stream 1"),
+		)
+	}
+
+	test("a stream that never played is abandoned when the player closes or tunes to another channel") {
+		val tracker = PlaySessionTracker<String>()
+		tracker.update("channel 1", PlayState.PAUSED, 0.seconds)
+		tracker.update(null, PlayState.STOPPED, null) shouldContainExactly listOf(PlaySessionReport.Abandon("channel 1"))
+		tracker.update(null, PlayState.STOPPED, null).shouldBeEmpty()
+
+		tracker.update("channel 2", PlayState.PAUSED, 0.seconds)
+		tracker.update("channel 3", PlayState.PAUSED, 0.seconds) shouldContainExactly listOf(PlaySessionReport.Abandon("channel 2"))
+	}
+
+	test("a stream that played gets its stop, not an abandon") {
+		val tracker = PlaySessionTracker<String>()
+		tracker.update("channel 1", PlayState.PAUSED, 0.seconds)
+		tracker.update("channel 1", PlayState.PLAYING, 0.seconds)
+
+		tracker.update("channel 2", PlayState.PAUSED, 0.seconds) shouldContainExactly listOf(
+			PlaySessionReport.Stop("channel 1", 0.seconds, failed = false),
+			PlaySessionReport.Start("channel 2"),
+		)
+	}
 })

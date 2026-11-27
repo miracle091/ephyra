@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -35,6 +36,7 @@ import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Job
@@ -58,10 +60,10 @@ fun PlayerOverlayLayout(
 	// Velella: the video player keeps the legacy player's margins, the other players the default overscan
 	contentPadding: PaddingValues = overscanPaddingValues,
 ) {
-	// Velella: the layout takes the focus when it opens and whenever the controls hide (their focused button leaves); with no focus
-	// the first key press only gave it the focus and did nothing else
+	// Velella: the layout takes the focus when it opens and whenever the controls hide (their focused button leaves), or the state's
+	// focus key changes while they are hidden; with no focus the first key press only gave it the focus and did nothing else
 	val rootFocus = remember { FocusRequester() }
-	LaunchedEffect(visibilityState.visible) {
+	LaunchedEffect(visibilityState.visible, visibilityState.focusKey) {
 		if (!visibilityState.visible) rootFocus.requestFocus()
 	}
 
@@ -156,11 +158,13 @@ private fun PlayerOverlayControls(
 			.focusTarget()
 	)
 
+	// Velella: at least a third of the screen, taller when the controls need it (the live player's programme block sits above them)
+	val minHeight = with(LocalDensity.current) { (LocalWindowInfo.current.containerSize.height * OVERLAY_HEIGHT_FRACTION).toDp() }
 	Box(
 		contentAlignment = Alignment.BottomCenter,
 		modifier = Modifier
 			.fillMaxWidth()
-			.fillMaxHeight(OVERLAY_HEIGHT_FRACTION)
+			.heightIn(min = minHeight)
 			.background(
 				brush = Brush.verticalGradient(
 					colors = listOf(
@@ -197,11 +201,19 @@ data class PlayerOverlayVisibilityState(
 	val toggle: () -> Unit,
 	val show: () -> Unit,
 	val hide: () -> Unit,
+
+	// Velella: see rememberPlayerOverlayVisibility
+	val focusKey: Any? = null,
 )
 
+/**
+ * The overlay's visibility, hidden after [timeout] without keys. Velella: a change of [focusKey] while the controls are hidden gives
+ * the overlay the focus back, after something else that had it left (the live player's channel bar, a new channel).
+ */
 @Composable
 fun rememberPlayerOverlayVisibility(
 	timeout: Duration = 5.seconds,
+	focusKey: Any? = null,
 ): PlayerOverlayVisibilityState {
 	val scope = rememberCoroutineScope()
 	var timerVisible by remember { mutableStateOf(false) }
@@ -243,5 +255,6 @@ fun rememberPlayerOverlayVisibility(
 		toggle = ::toggle,
 		show = ::show,
 		hide = ::hide,
+		focusKey = focusKey,
 	)
 }

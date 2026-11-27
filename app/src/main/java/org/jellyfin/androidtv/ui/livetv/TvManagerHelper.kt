@@ -20,6 +20,23 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 
+/**
+ * The live TV channels with their programme on air, in the user's order (by name, or last played first; favourites first when
+ * asked), as the guide shows them. Velella: shared by the guide and the new video player's channel bar.
+ */
+suspend fun ApiClient.getLiveTvChannelList(liveTvPreferences: LiveTvPreferences): List<BaseItemDto> {
+	val sortDatePlayed = liveTvPreferences[LiveTvPreferences.channelOrder] == ItemSortBy.DATE_PLAYED.serialName
+
+	return withContext(Dispatchers.IO) {
+		liveTvApi.getLiveTvChannels(
+			addCurrentProgram = true,
+			enableFavoriteSorting = liveTvPreferences[LiveTvPreferences.favsAtTop],
+			sortBy = if (sortDatePlayed) setOf(ItemSortBy.DATE_PLAYED) else setOf(ItemSortBy.SORT_NAME),
+			sortOrder = if (sortDatePlayed) SortOrder.DESCENDING else SortOrder.ASCENDING,
+		).content.items
+	}
+}
+
 fun BaseItemDto.copyWithLastPlayedDate(
 	lastPlayedDate: LocalDateTime,
 ) = copy(
@@ -33,18 +50,8 @@ fun loadLiveTvChannels(fragment: Fragment, callback: (channels: Collection<BaseI
 	val api by fragment.inject<ApiClient>()
 
 	fragment.lifecycleScope.launch {
-		val sortDatePlayed =
-			liveTvPreferences[LiveTvPreferences.channelOrder] == ItemSortBy.DATE_PLAYED.serialName
-
 		runCatching {
-			withContext(Dispatchers.IO) {
-				api.liveTvApi.getLiveTvChannels(
-					addCurrentProgram = true,
-					enableFavoriteSorting = liveTvPreferences[LiveTvPreferences.favsAtTop],
-					sortBy = if (sortDatePlayed) setOf(ItemSortBy.DATE_PLAYED) else setOf(ItemSortBy.SORT_NAME),
-					sortOrder = if (sortDatePlayed) SortOrder.DESCENDING else SortOrder.ASCENDING,
-				).content.items
-			}
+			api.getLiveTvChannelList(liveTvPreferences)
 		}.fold(
 			onSuccess = { channels -> callback(channels) },
 			onFailure = { callback(null) },

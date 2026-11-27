@@ -45,6 +45,14 @@ internal class MediaStreamService(
 	/** Velella: what the player did about each failed playback, for the UI. */
 	val failures: SharedFlow<PlaybackFailure> = _failures.asSharedFlow()
 
+	private val _discardedStreams = MutableSharedFlow<PlayableMediaStream>(extraBufferCapacity = FAILURE_BUFFER)
+
+	/**
+	 * Velella: streams that came after playback had moved on (another entry, another reload, the player closed), so they never
+	 * play; a live stream the server opened for one must be closed, as no stop report will name it.
+	 */
+	val discardedStreams: SharedFlow<PlayableMediaStream> = _discardedStreams.asSharedFlow()
+
 	override suspend fun onInitialize() {
 		// Velella: the backend's errors, each one (the play state stays ERROR when a retry fails again, so it can't tell them apart)
 		manager.backendService.addListener(object : PlayerBackendEventListener() {
@@ -112,6 +120,15 @@ internal class MediaStreamService(
 	private suspend fun playEntry(entry: QueueEntry) {
 		val backend = requireNotNull(manager.backend)
 		val hasMediaStream = entry.ensureMediaStream()
+
+		// Velella: entries are played one at a time, so the user may have moved on (another channel, Back) while this one's stream
+		// was asked for: it must not start then
+		if (manager.queue.entry.value !== entry) {
+			Timber.i("Not playing $entry: the queue moved on while its stream was asked for")
+			entry.mediaStream?.let { _discardedStreams.tryEmit(it) }
+			entry.mediaStream = null
+			return
+		}
 
 		if (hasMediaStream) {
 			backend.playItem(entry)
@@ -194,7 +211,8 @@ internal class MediaStreamService(
 				backend.playItem(entry)
 				if (!play) backend.pause() else watchLiveStart(entry)
 			}
-			if (!reloaded) {
+			reloaded.unused?.let { _discardedStreams.tryEmit(it) }
+			if (!reloaded.replaced) {
 				Timber.w("Kept the current stream of $entry: no new stream, or playback moved on")
 				if (manager.queue.entry.value === entry) onKept()
 			}
@@ -219,7 +237,7 @@ internal class MediaStreamService(
 /**
  * Velella: the reload of [entry]'s stream. The new stream is asked for first ([resolve], with [position] as the entry's start, so
  * a transcode starts there) and replaces the old one, then [play]s, only if it came and [entry] still is the current entry
- * ([isCurrent]) with its old stream; otherwise the old stream plays on and the start is forgotten. Returns whether it replaced it.
+ * ([isCurrent]) with its old stream; otherwise the old stream plays on and the start is forgotten.
  */
 internal suspend fun reloadEntryStream(
 	entry: QueueEntry,
@@ -227,9 +245,9 @@ internal suspend fun reloadEntryStream(
 	isCurrent: () -> Boolean,
 	resolve: suspend () -> PlayableMediaStream?,
 	play: () -> Unit,
-): Boolean {
+): StreamReload {
 	// Still being asked for the first time: that request already reads the entry's new picks or not, nothing to replace
-	val oldStream = entry.mediaStream ?: return false
+	val oldStream = entry.mediaStream ?: return StreamReload(replaced = false)
 	val start = position.takeIf { it > Duration.ZERO }
 	entry.startPosition = start
 
@@ -242,12 +260,18 @@ internal suspend fun reloadEntryStream(
 
 	if (newStream == null || !isCurrent() || entry.mediaStream !== oldStream) {
 		entry.startPosition = null
-		return false
+		return StreamReload(replaced = false, unused = newStream)
 	}
 
 	// Set again: a cancelled older reload may have cleared it meanwhile
 	entry.startPosition = start
 	entry.mediaStream = newStream
 	play()
-	return true
+	return StreamReload(replaced = true)
 }
+
+/**
+ * Velella: how a [reloadEntryStream] ended: whether the new stream [replaced] the old one, and the new stream that came too late to
+ * be used ([unused]), so a live stream the server opened for it can be closed.
+ */
+internal data class StreamReload(val replaced: Boolean, val unused: PlayableMediaStream? = null)

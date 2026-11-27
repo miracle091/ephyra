@@ -39,11 +39,13 @@ private const val DEFAULT_VIDEO_ASPECT_RATIO = 16f / 9f
 fun VideoPlayerScreen(
 	// Velella: the prompt asked while the queue holds at the end of an entry (VideoPlayerFragment sets the hold)
 	endPrompt: StateFlow<EndOfEntryPrompt>,
+	// Velella: tunes to another live TV channel (channel bar, guide, previous channel)
+	liveTvSwitch: LiveTvSwitch,
 ) {
 	val playbackManager = koinInject<PlaybackManager>()
 	val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 	val close = { backDispatcher?.onBackPressed() ?: Unit }
-	VideoPlayerExits(playbackManager, onClose = close)
+	VideoPlayerExits(playbackManager, onClose = close, switchingChannel = liveTvSwitch.switching)
 	val queueService = remember(playbackManager) { requireNotNull(playbackManager.getService<QueueService>()) { "No queue service" } }
 	val heldNext by queueService.heldNext.collectAsState()
 	val prompt by endPrompt.collectAsState()
@@ -102,6 +104,7 @@ fun VideoPlayerScreen(
 			PlayerOverlay.CONTROLS -> VideoPlayerOverlay(
 				playbackManager = playbackManager,
 				mediaToastRegistry = mediaToastRegistry,
+				liveTvSwitch = liveTvSwitch,
 			)
 
 			PlayerOverlay.END_OF_ENTRY -> if (next != null) EndOfEntryOverlay(playbackManager, prompt, next, onClose = close)

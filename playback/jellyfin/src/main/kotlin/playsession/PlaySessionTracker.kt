@@ -10,6 +10,12 @@ sealed interface PlaySessionReport<out T> {
 	data class Start<T>(override val session: T) : PlaySessionReport<T>
 	data class Progress<T>(override val session: T) : PlaySessionReport<T>
 	data class Stop<T>(override val session: T, val position: Duration, val failed: Boolean) : PlaySessionReport<T>
+
+	/**
+	 * A session whose stream was handed out but never played (a live stream that stalled, then a retry, another channel or the
+	 * player closing replaced it): no start was reported, so no stop either; a live stream the server opened for it must be closed.
+	 */
+	data class Abandon<T>(override val session: T) : PlaySessionReport<T>
 }
 
 /**
@@ -23,6 +29,10 @@ class PlaySessionTracker<T : Any> {
 
 	private var lastPosition: Duration = Duration.ZERO
 
+	// The session seen last, and the one started last: a seen session that was not started and is gone was abandoned
+	private var seen: T? = null
+	private var lastStarted: T? = null
+
 	/** Remembers the started session's [position] between reports, so a stop reported after the queue was cleared is exact. */
 	fun observe(current: T?, position: Duration) {
 		if (current != null && current == active) lastPosition = position
@@ -34,6 +44,10 @@ class PlaySessionTracker<T : Any> {
 	 */
 	fun update(current: T?, playState: PlayState, position: Duration?): List<PlaySessionReport<T>> {
 		val reports = mutableListOf<PlaySessionReport<T>>()
+
+		val previous = seen
+		seen = current
+		if (previous != null && previous != current && previous != lastStarted) reports += PlaySessionReport.Abandon(previous)
 
 		val started = active
 		if (started != null && current == started && position != null) lastPosition = position
@@ -48,6 +62,7 @@ class PlaySessionTracker<T : Any> {
 			current != null && shouldStart(started, current, playState) -> {
 				reports += PlaySessionReport.Start(current)
 				active = current
+				lastStarted = current
 				lastPosition = position ?: Duration.ZERO
 			}
 		}

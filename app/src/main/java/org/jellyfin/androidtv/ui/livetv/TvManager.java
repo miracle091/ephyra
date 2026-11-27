@@ -54,8 +54,12 @@ public class TvManager {
 
     public static void setLastLiveTvChannel(UUID id) {
         SystemPreferences systemPreferences = KoinJavaComponent.<SystemPreferences>get(SystemPreferences.class);
-        systemPreferences.set(SystemPreferences.Companion.getLiveTvPrevChannel(), systemPreferences.get(SystemPreferences.Companion.getLiveTvLastChannel()));
-        systemPreferences.set(SystemPreferences.Companion.getLiveTvLastChannel(), id.toString());
+        String last = systemPreferences.get(SystemPreferences.Companion.getLiveTvLastChannel());
+        // Velella: the same channel again (a retry, the player reopened) keeps the previous channel
+        if (!id.toString().equals(last)) {
+            systemPreferences.set(SystemPreferences.Companion.getLiveTvPrevChannel(), last);
+            systemPreferences.set(SystemPreferences.Companion.getLiveTvLastChannel(), id.toString());
+        }
         updateLastPlayedDate(id);
         fillChannelIds();
     }

@@ -6,8 +6,20 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.compose.content
+import android.widget.Toast
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.jellyfin.androidtv.R
+import org.jellyfin.androidtv.ui.livetv.TvManager
+import org.jellyfin.sdk.api.client.extensions.libraryApi
+import org.jellyfin.sdk.model.api.BaseItemKind
+import java.util.UUID
+import kotlin.time.Duration
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
@@ -61,8 +73,30 @@ class VideoPlayerFragment : Fragment() {
 
 		// Create a queue from the items added to the legacy video queue; Velella: starting at the launcher's item and resume point,
 		// applied when that entry's stream starts (a seek here would land before the stream is known)
+		startQueue(arguments?.getInt(EXTRA_POSITION)?.milliseconds)
+
+		// Pause player until the initial resume
+		playbackManager.state.pause()
+
+		// Velella: next up and still watching, as in the legacy player: the queue holds at the end of an entry while one is asked
+		queueService.advanceAtEnd = advanceAtEnd
+		// Velella: the prompt lasts until another entry starts; closing the player (no entry) keeps it, see playerOverlay
+		playbackManager.queue.entry
+			.filterNotNull()
+			.onEach { entry ->
+				endPrompt.value = EndOfEntryPrompt.NONE
+				switchingChannel.value = false
+				// Velella: as the legacy player, so the details screen below shows the episode played last
+				entry.baseItem?.let { dataRefreshService.lastPlayedItem = it }
+				// Velella: as the legacy player, for the previous channel button, the channel bar and the guide's first focus
+				entry.baseItem?.takeIf { it.type == BaseItemKind.TV_CHANNEL }?.let { TvManager.setLastLiveTvChannel(it.id) }
+			}
+			.launchIn(lifecycleScope)
+	}
+
+	/** The queue of the items added to the legacy video queue, from the launcher's item; [startPosition] for its first entry. */
+	private fun startQueue(startPosition: Duration?) {
 		val startIndex = videoQueueManager.getCurrentMediaPosition().coerceAtLeast(0)
-		val startPosition = arguments?.getInt(EXTRA_POSITION)?.milliseconds
 		// Velella: the tracks picked on the details screen, used once
 		val items = videoQueueManager.getCurrentVideoQueue()
 		val startTracks = items.getOrNull(startIndex)?.let { item -> trackPreselection.take(item.id, item.playedMediaSource?.id) }
@@ -77,25 +111,39 @@ class VideoPlayerFragment : Fragment() {
 		Timber.i("Created a queue with ${queueSupplier.items.size} items, starting at $startIndex")
 		playbackManager.queue.clear()
 		playbackManager.queue.addSupplier(queueSupplier, startIndex)
+	}
 
-		// Pause player until the initial resume
-		playbackManager.state.pause()
+	/** Velella: tunes to another live TV channel in this player, as the legacy player's channel bar and guide do (playChannel). */
+	private fun switchChannel(channelId: UUID) {
+		val current = playbackManager.queue.entry.value?.baseItem
+		if (current?.id == channelId) return
 
-		// Velella: next up and still watching, as in the legacy player: the queue holds at the end of an entry while one is asked
-		queueService.advanceAtEnd = advanceAtEnd
-		// Velella: the prompt lasts until another entry starts; closing the player (no entry) keeps it, see playerOverlay
-		playbackManager.queue.entry
-			.filterNotNull()
-			.onEach { entry ->
-				endPrompt.value = EndOfEntryPrompt.NONE
-				// Velella: as the legacy player, so the details screen below shows the episode played last
-				entry.baseItem?.let { dataRefreshService.lastPlayedItem = it }
+		viewLifecycleOwner.lifecycleScope.launch {
+			val channel = try {
+				withContext(Dispatchers.IO) { api.libraryApi.getItem(channelId).content }
+			} catch (error: CancellationException) {
+				throw error
+			} catch (@Suppress("TooGenericExceptionCaught") error: Exception) {
+				Timber.w(error, "Unable to get channel $channelId")
+				Toast.makeText(requireContext(), R.string.msg_video_playback_error, Toast.LENGTH_LONG).show()
+				return@launch
 			}
-			.launchIn(lifecycleScope)
+
+			// The player was left (Home, the guide) while the channel was asked for: it must not start playing in the background
+			if (!lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) return@launch
+			Timber.i("Switching to channel ${channel.id}")
+			switchingChannel.value = true
+			videoQueueManager.setCurrentVideoQueue(listOf(channel))
+			videoQueueManager.setCurrentMediaPosition(0)
+			startQueue(null)
+			playbackManager.state.unpause()
+		}
 	}
 
 	private val queueService get() = requireNotNull(playbackManager.getService<QueueService>()) { "No queue service" }
 	private val endPrompt = MutableStateFlow(EndOfEntryPrompt.NONE)
+	private val switchingChannel = MutableStateFlow(false)
+	private val liveTvSwitch = LiveTvSwitch(switchingChannel, ::switchChannel)
 	private val advanceAtEnd: (QueueEntry, QueueEntry) -> Boolean = { ended, _ ->
 		val endedItem = ended.baseItem
 		interactionTracker.onEpisodeWatched(endedItem?.runTimeTicks?.ticks?.inWholeMilliseconds ?: 0)
@@ -116,7 +164,7 @@ class VideoPlayerFragment : Fragment() {
 		savedInstanceState: Bundle?
 	) = content {
 		BaseScreen {
-			VideoPlayerScreen(endPrompt = endPrompt)
+			VideoPlayerScreen(endPrompt = endPrompt, liveTvSwitch = liveTvSwitch)
 		}
 	}
 

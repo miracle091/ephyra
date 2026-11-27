@@ -1,5 +1,6 @@
 package org.jellyfin.playback.jellyfin.playsession
 
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
@@ -20,6 +21,7 @@ import org.jellyfin.playback.core.queue.queue
 import org.jellyfin.playback.jellyfin.SUBTITLES_OFF
 import org.jellyfin.playback.jellyfin.queue.baseItem
 import org.jellyfin.sdk.api.client.ApiClient
+import org.jellyfin.sdk.api.client.extensions.mediaInfoApi
 import org.jellyfin.sdk.api.client.extensions.sessionApi
 import org.jellyfin.sdk.model.api.BaseItemDto
 import org.jellyfin.sdk.model.api.PlayMethod
@@ -57,6 +59,8 @@ class PlaySessionService(
 	override suspend fun onInitialize() {
 		state.playState.onEach { sync() }.launchIn(coroutineScope)
 		manager.queue.entry.onEach { sync() }.launchIn(coroutineScope)
+		// Velella: a stream that came after playback moved on never becomes a session; close its live stream
+		manager.discardedStreams.onEach { stream -> closeLiveStream(stream, "came after playback moved on") }.launchIn(coroutineScope)
 
 		// Velella: periodic progress, and a start as soon as the next entry's stream is known (no play state change then)
 		coroutineScope.launch {
@@ -114,6 +118,7 @@ class PlaySessionService(
 				is PlaySessionReport.Start -> sendStreamStart(report.session, position ?: Duration.ZERO)
 				is PlaySessionReport.Progress -> sendStreamUpdate(report.session, position ?: Duration.ZERO)
 				is PlaySessionReport.Stop -> sendStreamStop(report.session, report.position, report.failed)
+				is PlaySessionReport.Abandon -> closeLiveStream(report.session.stream, "never played")
 			}
 		}
 		lastReport = TimeSource.Monotonic.markNow()
@@ -180,6 +185,22 @@ class PlaySessionService(
 				)
 			)
 		}.onFailure { error -> Timber.w(error, "Failed to send playback update event") }
+	}
+
+	/**
+	 * Velella: closes the live stream (tuner, shared M3U stream) the server opened for a [stream] that never played, which gets no
+	 * stop report to close it; every PlaybackInfo that opened one counts as a consumer until it is closed.
+	 */
+	private suspend fun closeLiveStream(stream: PlayableMediaStream, reason: String) {
+		val liveStreamId = stream.liveStreamId ?: return
+		Timber.i("Closing the live stream of ${stream.queueEntry}, which $reason")
+		try {
+			api.mediaInfoApi.closeLiveStream(liveStreamId)
+		} catch (error: CancellationException) {
+			throw error
+		} catch (@Suppress("TooGenericExceptionCaught") error: Exception) {
+			Timber.w(error, "Failed to close the live stream")
+		}
 	}
 
 	private suspend fun sendStreamStop(session: PlaySession, position: Duration, failed: Boolean) {

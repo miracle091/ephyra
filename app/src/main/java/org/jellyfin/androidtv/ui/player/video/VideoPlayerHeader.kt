@@ -30,12 +30,19 @@ import org.jellyfin.sdk.model.api.BaseItemDto
 fun VideoPlayerHeader(
 	item: BaseItemDto?,
 	stream: PlayableMediaStream?,
+	// Velella: a live channel shows only the badge and the channel here; the programme and the play method sit above the buttons
+	live: LiveChannelInfo? = null,
 ) {
 	val palette = LocalVelellaPalette.current
 	val context = LocalContext.current
 
 	// The legacy header: the text keeps 24dp from the clock, the clock sits 8dp lower than the title block
 	PlayerHeader(clockModifier = Modifier.padding(top = 8.dp), spacing = 24.dp) {
+		if (live != null) {
+			LiveChannelLine(live)
+			return@PlayerHeader
+		}
+
 		if (item != null) {
 			val overline = remember(item) { OsdHeader.overlineOf(item, item.getSeasonEpisodeName(context)) }
 			if (overline.isNotBlank()) {

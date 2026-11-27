@@ -108,12 +108,20 @@ section 2(a) of the GPL-2.0.
   stream, waits up to 2 minutes while the server tunes it and follows the "direct play live TV" setting. Live
   channels, `.strm` files and other remote sources are no longer refused (a remote HTTP source plays from its own
   address); sources Media3 can't read directly go through the server.
-- A live channel that has not started playing 20 seconds after the new player got its stream counts as a stream
-  error, so the retry chain tries it again or gives up (about a minute on a dead channel), as in the legacy player.
+- A live channel that has not started playing 45 seconds after the new player got its stream counts as a stream
+  error, so the retry chain tries it again or gives up (about two minutes on a dead channel). Cold channels took up to
+  34 seconds to start on the Shield, so the legacy player's 20 seconds would restart them before they could play.
+- The new player's live TV controls follow the legacy player's: the "Live" badge and the channel at the top, the
+  programme on air with a bar of its elapsed time between its start and end, the next programme and how the server
+  delivers the stream above the buttons, no seeking, and TV guide, Record (red while set, with the series question),
+  Channels and previous channel buttons, as icons only. Down with the controls hidden, or Channels, opens a row of the channels at the
+  bottom of the picture; OK tunes to one in the same player. The controls area grows when its content needs it.
 - The new player tells the server which live stream it played, so the server closes it (and frees the tuner) when
-  playback stops or moves to another stream. The retry chain counts its attempts again only after 30 seconds of real
-  playback, not merely 30 seconds after the last error, and ignores a late error of the stream a retry is already
-  replacing, so a channel that never starts reaches the transcode and gives up instead of retrying forever. Stream
+  playback stops or moves to another stream; a live stream that never started (a retry, another channel or Back
+  replaced it, or it came after the user had moved on) is closed too and does not start late, so failed attempts no
+  longer keep tuners busy. The retry chain counts its attempts again only after 30 seconds of real playback, not
+  merely 30 seconds after the last error, and ignores a late error of the stream a retry is already replacing, so a
+  channel that never starts reaches the transcode and gives up instead of retrying forever. Stream
   addresses that are not the server's are logged by their host only, since they may hold credentials.
 - Trailers skip an Invidious instance that hands out YouTube's own addresses instead of proxying the video, and the
   trailer player refuses any request or redirect to YouTube's or Google's video hosts. A malformed instance address

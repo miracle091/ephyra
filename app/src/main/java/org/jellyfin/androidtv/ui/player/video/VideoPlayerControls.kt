@@ -146,7 +146,8 @@ fun VideoPlayerControls(
 	// Velella: a menu asked for by its remote key (Captions, Audio track), opened once the controls show
 	menuRequest: VideoPlayerKeyAction? = null,
 	onMenuRequestHandled: () -> Unit = {},
-	modifier: Modifier = Modifier,
+	// Velella: a live channel shows its programme block in place of the seek bar and can't seek, as in the legacy player
+	live: LiveControls? = null,
 ) {
 	val playState by playbackManager.state.playState.collectAsState()
 	val seekbarFocus = remember { FocusRequester() }
@@ -157,20 +158,23 @@ fun VideoPlayerControls(
 	// more around the row). The legacy order: rewind, play/pause, fast forward, next
 	Column(
 		verticalArrangement = Arrangement.Bottom,
-		modifier = modifier,
 	) {
-		VideoSeekbar(playbackManager, seekbarFocus, playPauseFocus)
+		if (live != null) {
+			LiveProgramBlock(live.info, live.playInfo)
+		} else {
+			VideoSeekbar(playbackManager, seekbarFocus, playPauseFocus)
 
-		PositionRow(playbackManager, Modifier.padding(top = 8.dp))
+			PositionRow(playbackManager, Modifier.padding(top = 8.dp))
+		}
 
 		Row(
 			horizontalArrangement = Arrangement.spacedBy(12.dp),
 			modifier = Modifier
 				.padding(start = 2.dp, top = 18.dp, end = 2.dp)
 				// Velella: up from the buttons goes to the seek bar above them; the 2D focus search skipped the thin bar and left
-				// the controls, which hides the overlay
+				// the controls, which hides the overlay. A live channel's bar takes no focus: up leaves and hides the overlay.
 				.onPreviewKeyEvent { event ->
-					val up = event.type == KeyEventType.KeyDown && event.key == Key.DirectionUp
+					val up = live == null && event.type == KeyEventType.KeyDown && event.key == Key.DirectionUp
 					if (up) seekbarFocus.requestFocus()
 					up
 				}
@@ -178,14 +182,17 @@ fun VideoPlayerControls(
 				.focusGroup()
 		) {
 			PreviousEntryButton(playbackManager)
-			RewindButton(playbackManager)
+			if (live == null) RewindButton(playbackManager)
 			PlayPauseButton(playbackManager, playState, playPauseFocus)
-			FastForwardButton(playbackManager)
+			if (live == null) FastForwardButton(playbackManager)
 			NextEntryButton(playbackManager)
+			if (live != null) LiveTvPills(live.info, live.actions)
 
 			Spacer(Modifier.weight(1f))
 
-			VideoPlayerMenus(playbackManager, menuRequest, onMenuRequestHandled)
+			if (live != null) PreviousChannelButton(live.info.channel.id, live.actions.onSwitch)
+
+			VideoPlayerMenus(playbackManager, menuRequest, onMenuRequestHandled, showQuality = live == null)
 			PlaybackInfoButton(onClick = onPlaybackInfoClick)
 		}
 	}

@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.emptyFlow
 import org.jellyfin.playback.core.backend.BackendService
 import org.jellyfin.playback.core.backend.PlayerBackend
 import org.jellyfin.playback.core.mediastream.MediaStreamService
+import org.jellyfin.playback.core.mediastream.PlayableMediaStream
 import org.jellyfin.playback.core.model.PlaybackFailure
 import org.jellyfin.playback.core.plugin.PlayerService
 import timber.log.Timber
@@ -46,6 +47,10 @@ class PlaybackManager internal constructor(
 	/** Velella: what the player did about each failed playback (retried with a heavier stream, gave up, skipped an entry). */
 	val failures: Flow<PlaybackFailure>
 		get() = getService<MediaStreamService>()?.failures ?: emptyFlow()
+
+	/** Velella: streams the server handed out that will never play (playback moved on while they were asked for). */
+	val discardedStreams: Flow<PlayableMediaStream>
+		get() = getService<MediaStreamService>()?.discardedStreams ?: emptyFlow()
 
 	fun addService(service: PlayerService) {
 		Timber.i("Adding service $service")

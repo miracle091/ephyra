@@ -2,18 +2,18 @@ package org.jellyfin.androidtv.ui.player.video
 
 import android.view.KeyEvent
 
-/** Velella: what a remote or gamepad key does in the video player, beyond moving the focus. */
-enum class VideoPlayerKeyAction {
+/** Velella: what a remote or gamepad key does in the video player, beyond moving the focus; [seeks] for those a live channel ignores. */
+enum class VideoPlayerKeyAction(val seeks: Boolean = false) {
 	PLAY,
 	PAUSE,
 	PLAY_PAUSE,
-	FAST_FORWARD,
-	REWIND,
+	FAST_FORWARD(seeks = true),
+	REWIND(seeks = true),
 	STOP,
 	SUBTITLES_MENU,
 	AUDIO_MENU,
-	QUICK_SEEK_FORWARD,
-	QUICK_SEEK_REWIND,
+	QUICK_SEEK_FORWARD(seeks = true),
+	QUICK_SEEK_REWIND(seeks = true),
 }
 
 /**

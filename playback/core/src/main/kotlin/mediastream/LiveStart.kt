@@ -9,11 +9,13 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 /**
- * Velella: how long a live stream may take to start playing. Some channels leave the player buffering forever without an error;
- * a transcoded channel took about 15 s to start on the Shield, so 20 s leaves some room and, with the retry chain, closes a dead
- * channel in about a minute (as the legacy player's `LiveStreamRetry`).
+ * Velella: how long a live stream may take to start playing once the player has it. Some channels leave the player buffering
+ * forever without an error. On the Shield, cold channels showed their first frame up to 34 s after the stream was handed to the
+ * player (guide, 2026-11-03) and 24 s on 2026-11-27, and a retry starts the server's transcode over: 20 s (the legacy player's
+ * `LiveStreamRetry`) made such channels never start. 45 s lets them start, and the retry chain (three attempts) still closes a
+ * dead channel in about two minutes.
  */
-internal val LIVE_START_TIMEOUT = 20.seconds
+internal val LIVE_START_TIMEOUT = 45.seconds
 
 /**
  * Velella: whether a live stream that was just handed to the player stalled: it neither played nor failed within [timeout]. A

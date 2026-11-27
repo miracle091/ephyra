@@ -34,6 +34,8 @@ fun VideoPlayerMenus(
 	// Velella: the menu its remote key asked for (Captions, Audio track); a request for a menu the video lacks is just dropped
 	menuRequest: VideoPlayerKeyAction? = null,
 	onMenuRequestHandled: () -> Unit = {},
+	// Velella: as in the legacy player, a live channel has no quality menu
+	showQuality: Boolean = true,
 	userPreferences: UserPreferences = koinInject(),
 ) {
 	val entry by rememberQueueEntry(playbackManager)
@@ -87,7 +89,8 @@ fun VideoPlayerMenus(
 		)
 	}
 
-	VideoPlayerMoreButton(listOfNotNull(chapterMenu, qualitySubmenu(playbackManager, userPreferences)))
+	val qualityMenu = if (showQuality) qualitySubmenu(playbackManager, userPreferences) else null
+	VideoPlayerMoreButton(listOfNotNull(chapterMenu, qualityMenu))
 }
 
 /** Velella: the quality (maximum bitrate) menu; picking one asks the server for a new stream under it, from the current position. */
