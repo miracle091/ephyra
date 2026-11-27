@@ -51,7 +51,8 @@ section 2(a) of the GPL-2.0.
 - Library grids load faster: pages leave out the fields the grid never shows (chapters, trickplay, media streams,
   paths, overviews, taglines), their size follows the cards on screen instead of a fixed 100, and each new page is
   appended instead of diffing the whole list on the main thread.
-- Cast and crew cards on the details screens are larger (120dp pictures instead of 88dp).
+- Cast and crew cards on the details screens are larger, with portrait pictures again: 120dp tall (instead of 88dp
+  squares) and 7:9 like the other person cards.
 - The new player frees its decoders and buffers when playback stops and builds a fresh player for the next one, so
   changes to the FFmpeg, libass and buffer settings apply without restarting the app.
 - The new player switches the display to the video's frame rate (and back on exit) like the legacy one, with the

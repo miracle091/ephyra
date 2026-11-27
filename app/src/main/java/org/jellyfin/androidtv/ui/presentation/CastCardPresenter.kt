@@ -43,19 +43,22 @@ import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.composable.item.ArtToneCover
 import org.jellyfin.androidtv.ui.composable.item.cardFocusRing
 import org.jellyfin.androidtv.ui.itemhandling.BaseRowItem
+import org.jellyfin.androidtv.util.ImageHelper
 import org.jellyfin.androidtv.util.apiclient.getUrl
 import org.jellyfin.androidtv.util.getActivity
 import org.jellyfin.sdk.api.client.ApiClient
 import org.koin.compose.koinInject
 
-// Large enough to recognise faces from the sofa, small enough that a row still shows several people
-private val CastImageSize = 120.dp
+// Large enough to recognise faces from the sofa, small enough that a row still shows several people; portrait like the person
+// cards elsewhere (7:9), as tall as the square pictures were, so the row keeps its height
+private val CastImageHeight = 120.dp
+private val CastImageWidth = CastImageHeight * ImageHelper.ASPECT_RATIO_7_9.toFloat()
 private const val MARQUEE_DELAY_MS = 1500
 
 /**
- * Velella: the compact cast card of the details screens: a square 120dp picture with rounded corners and, under it, the person's
- * name and role in two small lines. More people fit in a row than with the poster-shaped cards. Focus ring and click behaviour
- * are the covers': the row handles the click and the ring is drawn here.
+ * Velella: the compact cast card of the details screens: a 120dp-tall portrait picture (7:9) with rounded corners and, under
+ * it, the person's name and role in two small lines. Focus ring and click behaviour are the covers': the row handles the click
+ * and the ring is drawn here.
  */
 class CastCardPresenter : Presenter() {
 	override fun onCreateViewHolder(parent: ViewGroup): ViewHolder {
@@ -118,7 +121,7 @@ private fun CastCard(item: BaseRowItem, focused: Boolean) {
 	val context = LocalContext.current
 	val palette = LocalVelellaPalette.current
 	val shape = JellyfinTheme.shapes.medium
-	val imageSize = with(LocalDensity.current) { CastImageSize.roundToPx() }
+	val imageHeight = with(LocalDensity.current) { CastImageHeight.roundToPx() }
 
 	val name = item.getFullName(context)
 	val role = item.getSubText(context)
@@ -126,20 +129,20 @@ private fun CastCard(item: BaseRowItem, focused: Boolean) {
 	// A name or role longer than the card scrolls by itself, focused or not
 	val marquee = Modifier.basicMarquee(iterations = Int.MAX_VALUE, initialDelayMillis = MARQUEE_DELAY_MS)
 
-	Column(modifier = Modifier.width(CastImageSize)) {
+	Column(modifier = Modifier.width(CastImageWidth)) {
 		Box(
 			modifier = Modifier
-				.size(CastImageSize)
+				.size(width = CastImageWidth, height = CastImageHeight)
 				.clip(shape)
 				.background(palette.surface1)
 				.cardFocusRing(focused, palette.accent, shape)
 		) {
 			if (image != null) {
 				AsyncImage(
-					model = image.getUrl(api, maxWidth = imageSize * 2, maxHeight = imageSize * 2),
+					model = image.getUrl(api, maxHeight = imageHeight * 2),
 					contentDescription = null,
 					contentScale = ContentScale.Crop,
-					// Portraits: keep the faces in the square
+					// Portraits: keep the faces in the frame
 					alignment = Alignment.TopCenter,
 					modifier = Modifier.fillMaxSize(),
 				)
