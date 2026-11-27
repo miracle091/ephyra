@@ -25,9 +25,19 @@ class SpotlightItemsTest : FunSpec({
 		genres = genres,
 	)
 
-	test("the overline names the first genre after the label") {
-		spotlightOverline("Spotlight", item(BaseItemKind.MOVIE, genres = listOf("Thriller", "Drama"))) shouldBe "Spotlight · Thriller"
-		spotlightOverline("Spotlight", item(BaseItemKind.MOVIE)) shouldBe "Spotlight"
+	test("the info row lists up to three genres joined by a dot") {
+		spotlightGenres(item(BaseItemKind.MOVIE, genres = listOf("Thriller", " ", "Drama", "Crime", "Mystery"))) shouldBe
+			"Thriller · Drama · Crime"
+		spotlightGenres(item(BaseItemKind.MOVIE, genres = listOf("Horror"))) shouldBe "Horror"
+		spotlightGenres(item(BaseItemKind.MOVIE)) shouldBe null
+		spotlightGenres(item(BaseItemKind.MOVIE, genres = listOf(""))) shouldBe null
+	}
+
+	test("the overview comes first, the tagline only when there is no overview") {
+		val film = item(BaseItemKind.MOVIE).copy(overview = " A count moves to London. ", taglines = listOf("The strangest passion"))
+		spotlightOverview(film) shouldBe "A count moves to London."
+		spotlightOverview(film.copy(overview = " ")) shouldBe "The strangest passion"
+		spotlightOverview(film.copy(overview = null, taglines = listOf(""))) shouldBe null
 	}
 
 	test("films show their running time; series leave it out") {

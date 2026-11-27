@@ -100,8 +100,8 @@
     <string name="velella_pref_stop_at_season_end_description">Episodes play one after another only within the same season</string>
 
     <!-- Home spotlight (ui/home/spotlight/HomeSpotlight.kt) -->
-    <string name="velella_spotlight">Spotlight</string>
     <string name="velella_spotlight_details">Details</string>
+    <string name="velella_see_all">See all</string>
     <string name="velella_pref_home_spotlight">Spotlight</string>
     <string name="velella_pref_home_spotlight_description">Recent films and series you have not watched, in turn at the top of the home screen</string>
     <string name="velella_pref_home_playlists">Playlists in My media</string>

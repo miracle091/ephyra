@@ -91,8 +91,8 @@
     <string name="velella_pref_stop_at_season_end_description">Gli episodi si susseguono solo all\'interno della stessa stagione</string>
 
     <!-- Home spotlight (ui/home/spotlight/HomeSpotlight.kt) -->
-    <string name="velella_spotlight">In evidenza</string>
     <string name="velella_spotlight_details">Dettagli</string>
+    <string name="velella_see_all">Vedi tutto</string>
     <string name="velella_pref_home_spotlight">In evidenza</string>
     <string name="velella_pref_home_spotlight_description">Film e serie recenti non ancora visti, a turno in cima alla home</string>
     <string name="velella_pref_home_playlists">Playlist in I miei media</string>

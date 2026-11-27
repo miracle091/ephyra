@@ -54,6 +54,7 @@ import org.jellyfin.androidtv.ui.composable.item.cardFocusRing
 import org.jellyfin.androidtv.ui.itemhandling.BaseItemDtoBaseRowItem
 import org.jellyfin.androidtv.ui.itemhandling.BaseRowItem
 import org.jellyfin.androidtv.ui.itemhandling.BaseRowType
+import org.jellyfin.androidtv.ui.home.SeeAllButton
 import org.jellyfin.androidtv.ui.itemhandling.GridButtonBaseRowItem
 import org.jellyfin.androidtv.util.ImageHelper
 import org.jellyfin.androidtv.util.apiclient.JellyfinImage
@@ -216,11 +217,16 @@ private fun BaseRowItem.getDisplayConfig(imageType: ImageType, uniformAspect: Bo
 		iconRes = R.drawable.ic_clapperboard,
 	)
 
-	BaseRowType.GridButton -> BaseRowItemDisplayConfig(
-		aspectRatio = ImageHelper.ASPECT_RATIO_7_9.toFloat(),
-		image = getImage(imageType),
-		iconRes = R.drawable.ic_clapperboard,
-	)
+	BaseRowType.GridButton -> {
+		val button = (this as? GridButtonBaseRowItem)?.gridButton
+		BaseRowItemDisplayConfig(
+			// Velella: a See all card takes the shape of the card before it
+			aspectRatio = (button as? SeeAllButton)?.neighbour?.getDisplayConfig(imageType, uniformAspect)?.aspectRatio
+				?: ImageHelper.ASPECT_RATIO_7_9.toFloat(),
+			image = getImage(imageType),
+			iconRes = button?.iconRes ?: R.drawable.ic_clapperboard,
+		)
+	}
 }
 
 @Composable
@@ -314,7 +320,8 @@ private fun CardImage(
 				.fillMaxSize()
 		)
 	} else {
-		ArtToneCover(title, displayConfig.iconRes) // Velella
+		// Velella: a button with its own icon, as See all, shows it on the colour tone
+		ArtToneCover(title, displayConfig.iconRes, alwaysShowIcon = (item as? GridButtonBaseRowItem)?.gridButton?.iconRes != null)
 	}
 }
 

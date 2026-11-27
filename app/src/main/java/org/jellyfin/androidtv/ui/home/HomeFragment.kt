@@ -21,6 +21,8 @@ import androidx.fragment.compose.AndroidFragment
 import androidx.fragment.compose.content
 import androidx.lifecycle.Lifecycle
 import org.jellyfin.androidtv.ui.home.spotlight.HomeSpotlight
+import org.jellyfin.androidtv.ui.home.spotlight.HomeSpotlightBackdrop
+import org.jellyfin.androidtv.ui.home.spotlight.rememberHomeSpotlightState
 import org.jellyfin.androidtv.ui.shared.toolbar.MainToolbar
 import org.jellyfin.androidtv.ui.shared.toolbar.MainToolbarActiveButton
 
@@ -33,14 +35,18 @@ class HomeFragment : Fragment() {
 		val rowsFocusRequester = remember { FocusRequester() }
 		LaunchedEffect(rowsFocusRequester) { rowsFocusRequester.requestFocus() }
 
+		// The leanback code has its own awful focus handling that doesn't work properly with Compose view inteop to workaround this
+		// issue we add custom behavior that only allows focus exit when the current selected row is the first one. Additionally when
+		// we do switch the focus, we reset the leanback state so it won't cause weird behavior when focus is regained
+		var rowsSupportFragment by remember { mutableStateOf<HomeRowsFragment?>(null) }
+		// Velella: the spotlight's backdrop runs behind the toolbar and its text sits above the rows
+		val spotlight = rememberHomeSpotlightState(rowsSupportFragment)
+		HomeSpotlightBackdrop(spotlight)
+
 		Column {
 			MainToolbar(MainToolbarActiveButton.Home)
 
-			// The leanback code has its own awful focus handling that doesn't work properly with Compose view inteop to workaround this
-			// issue we add custom behavior that only allows focus exit when the current selected row is the first one. Additionally when
-			// we do switch the focus, we reset the leanback state so it won't cause weird behavior when focus is regained
-			var rowsSupportFragment by remember { mutableStateOf<HomeRowsFragment?>(null) }
-			HomeSpotlight(rowsSupportFragment) // Velella: spotlight above the rows
+			HomeSpotlight(spotlight)
 			AndroidFragment<HomeRowsFragment>(
 				modifier = Modifier
 					.focusGroup()

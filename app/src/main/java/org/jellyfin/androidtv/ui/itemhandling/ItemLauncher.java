@@ -9,6 +9,7 @@ import org.jellyfin.androidtv.constant.QueryType;
 import org.jellyfin.androidtv.data.model.ChapterItemInfo;
 import org.jellyfin.androidtv.preference.LibraryPreferences;
 import org.jellyfin.androidtv.preference.PreferencesRepository;
+import org.jellyfin.androidtv.ui.home.SeeAllButton;
 import org.jellyfin.androidtv.ui.navigation.Destination;
 import org.jellyfin.androidtv.ui.navigation.Destinations;
 import org.jellyfin.androidtv.ui.navigation.NavigationRepository;
@@ -266,6 +267,11 @@ public class ItemLauncher {
 
                     case LiveTvOption.LIVE_TV_SERIES_OPTION_ID:
                         navigationRepository.getValue().navigate(Destinations.INSTANCE.getLiveTvSeriesRecordings());
+                        break;
+
+                    case SeeAllButton.ID:
+                        // Velella: the See all card at the end of a home row opens its library
+                        launchUserView(((SeeAllButton) ((GridButtonBaseRowItem) rowItem).getGridButton()).getLibrary());
                         break;
 
                     case LiveTvOption.LIVE_TV_SCHEDULE_OPTION_ID:

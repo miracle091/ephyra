@@ -33,7 +33,7 @@ suspend fun loadSpotlightItems(api: ApiClient): List<BaseItemDto> = withContext(
 			// The name breaks ties (items scanned together share their date), so the order stays the same between loads
 			sortBy = setOf(ItemSortBy.DATE_CREATED, ItemSortBy.SORT_NAME),
 			sortOrder = setOf(SortOrder.DESCENDING, SortOrder.ASCENDING),
-			fields = setOf(ItemFields.GENRES, ItemFields.TAGLINES),
+			fields = setOf(ItemFields.GENRES, ItemFields.TAGLINES, ItemFields.OVERVIEW),
 			limit = SPOTLIGHT_SIZE,
 		).content.items
 	} catch (error: CancellationException) {
@@ -67,9 +67,11 @@ suspend fun loadSpotlightPlayTarget(api: ApiClient, item: BaseItemDto): UUID {
 fun spotlightPlayTarget(item: BaseItemDto, nextUp: BaseItemDto?): UUID =
 	nextUp?.takeIf { item.type == BaseItemKind.SERIES && it.seriesId == item.id }?.id ?: item.id
 
-/** Velella: the line above the title: the spotlight label, then the first genre ("SPOTLIGHT · THRILLER"). */
-fun spotlightOverline(label: String, item: BaseItemDto): String =
-	listOfNotNull(label, item.genres?.firstOrNull()).joinToString(" · ")
+private const val SPOTLIGHT_GENRES = 3
+
+/** Velella: the first three genres for the info row ("Thriller · Drama · Crime"), null when the title has none. */
+fun spotlightGenres(item: BaseItemDto): String? =
+	item.genres.orEmpty().filter { it.isNotBlank() }.take(SPOTLIGHT_GENRES).joinToString(" · ").ifEmpty { null }
 
 /** Velella: the running time of a film ("2 h 46 min"), null for anything else or when unknown. */
 fun spotlightRuntime(item: BaseItemDto, getString: (Int, Array<out Any>) -> String): String? =
@@ -80,5 +82,6 @@ fun spotlightRuntime(item: BaseItemDto, getString: (Int, Array<out Any>) -> Stri
 		else getString(R.string.velella_runtime_minutes, arrayOf(minutes))
 	}
 
-/** Velella: the first non blank tagline, or null so the spotlight shows no line. */
-fun spotlightTagline(item: BaseItemDto): String? = item.taglines?.firstOrNull { it.isNotBlank() }?.trim()
+/** Velella: the overview, up to three lines under the title; the first tagline when there is none, else null. */
+fun spotlightOverview(item: BaseItemDto): String? =
+	item.overview?.trim()?.ifEmpty { null } ?: item.taglines?.firstOrNull { it.isNotBlank() }?.trim()

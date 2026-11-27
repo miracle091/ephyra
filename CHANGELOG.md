@@ -16,8 +16,14 @@ section 2(a) of the GPL-2.0.
 
 - Release notes are written from this changelog: the release workflow fills `.github/release-template.md` with the
   version's section and a link to it.
+- The "Recently added" rows of the home screen end with a "See all" card that opens the library, as its tile in My
+  media does.
 
 ### Changed
+
+- The home spotlight spans the screen behind the toolbar, about 60% of its height, fading to the left and into the
+  rows; it shows the title's logo in large (the name when there is none), the genres in the info row, up to three lines
+  of overview (the tagline when there is none), labelled Play and Details buttons, and a dash for each title.
 
 - Ephyra is now called Velella, with a new logo (a velella's float and sail, also next to About in the settings) and
   the application id `com.velella.app`, so it is no longer confused with
