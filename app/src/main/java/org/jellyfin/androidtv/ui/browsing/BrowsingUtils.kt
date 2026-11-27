@@ -20,7 +20,6 @@ import org.jellyfin.sdk.model.api.request.GetArtistsRequest
 import org.jellyfin.sdk.model.api.request.GetLatestMediaRequest
 import org.jellyfin.sdk.model.api.request.GetNextUpRequest
 import org.jellyfin.sdk.model.api.request.GetSeasonsRequest
-import org.jellyfin.sdk.model.api.request.GetSimilarItemsRequest
 import org.jellyfin.sdk.model.api.request.GetUpcomingEpisodesRequest
 import timber.log.Timber
 import java.util.UUID
@@ -114,12 +113,6 @@ fun createSeasonsRequest(seriesId: UUID) = GetSeasonsRequest(
 fun createUpcomingEpisodesRequest(parentId: UUID) = GetUpcomingEpisodesRequest(
 	parentId = parentId,
 	fields = ItemRepository.itemFields,
-)
-
-fun createSimilarItemsRequest(itemId: UUID) = GetSimilarItemsRequest(
-	itemId = itemId,
-	fields = ItemRepository.itemFields,
-	limit = 20,
 )
 
 fun createAlbumArtistsRequest(parentId: UUID) = GetAlbumArtistsRequest(

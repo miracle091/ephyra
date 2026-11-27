@@ -141,6 +141,7 @@ section 2(a) of the GPL-2.0.
 
 ### Removed
 
+- The More like this row on the details of films, trailers and shows.
 - Trailers no longer open the YouTube app or a browser, and the app no longer declares that it looks for apps that open
   YouTube links.
 - Dead code: functions and members with no caller (`PopoverMenu.kt`, `ItemRowAdapter.setSiblingRow`,
