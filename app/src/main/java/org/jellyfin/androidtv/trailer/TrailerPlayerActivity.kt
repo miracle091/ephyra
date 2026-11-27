@@ -3,8 +3,13 @@ package org.jellyfin.androidtv.trailer
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.Gravity
+import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+import android.widget.FrameLayout
+import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.annotation.OptIn
+import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.AudioAttributes
@@ -31,6 +36,7 @@ import timber.log.Timber
 class TrailerPlayerActivity : FragmentActivity() {
 	private val resolver by inject<TrailerResolver>()
 	private lateinit var playerView: PlayerView
+	private lateinit var loading: ProgressBar
 	private var player: ExoPlayer? = null
 	private var videoIds: List<String> = emptyList()
 	private var videoIndex = 0
@@ -47,12 +53,20 @@ class TrailerPlayerActivity : FragmentActivity() {
 			setShowNextButton(false)
 			setShowPreviousButton(false)
 		}
-		setContentView(playerView)
+		// A spinner while the instances are asked and the stream starts, instead of a black screen
+		loading = ProgressBar(this).apply { isIndeterminate = true }
+		setContentView(
+			FrameLayout(this).apply {
+				addView(playerView)
+				addView(loading, FrameLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT, Gravity.CENTER))
+			}
+		)
 		playCurrent()
 	}
 
 	private fun playCurrent() {
 		val videoId = videoIds.getOrNull(videoIndex) ?: return giveUp()
+		loading.isVisible = true
 		lifecycleScope.launch {
 			val trailer = resolver.resolve(videoId, failedInstances)
 			if (trailer == null) {
@@ -96,6 +110,7 @@ class TrailerPlayerActivity : FragmentActivity() {
 
 	private inner class TrailerListener : Player.Listener {
 		override fun onPlaybackStateChanged(playbackState: Int) {
+			if (playbackState == Player.STATE_READY) loading.isVisible = false
 			if (playbackState == Player.STATE_ENDED) finish()
 		}
 

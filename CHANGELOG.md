@@ -164,6 +164,7 @@ section 2(a) of the GPL-2.0.
   so they no longer sit on top of the cards that scroll up under them.
 - Long cast and crew names no longer overlap the next card: they end with an ellipsis, and the selected card scrolls
   its name and role inside the card.
+- A trailer shows a spinner while the Invidious instances are asked and the stream starts, instead of a black screen.
 - Leaving the new player refreshes the details screen below, as the legacy player does: the resume point, the
   watched state and the episode played last show at once, and the focus moves to Resume or Play.
 - The new player skips media segments as set in Settings (intro, outro, recap, preview, commercial) instead of always
