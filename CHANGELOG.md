@@ -156,7 +156,8 @@ section 2(a) of the GPL-2.0.
 ### Fixed
 
 - A screen opened from navigation no longer stays blank now and then, and a freshly created screen gets its arguments
-  (upstream fixes `5e9140df4` and `8653f7b06`).
+  (upstream fixes `5e9140df4` and `8653f7b06`). An empty library grid no longer crashes when the focus moves (upstream
+  `10d01122a`).
 - Leaving the new player refreshes the details screen below, as the legacy player does: the resume point, the
   watched state and the episode played last show at once, and the focus moves to Resume or Play.
 - The new player skips media segments as set in Settings (intro, outro, recap, preview, commercial) instead of always
