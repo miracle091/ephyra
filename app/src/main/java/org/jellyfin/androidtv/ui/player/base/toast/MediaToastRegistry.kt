@@ -1,6 +1,7 @@
 package org.jellyfin.androidtv.ui.player.base.toast
 
 import androidx.annotation.DrawableRes
+import androidx.compose.runtime.staticCompositionLocalOf
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -46,4 +47,7 @@ class MediaToastRegistry(
 		emit(data)
 	}
 }
+
+/** Velella: the player's [MediaToastRegistry] for its controls, so the play/pause button shows the icon of the user's command. */
+val LocalMediaToastRegistry = staticCompositionLocalOf<MediaToastRegistry> { error("No MediaToastRegistry provided") }
 

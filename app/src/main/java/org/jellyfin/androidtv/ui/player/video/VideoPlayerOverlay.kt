@@ -30,7 +30,6 @@ import org.jellyfin.androidtv.ui.player.base.toast.MediaToastRegistry
 import org.jellyfin.androidtv.ui.player.base.toast.MediaToasts
 import org.jellyfin.playback.core.PlaybackManager
 import org.jellyfin.playback.core.mediastream.mediaStream
-import org.jellyfin.playback.core.model.PlayState
 import org.jellyfin.playback.core.mediastream.mediaStreamFlow
 import org.jellyfin.playback.core.queue.startPosition
 import org.jellyfin.playback.jellyfin.queue.baseItem
@@ -38,22 +37,23 @@ import org.jellyfin.playback.jellyfin.queue.baseItemFlow
 import org.koin.compose.koinInject
 import kotlin.time.Duration
 
-/** Velella: the playback keys' [action]; the play/pause key and centre play, go on from a pause, or pause while playing. */
-private fun PlaybackManager.perform(action: VideoPlayerKeyAction) {
-	when (action) {
-		VideoPlayerKeyAction.PLAY -> state.unpause()
-		VideoPlayerKeyAction.PAUSE -> state.pause()
-		VideoPlayerKeyAction.FAST_FORWARD -> state.fastForward()
-		VideoPlayerKeyAction.REWIND -> state.rewind()
-		VideoPlayerKeyAction.PLAY_PAUSE -> when (state.playState.value) {
-			PlayState.PLAYING -> state.pause()
-			PlayState.PAUSED -> state.unpause()
-			PlayState.STOPPED, PlayState.ERROR -> state.play()
-		}
+/**
+ * Velella: the playback keys' [action]; the play/pause key and centre play, go on from a pause, or pause while playing. [onPause] runs
+ * after a pause.
+ */
+private fun PlaybackManager.perform(action: VideoPlayerKeyAction, mediaToastRegistry: MediaToastRegistry, onPause: () -> Unit) {
+	val command = when (action) {
+		VideoPlayerKeyAction.PLAY -> PlayPauseCommand.UNPAUSE
+		VideoPlayerKeyAction.PAUSE -> PlayPauseCommand.PAUSE
+		VideoPlayerKeyAction.PLAY_PAUSE -> playPauseCommand(state.playState.value)
+		VideoPlayerKeyAction.FAST_FORWARD -> null.also { state.fastForward() }
+		VideoPlayerKeyAction.REWIND -> null.also { state.rewind() }
 		// Handled by the overlay
 		VideoPlayerKeyAction.STOP, VideoPlayerKeyAction.SUBTITLES_MENU, VideoPlayerKeyAction.AUDIO_MENU,
-		VideoPlayerKeyAction.QUICK_SEEK_FORWARD, VideoPlayerKeyAction.QUICK_SEEK_REWIND -> Unit
+		VideoPlayerKeyAction.QUICK_SEEK_FORWARD, VideoPlayerKeyAction.QUICK_SEEK_REWIND -> null
 	}
+	command?.let { perform(it, mediaToastRegistry) }
+	if (command == PlayPauseCommand.PAUSE) onPause()
 }
 
 // Velella: the legacy player's margins (velella_side_margin, velella_safe_y, velella_osd_padding_bottom); the bottom one is 2dp more
@@ -103,7 +103,8 @@ fun VideoPlayerOverlay(
 				menuRequest = action
 				visibilityState.show()
 			}
-			else -> if (!quickSeek.onKey(action, keyCode)) playbackManager.perform(action)
+			// Velella: a pause by the user shows the controls
+			else -> if (!quickSeek.onKey(action, keyCode)) playbackManager.perform(action, mediaToastRegistry, onPause = visibilityState.show)
 		}
 		skipAction != null || action != null
 	}

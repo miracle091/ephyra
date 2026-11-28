@@ -58,6 +58,7 @@ import org.jellyfin.androidtv.ui.base.popover.Popover
 import org.jellyfin.androidtv.ui.base.popover.PopoverPlacement
 import org.jellyfin.androidtv.ui.composable.rememberPlayerPositionInfo
 import org.jellyfin.androidtv.ui.player.base.PlayerSeekbar
+import org.jellyfin.androidtv.ui.player.base.toast.LocalMediaToastRegistry
 import org.jellyfin.androidtv.util.getTimeFormatter
 import org.jellyfin.androidtv.ui.composable.rememberQueueEntry
 import org.jellyfin.playback.core.PlaybackManager
@@ -204,20 +205,14 @@ private fun PlayPauseButton(
 	playState: PlayState,
 	focusRequester: FocusRequester,
 ) {
+	val mediaToastRegistry = LocalMediaToastRegistry.current
+
 	// Velella: take the focus as soon as the controls appear. onVisibilityChanged waited until the button was fully on screen, at
 	// the end of the controls' slide in, so a right press during the slide found no focused button and was lost
 	LaunchedEffect(focusRequester) { focusRequester.requestFocus() }
 
 	IconButton(
-		onClick = {
-			when (playState) {
-				PlayState.STOPPED,
-				PlayState.ERROR -> playbackManager.state.play()
-
-				PlayState.PLAYING -> playbackManager.state.pause()
-				PlayState.PAUSED -> playbackManager.state.unpause()
-			}
-		},
+		onClick = { playbackManager.perform(playPauseCommand(playState), mediaToastRegistry) },
 		modifier = Modifier.focusRequester(focusRequester)
 	) {
 		AnimatedContent(playState) { playState ->

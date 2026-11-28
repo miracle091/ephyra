@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
@@ -26,8 +27,8 @@ import org.jellyfin.androidtv.preference.constant.ZoomMode
 import org.jellyfin.androidtv.ui.ScreensaverLock
 import org.jellyfin.androidtv.ui.player.base.PlayerSubtitles
 import org.jellyfin.androidtv.ui.player.base.PlayerSurface
+import org.jellyfin.androidtv.ui.player.base.toast.LocalMediaToastRegistry
 import org.jellyfin.androidtv.ui.player.base.toast.MediaToastRegistry
-import org.jellyfin.androidtv.ui.player.video.toast.rememberPlaybackManagerMediaToastEmitter
 import org.jellyfin.playback.core.PlaybackManager
 import org.jellyfin.playback.core.model.PlayState
 import org.jellyfin.playback.core.queue.QueueService
@@ -66,8 +67,8 @@ fun VideoPlayerScreen(
 	val aspectRatio = videoSize.aspectRatio.takeIf { !it.isNaN() && it > 0f } ?: DEFAULT_VIDEO_ASPECT_RATIO
 
 	val coroutineScope = rememberCoroutineScope()
+	// Velella: shows the play and pause icons of the user's own commands (PlayPauseCommand.kt) and the quick seek steps
 	val mediaToastRegistry = remember { MediaToastRegistry(coroutineScope) }
-	rememberPlaybackManagerMediaToastEmitter(playbackManager, mediaToastRegistry)
 
 	// Velella: the user's zoom mode for the picture; subtitles stay inside the whole (fitted) picture so none is cut off
 	val userPreferences = koinInject<UserPreferences>()
@@ -101,11 +102,14 @@ fun VideoPlayerScreen(
 		// Velella: next up or still watching replace the controls while the queue holds (the controls would take the focus back)
 		val next = heldNext
 		when (playerOverlay(prompt, holding = next != null)) {
-			PlayerOverlay.CONTROLS -> VideoPlayerOverlay(
-				playbackManager = playbackManager,
-				mediaToastRegistry = mediaToastRegistry,
-				liveTvSwitch = liveTvSwitch,
-			)
+			// Velella: the controls' play/pause button shows its icons through the registry too
+			PlayerOverlay.CONTROLS -> CompositionLocalProvider(LocalMediaToastRegistry provides mediaToastRegistry) {
+				VideoPlayerOverlay(
+					playbackManager = playbackManager,
+					mediaToastRegistry = mediaToastRegistry,
+					liveTvSwitch = liveTvSwitch,
+				)
+			}
 
 			PlayerOverlay.END_OF_ENTRY -> if (next != null) EndOfEntryOverlay(playbackManager, prompt, next, onClose = close)
 			PlayerOverlay.NONE -> Unit
