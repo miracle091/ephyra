@@ -1,15 +1,11 @@
 package org.jellyfin.androidtv.ui.playback.nextup
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.ViewGroup
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
@@ -20,8 +16,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -36,15 +30,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.fragment.app.Fragment
-import androidx.fragment.compose.content
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jellyfin.androidtv.R
-import org.jellyfin.androidtv.data.service.BackgroundService
 import org.jellyfin.androidtv.preference.UserPreferences
 import org.jellyfin.androidtv.preference.constant.NEXTUP_TIMER_DISABLED
-import org.jellyfin.androidtv.ui.background.AppBackground
 import org.jellyfin.androidtv.ui.base.JellyfinTheme
 import org.jellyfin.androidtv.ui.base.LocalTextStyle
 import org.jellyfin.androidtv.ui.base.ProvideTextStyle
@@ -55,81 +45,10 @@ import org.jellyfin.androidtv.ui.composable.AsyncImage
 import org.jellyfin.androidtv.ui.composable.AsyncImageSource
 import org.jellyfin.androidtv.ui.composable.FixedMotionDurationScale
 import org.jellyfin.androidtv.ui.composable.modifier.overscan
-import org.jellyfin.androidtv.ui.navigation.Destinations
-import org.jellyfin.androidtv.ui.navigation.NavigationRepository
 import org.jellyfin.androidtv.util.apiclient.JellyfinImage
 import org.jellyfin.androidtv.util.apiclient.getUrl
 import org.jellyfin.sdk.api.client.ApiClient
-import org.jellyfin.sdk.model.serializer.toUUIDOrNull
-import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
-import java.util.UUID
-
-@Composable
-fun NextUpScreen(
-	itemId: UUID,
-) {
-	val api = koinInject<ApiClient>()
-	val navigationRepository = koinInject<NavigationRepository>()
-	val backgroundService = koinInject<BackgroundService>()
-	val viewModel = koinViewModel<NextUpViewModel>()
-
-	val state by viewModel.state.collectAsState()
-
-	LaunchedEffect(itemId) {
-		viewModel.setItemId(itemId)
-	}
-
-	val item by viewModel.item.collectAsState()
-	if (item == null) return
-
-	LaunchedEffect(Unit) {
-		backgroundService.clearBackgrounds()
-	}
-
-	LaunchedEffect(state) {
-		when (state) {
-			// Open next item
-			NextUpState.PLAY_NEXT -> navigationRepository.navigate(Destinations.videoPlayer(0), true)
-			// Close activity
-			NextUpState.CLOSE -> navigationRepository.goBack()
-			// Unknown state
-			else -> Unit
-		}
-	}
-
-	val focusRequester = remember { FocusRequester() }
-
-	Box {
-		AppBackground()
-
-		// Logo
-		item?.logo?.let { logo ->
-			AsyncImage(
-				modifier = Modifier
-					.align(Alignment.TopStart)
-					.overscan()
-					.height(75.dp),
-				source = AsyncImageSource(url = logo.getUrl(api), blurHash = logo.blurHash),
-				aspectRatio = logo.aspectRatio ?: 1f,
-			)
-		}
-
-		// Overlay
-		NextUpOverlay(
-			modifier = Modifier
-				.align(Alignment.BottomCenter)
-				.focusRequester(focusRequester),
-			item = requireNotNull(item),
-			onConfirm = { viewModel.playNext() },
-			onCancel = { viewModel.close() },
-		)
-	}
-
-	LaunchedEffect(focusRequester) {
-		focusRequester.requestFocus()
-	}
-}
 
 @Composable
 private fun rememberConfirmTimer(item: NextUpItemData, onConfirm: () -> Unit): Animatable<Float, AnimationVector1D> {
@@ -253,25 +172,6 @@ fun NextUpOverlay(
 			Spacer(Modifier.height(16.dp))
 
 			NextUpButtons(onCancel, onConfirm, confirmTimer, focusRequester)
-		}
-	}
-}
-
-class NextUpFragment : Fragment() {
-	companion object {
-		const val ARGUMENT_ITEM_ID = "item_id"
-	}
-
-	override fun onCreateView(
-		inflater: LayoutInflater,
-		container: ViewGroup?,
-		savedInstanceState: Bundle?,
-	) = content {
-		val id = remember(arguments) { arguments?.getString(ARGUMENT_ITEM_ID)?.toUUIDOrNull() }
-		if (id != null) {
-			NextUpScreen(
-				itemId = id,
-			)
 		}
 	}
 }

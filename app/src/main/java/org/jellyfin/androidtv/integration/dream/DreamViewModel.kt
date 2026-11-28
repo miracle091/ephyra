@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.jellyfin.androidtv.integration.dream.model.DreamContent
-import org.jellyfin.androidtv.ui.playback.PlaybackControllerContainer
 import org.jellyfin.playback.core.PlaybackManager
 import org.jellyfin.playback.core.mediastream.mediatype.MediaType
 import org.jellyfin.playback.core.mediastream.mediatype.mediaType
@@ -16,7 +15,6 @@ import org.jellyfin.playback.jellyfin.queue.baseItem
 
 class DreamViewModel(
 	private val playbackManager: PlaybackManager,
-	private val playbackControllerContainer: PlaybackControllerContainer,
 ) : ViewModel() {
 	// Velella: a video paused in the player, else what is playing, else the clock (no library showcase)
 	val content: Flow<DreamContent> = playbackManager.queue.entry.map(::contentFor)
@@ -34,18 +32,11 @@ class DreamViewModel(
 			?.let { baseItem -> DreamContent.NowPlaying(entry, baseItem) }
 		?: DreamContent.Clock
 
-	private fun pausedVideo(): DreamContent.VideoPaused? = legacyPausedVideo() ?: pausedVideoContent(
+	private fun pausedVideo(): DreamContent.VideoPaused? = pausedVideoContent(
 		playState = playbackManager.state.playState.value,
 		entry = playbackManager.queue.entry.value,
 		position = { playbackManager.state.positionInfo },
 	)
-
-	private fun legacyPausedVideo(): DreamContent.VideoPaused? {
-		val controller = playbackControllerContainer.playbackController ?: return null
-		if (!controller.isPaused || controller.isLiveTv) return null
-		val item = controller.currentlyPlayingItem ?: return null
-		return DreamContent.VideoPaused(item, controller.currentPosition, controller.duration)
-	}
 }
 
 /** Velella: the new player's paused video for the screensaver, or null when it plays no video or isn't paused. */

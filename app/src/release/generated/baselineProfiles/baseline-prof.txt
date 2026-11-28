@@ -19428,9 +19428,7 @@ SPLorg/jellyfin/androidtv/ui/navigation/RouterKt$$ExternalSyntheticLambda2;-><in
 Lorg/jellyfin/androidtv/ui/navigation/RouterKt$$ExternalSyntheticLambda9;
 SPLorg/jellyfin/androidtv/ui/navigation/RouterKt$$ExternalSyntheticLambda9;-><init>()V
 Lorg/jellyfin/androidtv/ui/playback/MediaManager;
-Lorg/jellyfin/androidtv/ui/playback/PlaybackControllerContainer;
 Lorg/jellyfin/androidtv/ui/playback/PlaybackLauncher;
-Lorg/jellyfin/androidtv/ui/playback/PlaybackManager;
 Lorg/jellyfin/androidtv/ui/playback/VideoQueueManager;
 Lorg/jellyfin/androidtv/ui/playback/external/DefaultExternalPlayerApi;
 Lorg/jellyfin/androidtv/ui/playback/external/ExternalPlayerApi;
@@ -19982,7 +19980,6 @@ SPLorg/jellyfin/androidtv/util/ThemeViewModel;-><clinit>()V
 SPLorg/jellyfin/androidtv/util/ThemeViewModel;-><init>()V
 SPLorg/jellyfin/androidtv/util/ThemeViewModel;->getTheme()Lorg/jellyfin/androidtv/preference/constant/AppTheme;
 SPLorg/jellyfin/androidtv/util/ThemeViewModel;->setTheme(Lorg/jellyfin/androidtv/preference/constant/AppTheme;)V
-Lorg/jellyfin/androidtv/util/apiclient/ReportingHelper;
 Lorg/jellyfin/androidtv/util/coil/CoilConnectivityCheckerKt;
 Lorg/jellyfin/androidtv/util/coil/CoilTimberLogger;
 SPLorg/jellyfin/androidtv/util/coil/CoilTimberLogger;-><clinit>()V

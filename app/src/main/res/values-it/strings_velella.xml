@@ -11,8 +11,6 @@
     <string name="velella_tv_provider_enabled_description">Mostra i canali e i suggerimenti di Velella nella schermata home di Android TV</string>
     <string name="velella_screensaver_inapp_enabled_description">Mostra il salvaschermo di Velella mentre l\'app è aperta</string>
     <string name="velella_video_player_external_empty">Non hai installato sul tuo dispositivo nessun lettore video che possa aprire questi video.</string>
-    <string name="velella_video_player_legacy">Lettore video precedente</string>
-    <string name="velella_video_player_legacy_description">Resta come ripiego per questa versione, poi verrà rimosso</string>
     <string name="velella_app_version">Versione di Velella</string>
 
     <string name="velella_update_check">Cerca aggiornamenti</string>

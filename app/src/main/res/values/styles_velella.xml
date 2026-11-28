@@ -63,15 +63,6 @@
         <item name="android:textStyle">bold</item>
     </style>
 
-    <!-- Velella: the video player's times and end time under the seek bar, 14sp medium ink-muted with even-width digits -->
-    <style name="TextAppearance.Velella.OsdTime" parent="">
-        <item name="android:textColor">?attr/controlIconForegroundInactive</item>
-        <item name="android:textSize">14sp</item>
-        <item name="android:fontFamily">@font/atkinson_hyperlegible_next_family</item>
-        <item name="android:fontFeatureSettings">tnum</item>
-        <item name="android:layout_marginTop">8dp</item>
-    </style>
-
     <!-- Velella: the video player's overline over the title, like the details' genres but in ink-muted -->
     <style name="TextAppearance.Velella.OsdOverline" parent="">
         <item name="android:textColor">?attr/controlIconForegroundInactive</item>

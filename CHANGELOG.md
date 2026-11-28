@@ -27,9 +27,8 @@ section 2(a) of the GPL-2.0.
 
 ### Changed
 
-- Videos and live TV play in the new player for everyone, also after an update from a version that used the old
-  one. The old player stays for this release only in debug builds, as "Previous video player" in Settings > Playback >
-  Video player; it will be removed in the next release.
+- Videos and live TV play in the new player for everyone, also after an update from a version that used the old one
+  (the old player is gone, see Removed).
 - The live TV guide is easier to read: a wider time scale (about two hours across instead of two and a half), so
   short programmes keep their titles and no programme is narrower than a quarter of an hour; only half-hour marks on
   the time line; the grid starts at the half hour now falls in; the focused row always stays whole on screen; the rows
@@ -174,6 +173,9 @@ section 2(a) of the GPL-2.0.
 
 ### Removed
 
+- The old video player (the Leanback one, with its own controls, next up and still watching screens): every video
+  and live channel plays in the new player, so Settings > Playback > Video player offers the built-in player and the
+  external apps only. Remote control from another Jellyfin app goes through the new player's own handling.
 - The More like this row on the details of films, trailers and shows.
 - The home's On now row and its Live TV home section (the Live TV screen's spotlight shows what is on air; a home slot
   set to it falls back to its default), and the Recordings card among the home's libraries (the Live TV screen opens

@@ -1,11 +1,8 @@
 package org.jellyfin.androidtv.ui.playback
 
 import android.content.Context
-import android.widget.TextView
 import androidx.annotation.StringRes
-import androidx.core.view.isVisible
 import org.jellyfin.androidtv.R
-import org.jellyfin.androidtv.data.compat.StreamInfo
 import org.jellyfin.sdk.model.api.PlayMethod
 import org.jellyfin.sdk.model.api.TranscodeReason
 import java.net.URLDecoder
@@ -37,14 +34,6 @@ object PlayInfo {
 
 		val reasons = transcodeReasons(transcodingUrl).map { context.getString(it.label) }
 		return if (reasons.isEmpty()) method else context.getString(R.string.velella_play_info_with_reasons, method, reasons.joinToString())
-	}
-
-	/** Shows the line for [streamInfo] in [view], or hides the view while no stream is known. */
-	@JvmStatic
-	fun bind(view: TextView, streamInfo: StreamInfo?) {
-		val text = streamInfo?.let { describe(view.context, it.playMethod, it.mediaSource?.transcodingUrl) }
-		view.text = text
-		view.isVisible = text != null
 	}
 
 	@get:StringRes

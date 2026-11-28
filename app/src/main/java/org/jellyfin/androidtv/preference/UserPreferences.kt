@@ -194,11 +194,6 @@ class UserPreferences(context: Context) : SharedPreferenceStore(
 		var debuggingEnabled = booleanPreference("pref_enable_debug", false)
 
 		/**
-		 * Use playback rewrite module for video. Velella: the default since v0.6.0; false picks the old player, kept as a hidden fallback
-		 */
-		var playbackRewriteVideoEnabled = booleanPreference("playback_new", true)
-
-		/**
 		 * When to show the clock.
 		 */
 		var clockBehavior = enumPreference("pref_clock_behavior", ClockBehavior.ALWAYS)
@@ -342,8 +337,8 @@ class UserPreferences(context: Context) : SharedPreferenceStore(
 
 			// Velella v0.5.z to v0.6.0
 			migration(toVersion = 10) {
-				// Move everyone to the new video player, also users who picked the old built-in one
-				putBoolean("playback_new", true)
+				// The old video player is gone, and with it the choice between the two
+				remove("playback_new")
 			}
 		}
 	}

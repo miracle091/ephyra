@@ -11,7 +11,6 @@ import kotlinx.coroutines.withContext
 import org.jellyfin.androidtv.R
 import org.jellyfin.androidtv.data.repository.ItemRepository
 import org.jellyfin.androidtv.preference.UserPreferences
-import org.jellyfin.androidtv.ui.playback.PlaybackControllerContainer
 import org.jellyfin.androidtv.ui.playback.PlaybackLauncher
 import org.jellyfin.androidtv.ui.playback.QueueStart
 import org.jellyfin.androidtv.ui.player.video.isVideoInProgress
@@ -35,7 +34,6 @@ class SdkPlaybackHelper(
 	private val api: ApiClient,
 	private val userPreferences: UserPreferences,
 	private val playbackLauncher: PlaybackLauncher,
-	private val playbackControllerContainer: PlaybackControllerContainer,
 	// Velella: the new player, so a playback started while it plays a video replaces its screen
 	private val playbackManager: PlaybackManager,
 ) : PlaybackHelper {
@@ -173,7 +171,7 @@ class SdkPlaybackHelper(
 				context,
 				items,
 				pos.inWholeMilliseconds.toInt(),
-				playbackControllerContainer.playbackController?.hasFragment() == true || playbackManager.isVideoInProgress,
+				playbackManager.isVideoInProgress,
 				QueueStart(0, shuffle),
 			)
 		}
@@ -200,7 +198,7 @@ class SdkPlaybackHelper(
 				context,
 				items,
 				pos.inWholeMilliseconds.toInt(),
-				playbackControllerContainer.playbackController?.hasFragment() == true || playbackManager.isVideoInProgress,
+				playbackManager.isVideoInProgress,
 				QueueStart(index ?: 0, shuffle),
 			)
 		}

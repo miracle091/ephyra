@@ -4,7 +4,6 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
-import org.jellyfin.androidtv.data.compat.VideoOptions
 import org.jellyfin.androidtv.ui.itemdetail.DetailsTrackButtons
 import org.jellyfin.sdk.model.api.BaseItemDto
 import org.jellyfin.sdk.model.api.BaseItemKind
@@ -42,46 +41,16 @@ class TrackPreselectionTest : FunSpec({
 	val other = source("other", stream(0, MediaStreamType.VIDEO, null), stream(1, MediaStreamType.AUDIO, "eng"))
 	fun movie(vararg sources: MediaSourceInfo) = BaseItemDto(id = itemId, type = BaseItemKind.MOVIE, mediaSources = sources.toList())
 
-	test("the exact picked tracks go into the request, with their languages saved") {
-		val preselection = TrackPreselection()
-		val queue = VideoQueueManager()
-		preselection.pickAudio(itemId, main.id, 2)
-		preselection.pickSubtitle(itemId, main.id, 5)
-
-		val options = VideoOptions()
-		applyTrackPreselection(options, movie(main), main, preselection, queue)
-
-		options.audioStreamIndex shouldBe 2
-		options.subtitleStreamIndex shouldBe 5
-		queue.getLastPlayedAudioLanguageIsoCode() shouldBe "eng"
-		queue.getLastPlayedSubtitleLanguageIsoCode() shouldBe "eng"
-	}
-
-	test("subtitles off are sent as -1 and saved as an empty language") {
-		val preselection = TrackPreselection()
-		val queue = VideoQueueManager()
-		preselection.pickSubtitle(itemId, main.id, SUBTITLES_OFF)
-
-		val options = VideoOptions().apply { audioStreamIndex = 3 }
-		applyTrackPreselection(options, movie(main), main, preselection, queue)
-
-		options.subtitleStreamIndex shouldBe SUBTITLES_OFF
-		options.audioStreamIndex shouldBe 3 // not picked: left as the player set it
-		queue.getLastPlayedSubtitleLanguageIsoCode() shouldBe ""
-	}
-
 	test("a pick applies once, and only to its item and version") {
 		val preselection = TrackPreselection()
-		val queue = VideoQueueManager()
 		preselection.pickAudio(itemId, main.id, 3)
 
 		// An intro or another version plays first: the pick waits
-		val intro = BaseItemDto(id = UUID.randomUUID(), type = BaseItemKind.TRAILER)
-		VideoOptions().also { applyTrackPreselection(it, intro, other, preselection, queue) }.audioStreamIndex shouldBe null
-		VideoOptions().also { applyTrackPreselection(it, movie(main), other, preselection, queue) }.audioStreamIndex shouldBe null
+		preselection.take(UUID.randomUUID(), other.id) shouldBe null
+		preselection.take(itemId, other.id) shouldBe null
 
-		VideoOptions().also { applyTrackPreselection(it, movie(main), main, preselection, queue) }.audioStreamIndex shouldBe 3
-		VideoOptions().also { applyTrackPreselection(it, movie(main), main, preselection, queue) }.audioStreamIndex shouldBe null
+		preselection.take(itemId, main.id)?.audioIndex shouldBe 3
+		preselection.take(itemId, main.id) shouldBe null
 	}
 
 	test("the played media source is the one with the item's id, else the first") {

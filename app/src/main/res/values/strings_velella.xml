@@ -19,9 +19,6 @@
     <string name="velella_tv_provider_enabled_description">Show Velella channels and recommendations on the Android TV home screen</string>
     <string name="velella_screensaver_inapp_enabled_description">Show the Velella screensaver while the app is open</string>
     <string name="velella_video_player_external_empty">You don\'t have any video player apps installed on your device that can open these videos.</string>
-    <!-- Old built-in player, a hidden fallback in Settings, Playback, Video player (debug builds only) -->
-    <string name="velella_video_player_legacy">Previous video player</string>
-    <string name="velella_video_player_legacy_description">Kept as a fallback for this release, then removed</string>
     <string name="velella_app_version">Velella version</string>
 
     <!-- Updates from GitHub Releases (Settings, About) -->

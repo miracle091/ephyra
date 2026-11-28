@@ -8,13 +8,4 @@
         <item name="android:letterSpacing">0</item>
         <item name="android:textAllCaps">false</item>
     </style>
-
-    <!-- Velella: the design system's danger badge, 20dp high, 4dp radius, bold 11sp caps -->
-    <style name="TextAppearance.Velella.OsdBadge" parent="">
-        <item name="android:textColor">@color/velella_osd_on_danger</item>
-        <item name="android:textSize">11sp</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:letterSpacing">0.06</item>
-        <item name="android:textAllCaps">true</item>
-    </style>
 </resources>

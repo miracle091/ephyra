@@ -17,9 +17,6 @@ import org.jellyfin.androidtv.data.model.DataRefreshService
 import org.jellyfin.androidtv.ui.itemhandling.ItemLauncher
 import org.jellyfin.androidtv.ui.navigation.Destinations
 import org.jellyfin.androidtv.ui.navigation.NavigationRepository
-import org.jellyfin.androidtv.ui.playback.MediaManager
-import org.jellyfin.androidtv.ui.playback.PlaybackControllerContainer
-import org.jellyfin.androidtv.ui.playback.setSubtitleIndex
 import org.jellyfin.androidtv.ui.player.video.isVideoInProgress
 import org.jellyfin.androidtv.util.PlaybackHelper
 import org.jellyfin.playback.core.PlaybackManager
@@ -36,11 +33,8 @@ import org.jellyfin.sdk.model.api.LibraryChangedMessage
 import org.jellyfin.sdk.model.api.LibraryUpdateInfo
 import org.jellyfin.sdk.model.api.MediaType
 import org.jellyfin.sdk.model.api.PlayMessage
-import org.jellyfin.sdk.model.api.PlaystateCommand
-import org.jellyfin.sdk.model.api.PlaystateMessage
 import org.jellyfin.sdk.model.extensions.get
 import org.jellyfin.sdk.model.extensions.getValue
-import org.jellyfin.sdk.model.extensions.ticks
 import org.jellyfin.sdk.model.serializer.toUUIDOrNull
 import timber.log.Timber
 import java.time.Instant
@@ -50,8 +44,6 @@ import java.util.UUID
  * The playback related collaborators of [SocketHandler].
  */
 class SocketPlaybackDependencies(
-	val mediaManager: MediaManager,
-	val playbackControllerContainer: PlaybackControllerContainer,
 	val playbackHelper: PlaybackHelper,
 	// Velella: the new player, so a video playing there is not interrupted either
 	val playbackManager: PlaybackManager,
@@ -74,8 +66,6 @@ class SocketHandler(
 	private val audioManager: AudioManager,
 	private val lifecycle: Lifecycle,
 ) {
-	private val mediaManager = playback.mediaManager
-	private val playbackControllerContainer = playback.playbackControllerContainer
 	private val playbackHelper = playback.playbackHelper
 	private val playbackManager = playback.playbackManager
 	private val dataRefreshService = browsing.dataRefreshService
@@ -133,29 +123,7 @@ class SocketHandler(
 			.onEach { message -> onPlayMessage(message) }
 			.launchIn(coroutineScope)
 
-		subscribe<PlaystateMessage>()
-			.onEach { message -> onPlayStateMessage(message) }
-			.launchIn(coroutineScope)
-
-		subscribeGeneralCommand(GeneralCommandType.SET_SUBTITLE_STREAM_INDEX)
-			.onEach { message ->
-				val index = message["index"]?.toIntOrNull() ?: return@onEach
-
-				withContext(Dispatchers.Main) {
-					playbackControllerContainer.playbackController?.setSubtitleIndex(index)
-				}
-			}
-			.launchIn(coroutineScope)
-
-		subscribeGeneralCommand(GeneralCommandType.SET_AUDIO_STREAM_INDEX)
-			.onEach { message ->
-				val index = message["index"]?.toIntOrNull() ?: return@onEach
-
-				withContext(Dispatchers.Main) {
-					playbackControllerContainer.playbackController?.switchAudioStream(index)
-				}
-			}
-			.launchIn(coroutineScope)
+		// Velella: play state, audio and subtitle track commands are handled by the player's PlaySessionSocketService
 
 		// General commands
 		subscribeGeneralCommand(GeneralCommandType.DISPLAY_CONTENT)
@@ -211,43 +179,8 @@ class SocketHandler(
 		}.onFailure { Timber.w(it, "Failed to start playback") }
 	}
 
-	@Suppress("ComplexMethod")
-	private suspend fun onPlayStateMessage(message: PlaystateMessage) = withContext(Dispatchers.Main) {
-		Timber.i("Received PlayStateMessage with command ${message.data?.command}")
-
-		// Audio playback uses (Rewrite)MediaManager, (legacy) video playback uses playbackController
-		when {
-			mediaManager.hasAudioQueueItems() -> {
-				Timber.i("Ignoring PlayStateMessage: should be handled by PlaySessionSocketService")
-				return@withContext
-			}
-
-			// PlaybackController
-			else -> {
-				val playbackController = playbackControllerContainer.playbackController
-				when (message.data?.command) {
-					PlaystateCommand.STOP -> playbackController?.endPlayback(true)
-					PlaystateCommand.PAUSE, PlaystateCommand.UNPAUSE, PlaystateCommand.PLAY_PAUSE -> playbackController?.playPause()
-					PlaystateCommand.NEXT_TRACK -> playbackController?.next()
-					PlaystateCommand.PREVIOUS_TRACK -> playbackController?.prev()
-					PlaystateCommand.SEEK -> playbackController?.seek(
-						message.data?.seekPositionTicks?.ticks?.inWholeMilliseconds ?: 0
-					)
-
-					PlaystateCommand.REWIND -> playbackController?.rewind()
-					PlaystateCommand.FAST_FORWARD -> playbackController?.fastForward()
-
-					null -> Unit
-				}
-			}
-		}
-	}
-
 	private suspend fun onDisplayContent(itemId: UUID, itemKind: BaseItemKind) = withContext(Dispatchers.Main) {
-		val playbackController = playbackControllerContainer.playbackController
-
-		val legacyPlaying = playbackController?.isPlaying == true || playbackController?.isPaused == true
-		if (legacyPlaying || playbackManager.isVideoInProgress) {
+		if (playbackManager.isVideoInProgress) {
 			Timber.i("Not launching $itemId: playback in progress")
 			return@withContext
 		}

@@ -1,11 +1,8 @@
 package org.jellyfin.androidtv.ui.playback
 
-import org.jellyfin.androidtv.data.compat.VideoOptions
 import org.jellyfin.sdk.model.api.BaseItemDto
 import org.jellyfin.sdk.model.api.MediaSourceInfo
-import org.jellyfin.sdk.model.api.MediaStreamType
 import org.jellyfin.sdk.model.serializer.toUUIDOrNull
-import org.koin.java.KoinJavaComponent
 import java.util.UUID
 
 /** Velella: subtitle index that means "no subtitles", as the server reads it (shared with the new player). */
@@ -45,41 +42,3 @@ class TrackPreselection {
 /** Velella: the media source the legacy player picks for [this] item: the one with the item's id, or the first. */
 val BaseItemDto.playedMediaSource: MediaSourceInfo?
 	get() = mediaSources?.let { sources -> sources.firstOrNull { it.id?.toUUIDOrNull() == id } ?: sources.firstOrNull() }
-
-/**
- * Velella: puts the tracks picked on the details screen for [item] into the request [options], so the server builds the stream
- * with them from the start. The languages are saved as the "last played" ones too, as a pick in the player would, so the
- * player keeps the picked subtitle once the stream starts and the next episodes follow the same languages.
- */
-fun applyTrackPreselection(options: VideoOptions, item: BaseItemDto, mediaSource: MediaSourceInfo?) = applyTrackPreselection(
-	options = options,
-	item = item,
-	mediaSource = mediaSource,
-	preselection = KoinJavaComponent.get(TrackPreselection::class.java),
-	queue = KoinJavaComponent.get(VideoQueueManager::class.java),
-)
-
-internal fun applyTrackPreselection(
-	options: VideoOptions,
-	item: BaseItemDto,
-	mediaSource: MediaSourceInfo?,
-	preselection: TrackPreselection,
-	queue: VideoQueueManager,
-) {
-	val choice = preselection.take(item.id, mediaSource?.id) ?: return
-	val streams = mediaSource?.mediaStreams.orEmpty()
-
-	choice.audioIndex?.let { index ->
-		options.audioStreamIndex = index
-		streams.firstOrNull { it.index == index && it.type == MediaStreamType.AUDIO }?.let(queue::setLastPlayedAudioTrack)
-	}
-	choice.subtitleIndex?.let { index ->
-		options.subtitleStreamIndex = index
-		val stream = streams.firstOrNull { it.index == index }
-		when {
-			index == SUBTITLES_OFF -> queue.setLastPlayedSubtitleLanguageIsoCode("")
-			stream != null -> queue.setLastPlayedSubtitleTrack(stream)
-			else -> queue.setLastPlayedSubtitleLanguageIsoCode(null)
-		}
-	}
-}

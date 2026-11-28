@@ -6,19 +6,15 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil3.compose.rememberAsyncImagePainter
-import org.jellyfin.androidtv.BuildConfig
 import org.jellyfin.androidtv.R
 import org.jellyfin.androidtv.data.repository.ExternalAppRepository
-import org.jellyfin.androidtv.preference.UserPreferences
 import org.jellyfin.androidtv.ui.base.LocalShapes
 import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.base.form.RadioButton
@@ -28,14 +24,12 @@ import org.jellyfin.androidtv.ui.base.list.ListMessage
 import org.jellyfin.androidtv.ui.base.list.ListSection
 import org.jellyfin.androidtv.ui.navigation.LocalRouter
 import org.jellyfin.androidtv.ui.navigation.focus.focusKey
-import org.jellyfin.androidtv.ui.settings.compat.rememberPreference
 import org.jellyfin.androidtv.ui.settings.composable.SettingsColumn
 import org.jellyfin.androidtv.util.componentName
 import org.koin.compose.koinInject
 
 @Composable
 fun SettingsPlaybackPlayerScreen() {
-	val userPreferences = koinInject<UserPreferences>()
 	val externalAppRepository = koinInject<ExternalAppRepository>()
 	val context = LocalContext.current
 	val router = LocalRouter.current
@@ -43,29 +37,13 @@ fun SettingsPlaybackPlayerScreen() {
 	val externalPlayerApps = remember(context) { externalAppRepository.getExternalPlayerApps(context) }
 	val currentExternalPlayer = remember(context) { externalAppRepository.getCurrentExternalPlayerApp(context) }
 
-	var playbackRewriteVideoEnabled by rememberPreference(userPreferences, UserPreferences.playbackRewriteVideoEnabled)
-	// Velella: the old player stays for one release as a fallback in debug builds only; release builds always use the new one
-	val showLegacyPlayer = BuildConfig.DEBUG
-
 	SettingsColumn {
 		item { PlayerHeader() }
 
 		item {
 			InternalPlayerButton(
-				selected = currentExternalPlayer == null && playbackRewriteVideoEnabled,
+				selected = currentExternalPlayer == null,
 				onClick = {
-					playbackRewriteVideoEnabled = true
-					externalAppRepository.setExternalPlayerapp(null)
-					router.back()
-				},
-			)
-		}
-
-		if (showLegacyPlayer) item {
-			LegacyPlayerButton(
-				selected = currentExternalPlayer == null && !playbackRewriteVideoEnabled,
-				onClick = {
-					playbackRewriteVideoEnabled = false
 					externalAppRepository.setExternalPlayerapp(null)
 					router.back()
 				},
@@ -111,20 +89,6 @@ private fun InternalPlayerButton(selected: Boolean, onClick: () -> Unit) {
 			heading = stringResource(R.string.app_name),
 			caption = stringResource(R.string.video_player_internal),
 			key = "player_internal",
-			selected = selected,
-		),
-		onClick = onClick,
-	)
-}
-
-@Composable
-private fun LegacyPlayerButton(selected: Boolean, onClick: () -> Unit) {
-	PlayerOptionButton(
-		option = PlayerOption(
-			iconModel = R.drawable.ic_flask,
-			heading = stringResource(R.string.velella_video_player_legacy),
-			caption = stringResource(R.string.velella_video_player_legacy_description),
-			key = "player_legacy",
 			selected = selected,
 		),
 		onClick = onClick,

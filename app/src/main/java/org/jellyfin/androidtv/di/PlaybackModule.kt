@@ -41,10 +41,8 @@ import org.koin.core.scope.Scope
 import org.koin.dsl.module
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
-import org.jellyfin.androidtv.ui.playback.PlaybackManager as LegacyPlaybackManager
 
 val playbackModule = module {
-	single { LegacyPlaybackManager(get(), get()) }
 	single { VideoQueueManager() }
 	single { TrackPreselection() } // Velella: tracks picked on the details screen
 	single<MediaManager> { RewriteMediaManager(get(), get()) }

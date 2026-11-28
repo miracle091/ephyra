@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Velella: the video player's bottom shade, from the design system's OSD scrim -->
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="rectangle">
-    <gradient
-        android:angle="90"
-        android:endColor="#00050814"
-        android:startColor="#E0050814" />
-</shape>

@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.jellyfin.androidtv.preference.UserPreferences
-import org.jellyfin.androidtv.ui.playback.PlaybackControllerContainer
 import org.jellyfin.androidtv.ui.player.video.isVideoPaused
 import org.jellyfin.playback.core.PlaybackManager
 import org.jellyfin.sdk.model.api.BaseItemDto
@@ -27,7 +26,6 @@ fun screensaverDelay(timeout: Duration, videoPaused: Boolean): Duration = if (vi
 
 class InteractionTrackerViewModel(
 	private val userPreferences: UserPreferences,
-	private val playbackControllerContainer: PlaybackControllerContainer,
 	// Velella: the new player, so a video paused there counts too
 	private val playbackManager: PlaybackManager,
 ) : ViewModel() {
@@ -49,7 +47,7 @@ class InteractionTrackerViewModel(
 	private val timeout get() = userPreferences[UserPreferences.screensaverInAppTimeout].milliseconds
 	private val stillWatchingBehavior get() = userPreferences[UserPreferences.stillWatchingBehavior]
 	private val videoPaused
-		get() = playbackControllerContainer.playbackController?.let { it.isPaused && !it.isLiveTv } == true || playbackManager.isVideoPaused
+		get() = playbackManager.isVideoPaused
 
 	// State
 
@@ -90,9 +88,7 @@ class InteractionTrackerViewModel(
 		resetSession()
 	}
 
-	fun onEpisodeWatched() = onEpisodeWatched(playbackControllerContainer.playbackController?.duration ?: 0)
-
-	// Velella: the new player passes its own entry's length
+	// Velella: the player passes its own entry's length
 	fun onEpisodeWatched(durationMs: Long) {
 		if (!episodeWasInterrupted) episodeCount++
 		watchTime += durationMs
