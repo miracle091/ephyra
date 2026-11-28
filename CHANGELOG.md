@@ -196,6 +196,8 @@ section 2(a) of the GPL-2.0.
 
 ### Fixed
 
+- In the video player, the first press of right just after the controls appear moves to the next button again: the
+  play/pause button now takes the focus as soon as the controls show, not at the end of their slide in.
 - A screen opened from navigation no longer stays blank now and then, and a freshly created screen gets its arguments
   (upstream fixes `5e9140df4` and `8653f7b06`). An empty library grid no longer crashes when the focus moves (upstream
   `10d01122a`).

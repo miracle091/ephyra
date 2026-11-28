@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -34,7 +35,6 @@ import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.onVisibilityChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -204,6 +204,10 @@ private fun PlayPauseButton(
 	playState: PlayState,
 	focusRequester: FocusRequester,
 ) {
+	// Velella: take the focus as soon as the controls appear. onVisibilityChanged waited until the button was fully on screen, at
+	// the end of the controls' slide in, so a right press during the slide found no focused button and was lost
+	LaunchedEffect(focusRequester) { focusRequester.requestFocus() }
+
 	IconButton(
 		onClick = {
 			when (playState) {
@@ -214,11 +218,7 @@ private fun PlayPauseButton(
 				PlayState.PAUSED -> playbackManager.state.unpause()
 			}
 		},
-		modifier = Modifier
-			.focusRequester(focusRequester)
-			.onVisibilityChanged {
-				focusRequester.requestFocus()
-			}
+		modifier = Modifier.focusRequester(focusRequester)
 	) {
 		AnimatedContent(playState) { playState ->
 			when (playState) {
