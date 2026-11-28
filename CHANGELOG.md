@@ -203,8 +203,8 @@ section 2(a) of the GPL-2.0.
   lists remember their focus (upstream `388e641a5`, `971257d77` and `1dc9390fb`).
 - The home button, clock and now playing bug of the details screen fade out while a row below the details is selected,
   so they no longer sit on top of the cards that scroll up under them.
-- Long cast and crew names no longer overlap the next card: they end with an ellipsis, and the selected card scrolls
-  its name and role inside the card.
+- Long cast and crew names no longer overlap the next card: a name or role longer than its card scrolls by itself
+  inside the card, on every card, with faded edges so neighbouring names stay apart; names that fit stay still.
 - A trailer shows a spinner while the Invidious instances are asked and the stream starts, instead of a black screen.
 - Down from the seek bar of the new player goes to play/pause, not to whichever button was nearest.
 - YouTube trailers play again: Invidious instances now answer with YouTube's own stream addresses even when asked for

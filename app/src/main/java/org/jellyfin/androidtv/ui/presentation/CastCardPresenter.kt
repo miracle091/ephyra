@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,15 +15,24 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.CompositingStrategy
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.findViewTreeCompositionContext
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -54,6 +64,7 @@ import org.koin.compose.koinInject
 private val CastImageHeight = 120.dp
 private val CastImageWidth = CastImageHeight * ImageHelper.ASPECT_RATIO_7_9.toFloat()
 private const val MARQUEE_DELAY_MS = 1500
+private val MarqueeFadeWidth = 8.dp
 
 /**
  * Velella: the compact cast card of the details screens: a 120dp-tall portrait picture (7:9) with rounded corners and, under
@@ -126,8 +137,6 @@ private fun CastCard(item: BaseRowItem, focused: Boolean) {
 	val name = item.getFullName(context)
 	val role = item.getSubText(context)
 	val image = item.getImage(ImageType.POSTER)
-	// Only the focused card scrolls a name or role longer than the card; the others ellipsize, so the texts never run into each other
-	val marquee = if (focused) Modifier.basicMarquee(iterations = Int.MAX_VALUE, initialDelayMillis = MARQUEE_DELAY_MS) else Modifier
 
 	Column(modifier = Modifier.width(CastImageWidth)) {
 		Box(
@@ -153,22 +162,49 @@ private fun CastCard(item: BaseRowItem, focused: Boolean) {
 
 		Spacer(Modifier.height(6.dp))
 
-		Text(
-			text = name.orEmpty(),
-			maxLines = 1,
-			overflow = TextOverflow.Ellipsis,
-			style = LocalTextStyle.current.merge(color = palette.ink, fontSize = 14.sp, fontWeight = FontWeight.Bold),
-			modifier = marquee,
-		)
+		CastLine(name.orEmpty(), LocalTextStyle.current.merge(color = palette.ink, fontSize = 14.sp, fontWeight = FontWeight.Bold))
 
 		if (!role.isNullOrBlank()) {
-			Text(
-				text = role,
-				maxLines = 1,
-				overflow = TextOverflow.Ellipsis,
-				style = LocalTextStyle.current.merge(color = palette.inkMuted, fontSize = 12.sp),
-				modifier = marquee,
-			)
+			CastLine(role, LocalTextStyle.current.merge(color = palette.inkMuted, fontSize = 12.sp))
 		}
 	}
 }
+
+/**
+ * A name or role line: on every card, focused or not, a line longer than the card scrolls by itself, with faded edges so the
+ * moving texts of neighbouring cards stay apart; a line that fits stays still and whole.
+ */
+@Composable
+private fun CastLine(text: String, style: TextStyle) {
+	BoxWithConstraints {
+		val measurer = rememberTextMeasurer()
+		val overflows = remember(text, style, constraints.maxWidth) {
+			measurer.measure(text, style, maxLines = 1, softWrap = false).size.width > constraints.maxWidth
+		}
+
+		Text(
+			text = text,
+			maxLines = 1,
+			overflow = TextOverflow.Ellipsis,
+			style = style,
+			modifier = if (overflows) {
+				Modifier
+					.fadedEdges()
+					.basicMarquee(iterations = Int.MAX_VALUE, initialDelayMillis = MARQUEE_DELAY_MS)
+			} else {
+				Modifier
+			},
+		)
+	}
+}
+
+private fun Modifier.fadedEdges() = graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
+	.drawWithContent {
+		drawContent()
+		// Only lines wider than the card get here, so the card is always much wider than the two fades
+		val edge = MarqueeFadeWidth.toPx() / size.width
+		drawRect(
+			brush = Brush.horizontalGradient(0f to Color.Transparent, edge to Color.Black, 1f - edge to Color.Black, 1f to Color.Transparent),
+			blendMode = BlendMode.DstIn,
+		)
+	}
