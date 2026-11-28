@@ -44,27 +44,28 @@ fun SettingsPlaybackPlayerScreen() {
 	val currentExternalPlayer = remember(context) { externalAppRepository.getCurrentExternalPlayerApp(context) }
 
 	var playbackRewriteVideoEnabled by rememberPreference(userPreferences, UserPreferences.playbackRewriteVideoEnabled)
-	val showNewPlayer = playbackRewriteVideoEnabled || BuildConfig.DEVELOPMENT
+	// Velella: the old player stays for one release as a fallback in debug builds only; release builds always use the new one
+	val showLegacyPlayer = BuildConfig.DEBUG
 
 	SettingsColumn {
 		item { PlayerHeader() }
 
 		item {
 			InternalPlayerButton(
-				selected = currentExternalPlayer == null && !playbackRewriteVideoEnabled,
+				selected = currentExternalPlayer == null && playbackRewriteVideoEnabled,
 				onClick = {
-					playbackRewriteVideoEnabled = false
+					playbackRewriteVideoEnabled = true
 					externalAppRepository.setExternalPlayerapp(null)
 					router.back()
 				},
 			)
 		}
 
-		if (showNewPlayer) item {
-			NewPlayerButton(
-				selected = currentExternalPlayer == null && playbackRewriteVideoEnabled,
+		if (showLegacyPlayer) item {
+			LegacyPlayerButton(
+				selected = currentExternalPlayer == null && !playbackRewriteVideoEnabled,
 				onClick = {
-					playbackRewriteVideoEnabled = true
+					playbackRewriteVideoEnabled = false
 					externalAppRepository.setExternalPlayerapp(null)
 					router.back()
 				},
@@ -117,13 +118,13 @@ private fun InternalPlayerButton(selected: Boolean, onClick: () -> Unit) {
 }
 
 @Composable
-private fun NewPlayerButton(selected: Boolean, onClick: () -> Unit) {
+private fun LegacyPlayerButton(selected: Boolean, onClick: () -> Unit) {
 	PlayerOptionButton(
 		option = PlayerOption(
 			iconModel = R.drawable.ic_flask,
-			heading = "New video player",
-			caption = stringResource(R.string.enable_playback_module_description),
-			key = "player_new",
+			heading = stringResource(R.string.velella_video_player_legacy),
+			caption = stringResource(R.string.velella_video_player_legacy_description),
+			key = "player_legacy",
 			selected = selected,
 		),
 		onClick = onClick,

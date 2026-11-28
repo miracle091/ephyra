@@ -27,6 +27,9 @@ section 2(a) of the GPL-2.0.
 
 ### Changed
 
+- Videos and live TV play in the new player for everyone, also after an update from a version that used the old
+  one. The old player stays for this release only in debug builds, as "Previous video player" in Settings > Playback >
+  Video player; it will be removed in the next release.
 - The live TV guide is easier to read: a wider time scale (about two hours across instead of two and a half), so
   short programmes keep their titles and no programme is narrower than a quarter of an hour; only half-hour marks on
   the time line; the grid starts at the half hour now falls in; the focused row always stays whole on screen; the rows

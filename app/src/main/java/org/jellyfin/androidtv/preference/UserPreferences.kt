@@ -194,9 +194,9 @@ class UserPreferences(context: Context) : SharedPreferenceStore(
 		var debuggingEnabled = booleanPreference("pref_enable_debug", false)
 
 		/**
-		 * Use playback rewrite module for video
+		 * Use playback rewrite module for video. Velella: the default since v0.6.0; false picks the old player, kept as a hidden fallback
 		 */
-		var playbackRewriteVideoEnabled = booleanPreference("playback_new", false)
+		var playbackRewriteVideoEnabled = booleanPreference("playback_new", true)
 
 		/**
 		 * When to show the clock.
@@ -338,6 +338,12 @@ class UserPreferences(context: Context) : SharedPreferenceStore(
 				// Reset subtitle text size as we changed from fractional sizing to absolute sizing
 				remove("subtitles_text_size")
 				// Velella: no item backdrops behind the screens, so the old backdrop setting is not carried over
+			}
+
+			// Velella v0.5.z to v0.6.0
+			migration(toVersion = 10) {
+				// Move everyone to the new video player, also users who picked the old built-in one
+				putBoolean("playback_new", true)
 			}
 		}
 	}
