@@ -12,6 +12,8 @@ section 2(a) of the GPL-2.0.
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-11-28
+
 ### Added
 
 - Release notes are written from this changelog: the release workflow fills `.github/release-template.md` with the
@@ -434,7 +436,8 @@ section 2(a) of the GPL-2.0.
 
 - Upstream's publish jobs (repo.jellyfin.org).
 
-[Unreleased]: https://github.com/miracle091/velella/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/miracle091/velella/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/miracle091/velella/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/miracle091/velella/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/miracle091/velella/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/miracle091/velella/compare/v0.2.0...v0.3.0
